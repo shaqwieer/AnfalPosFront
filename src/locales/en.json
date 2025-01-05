@@ -283,7 +283,9 @@
     "arabicNameLabel": "Arabic Name",
     "englishNameLabel": "English Name",
     "countryLabel": "Country",
-    "countryPlaceholder": "Choose Country"
+    "countryPlaceholder": "Choose Country",
+    "accountantEmail": "Accountant Email",
+    "address": "Address"
   },
   "organizationHeader": "Companies",
   "organizationDescription": "The Companies page provides comprehensive information about our affiliated partners, their missions, and the collaborative efforts we undertake together. Explore the diverse range of organizations we work with to understand how we contribute to our shared goals and community development.",
@@ -316,5 +318,31 @@
   "branch": {
     "Header": "Plants",
     "Description": "Plants under the organization are business units or entities operating under the umbrella of the parent organization. These companies are managed independently but adhere to the strategic goals and policies set by the organization. They may specialize in different fields or sectors that complement the parent organization's objectives, such as manufacturing, services, or technology."
+  },
+  "branchDialog": {
+    "requiredError": "This Field Is required",
+    "header": "Branch Management",
+    "generalInformation": "General Information ",
+    "sapInformation": "Sap Information",
+    "sapStorageLocation": "Sap Storage Location",
+    "sapStorageLocationPlaceholder": "Choose Sap Storage Location\t",
+    "cashJournal": "Cash Journal",
+    "cashJournalPlaceholder": "Choose Cash Journal",
+    "bankAccountsPlaceholder": "Choose Bank Account",
+    "bankAccounts": "Bank Accounts",
+    "profitCenter": "Profit Center",
+    "profitCenterPlaceholder": "Choose Profit Center",
+    "cashCustomer": "Cash Customer",
+    "cashCustomerPlaceholder": "Choose Cash Customer\t",
+    "additionalInformation": "Additional Info",
+    "countryPlaceholder": "Choose Country",
+    "country": "Country",
+    "cityPlaceholder": "Choose City",
+    "city": "City",
+    "branchTypePlaceholder": "Choose Branch Type",
+    "branchType": "Branch Type",
+    "email": "Email",
+    "primaryPhone": "Primary Phone Number",
+    "secondaryPhone": "Secondary Phone Number"
   }
 }

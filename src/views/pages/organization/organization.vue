@@ -13,6 +13,8 @@ import placeHolderPhoto from '@/assets/images/placeholder.jpg';
 const organizationStore = useOrganizationStore();
 const invoiceTemplates = computed(() => organizationStore.lookups.invoiceTemplates);
 const organizationTypes = computed(() =>  organizationStore.lookups.organizationTypes);
+const organizationConfigs = computed(() =>  organizationStore.lookups.organizationConfigs);
+
 
 const mainStore = useMainStore();
 const rtl = computed(() => mainStore.isRTL);

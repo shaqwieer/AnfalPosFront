@@ -62,6 +62,7 @@ const { handleSubmit, errors, resetForm, setValues, defineField } = useForm({
 
 let invoiceTemplates = [];
 let organizationTypes = [];
+let organizationConfigs=[];
 
 const [arabicName, arabicNameAttrs] = defineField('arabicName');
 const [englishName, englishNameAttrs] = defineField('englishName');
@@ -82,7 +83,7 @@ const createData = handleSubmit(async (validatedInfo) => {
     formData.append('englishName', validatedInfo.englishName);
     formData.append('organizationTypeId', validatedInfo.organizationType.id);
     formData.append('invoiceTemplateId', validatedInfo.invoiceTemplate.id);
-    formData.append('sapConfiguration', validatedInfo.sapConfiguration == null ? 0 : validatedInfo.sapConfiguration);
+    formData.append('organizationConfigId', validatedInfo.sapConfiguration == null ? 0 : validatedInfo.sapConfiguration);
     if (selectedFile.value != null) {
         formData.append('logoFile', selectedFile.value == null ? emptyBlob : selectedFile.value);
     }
@@ -97,7 +98,7 @@ const updateData = handleSubmit(async (validatedInfo) => {
     formData.append('organizationTypeId', validatedInfo.organizationType.id);
     formData.append('invoiceTemplateId', validatedInfo.invoiceTemplate.id);
     formData.append('isChangedLogo', isChangedLogo.value);
-    formData.append('sapConfiguration', validatedInfo.sapConfiguration == null ? 0 : validatedInfo.sapConfiguration);
+    formData.append('organizationConfigId', validatedInfo.sapConfiguration == null ? 0 : validatedInfo.sapConfiguration.id);
     if (selectedFile.value != null) {
         formData.append('logoFile', selectedFile.value == null ? emptyBlob : selectedFile.value);
     }
@@ -158,9 +159,10 @@ const setFormValues = () => {
     setValues({
         arabicName: props.selectedData.arabicName,
         englishName: props.selectedData.englishName,
-        sapConfiguration: null,
+        sapConfiguration: organizationConfigs.find((e) => e.id === props.selectedData.organizationConfigId),
         organizationType: organizationTypes.find((e) => e.id === props.selectedData.organizationTypeId),
         invoiceTemplate: invoiceTemplates.find((e) => e.id === props.selectedData.invoiceTemplateId)
+
     });
 };
 watch(
@@ -170,6 +172,7 @@ watch(
             var organizationLookups = await organizationStore.getOrganizationLookups();
             invoiceTemplates = organizationLookups.invoiceTemplates;
             organizationTypes = organizationLookups.organizationTypes;
+            organizationConfigs = organizationLookups.organizationConfigs;
             if (props.load === true && props.IsAdd === false && props.selectedData) {
                 setFormValues();
                 selectedFile.value = props.selectedData.logoImageUrl;
@@ -203,7 +206,7 @@ watch(
             </div>
 
             <div class="flex justify-content-between w-full gap-2">
-                <div class="field flex flex-column w-4">
+                <div class="field flex flex-column w-3">
                     <label for="organizationType" class="mb-3 required">{{ $t('organizationDialog.organizationType') }}</label>
                     <Dropdown
                         v-model="organizationType"
@@ -224,7 +227,7 @@ watch(
                     </Dropdown>
                     <small v-if="errors.organizationType" class="text-red-600">{{ errors.organizationType }}</small>
                 </div>
-                <div class="field flex flex-column w-4">
+                <div class="field flex flex-column w-3">
                     <label for="invoiceTemplate" class="mb-3 required">{{ $t('organizationDialog.invoicesTemplate') }}</label>
                     <Dropdown
                         v-model="invoiceTemplate"
@@ -245,23 +248,22 @@ watch(
                     </Dropdown>
                     <small v-if="errors.invoiceTemplate" class="text-red-600">{{ errors.invoiceTemplate }}</small>
                 </div>
-                <div class="field flex flex-column w-4">
+                <div class="field flex flex-column w-6 border-1 p-3  border-round-lg botder-dashed bg-gray-50">
                     <label for="sapConfiguration" class="mb-3 required">{{ $t('organizationDialog.sapConfiguration') }}</label>
                     <Dropdown
                         v-model="sapConfiguration"
-                        disabled
                         v-bind="sapConfigurationAttrs"
                         :virtualScrollerOptions="{ itemSize: 38 }"
-                        :options="invoiceTemplates"
+                        :options="organizationConfigs"
                         filter
                         :loading="false"
-                        optionLabel="name"
+                        :optionLabel="(option) => `${option.sapPlant}-${option.sapCode}`"
                         :placeholder="t('organizationDialog.sapConfigurationplaceholder')"
                         class="w-full"
                     >
                         <template #option="slotProps">
                             <div class="flex align-items-center mx-auto gap-3">
-                                <div>{{ slotProps.option.name }}</div>
+                                <div>{{ `${slotProps.option.sapPlant}-${slotProps.option.sapCode}` }}</div>
                             </div>
                         </template>
                     </Dropdown>
@@ -305,6 +307,7 @@ watch(
                     @click="
                         () => {
                             createData();
+                            selectedFile = null;
                             logoFile = null;
                         }
                     "
@@ -317,6 +320,7 @@ watch(
                         () => {
                             updateData();
                             logoFile = null;
+                            selectedFile = null;
                         }
                     "
                 />
@@ -329,6 +333,7 @@ watch(
                         () => {
                             resetForm();
                             logoFile = null;
+                            selectedFile = null;
                             closeDialog();
                         }
                     "

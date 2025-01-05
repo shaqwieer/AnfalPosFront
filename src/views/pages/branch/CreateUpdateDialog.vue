@@ -5,9 +5,6 @@ import { useI18n } from 'vue-i18n';
 import { useForm } from 'vee-validate';
 import * as yup from 'yup';
 import { useOrganizationStore } from '@/stores/organizationStore';
-import simpleuploader from '@/components/simpleuploader.vue';
-import { ImageIcon, XIcon } from 'lucide-vue-next';
-import placeHolderPhoto from '@/assets/images/placeholder.jpg';
 const organizationStore = useOrganizationStore();
 
 const mainStore = useMainStore();
@@ -45,141 +42,152 @@ const props = defineProps({
     }
 });
 
-const organizationSchema = yup.object({
-    arabicName: yup.string().required(t('organizationDialog.requiredError')),
-    englishName: yup.string().required(t('organizationDialog.requiredError')),
-    sapConfiguration: yup.mixed().nullable(),
-    organizationType: yup.mixed().required(t('organizationDialog.requiredError')),
-    invoiceTemplate: yup.mixed().required(t('organizationDialog.requiredError'))
+const branchSchema = yup.object({
+    arabicName: yup.string().required(t('branchDialog.requiredError')),
+    englishName: yup.string().required(t('branchDialog.requiredError')),
+    email: yup.string().required(t('branchDialog.requiredError')),
+    address: yup.string().required(t('branchDialog.requiredError')),
+    primaryPhone: yup.string().required(t('branchDialog.requiredError')),
+    secondaryPhone: yup.string().nullable(),
+
+    city: yup.mixed().required(t('branchDialog.requiredError')),
+    branchType: yup.mixed().required(t('branchDialog.requiredError')),
+    country: yup.mixed().required(t('branchDialog.requiredError')),
+
+    accountantEmail: yup.string().required(t('branchDialog.requiredError')),
+    sapStorageLocation: yup.mixed().nullable(),
+    cashCustomer: yup.mixed().nullable(),
+    profitCenter: yup.mixed().nullable(),
+    cashJournal: yup.mixed().nullable(),
+    bankAccounts: yup.mixed().nullable()
 });
 
-const informationInitial = ref({ arabicName: '', englishName: '', sapConfiguration: null, organizationType: null, invoiceTemplate: null });
+const informationInitial = ref({
+    arabicName: '',
+    englishName: '',
+    email: '',
+    address: '',
+    primaryPhone: '',
+    secondaryPhone: '',
+    accountantEmail: '',
+    city: null,
+    country: null,
+    branchType: null,
+    sapStorageLocation: null,
+    cashCustomer: null,
+    profitCenter: null,
+    cashJournal: null,
+    bankAccounts: null
+});
 
 const { handleSubmit, errors, resetForm, setValues, defineField } = useForm({
-    validationSchema: organizationSchema,
+    validationSchema: branchSchema,
     initialValues: informationInitial.value
 });
 
-let invoiceTemplates = [];
-let organizationTypes = [];
+let countries = [];
+const cities = ref([]);
+const filterCities = computed(() => { return cities.value.filter((e) => e.countryId === country?.value?.id)});
+let branchTypes = [];
 
 const [arabicName, arabicNameAttrs] = defineField('arabicName');
 const [englishName, englishNameAttrs] = defineField('englishName');
-const [sapConfiguration, sapConfigurationAttrs] = defineField('sapConfiguration');
-const [organizationType, organizationTypeAttrs] = defineField('organizationType');
-const [invoiceTemplate, invoiceTemplateAttrs] = defineField('invoiceTemplate');
-const selectedFile = ref(null);
+const [email, emailAttrs] = defineField('email');
+const [address, addressAttrs] = defineField('address');
+const [primaryPhone, primaryPhoneAttrs] = defineField('primaryPhone');
+const [secondaryPhone, secondaryPhoneAttrs] = defineField('secondaryPhone');
 
-const loadPlaceholderBlob = async () => {
-    const response = await fetch(placeHolderPhoto);
-    const blob = await response.blob();
-    return blob;
-};
+const [city, cityAttrs] = defineField('city');
+const [branchType, branchTypeAttrs] = defineField('branchType');
+const [country, countryAttrs] = defineField('country');
+
+const [accountantEmail, accountantEmailAttrs] = defineField('accountantEmail');
+const [sapStorageLocation, sapStorageLocationAttrs] = defineField('sapStorageLocation');
+const [cashCustomer, cashCustomerAttrs] = defineField('cashCustomer');
+const [profitCenter, profitCenterAttrs] = defineField('profitCenter');
+const [cashJournal, cashJournalAttrs] = defineField('cashJournal');
+const [bankAccounts, bankAccountsAttrs] = defineField('bankAccounts');
 
 const createData = handleSubmit(async (validatedInfo) => {
-    const formData = new FormData();
-    formData.append('arabicName', validatedInfo.arabicName);
-    formData.append('englishName', validatedInfo.englishName);
-    formData.append('organizationTypeId', validatedInfo.organizationType.id);
-    formData.append('invoiceTemplateId', validatedInfo.invoiceTemplate.id);
-    formData.append('sapConfiguration', validatedInfo.sapConfiguration == null ? 0 : validatedInfo.sapConfiguration);
-    if (selectedFile.value != null) {
-        formData.append('logoFile', selectedFile.value == null ? emptyBlob : selectedFile.value);
-    }
-    props.createElement(formData);
+    const branchDto = {
+            "arabicName": validatedInfo.arabicName,
+            "englishName": validatedInfo.englishName,
+            "sapStorageLocation": validatedInfo.sapStorageLocation || null,
+            "profitCenter": validatedInfo.profitCenter || null,
+            "primaryPhone": validatedInfo.primaryPhone,
+            "OrganizationId": validatedInfo.organizationId || 1, // Provide default value if not present
+            "BankAccountId": validatedInfo.bankAccounts || null,
+            "BankName": validatedInfo.bankName || null,
+            "BankCode": validatedInfo.bankCode || null,
+            "BankAccountNo": validatedInfo.bankAccountNo || null,
+
+            "SecondaryPhone": validatedInfo.secondaryPhone || null,
+            "AccountantEmail": validatedInfo.accountantEmail || null,
+            "CashCustomer": validatedInfo.cashCustomer || null,
+            "BranchTypeId": validatedInfo.branchType?.id || 0,
+            "CountryId": validatedInfo.country?.id || 0,
+            "CityId": validatedInfo.city?.id || 0,
+            "Email": validatedInfo.email,
+            "Address": validatedInfo.address,
+        };
+    props.createElement(branchDto);
     resetForm();
 });
 const updateData = handleSubmit(async (validatedInfo) => {
-    const formData = new FormData();
-    formData.append('uniqueIdentifier', props.selectedData.uniqueIdentifier);
-    formData.append('arabicName', validatedInfo.arabicName);
-    formData.append('englishName', validatedInfo.englishName);
-    formData.append('organizationTypeId', validatedInfo.organizationType.id);
-    formData.append('invoiceTemplateId', validatedInfo.invoiceTemplate.id);
-    formData.append('isChangedLogo', isChangedLogo.value);
-    formData.append('sapConfiguration', validatedInfo.sapConfiguration == null ? 0 : validatedInfo.sapConfiguration);
-    if (selectedFile.value != null) {
-        formData.append('logoFile', selectedFile.value == null ? emptyBlob : selectedFile.value);
-    }
-    props.editElement(props.selectedData.id, formData);
+    const branchDto = {
+            "arabicName": validatedInfo.arabicName,
+            "englishName": validatedInfo.englishName,
+            "sapStorageLocation": validatedInfo.sapStorageLocation || null,
+            "profitCenter": validatedInfo.profitCenter || null,
+            "primaryPhone": validatedInfo.primaryPhone,
+            "OrganizationId": validatedInfo.organizationId || 1, // Provide default value if not present
+            "BankAccountId": validatedInfo.bankAccounts || null,
+            "BankName": validatedInfo.bankName || null,
+            "BankCode": validatedInfo.bankCode || null,
+            "BankAccountNo": validatedInfo.bankAccountNo || null,
+
+            "SecondaryPhone": validatedInfo.secondaryPhone || null,
+            "AccountantEmail": validatedInfo.accountantEmail || null,
+            "CashCustomer": validatedInfo.cashCustomer || null,
+            "BranchTypeId": validatedInfo.branchType?.id || 0,
+            "CountryId": validatedInfo.country?.id || 0,
+            "CityId": validatedInfo.city?.id || 0,
+            "Email": validatedInfo.email,
+            "Address": validatedInfo.address,
+        };
+    props.editElement(props.selectedData.id, branchDto);
     resetForm();
 });
-//
-const fileInput = ref(null);
-const isDragging = ref(false);
-const errorMessage = ref('');
-const isChangedLogo = ref(false);
 
-const previewUrl = computed(() => {
-    return selectedFile.value ? (!props.IsUpdate && !(selectedFile.value instanceof Blob) ? selectedFile.value : URL.createObjectURL(selectedFile.value)) : null;
-});
-
-const dragover = (e) => {
-    isDragging.value = true;
-};
-
-const dragleave = (e) => {
-    isDragging.value = false;
-};
-
-const drop = (e) => {
-    isDragging.value = false;
-    const file = e.dataTransfer.files[0];
-    if (file) addFile(file);
-};
-
-const handleFileSelect = (e) => {
-    const file = e.target.files[0];
-    if (file) addFile(file);
-};
-const addFile = (file) => {
-    if (file.type.startsWith('image/')) {
-        if (file.size <= 5 * 1024 * 1024) {
-            if (selectedFile.value instanceof Blob) {
-                URL.revokeObjectURL(selectedFile.value);
-            }
-            selectedFile.value = file;
-            isChangedLogo.value = true;
-            errorMessage.value = '';
-        } else {
-            errorMessage.value = 'File size exceeds 5MB limit.';
-        }
-    } else {
-        errorMessage.value = 'Please select an image file.';
-    }
-};
-const removeFile = () => {
-    selectedFile.value = null;
-    isChangedLogo.value = true;
-    errorMessage.value = '';
-};
-//
 const setFormValues = () => {
     setValues({
         arabicName: props.selectedData.arabicName,
         englishName: props.selectedData.englishName,
-        sapConfiguration: null,
-        organizationType: organizationTypes.find((e) => e.id === props.selectedData.organizationTypeId),
-        invoiceTemplate: invoiceTemplates.find((e) => e.id === props.selectedData.invoiceTemplateId)
+        email: props.selectedData.email,
+        address: props.selectedData.address,
+        primaryPhone: props.selectedData.primaryPhone,
+        secondaryPhone: props.selectedData.secondaryPhone,
+        accountantEmail: props.selectedData.accountantEmail,
+        sapStorageLocation: null,
+        cashCustomer: null,
+        profitCenter: null,
+        bankAccounts: null,
+        cashJournal: null,
+        country: countries.find((e) => e.id === props.selectedData.countryId),
+        branchType: branchTypes.find((e) => e.id === props.selectedData.branchTypeId),
+        city: cities.value.find((e) => e.id === props.selectedData.cityId)
     });
 };
 watch(
     () => props.load,
     async (newLoad) => {
         if (newLoad) {
-            var organizationLookups = await organizationStore.getOrganizationLookups();
-            invoiceTemplates = organizationLookups.invoiceTemplates;
-            organizationTypes = organizationLookups.organizationTypes;
+            var branchLookups = await organizationStore.getBranchLookups();
+            countries = branchLookups.countries;
+            branchTypes = branchLookups.branchTypes;
+            cities.value = branchLookups.cities;
             if (props.load === true && props.IsAdd === false && props.selectedData) {
                 setFormValues();
-                selectedFile.value = props.selectedData.logoImageUrl;
-                // console.log(props.selectedData.logoImageUrl);
-                // const response = await fetch(props.selectedData.logoImageUrl, { mode: 'no-cors' });
-                // if (!response.ok) {
-                //     throw new Error(`Failed to fetch logo: ${response.status} ${response.statusText}`);
-                // }
-                // logoFile.value = await response.blob();
-                // console.log(logoFile.value);
             }
         }
     }
@@ -187,115 +195,215 @@ watch(
 </script>
 
 <template>
-    <Dialog v-model:visible="visible" :breakpoints="{ '640px': '25rem' }" :header="$t('organizationDialog.header')" :class="containerClass" :style="{ minWidth: '45rem' }" :modal="true" :closable="false">
+    <Dialog v-model:visible="visible" :breakpoints="{ '640px': '25rem' }" :header="$t('branchDialog.header')" :class="containerClass" :style="{ minWidth: '60rem' }" :modal="true" :closable="false">
         <div class="flex flex-column gap-4 p-4">
-            <div class="flex justify-content-between w-full gap-2">
-                <div class="field flex flex-column w-6">
-                    <label for="englishName" class="required">{{ $t('cityDialog.englishNameLabel') }}</label>
-                    <InputText id="englishName" v-model="englishName" v-bind="englishNameAttrs" autofocus :invalid="!!errors.englishName" />
-                    <small v-if="errors.englishName" class="text-red-600">{{ errors.englishName }}</small>
-                </div>
-                <div class="field flex flex-column w-6">
-                    <label for="arabicName" class="required">{{ $t('cityDialog.arabicNameLabel') }}</label>
-                    <InputText id="arabicName" v-model="arabicName" v-bind="arabicNameAttrs" autofocus :invalid="!!errors.arabicName" />
-                    <small v-if="errors.arabicName" class="text-red-600">{{ errors.arabicName }}</small>
-                </div>
-            </div>
-
-            <div class="flex justify-content-between w-full gap-2">
-                <div class="field flex flex-column w-4">
-                    <label for="organizationType" class="mb-3 required">{{ $t('organizationDialog.organizationType') }}</label>
-                    <Dropdown
-                        v-model="organizationType"
-                        v-bind="organizationTypeAttrs"
-                        :virtualScrollerOptions="{ itemSize: 38 }"
-                        :options="organizationTypes"
-                        filter
-                        :loading="false"
-                        optionLabel="name"
-                        :placeholder="t('organizationDialog.organizationTypePlaceholder')"
-                        class="w-full"
-                    >
-                        <template #option="slotProps">
-                            <div class="flex align-items-center mx-auto gap-3">
-                                <div>{{ slotProps.option.name }}</div>
-                            </div>
-                        </template>
-                    </Dropdown>
-                    <small v-if="errors.organizationType" class="text-red-600">{{ errors.organizationType }}</small>
-                </div>
-                <div class="field flex flex-column w-4">
-                    <label for="invoiceTemplate" class="mb-3 required">{{ $t('organizationDialog.invoicesTemplate') }}</label>
-                    <Dropdown
-                        v-model="invoiceTemplate"
-                        v-bind="invoiceTemplateAttrs"
-                        :virtualScrollerOptions="{ itemSize: 38 }"
-                        :options="invoiceTemplates"
-                        filter
-                        :loading="false"
-                        optionLabel="name"
-                        :placeholder="t('organizationDialog.invoicesTemplatePlaceholder')"
-                        class="w-full"
-                    >
-                        <template #option="slotProps">
-                            <div class="flex align-items-center mx-auto gap-3">
-                                <div>{{ slotProps.option.name }}</div>
-                            </div>
-                        </template>
-                    </Dropdown>
-                    <small v-if="errors.invoiceTemplate" class="text-red-600">{{ errors.invoiceTemplate }}</small>
-                </div>
-                <div class="field flex flex-column w-4">
-                    <label for="sapConfiguration" class="mb-3 required">{{ $t('organizationDialog.sapConfiguration') }}</label>
-                    <Dropdown
-                        v-model="sapConfiguration"
-                        disabled
-                        v-bind="sapConfigurationAttrs"
-                        :virtualScrollerOptions="{ itemSize: 38 }"
-                        :options="invoiceTemplates"
-                        filter
-                        :loading="false"
-                        optionLabel="name"
-                        :placeholder="t('organizationDialog.sapConfigurationplaceholder')"
-                        class="w-full"
-                    >
-                        <template #option="slotProps">
-                            <div class="flex align-items-center mx-auto gap-3">
-                                <div>{{ slotProps.option.name }}</div>
-                            </div>
-                        </template>
-                    </Dropdown>
-                    <small v-if="errors.sapConfiguration" class="text-red-600">{{ errors.sapConfiguration }}</small>
-                </div>
-            </div>
-            <div class="flex justify-content-between w-full gap-2">
-                <div class="field flex flex-column w-6">
-                    <vue-tel-input class="w-full p-2 mr-8" v-model="arabicName"></vue-tel-input>
-                    {{arabicName}}
-                    <label for="invoiceTemplate" class="mb-3">{{ $t('organizationDialog.logouploader') }}</label>
-                    <div
-                        @dragover.prevent="dragover"
-                        @dragleave.prevent="dragleave"
-                        @drop.prevent="drop"
-                        :class="['max-w-md mx-auto  p-2  border-round-lg h-16m shadow-1 border-2 border-dashed border-round-lg  text-center transition-colors', isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400']"
-                    >
-                        <input type="file" ref="fileInput" @change="handleFileSelect" class="hidden" accept="image/*" />
-
-                        <div v-if="!selectedFile">
-                            <ImageIcon class="w-4rem mt-2 h-4rem mx-auto text-gray-400 mb-4" />
-                            <p class="text-gray-600 mb-4">{{ t('uploader.mainlabel') }}</p>
-                            <Button @click="$refs.fileInput.click()" text severity="info" class="mx-auto py-1 h-2rem">{{ t('uploader.secondarylabel') }}</Button>
-                        </div>
-
-                        <div v-else class="flex flex-column align-items-center">
-                            <img :src="previewUrl" alt="Logo preview" class="max-w-full max-h-16rem mb-4 border-round-lg" />
-                            <p class="text-sm text-gray-600 mb-2">{{ selectedFile.name }}</p>
-                            <Button severity="danger" text @click="removeFile">
-                                <XIcon class="w-1rem h-1rem" />
-                            </Button>
-                        </div>
+            <div class="flex flex-column w-full gap-2 border-1 p-4 border-round-lg">
+                <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.generalInformation') }}</h3>
+                <div class="flex gap-2">
+                    <div class="field flex flex-column w-6">
+                        <label for="englishName" class="required">{{ $t('cityDialog.englishNameLabel') }}</label>
+                        <InputText id="englishName" v-model="englishName" v-bind="englishNameAttrs" autofocus :invalid="!!errors.englishName" />
+                        <small v-if="errors.englishName" class="text-red-600">{{ errors.englishName }}</small>
                     </div>
-                    <!-- <simpleuploader v-model:logoFile="logoFile" v-model:imageChanged="imageChanged" :PhotoString="selectedData.logoImageUrl" :IsUpdated="IsAdd" /> -->
+                    <div class="field flex flex-column w-6">
+                        <label for="arabicName" class="required">{{ $t('cityDialog.arabicNameLabel') }}</label>
+                        <InputText id="arabicName" v-model="arabicName" v-bind="arabicNameAttrs" autofocus :invalid="!!errors.arabicName" />
+                        <small v-if="errors.arabicName" class="text-red-600">{{ errors.arabicName }}</small>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-column w-full gap-2 border-1 p-4 border-round-lg">
+                <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.sapInformation') }}</h3>
+                <div class="flex gap-2">
+                    <div class="field flex flex-column w-4">
+                        <label for="organizationType" class="mb-3 required">{{ $t('branchDialog.sapStorageLocation') }}</label>
+                        <Dropdown
+                            v-model="sapStorageLocation"
+                            v-bind="sapStorageLocationAttrs"
+                            :virtualScrollerOptions="{ itemSize: 38 }"
+                            :options="countries"
+                            filter
+                            :disabled="true"
+                            :loading="false"
+                            optionLabel="name"
+                            :placeholder="t('branchDialog.sapStorageLocationPlaceholder')"
+                            class="w-full"
+                        >
+                            <template #option="slotProps">
+                                <div class="flex align-items-center mx-auto gap-3">
+                                    <div>{{ slotProps.option.name }}</div>
+                                </div>
+                            </template>
+                        </Dropdown>
+                        <small v-if="errors.sapStorageLocation" class="text-red-600">{{ errors.sapStorageLocation }}</small>
+                    </div>
+                    <div class="field flex flex-column w-4">
+                        <label for="cashJournal" class="mb-3 required">{{ $t('branchDialog.cashJournal') }}</label>
+                        <Dropdown
+                            v-model="cashJournal"
+                            v-bind="cashJournalAttrs"
+                            :virtualScrollerOptions="{ itemSize: 38 }"
+                            :options="countries"
+                            filter
+                            :loading="false"
+                            optionLabel="name"
+                            disabled
+                            :placeholder="t('branchDialog.cashJournalPlaceholder')"
+                            class="w-full"
+                        >
+                            <template #option="slotProps">
+                                <div class="flex align-items-center mx-auto gap-3">
+                                    <div>{{ slotProps.option.name }}</div>
+                                </div>
+                            </template>
+                        </Dropdown>
+                        <small v-if="errors.cashJournal" class="text-red-600">{{ errors.cashJournal }}</small>
+                    </div>
+                    <div class="field flex flex-column w-4">
+                        <label for="bankAccounts" class="mb-3 required">{{ $t('branchDialog.bankAccounts') }}</label>
+                        <Dropdown
+                            v-model="bankAccounts"
+                            disabled
+                            v-bind="bankAccountsAttrs"
+                            :virtualScrollerOptions="{ itemSize: 38 }"
+                            :options="countries"
+                            filter
+                            :loading="false"
+                            optionLabel="name"
+                            :placeholder="t('branchDialog.bankAccountsPlaceholder')"
+                            class="w-full"
+                        >
+                            <template #option="slotProps">
+                                <div class="flex align-items-center mx-auto gap-3">
+                                    <div>{{ slotProps.option.name }}</div>
+                                </div>
+                            </template>
+                        </Dropdown>
+                        <small v-if="errors.bankAccounts" class="text-red-600">{{ errors.bankAccounts }}</small>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <div class="field flex flex-column w-4">
+                        <label for="profitCenter" class="mb-3 required">{{ $t('branchDialog.profitCenter') }}</label>
+                        <Dropdown
+                            v-model="profitCenter"
+                            disabled
+                            v-bind="profitCenterAttrs"
+                            :virtualScrollerOptions="{ itemSize: 38 }"
+                            :options="countries"
+                            filter
+                            :loading="false"
+                            optionLabel="name"
+                            :placeholder="t('branchDialog.profitCenterPlaceholder')"
+                            class="w-full"
+                        >
+                            <template #option="slotProps">
+                                <div class="flex align-items-center mx-auto gap-3">
+                                    <div>{{ slotProps.option.name }}</div>
+                                </div>
+                            </template>
+                        </Dropdown>
+                        <small v-if="errors.profitCenter" class="text-red-600">{{ errors.profitCenter }}</small>
+                    </div>
+                    <div class="field flex flex-column w-4">
+                        <label for="cashCustomer" class="mb-3 required">{{ $t('branchDialog.cashCustomer') }}</label>
+                        <Dropdown
+                            v-model="cashCustomer"
+                            disabled
+                            v-bind="cashCustomerAttrs"
+                            :virtualScrollerOptions="{ itemSize: 38 }"
+                            :options="countries"
+                            filter
+                            :loading="false"
+                            optionLabel="name"
+                            :placeholder="t('branchDialog.cashCustomerPlaceholder')"
+                            class="w-full"
+                        >
+                            <template #option="slotProps">
+                                <div class="flex align-items-center mx-auto gap-3">
+                                    <div>{{ slotProps.option.name }}</div>
+                                </div>
+                            </template>
+                        </Dropdown>
+                        <small v-if="errors.cashCustomer" class="text-red-600">{{ errors.cashCustomer }}</small>
+                    </div>
+                    <div class="field flex flex-column w-6 p-2">
+                        <label for="accountantEmail" class="required">{{ $t('cityDialog.accountantEmail') }}</label>
+                        <InputText id="accountantEmail" v-model="accountantEmail" v-bind="accountantEmailAttrs" autofocus :invalid="!!errors.accountantEmail" />
+                        <small v-if="errors.accountantEmail" class="text-red-600">{{ errors.accountantEmail }}</small>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-column w-full gap-2 border-1 p-4 border-round-lg">
+                <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.additionalInformation') }}</h3>
+                <div class="flex gap-2">
+                    <div class="field flex flex-column w-4">
+                        <label for="organizationType" class="mb-3 required">{{ $t('branchDialog.country') }}</label>
+                        <Dropdown v-model="country" v-bind="countryAttrs" :virtualScrollerOptions="{ itemSize: 38 }" :options="countries" filter :loading="false" optionLabel="name" :placeholder="t('branchDialog.countryPlaceholder')" class="w-full">
+                            <template #option="slotProps">
+                                <div class="flex align-items-center mx-auto gap-3">
+                                    <div>{{ slotProps.option.name }}</div>
+                                </div>
+                            </template>
+                        </Dropdown>
+                        <small v-if="errors.country" class="text-red-600">{{ errors.country }}</small>
+                    </div>
+                    <div class="field flex flex-column w-4">
+                        <label for="city" class="mb-3 required">{{ $t('branchDialog.city') }}</label>
+                        <Dropdown v-model="city" v-bind="cityAttrs" :virtualScrollerOptions="{ itemSize: 38 }" :options="filterCities" filter :loading="false" optionLabel="name" :placeholder="t('branchDialog.cityPlaceholder')" class="w-full">
+                            <template #option="slotProps">
+                                <div class="flex align-items-center mx-auto gap-3">
+                                    <div>{{ slotProps.option.name }}</div>
+                                </div>
+                            </template>
+                        </Dropdown>
+                        <small v-if="errors.city" class="text-red-600">{{ errors.city }}</small>
+                    </div>
+                    <div class="field flex flex-column w-4">
+                        <label for="branchType" class="mb-3 required">{{ $t('branchDialog.branchType') }}</label>
+                        <Dropdown
+                            v-model="branchType"
+                            v-bind="branchTypeAttrs"
+                            :virtualScrollerOptions="{ itemSize: 38 }"
+                            :options="branchTypes"
+                            filter
+                            :loading="false"
+                            optionLabel="name"
+                            :placeholder="t('branchDialog.branchTypePlaceholder')"
+                            class="w-full"
+                        >
+                            <template #option="slotProps">
+                                <div class="flex align-items-center mx-auto gap-3">
+                                    <div>{{ slotProps.option.name }}</div>
+                                </div>
+                            </template>
+                        </Dropdown>
+                        <small v-if="errors.branchType" class="text-red-600">{{ errors.branchType }}</small>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <div class="field flex flex-column w-6">
+                        <label for="email" class="required">{{ $t('branchDialog.email') }}</label>
+                        <InputText id="email" v-model="email" v-bind="emailAttrs" autofocus :invalid="!!errors.email" />
+                        <small v-if="errors.email" class="text-red-600">{{ errors.email }}</small>
+                    </div>
+                    <div class="field flex flex-column w-6">
+                        <label for="primaryPhone" class="required">{{ $t('branchDialog.primaryPhone') }}</label>
+                        <vue-tel-input class="w-full p-2" v-model="primaryPhone"  v-bind="primaryPhoneAttrs"></vue-tel-input>
+                        <small v-if="errors.primaryPhone" class="text-red-600">{{ errors.primaryPhone }}</small>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <div class="field flex flex-column w-6">
+                        <label for="address" class="required">{{ $t('cityDialog.address') }}</label>
+                        <InputText id="address" v-model="address" v-bind="addressAttrs" autofocus :invalid="!!errors.address" />
+                        <small v-if="errors.address" class="text-red-600">{{ errors.address }}</small>
+                    </div>
+                    <div class="field flex flex-column w-6">
+                        <label for="secondaryPhone" class="required">{{ $t('branchDialog.secondaryPhone') }}</label>
+                        <vue-tel-input class="w-full p-2" v-model="secondaryPhone"  v-bind="secondaryPhoneAttrs"></vue-tel-input>
+                        <small v-if="errors.secondaryPhone" class="text-red-600">{{ errors.secondaryPhone }}</small>
+                    </div>
                 </div>
             </div>
 
@@ -348,5 +456,8 @@ watch(
 }
 .max-w-md {
     max-width: 760px;
+}
+.vti__dropdown-list {
+    right: 0;
 }
 </style>

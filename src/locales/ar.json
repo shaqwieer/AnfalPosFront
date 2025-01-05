@@ -276,7 +276,9 @@
     "arabicNameLabel": "الأسم باللغة العربية",
     "englishNameLabel": "الأسم باللغة الانجليزية",
     "countryLabel": "الدولة",
-    "countryPlaceholder": "اختار الدولة"
+    "countryPlaceholder": "اختار الدولة",
+    "accountantEmail": "ايميل المحاسب",
+    "address": "العنوان"
   },
   "organizationHeader": "الشركات",
   "organizationDescription": " تُقدِّم صفحة الشركات معلومات شاملة عن شركائنا المرتبطين، ورسائلهم، والجهود التعاونية التي نقوم بها معًا. استكشف مجموعة متنوعة من المنظمات التي نتعاون معها لتفهم كيف نساهم في تحقيق أهدافنا المشتركة وتنمية المجتمع.",
@@ -309,5 +311,31 @@
   "branch": {
     "Header": "الفروع",
     "Description": "الشركات التابعة للمنظمة هي وحدات أو كيانات تجارية تعمل تحت مظلة المنظمة الأم. تُدار هذه الشركات بشكل مستقل ولكنها تلتزم بالسياسات والأهداف الاستراتيجية التي تحددها المنظمة. قد تكون هذه الشركات مختصة بمجالات أو قطاعات مختلفة تكمّل أهداف المنظمة الأم، مثل التصنيع، الخدمات، أو التكنولوجيا."
+  },
+  "branchDialog": {
+    "requiredError": "هذة الخانة مطلوبة\t",
+    "header": "أدارة الفروع",
+    "generalInformation": "البيانات الاساسية",
+    "sapInformation": "Sap",
+    "sapStorageLocation": "Sap Storage Location\t",
+    "sapStorageLocationPlaceholder": "Choose Sap Storage Location\t",
+    "cashJournal": "الخزنة",
+    "cashJournalPlaceholder": "اختار الخزنة",
+    "bankAccountsPlaceholder": "اختار الحساب البنكى",
+    "bankAccounts": "الحسابات البنكية",
+    "profitCenter": "المركز الربحى",
+    "profitCenterPlaceholder": "اختار المركز الربحى",
+    "cashCustomer": "Cash Customer\t",
+    "cashCustomerPlaceholder": "Choose Cash Customer\t",
+    "additionalInformation": "البيانات الاضافية",
+    "countryPlaceholder": "أختار الدولة",
+    "country": "الدولة",
+    "cityPlaceholder": "اختار المدينة",
+    "city": "المدينة",
+    "branchTypePlaceholder": "اختار نوع الفرع",
+    "branchType": "نوع الفرع",
+    "email": "الايميل",
+    "primaryPhone": "رقم الموبايل الاساسى",
+    "secondaryPhone": "رقم الموبايل الثانوى"
   }
 }

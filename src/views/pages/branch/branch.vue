@@ -11,8 +11,10 @@ import { handleError } from '@/utilities/errorHandler';
 import placeHolderPhoto from '@/assets/images/placeholder.jpg';
 
 const organizationStore = useOrganizationStore();
-const invoiceTemplates = computed(() => organizationStore.lookups.invoiceTemplates);
-const organizationTypes = computed(() => organizationStore.lookups.organizationTypes);
+const countries = computed(() => organizationStore.branchLookups.countries);
+const cities = computed(() => organizationStore.branchLookups.cities);
+const branchTypes = computed(() => organizationStore.branchLookups.branchTypes);
+
 
 const mainStore = useMainStore();
 const rtl = computed(() => mainStore.isRTL);
@@ -104,9 +106,10 @@ const toggleCreateEditDialog = (addFlag, data, close) => {
 
 const editData = async (id, data) => {
     try {
-        const response = await apiClient.put('/Organizations/UpdateWithLogo', data);
-        response.data.data.organizationTypeName = organizationTypes.value.find((e) => e.id === response.data.data.organizationTypeId).name;
-        response.data.data.invoiceTemplateName = invoiceTemplates.value.find((e) => e.id === response.data.data.invoiceTemplateId).name;
+        const response = await apiClient.put(`/Branches/${id}`, data);
+        response.data.data.branchTypeName = branchTypes.value.find((e) => e.id === response.data.data.branchTypeId).name;
+        response.data.data.countryName = countries.value.find((e) => e.id === response.data.data.countryId).name;
+        response.data.data.cityName = cities.value.find((e) => e.id === response.data.data.cityId).name;
         const index = entities.value.findIndex((entity) => entity.id === id);
         entities.value[index] = { ...entities.value[index], ...response.data.data };
         mainStore.loading.setNotificationInfo('success', response.data.message);
@@ -117,9 +120,10 @@ const editData = async (id, data) => {
 };
 const addData = async (data) => {
     try {
-        const response = await apiClient.post('/Organizations/CreateWithLogo', data);
-        response.data.data.organizationTypeName = organizationTypes.value.find((e) => e.id === response.data.data.organizationTypeId).name;
-        response.data.data.invoiceTemplateName = invoiceTemplates.value.find((e) => e.id === response.data.data.invoiceTemplateId).name;
+        const response = await apiClient.post('/Branches', data);
+        response.data.data.branchTypeName = branchTypes.value.find((e) => e.id === response.data.data.branchTypeId).name;
+        response.data.data.countryName = countries.value.find((e) => e.id === response.data.data.countryId).name;
+        response.data.data.cityName = cities.value.find((e) => e.id === response.data.data.cityId).name;
         entities.value.push(response.data.data);
         mainStore.loading.setNotificationInfo('success', response.data.message);
     } catch (err) {
