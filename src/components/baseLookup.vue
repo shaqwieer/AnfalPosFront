@@ -1,6 +1,6 @@
 <template>
-    <div class="flex flex-column gap-4">
-
+    <div class="flex flex-column gap-2">
+        <PageTopBar v-model:searchText="filters['global'].value" :title="t(`baseLookup.${name}`)" :addText="t('baseLookup.createButtonLabel')" simple :addButton="openCreateDialog"></PageTopBar>
         <div class="card">
             <DataTable
                 :value="entities"
@@ -15,7 +15,7 @@
                 :rowsPerPageOptions="[5, 10, 25]"
                 :currentPageReportTemplate="''"
             >
-            <template #header>
+                <!-- <template #header>
                     <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
                         <h5 class="m-0">{{ t(`baseLookup.${name}`) }}</h5>
                         <div class="flex gap-2">
@@ -26,11 +26,12 @@
                             <Button :label="t('baseLookup.createButtonLabel')" v-tooltip.top="t('baseLookup.createButtonLabel')" icon="pi pi-plus" @click="openCreateDialog" />
                         </div>
                     </div>
-                </template>
+                </template> -->
                 <template #empty>
                     <div class="flex justify-content-center align-items-center font-bold text-lg">
                         {{ t(`baseLookup.empty${name}`) }}
-                    </div></template>
+                    </div></template
+                >
 
                 <Column field="name" :header="t('labels.name')" class="" :sortable="true">
                     <template #body="slotProps">
@@ -98,7 +99,7 @@
                     outlined
                     @click="
                         () => {
-                            visible=false;
+                            visible = false;
                             resetForm();
                         }
                     "
@@ -122,12 +123,13 @@
 import DeleteDialog from '@/components/DeleteDialog.vue';
 import { handleError } from '@/utilities/errorHandler';
 import { FilterMatchMode } from 'primevue/api';
-import { ref, onMounted,computed } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import * as yup from 'yup';
 import { useI18n } from 'vue-i18n';
 import apiClient from '@/api/apiClient';
 import { useMainStore } from '@/stores/mainStore';
 import { useForm } from 'vee-validate';
+import PageTopBar from './pageTopBar.vue';
 
 const entities = ref([]);
 onMounted(async () => {
@@ -184,7 +186,7 @@ const isEdit = ref(false);
 const openCreateDialog = () => {
     visible.value = true;
     isEdit.value = false;
-}
+};
 
 const createData = handleSubmit(async (validatedInfo) => {
     const transformedInfo = {

@@ -469,6 +469,21 @@ const router = createRouter({
                     path: '/pages/invoice',
                     name: 'invoice',
                     component: () => import('@/views/pages/Invoice.vue')
+                },
+                {
+                    path: '/Quickinvoice',
+                    name: 'Quickinvoice',
+                    component: () => import('@/views/pages/invoice/QuickInvoice.vue')
+                },
+                {
+                    path: 'orders/draft',
+                    name: 'DraftOrders',
+                    component: () => import('@/views/pages/orders/DraftOrders.vue')
+                },
+                {
+                    path: 'orders/history',
+                    name: 'OrderHistory',
+                    component: () => import('@/views/pages/orders/OrderHistory.vue')
                 }
             ]
         },

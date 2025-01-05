@@ -18,6 +18,7 @@
                     ><font-awesome-icon :icon="extraIcon" /><span class="hidden md:inline">{{ extraText }}</span>
                 </Button>
                 <Button
+                    v-if="hasAddButton"
                     size="small"
                     class="min-w-max flex gap-2"
                     @click="
@@ -62,6 +63,10 @@ const props = defineProps({
         type: Function,
         default: () => {}
     },
+    hasAddButton: {
+        type: Boolean,
+        default: true
+    },
     extraText: {
         type: String,
         default: ''
@@ -82,8 +87,8 @@ const props = defineProps({
 const searchText = defineModel('searchText', { default: '', type: String });
 const value = defineModel('value', { default: 'grid', type: String });
 const options = ref([
-    { icon: 'pi pi-th-large', value: 'grid' },
-    { icon: 'pi pi-bars', value: 'list' }
+    { icon: 'pi pi-bars', value: 'list' },
+    { icon: 'pi pi-th-large', value: 'grid' }
 ]);
 </script>
 <style scoped>
