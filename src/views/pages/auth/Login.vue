@@ -67,7 +67,6 @@ const login = handleSubmit(async (loginData) => {
     <div class="px-5 min-h-screen flex justify-content-center align-items-center" @keyup.enter="login">
         <div class="border-1 surface-border surface-card border-round py-7 px-4 md:px-7 z-1">
             <div class="mb-4">
-                shaqwieer
                 <div class="text-900 text-xl font-bold mb-2">{{ t('loginPage.title') }}</div>
                 <span class="text-600 font-medium">{{ t('loginPage.subtitle') }}</span>
             </div>
