@@ -6,7 +6,7 @@ import { useMainStore } from '../stores/mainStore';
 // import { useAuthStore } from '../stores/AuthStore';
 // build
 const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API, // Replace with your actual API URL
+    baseURL: import.meta.env.VITE_API, 
     headers: {
         Accept: 'application/json'
         // 'Content-Type': 'application/json'
