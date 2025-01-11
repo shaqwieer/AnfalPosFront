@@ -38,16 +38,13 @@ export const useUserRoleStore = defineStore({
 
             }
         },
-        async GetRolesBasedOnTenant() {
-            // this.loading.setLoading();
+        async GetLookups() {
             try {
-                const response = await apiClient.get('/Roles/GetRolesBasedOnTenant');
+                const response = await apiClient.get('/Roles/GetLookups');
                 this.rolesSelection = response.data.data;
-                // this.loading.resetLoading();
+                return response.data.data;
             } catch (err) {
-                // this.loading.resetLoading();
                 this.error = handleError(err, this.loading);
-
             }
         },
         async UsersInTenant() {
@@ -142,16 +139,18 @@ export const useUserRoleStore = defineStore({
 
             }
         },
-        async createUser(payload) {
+        async createUser(payload,countryName,organizationName) {
             // this.loading.setLoading();
             try {
                 const response = await apiClient.post('/Auth/register', payload);
                 const newUser = response.data.data;
+                newUser.countryName = countryName;
+                newUser.organizationName = organizationName;
                 this.users.push(newUser);
                 newUser.roles.forEach((newRole) => {
                     const role = this.roles.find((r) => r.id === newRole.id);
                     if (role) {
-                        role.users = [...role.users, newUser.userName];
+                        role.users = [...role.users, newUser.email];
                         //   role.users.push(newUser.userName);
                     }
                 });

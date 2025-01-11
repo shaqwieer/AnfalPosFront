@@ -63,8 +63,8 @@ const editData = async (userId, newData) => {
     await userRoleStore.updateUser(userId, newData);
     toggleCreateEditDialog(true, {}, true);
 };
-const addData = async (data) => {
-    await userRoleStore.createUser(data);
+const addData = async (data,countryName,organizationName) => {
+    await userRoleStore.createUser(data,countryName,organizationName);
     toggleCreateEditDialog(true, {}, true);
 };
 
@@ -109,6 +109,15 @@ const savePassword = async (userId, payload) => {
                         </div>
                     </template>
                     <template #empty>{{ t('users.noUsers') }}</template>
+                    <Column  :header="t('users.mainData')"  headerStyle="min-width:10rem;">
+                        <template #body="slotProps">
+                            <div class="flex flex-column ">
+                                <p class="font-bold text-base  mb-0">{{ slotProps.data.countryName }}</p>
+                                <p class="text-sm font-semibold text-primary ">{{  slotProps.data.organizationName }}</p>
+
+                            </div>
+                        </template>
+                    </Column>
                     <Column field="email" :header="t('users.userName')" :sortable="true" headerStyle="min-width:10rem;">
                         <template #body="slotProps">
                             <div class="flex gap-2 ">

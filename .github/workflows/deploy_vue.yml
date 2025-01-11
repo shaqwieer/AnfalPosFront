@@ -1,0 +1,39 @@
+name: Deploy Vue.js App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build the project
+        run: npm run build
+
+      - name: Deploy to VPS
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: 38.242.252.52
+          SSH_USER: root
+          TARGET_DIR: /var/www/html/anfal-app/dist
+
+        run: |
+          mkdir -p $HOME/.ssh
+          echo "$SSH_PRIVATE_KEY" > $HOME/.ssh/id_rsa
+          chmod 600 $HOME/.ssh/id_rsa
+          ssh-keyscan -H $SSH_HOST >> $HOME/.ssh/known_hosts
+          rsync -avz --delete -e "ssh -i $HOME/.ssh/id_rsa" ./dist/ $SSH_USER@$SSH_HOST:$TARGET_DIR
