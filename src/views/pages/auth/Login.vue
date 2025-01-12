@@ -39,7 +39,6 @@ const login = handleSubmit(async (loginData) => {
     payload.append('Email', loginData.email);
     payload.append('Password', loginData.password);
     payload.append('RememberMe', loginData.rememberMe);
-    console.log(loginData.rememberMe);
     await mainStore.login(payload).then(() => {
         resetForm();
     });

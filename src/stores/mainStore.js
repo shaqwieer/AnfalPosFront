@@ -66,9 +66,9 @@ export const useMainStore = defineStore({
                     saveToLocalStorage('refreshToken', response.data.refreshToken);
                 } else {
                     sessionStorage.setItem('Token', token);
-                    localStorage.setItem('rememberMe', userPayload.rememberMe);
+                    // localStorage.setItem('rememberMe', userPayload.rememberMe);
+                    localStorage.setItem('rememberMe', false);
                 }
-
                 await this.getMenu();
                 //this.loading.resetLoading();
                 // this.loading.resetBarLoading();

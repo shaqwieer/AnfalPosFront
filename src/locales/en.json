@@ -121,7 +121,8 @@
     "noUsers": "There are No Users",
     "deleteTooltip": "Delete",
     "updateTooltip": "Update",
-    "passwordTooltip": "Password"
+    "passwordTooltip": "Password",
+    "mainData": "Main Data"
   },
   "CreateUpdateUsersRoles": {
     "header": "Add/Update Users and Roles",
@@ -139,7 +140,15 @@
     "requiredError": "This field is required",
     "nameMinError": "Name must be at least 6 characters",
     "userNameMinError": "User name must be at least 6 characters",
-    "passwordNotMatch": "Password and Confirm Password do not match"
+    "passwordNotMatch": "Password and Confirm Password do not match",
+    "emailInvalidError": "It Must Be Email",
+    "country": "Country",
+    "countryPlaceholder": "Choose Country",
+    "organizationPlaceholder": "Choose Organiztion",
+    "organization": "Organization",
+    "email": "Email",
+    "firstName": "First Name ",
+    "lastName": "Last Name"
   },
   "validations": {
     "invalidEmail": "Invalid email format.",

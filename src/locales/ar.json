@@ -121,7 +121,8 @@
     "noUsers": "لا يوجد مستخدمون",
     "deleteTooltip": "حذف",
     "updateTooltip": "تحديث",
-    "passwordTooltip": "كلمة المرور"
+    "passwordTooltip": "كلمة المرور",
+    "mainData": "البيانات الاساسية "
   },
   "CreateUpdateUsersRoles": {
     "header": "إضافة/تحديث المستخدمين والأدوار",
@@ -139,7 +140,15 @@
     "requiredError": "هذا الحقل مطلوب",
     "nameMinError": "يجب أن يحتوي الاسم على الأقل 6 أحرف",
     "userNameMinError": "يجب أن يحتوي اسم المستخدم على الأقل 6 أحرف",
-    "passwordNotMatch": "كلمة المرور وتأكيد كلمة المرور غير متطابقتين"
+    "passwordNotMatch": "كلمة المرور وتأكيد كلمة المرور غير متطابقتين",
+    "emailInvalidError": "يجب أن يكون على شكل البريد الالكترونى",
+    "country": "الدولة",
+    "countryPlaceholder": "اختار دولة ",
+    "organization": "الشركة",
+    "organizationPlaceholder": "أختار شركة",
+    "email": "البريد الالكترونى",
+    "firstName": "الاسم الأول",
+    "lastName": "الاسم الاخير"
   },
   "labels": {
     "cancel": "الغاء",

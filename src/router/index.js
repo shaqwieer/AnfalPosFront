@@ -9,6 +9,14 @@ const router = createRouter({
             component: AppLayout,
             children: [
                 {
+                    path: '/invoices/quick-invoice',
+                    name: 'Quickinvoice',
+                    meta: {
+                        breadcrumb: ['Quickinvoice']
+                    },
+                    component: () => import('@/views/pages/invoice/QuickInvoice.vue')
+                },
+                {
                     path: '/plants',
                     name: 'Plants',
                     meta: {
@@ -25,7 +33,7 @@ const router = createRouter({
                     component: () => import('@/views/pages/organization/organization.vue')
                 },
                 {
-                    path: '/settings/branches/cities',
+                    path: '/settings/plants/cities',
                     name: 'Cities',
                     meta: {
                         breadcrumb: ['Cities']
@@ -33,7 +41,7 @@ const router = createRouter({
                     component: () => import('@/views/pages/city/city.vue')
                 },
                 {
-                    path: '/settings/organizations/invoice-templates',
+                    path: '/settings/companies/invoice-templates',
                     name: 'InvoiceTemplates',
                     meta: {
                         breadcrumb: ['InvoiceTemplates']
@@ -41,7 +49,7 @@ const router = createRouter({
                     component: () => import('@/views/pages/invoiceTemplate/invoiceTemplate.vue')
                 },
                 {
-                    path: '/settings/branches/branch-types',
+                    path: '/settings/plants/branch-types',
                     name: 'BranchTypes',
                     meta: {
                         breadcrumb: ['BranchTypes']
@@ -49,7 +57,7 @@ const router = createRouter({
                     component: () => import('@/views/pages/branchType/branchType.vue')
                 },
                 {
-                    path: '/settings/branches/countries',
+                    path: '/settings/plants/countries',
                     name: 'Countries',
                     meta: {
                         breadcrumb: ['Countries']
@@ -57,7 +65,7 @@ const router = createRouter({
                     component: () => import('@/views/pages/country/country.vue')
                 },
                 {
-                    path: '/settings/organizations/organization-types',
+                    path: '/settings/companies/organization-types',
                     name: 'OrganizationTypes',
                     meta: {
                         breadcrumb: ['OrganizationTypes']
@@ -470,11 +478,11 @@ const router = createRouter({
                     name: 'invoice',
                     component: () => import('@/views/pages/Invoice.vue')
                 },
-                {
-                    path: '/Quickinvoice',
-                    name: 'Quickinvoice',
-                    component: () => import('@/views/pages/invoice/QuickInvoice.vue')
-                },
+                // {
+                //     path: '/Quickinvoice',
+                //     name: 'Quickinvoice',
+                //     component: () => import('@/views/pages/invoice/QuickInvoice.vue')
+                // },
                 {
                     path: 'orders/draft',
                     name: 'DraftOrders',
