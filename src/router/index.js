@@ -484,6 +484,16 @@ const router = createRouter({
                     path: 'orders/history',
                     name: 'OrderHistory',
                     component: () => import('@/views/pages/orders/OrderHistory.vue')
+                },
+                {
+                    path: 'sap/items',
+                    name: 'ItemsPage',
+                    component: () => import('@/views/pages/ItemsPage.vue')
+                },
+                {
+                    path: 'customer-list',
+                    name: 'CustomerList',
+                    component: () => import('@/views/pages/CustomerList.vue')
                 }
             ]
         },
