@@ -502,7 +502,12 @@ const router = createRouter({
                     path: 'customer-list',
                     name: 'CustomerList',
                     component: () => import('@/views/pages/CustomerList.vue')
-                }
+                },
+                // {
+                //     path: '/branch-list',
+                //     name: 'branchPage',
+                //     component: () => import('@/views/pages/branchPage.vue')
+                // },
             ]
         },
         {
@@ -520,6 +525,7 @@ const router = createRouter({
             name: 'login',
             component: () => import('@/views/pages/auth/Login.vue')
         },
+
         {
             path: '/auth/access',
             name: 'accessDenied',

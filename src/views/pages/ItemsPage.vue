@@ -40,16 +40,17 @@ const Rtl = ref();
 const getRtl = localStorage.getItem('Rtl');
 Rtl.value = getRtl;
 console.log(Rtl.value);
+
+
+import { useI18n } from 'vue-i18n';
+const { t, locale } = useI18n();
+
 </script>
 
 <template>
     <div class="">
-        <div class="card">
-            <div class="flex flex-column md:flex-row md:align-items-start md:justify-content-between mb-3">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                    <Button icon="pi pi-refresh" @click="getItems" rounded raised />
-                </div>
-            </div>
+        <div class="flex flex-column gap-2">
+            <PageTopBar :title="t(`items`)" simple></PageTopBar>
 
             <DataTable :value="ItemsData" dataKey="id" paginator :rows="5" responsiveLayout="scroll" v-model:filters="filterSalesTable">
                 <template #empty> No products found.</template>

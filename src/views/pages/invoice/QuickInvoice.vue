@@ -8,6 +8,9 @@
                     <Button label="Draft Orders" icon="pi pi-file" class="border-primary-200" outlined @click="navigateToDraft"></Button>
                 </div>
             </div>
+            <div class="card">
+                <TabMenu v-model:activeIndex="activeItem" :model="items" class="food-menu-tabs"> </TabMenu>
+            </div>
             <div class="grid">
                 <div class="col-6 sm:col-6 md:col-6 xl:col-4" v-for="item in invoiceStore.products" :key="item.id">
                     <ItemCard :itemData="item" @click="selectItem(item)" />
@@ -109,4 +112,53 @@ const navigateToHistory = () => {
 const navigateToDraft = () => {
     router.push({ name: 'DraftOrders' });
 };
+
+const activeItem = ref(1);
+
+const items = ref([
+    {
+        label: 'Appetizer',
+        icon: 'pi pi-fw pi-home'
+    },
+    {
+        label: 'Main course',
+        icon: 'pi pi-fw pi-calendar'
+    },
+    {
+        label: 'Dessert',
+        icon: 'pi pi-fw pi-pencil'
+    },
+    {
+        label: 'Beverage',
+        icon: 'pi pi-fw pi-file'
+    }
+]);
 </script>
+<!-- 
+<style lang="scss">
+.p-tabmenu .p-tabmenu-nav .p-tabmenuitem {
+    margin: 0 0.2rem;
+
+    border: none !important;
+
+    .p-menuitem-link {
+        border-radius: 9999px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+
+        &:not(.p-disabled):focus {
+            box-shadow: none;
+        }
+    }
+
+    &:not(.p-highlight):not(.p-disabled):hover .p-menuitem-link {
+        background: red;
+    }
+
+    &.p-highlight .p-menuitem-link {
+        background: white;
+        color: #1a1a1a;
+        box-shadow: 0 1px 3px red;
+    }
+}
+</style> -->

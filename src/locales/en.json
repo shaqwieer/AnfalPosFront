@@ -343,15 +343,5 @@
     "profitCenterPlaceholder": "Choose Profit Center",
     "cashCustomer": "Cash Customer",
     "cashCustomerPlaceholder": "Choose Cash Customer\t",
-    "additionalInformation": "Additional Info",
-    "countryPlaceholder": "Choose Country",
-    "country": "Country",
-    "cityPlaceholder": "Choose City",
-    "city": "City",
-    "branchTypePlaceholder": "Choose Branch Type",
-    "branchType": "Branch Type",
-    "email": "Email",
-    "primaryPhone": "Primary Phone Number",
-    "secondaryPhone": "Secondary Phone Number"
-  }
+    "additionalInformation":  },
 }
