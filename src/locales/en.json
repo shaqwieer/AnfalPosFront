@@ -353,5 +353,18 @@
     "email": "Email",
     "primaryPhone": "Primary Phone Number",
     "secondaryPhone": "Secondary Phone Number"
+  },
+  "items": {
+    "title": "items",
+    "barcode": "barcode",
+    "brand": "brand",
+    "id": "id",
+    "Group": "Group",
+    "price": "price",
+    "Desc": "Desc",
+    "empty": "No Items"
+  },
+  "Customer": {
+    "empty": "No Customer"
   }
 }
