@@ -82,10 +82,10 @@ const isOutsideClicked = (event) => {
     <div :class="['layout-container', { ...containerClass }, { rtl: rtl }]">
         <AppSidebar ref="sidebarRef" />
 
-        <div :class="['layout-content-wrapper',{ rtl: rtl }]">
+        <div :class="['layout-content-wrapper lg:max-h-screen flex flex-column overflow-y-auto', { rtl: rtl }]">
             <AppTopbar ref="topbarRef" />
             <AppBreadCrumb class="content-breadcrumb"></AppBreadCrumb>
-            <div :class="['layout-content',{ rtl: rtl }]">
+            <div :class="['layout-content flex flex-column h-full overflow-y-auto', { rtl: rtl }]">
                 <router-view></router-view>
             </div>
         </div>

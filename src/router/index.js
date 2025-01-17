@@ -478,11 +478,16 @@ const router = createRouter({
                     name: 'invoice',
                     component: () => import('@/views/pages/Invoice.vue')
                 },
-                // {
-                //     path: '/Quickinvoice',
-                //     name: 'Quickinvoice',
-                //     component: () => import('@/views/pages/invoice/QuickInvoice.vue')
-                // },
+                {
+                    path: '/Quickinvoice',
+                    name: 'Quickinvoice',
+                    component: () => import('@/views/pages/invoice/QuickInvoice.vue')
+                },
+                {
+                    path: '/Quickinvoice2',
+                    name: 'Quickinvoice2',
+                    component: () => import('@/views/pages/oldInvoice/QuickInvoice.vue')
+                },
                 {
                     path: 'orders/draft',
                     name: 'DraftOrders',
