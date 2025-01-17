@@ -26,7 +26,8 @@
                     <div class="flex justify-content-center align-items-center font-bold text-lg">
                         {{ t(`items.empty`) }}
                     </div>
-                </template>
+                    </template
+                >
 
                 <Column field="barcode" :header="t('items.barcode')" class="" :sortable="true">
                     <template #body="slotProps">
@@ -75,6 +76,7 @@
                         </div>
                     </template>
                 </Column>
+
             </DataTable>
         </div>
     </div>

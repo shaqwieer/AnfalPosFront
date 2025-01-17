@@ -3,7 +3,7 @@
         <PageTopBar v-model:searchText="filters['global'].value" :hasAddButton="false" :hasReload="true" :hasSearch="false" :title="t(`items.title`)" :addText="t('baseLookup.createButtonLabel')" simple :addButton="openCreateDialog">
             <template #action>
                 <div class="flex flex-wrap items-center justify-between gap-2">
-                    <Button icon="pi pi-refresh" rounded raised @click="getItems" />
+                    <Button icon="pi pi-refresh" rounded raised @click="getCustomers" />
                 </div>
             </template>
         </PageTopBar>
@@ -28,7 +28,7 @@
                     </div>
                 </template>
 
-                <Column field="barcode" :header="t('items.barcode')" class="" :sortable="true">
+                <Column field="name" :header="t('Customer.name')" class="" :sortable="true">
                     <template #body="slotProps">
                         <div class="flex flex-row align-items-center">
                             <span class="font-semibold text-md">{{ slotProps.data.name }}</span>
@@ -36,15 +36,31 @@
                     </template>
                 </Column>
 
-                <Column field="brand" :header="t('items.brand')" class="" :sortable="true">
+                <Column field="address" :header="t('Customer.address')" class="" :sortable="true">
                     <template #body="slotProps">
                         <div class="flex flex-row align-items-center">
-                            <span class="font-semibold text-md">{{ slotProps.data.brand }}</span>
+                            <span class="font-semibold text-md">{{ slotProps.data.address }}</span>
                         </div>
                     </template>
                 </Column>
 
-                <Column field="id" :header="t('items.id')" class="" :sortable="true">
+                <Column field="creditBalance" :header="t('Customer.creditBalance')" class="" :sortable="true">
+                    <template #body="slotProps">
+                        <div class="flex flex-row align-items-center">
+                            <span class="font-semibold text-md">{{ slotProps.data.creditBalance }}</span>
+                        </div>
+                    </template>
+                </Column>
+
+                <Column field="email" :header="t('Customer.email')" class="" :sortable="true">
+                    <template #body="slotProps">
+                        <div class="flex flex-row align-items-center">
+                            <span class="font-semibold text-md">{{ slotProps.data.email }}</span>
+                        </div>
+                    </template>
+                </Column>
+
+                <Column field="id" :header="t('Customer.id')" class="" :sortable="true">
                     <template #body="slotProps">
                         <div class="flex flex-row align-items-center">
                             <span class="font-semibold text-md">{{ slotProps.data.id }}</span>
@@ -52,26 +68,10 @@
                     </template>
                 </Column>
 
-                <Column field="price" :header="t('items.price')" class="" :sortable="true">
+                <Column field="primaryPhone" :header="t('Customer.primaryPhone')" class="" :sortable="true">
                     <template #body="slotProps">
                         <div class="flex flex-row align-items-center">
-                            <span class="font-semibold text-md">{{ slotProps.data.price }}</span>
-                        </div>
-                    </template>
-                </Column>
-
-                <Column field="itemGroup" :header="t('items.Group')" class="" :sortable="true">
-                    <template #body="slotProps">
-                        <div class="flex flex-row align-items-center">
-                            <span class="font-semibold text-md">{{ slotProps.data.itemGroup }}</span>
-                        </div>
-                    </template>
-                </Column>
-
-                <Column field="sapDescAr" :header="t('items.Desc')" class="" :sortable="true">
-                    <template #body="slotProps">
-                        <div class="flex flex-row align-items-center">
-                            <span class="font-semibold text-md">{{ slotProps.data.sapDescAr }}</span>
+                            <span class="font-semibold text-md">{{ slotProps.data.primaryPhone }}</span>
                         </div>
                     </template>
                 </Column>
@@ -156,10 +156,6 @@
 </template>
 
 <script setup>
-// const Rtl = ref();
-// Rtl.value = localStorage.getItem('Rtl');
-// console.log(Rtl.value)
-
 import DeleteDialog from '@/components/DeleteDialog.vue';
 import { handleError } from '@/utilities/errorHandler';
 import { FilterMatchMode } from 'primevue/api';
@@ -234,21 +230,21 @@ const openCreateDialog = () => {
     isEdit.value = false;
 };
 
-// const createData = handleSubmit(async (validatedInfo) => {
-//     const transformedInfo = {
-//         arabicName: validatedInfo.arabicName,
-//         englishName: validatedInfo.englishName
-//     };
-//     try {
-//         const response = await apiClient.post(`/${props.controllerName}`, transformedInfo);
-//         entities.value.push(response.data.data);
-//         mainStore.loading.setNotificationInfo('success', response.data.message);
-//         resetForm();
-//         visible.value = false;
-//     } catch (err) {
-//         handleError(err, mainStore.loading);
-//     }
-// });
+const createData = handleSubmit(async (validatedInfo) => {
+    const transformedInfo = {
+        arabicName: validatedInfo.arabicName,
+        englishName: validatedInfo.englishName
+    };
+    try {
+        const response = await apiClient.post(`/${props.controllerName}`, transformedInfo);
+        entities.value.push(response.data.data);
+        mainStore.loading.setNotificationInfo('success', response.data.message);
+        resetForm();
+        visible.value = false;
+    } catch (err) {
+        handleError(err, mainStore.loading);
+    }
+});
 
 // const updateData = handleSubmit(async (validatedInfo) => {
 //     const transformedInfo = {
@@ -286,11 +282,9 @@ const deleteText = ref('');
 const deletedKey = ref('');
 const confirmDelete = async () => {
     try {
-        const response = await apiClient.delete(`/${props.controllerName}/${deletedKey.value}`);
-        const index = entities.value.findIndex((entity) => entity.id === deletedKey.value);
-        entities.value.splice(index, 1);
+        await apiClient.delete(`Customers/${deletedKey.value}`);
         deleteDialogVisible.value = false;
-        mainStore.loading.setNotificationInfo('success', response.data.message);
+        CustomersData.value = CustomersData.value.filter((customer) => customer.id !== deletedKey.value);
     } catch (err) {
         handleError(err, mainStore.loading);
     }

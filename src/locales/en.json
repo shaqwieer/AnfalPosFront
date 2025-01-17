@@ -365,6 +365,12 @@
     "empty": "No Items"
   },
   "Customer": {
-    "empty": "No Customer"
+    "empty": "No Customer",
+    "address": "Customer Aaddress",
+    "name": "Customer name",
+    "creditBalance": "credit Balance",
+    "email": "email",
+    "id": "id",
+    "primaryPhone": "Phone"
   }
 }
