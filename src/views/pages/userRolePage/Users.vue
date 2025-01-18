@@ -139,6 +139,13 @@ const savePassword = async (userId, payload) => {
                             </div>
                         </template>
                     </Column>
+                    <Column field="branches" :header="t('users.branchesName')" :sortable="true" headerStyle="min-width:10rem;">
+                        <template #body="slotProps">
+                            <div class="flex justify-content-start gap-2">
+                                <Tag v-for="(branch, index) in slotProps.data.branches" :key="index" :severity="'sucess'" class=" w-6rem h-2rem">{{ branch.name }}</Tag>
+                            </div>
+                        </template>
+                    </Column>
                     <Column field="status" :header="t('users.status')" :sortable="true" headerStyle="min-width:10rem;">
                         <template #body="slotProps">
                             <Tag :severity="(slotProps.data.status === 'Active' || slotProps.data.status === 'نشط') ? 'info' : 'warning'" rounded class="w-6rem h-2rem" :value="slotProps.data.status"></Tag>

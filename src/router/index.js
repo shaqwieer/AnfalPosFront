@@ -478,11 +478,16 @@ const router = createRouter({
                     name: 'invoice',
                     component: () => import('@/views/pages/Invoice.vue')
                 },
-                // {
-                //     path: '/Quickinvoice',
-                //     name: 'Quickinvoice',
-                //     component: () => import('@/views/pages/invoice/QuickInvoice.vue')
-                // },
+                {
+                    path: '/Quickinvoice',
+                    name: 'Quickinvoice',
+                    component: () => import('@/views/pages/invoice/QuickInvoice.vue')
+                },
+                {
+                    path: '/Quickinvoice2',
+                    name: 'Quickinvoice2',
+                    component: () => import('@/views/pages/oldInvoice/QuickInvoice.vue')
+                },
                 {
                     path: 'orders/draft',
                     name: 'DraftOrders',
@@ -502,7 +507,12 @@ const router = createRouter({
                     path: 'customer-list',
                     name: 'CustomerList',
                     component: () => import('@/views/pages/CustomerList.vue')
-                }
+                },
+                // {
+                //     path: '/branch-list',
+                //     name: 'branchPage',
+                //     component: () => import('@/views/pages/branchPage.vue')
+                // },
             ]
         },
         {
@@ -520,6 +530,7 @@ const router = createRouter({
             name: 'login',
             component: () => import('@/views/pages/auth/Login.vue')
         },
+
         {
             path: '/auth/access',
             name: 'accessDenied',

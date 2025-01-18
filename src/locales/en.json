@@ -122,7 +122,8 @@
     "deleteTooltip": "Delete",
     "updateTooltip": "Update",
     "passwordTooltip": "Password",
-    "mainData": "Main Data"
+    "mainData": "Main Data",
+    "branchesName": "Branches Name\t"
   },
   "CreateUpdateUsersRoles": {
     "header": "Add/Update Users and Roles",
@@ -148,7 +149,9 @@
     "organization": "Organization",
     "email": "Email",
     "firstName": "First Name ",
-    "lastName": "Last Name"
+    "lastName": "Last Name",
+    "branchLabel": "Branches",
+    "branchesPlaceholder": "Add Branches"
   },
   "validations": {
     "invalidEmail": "Invalid email format.",
@@ -353,5 +356,24 @@
     "email": "Email",
     "primaryPhone": "Primary Phone Number",
     "secondaryPhone": "Secondary Phone Number"
+  },
+  "items": {
+    "title": "items",
+    "barcode": "barcode",
+    "brand": "brand",
+    "id": "id",
+    "Group": "Group",
+    "price": "price",
+    "Desc": "Desc",
+    "empty": "No Items"
+  },
+  "Customer": {
+    "empty": "No Customer",
+    "address": "Customer Aaddress",
+    "name": "Customer name",
+    "creditBalance": "credit Balance",
+    "email": "email",
+    "id": "id",
+    "primaryPhone": "Phone"
   }
 }

@@ -3,10 +3,16 @@
         <div class="flex justify-content-between card p-4 align-items-center">
             <span class="text-2xl font-bold">{{ props.title }}</span>
             <div class="flex gap-3">
-                <IconField v-if="simple" iconPosition="left">
+                <IconField v-if="simple && hasSearch" iconPosition="left">
                     <InputText type="text" v-model="searchText" :placeholder="t('labels.search')" class="w-full" />
                     <InputIcon class="pi pi-search" />
                 </IconField>
+
+                <IconField v-if="hasReload" iconPosition="left">
+                  
+                    <slot name="action"></slot>
+                </IconField>
+
                 <Button
                     size="small"
                     v-if="props.extraText"
@@ -66,6 +72,14 @@ const props = defineProps({
     hasAddButton: {
         type: Boolean,
         default: true
+    },
+    hasSearch: {
+        type: Boolean,
+        default: true
+    },
+    hasReload: {
+        type: Boolean,
+        default: false
     },
     extraText: {
         type: String,

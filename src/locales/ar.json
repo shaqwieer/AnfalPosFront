@@ -122,7 +122,8 @@
     "deleteTooltip": "حذف",
     "updateTooltip": "تحديث",
     "passwordTooltip": "كلمة المرور",
-    "mainData": "البيانات الاساسية "
+    "mainData": "البيانات الاساسية ",
+    "branchesName": "أسماء الفروع\t"
   },
   "CreateUpdateUsersRoles": {
     "header": "إضافة/تحديث المستخدمين والأدوار",
@@ -148,7 +149,9 @@
     "organizationPlaceholder": "أختار شركة",
     "email": "البريد الالكترونى",
     "firstName": "الاسم الأول",
-    "lastName": "الاسم الاخير"
+    "lastName": "الاسم الاخير",
+    "branchLabel": "الفروع",
+    "branchesPlaceholder": "أضافة فروع"
   },
   "labels": {
     "cancel": "الغاء",
@@ -346,5 +349,24 @@
     "email": "الايميل",
     "primaryPhone": "رقم الموبايل الاساسى",
     "secondaryPhone": "رقم الموبايل الثانوى"
+  },
+  "items": {
+    "title": "الاصناف",
+    "barcode": "منتج",
+    "brand": "ماركة",
+    "id": "معرف",
+    "Group": "مجموعة",
+    "price": "السعر",
+    "Desc": "وصف",
+    "empty": "لا توجد أصناف"
+  },
+  "Customer": {
+    "empty": "لا يوجد عملاء",
+    "address": "عنوان العميل",
+    "name": "اسم العميل",
+    "creditBalance": "رصيد الائتمان",
+    "email": "البريد",
+    "id": "المعرف",
+    "primaryPhone": "الهاتف"
   }
 }

@@ -1,217 +1,312 @@
-<script setup>
-import { useLayout } from '@/layout/composables/layout';
-import { computed, ref } from 'vue';
-// import AppConfig from '@/layout/AppConfig.vue';
-import { useRouter } from 'vue-router';
-import { usePrimeVue } from 'primevue/config';
-
-const $primevue = usePrimeVue();
-
-defineExpose({
-    $primevue
-});
-
-const router = useRouter();
-const { layoutConfig } = useLayout();
-const darkMode = computed(() => {
-    return layoutConfig.colorScheme.value !== 'light';
-});
-const navigateToDashboard = () => {
-    router.push('/');
-};
-
-const testData = ref([]);
-testData.value = [
-    {
-        companyName: 'Company A',
-        address: '123 Main St, City A',
-        email: 'contact@companya.com',
-        primaryPhone: '+962792000111',
-        secondaryPhone: '+962792000222',
-        creditBalance: 1000,
-        type: 1,
-        name: 'LCS24001111',
-        sapCustomer: 'L2S001',
-        vatNumber: 'VAT123456',
-        id: 1001,
-        uniqueIdentifier: 'e1b73127-1f22-45b3-99f4-567c1a12abcd',
-        createdAt: '2025-01-05T16:18:21.272344Z'
-    },
-    {
-        companyName: 'Company B',
-        address: '456 Elm St, City B',
-        email: 'info@companyb.com',
-        primaryPhone: '+962792000333',
-        secondaryPhone: '+962792000444',
-        creditBalance: 2000,
-        type: 2,
-        name: 'LCS24002222',
-        sapCustomer: 'L2S002',
-        vatNumber: 'VAT654321',
-        id: 1002,
-        uniqueIdentifier: 'a9c82f49-2f6a-4db3-baa1-1234abcd5678',
-        createdAt: '2025-01-05T17:30:00.000000Z'
-    },
-    {
-        companyName: 'Company C',
-        address: '789 Oak St, City C',
-        email: 'support@companyc.com',
-        primaryPhone: '+962792000555',
-        secondaryPhone: '+962792000666',
-        creditBalance: 1500,
-        type: 1,
-        name: 'LCS24003333',
-        sapCustomer: 'L2S003',
-        vatNumber: 'VAT987654',
-        id: 1003,
-        uniqueIdentifier: 'b2f3c234-4acd-44b3-a456-abcdef123456',
-        createdAt: '2025-01-06T10:15:00.000000Z'
-    },
-    {
-        companyName: 'Company D',
-        address: '101 Pine St, City D',
-        email: 'hello@companyd.com',
-        primaryPhone: '+962792000777',
-        secondaryPhone: '+962792000888',
-        creditBalance: 500,
-        type: 2,
-        name: 'LCS24004444',
-        sapCustomer: 'L2S004',
-        vatNumber: 'VAT112233',
-        id: 1004,
-        uniqueIdentifier: 'c3d4f567-5ef6-6a78-b89c-123456abcdef',
-        createdAt: '2025-01-06T12:45:00.000000Z'
-    },
-    {
-        companyName: 'Company E',
-        address: '202 Birch St, City E',
-        email: 'sales@companye.com',
-        primaryPhone: '+962792000999',
-        secondaryPhone: null,
-        creditBalance: 300,
-        type: 1,
-        name: 'LCS24005555',
-        sapCustomer: 'L2S005',
-        vatNumber: null,
-        id: 1005,
-        uniqueIdentifier: 'd4e5f678-7gh8-8i90-j123-k456lmnopqrs',
-        createdAt: '2025-01-07T08:30:00.000000Z'
-    },
-    {
-        companyName: 'Company F',
-        address: '303 Cedar St, City F',
-        email: 'admin@companyf.com',
-        primaryPhone: '+962792000111',
-        secondaryPhone: '+962792000222',
-        creditBalance: 750,
-        type: 2,
-        name: 'LCS24006666',
-        sapCustomer: 'L2S006',
-        vatNumber: 'VAT334455',
-        id: 1006,
-        uniqueIdentifier: 'e5f6g789-8hi9-0j12-k34l-m56nopqrstuv',
-        createdAt: '2025-01-07T10:00:00.000000Z'
-    },
-    {
-        companyName: 'Company G',
-        address: '404 Maple St, City G',
-        email: 'info@companyg.com',
-        primaryPhone: '+962792000333',
-        secondaryPhone: null,
-        creditBalance: 400,
-        type: 1,
-        name: 'LCS24007777',
-        sapCustomer: 'L2S007',
-        vatNumber: 'VAT556677',
-        id: 1007,
-        uniqueIdentifier: 'f6g7h890-9ij1-2k34-l45m-n67opqrstuvw',
-        createdAt: '2025-01-08T09:00:00.000000Z'
-    },
-    {
-        companyName: 'Company H',
-        address: '505 Walnut St, City H',
-        email: 'hello@companyh.com',
-        primaryPhone: '+962792000444',
-        secondaryPhone: '+962792000555',
-        creditBalance: 1200,
-        type: 2,
-        name: 'LCS24008888',
-        sapCustomer: 'L2S008',
-        vatNumber: 'VAT778899',
-        id: 1008,
-        uniqueIdentifier: 'g7h8i901-0jk2-3l45-m56n-o78pqrstuvwx',
-        createdAt: '2025-01-08T14:30:00.000000Z'
-    },
-    {
-        companyName: 'Company I',
-        address: '606 Spruce St, City I',
-        email: 'support@companyi.com',
-        primaryPhone: '+962792000666',
-        secondaryPhone: null,
-        creditBalance: 800,
-        type: 1,
-        name: 'LCS24009999',
-        sapCustomer: 'L2S009',
-        vatNumber: null,
-        id: 1009,
-        uniqueIdentifier: 'h8i9j012-1kl3-4m56-n78o-p89qrstuvwxy',
-        createdAt: '2025-01-09T08:00:00.000000Z'
-    },
-    {
-        companyName: 'Company J',
-        address: '707 Redwood St, City J',
-        email: 'contact@companyj.com',
-        primaryPhone: '+962792000777',
-        secondaryPhone: '+962792000888',
-        creditBalance: 0,
-        type: 2,
-        name: 'LCS24001000',
-        sapCustomer: 'L2S010',
-        vatNumber: 'VAT990011',
-        id: 1010,
-        uniqueIdentifier: 'i9j0k123-2lm4-5n67-o89p-q90rstuvwxyz',
-        createdAt: '2025-01-10T16:45:00.000000Z'
-    }
-];
-
-const formatCurrency = (value) => {
-    return new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'SAR' }).format(value);
-};
-</script>
-
 <template>
-    <div>
-        <DataTable :value="testData" tableStyle="min-width: 50rem">
-            <template #header>
+    <div class="flex flex-column gap-2">
+        <PageTopBar v-model:searchText="filters['global'].value" :hasAddButton="false" :hasReload="true" :hasSearch="false" :title="t(`items.title`)" :addText="t('baseLookup.createButtonLabel')" simple :addButton="openCreateDialog">
+            <template #action>
                 <div class="flex flex-wrap items-center justify-between gap-2">
-                    <span class="text-xl font-bold">Companies</span>
-                    <Button icon="pi pi-refresh" rounded raised />
+                    <Button icon="pi pi-refresh" rounded raised @click="getCustomers" />
                 </div>
             </template>
+        </PageTopBar>
 
-            <Column field="companyName" header="company Name"></Column>
-            <Column field="address" header="address"></Column>
-            <Column field="creditBalance" header="credit Balance"></Column>
-            <Column field="name" header="name"></Column>
-            <Column field="sapCustomer" header="sap Customer"></Column>
-            <Column field="vatNumber" header="vat Number"></Column>
-            <template #footer>
-                <div class="flex justify-between items-center flex-column gap-2">
-                    <span>In total there are {{ testData.length }} products.</span>
-                </div>
-            </template>
-        </DataTable>
+        <div class="card">
+            <DataTable
+                :value="CustomersData"
+                dataKey="id"
+                :paginator="true"
+                :rows="10"
+                :filters="filters"
+                :globalFilterFields="['name', 'id']"
+                :paginatorTemplate="
+                    mainStore.isRTL ? 'RowsPerPageDropdown NextPageLink LastPageLink  PageLinks FirstPageLink PrevPageLink  CurrentPageReport ' : 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
+                "
+                :rowsPerPageOptions="[5, 10, 25]"
+                :currentPageReportTemplate="''"
+            >
+                <template #empty>
+                    <div class="flex justify-content-center align-items-center font-bold text-lg">
+                        {{ t(`Customer.empty`) }}
+                    </div>
+                </template>
+
+                <Column field="name" :header="t('Customer.name')" class="" :sortable="true">
+                    <template #body="slotProps">
+                        <div class="flex flex-row align-items-center">
+                            <span class="font-semibold text-md">{{ slotProps.data.name }}</span>
+                        </div>
+                    </template>
+                </Column>
+
+                <Column field="address" :header="t('Customer.address')" class="" :sortable="true">
+                    <template #body="slotProps">
+                        <div class="flex flex-row align-items-center">
+                            <span class="font-semibold text-md">{{ slotProps.data.address }}</span>
+                        </div>
+                    </template>
+                </Column>
+
+                <Column field="creditBalance" :header="t('Customer.creditBalance')" class="" :sortable="true">
+                    <template #body="slotProps">
+                        <div class="flex flex-row align-items-center">
+                            <span class="font-semibold text-md">{{ slotProps.data.creditBalance }}</span>
+                        </div>
+                    </template>
+                </Column>
+
+                <Column field="email" :header="t('Customer.email')" class="" :sortable="true">
+                    <template #body="slotProps">
+                        <div class="flex flex-row align-items-center">
+                            <span class="font-semibold text-md">{{ slotProps.data.email }}</span>
+                        </div>
+                    </template>
+                </Column>
+
+                <Column field="id" :header="t('Customer.id')" class="" :sortable="true">
+                    <template #body="slotProps">
+                        <div class="flex flex-row align-items-center">
+                            <span class="font-semibold text-md">{{ slotProps.data.id }}</span>
+                        </div>
+                    </template>
+                </Column>
+
+                <Column field="primaryPhone" :header="t('Customer.primaryPhone')" class="" :sortable="true">
+                    <template #body="slotProps">
+                        <div class="flex flex-row align-items-center">
+                            <span class="font-semibold text-md">{{ slotProps.data.primaryPhone }}</span>
+                        </div>
+                    </template>
+                </Column>
+
+                <Column field="actions" :header="t('labels.actions')">
+                    <template #body="slotProps">
+                        <div class="flex gap-2">
+                            <Button
+                                icon="pi pi-trash"
+                                v-tooltip.top="t('users.deleteTooltip')"
+                                text
+                                rounded
+                                aria-label="Delete"
+                                severity="danger"
+                                @click="
+                                    () => {
+                                        deleteText = slotProps.data.name;
+                                        deletedKey = slotProps.data.id;
+                                        deleteDialogVisible = true;
+                                    }
+                                "
+                            />
+                            <Button
+                                icon="pi pi-pencil"
+                                v-tooltip.top="t('users.updateTooltip')"
+                                text
+                                rounded
+                                aria-label="Update"
+                                severity="success"
+                                @click="
+                                    () => {
+                                        editItem(slotProps.data);
+                                    }
+                                "
+                            />
+                        </div>
+                    </template>
+                </Column>
+            </DataTable>
+        </div>
     </div>
+    <Dialog v-model:visible="visible" :breakpoints="{ '640px': '25rem' }" :header="t(`baseLookup.${isEdit ? 'edit' : 'add'}${name}`)" :class="containerClass" :style="{ width: '35rem' }" :modal="true" :closable="false">
+        <div class="flex flex-column gap-4 p-4">
+            <div class="field flex flex-column">
+                <label for="arabicName" class="required">{{ t(`baseLookup.arabicName`) }}</label>
+                <InputText id="arabicName" v-model="arabicName" v-bind="arabicNameAttrs" autofocus :invalid="!!errors.arabicName" />
+                <small v-if="errors.arabicName" class="text-red-600">{{ errors.arabicName }}</small>
+            </div>
+            <div class="field flex flex-column">
+                <label for="englishName" class="required">{{ t(`baseLookup.englishName`) }}</label>
+                <InputText id="englishName" v-model="englishName" v-bind="englishNameAttrs" autofocus :invalid="!!errors.englishName" />
+                <small v-if="errors.englishName" class="text-red-600">{{ errors.englishName }}</small>
+            </div>
+            <div class="flex justify-content-end gap-3 pt-2">
+                <Button :label="t('RoleCreateUpdateDialog.addButton')" v-if="!isEdit" icon="pi pi-check" @click="createData" />
+                <Button :label="t('RoleCreateUpdateDialog.updateButton')" v-else icon="pi pi-check" @click="updateData" />
+                <Button
+                    :label="t('RoleCreateUpdateDialog.cancelButton')"
+                    severity="danger"
+                    icon="pi pi-times"
+                    outlined
+                    @click="
+                        () => {
+                            visible = false;
+                            resetForm();
+                        }
+                    "
+                />
+            </div>
+        </div>
+    </Dialog>
+    <DeleteDialog
+        v-model="deleteDialogVisible"
+        :confirmDelete="
+            () => {
+                confirmDelete();
+            }
+        "
+        :deleteText="deleteText"
+        :deletedKey="deletedKey"
+    />
 </template>
 
+<script setup>
+import DeleteDialog from '@/components/DeleteDialog.vue';
+import { handleError } from '@/utilities/errorHandler';
+import { FilterMatchMode } from 'primevue/api';
+import { ref, onMounted, computed } from 'vue';
+import * as yup from 'yup';
+import { useI18n } from 'vue-i18n';
+import apiClient from '@/api/apiClient';
+import { useMainStore } from '@/stores/mainStore';
+import { useForm } from 'vee-validate';
+import PageTopBar from '@/components/pageTopBar.vue';
+
+onMounted(() => {
+    getCustomers();
+});
+const CustomersData = ref([]);
+
+const getCustomers = async () => {
+    try {
+        console.log('response');
+        const response = await apiClient.get('/Customers');
+        CustomersData.value = response.data.data;
+        console.log(CustomersData.value);
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+const mainStore = useMainStore();
+const rtl = computed(() => mainStore.isRTL);
+const containerClass = computed(() => ({
+    rtl: mainStore.isRTL,
+    ltr: !mainStore.isRTL
+}));
+const { t, locale } = useI18n();
+
+const props = defineProps({
+    name: {
+        type: String,
+        required: true
+    },
+    controllerName: {
+        type: String,
+        required: true
+    }
+});
+
+const filters = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
+});
+
+const visible = ref(false);
+const initialValues = ref({
+    arabicName: '',
+    englishName: ''
+});
+const schema = yup.object().shape({
+    arabicName: yup.string().required('Arabic Name is required'),
+    englishName: yup.string().required('English Name is required')
+});
+const { handleSubmit, errors, resetForm, setValues, defineField } = useForm({
+    validationSchema: schema,
+    initialValues: initialValues.value
+});
+const [arabicName, arabicNameAttrs] = defineField('arabicName');
+const [englishName, englishNameAttrs] = defineField('englishName');
+
+// Update create Functionality
+const editId = ref(0);
+const isEdit = ref(false);
+const openCreateDialog = () => {
+    visible.value = true;
+    isEdit.value = false;
+};
+
+const createData = handleSubmit(async (validatedInfo) => {
+    const transformedInfo = {
+        arabicName: validatedInfo.arabicName,
+        englishName: validatedInfo.englishName
+    };
+    try {
+        const response = await apiClient.post(`/${props.controllerName}`, transformedInfo);
+        entities.value.push(response.data.data);
+        mainStore.loading.setNotificationInfo('success', response.data.message);
+        resetForm();
+        visible.value = false;
+    } catch (err) {
+        handleError(err, mainStore.loading);
+    }
+});
+
+// const updateData = handleSubmit(async (validatedInfo) => {
+//     const transformedInfo = {
+//         id: editId.value,
+//         arabicName: validatedInfo.arabicName,
+//         englishName: validatedInfo.englishName
+//     };
+//     try {
+//         const response = await apiClient.put(`/${props.controllerName}/${editId.value}`, transformedInfo);
+//         const index = entities.value.findIndex((entity) => entity.id === editId.value);
+//         entities.value[index] = { ...entities.value[index], ...response.data.data };
+//         mainStore.loading.setNotificationInfo('success', response.data.message);
+//         resetForm();
+//         isEdit.value = false;
+//         visible.value = false;
+//     } catch (err) {
+//         handleError(err, mainStore.loading);
+//     }
+// });
+
+const editItem = async (data) => {
+    console.log(data);
+    setValues({
+        arabicName: data.arabicName,
+        englishName: data.englishName
+    });
+    isEdit.value = true;
+    editId.value = data.id;
+    visible.value = true;
+};
+
+//Delete Option
+const deleteDialogVisible = ref(false);
+const deleteText = ref('');
+const deletedKey = ref('');
+const confirmDelete = async () => {
+    try {
+        await apiClient.delete(`Customers/${deletedKey.value}`);
+        deleteDialogVisible.value = false;
+        CustomersData.value = CustomersData.value.filter((customer) => customer.id !== deletedKey.value);
+    } catch (err) {
+        handleError(err, mainStore.loading);
+    }
+};
+</script>
 <style scoped>
-.bg-circle {
-    width: 1000px;
-    height: 1000px;
-    border-radius: 50%;
-    background-image: linear-gradient(140deg, var(--primary-color), var(--surface-ground) 80%);
-    position: absolute;
-    opacity: 0.25;
-    z-index: -1;
+.rtl-direction :deep(.p-datatable .p-datatable-tbody > tr > td) {
+    text-align: right;
+}
+:deep(.p-paginator .p-dropdown .p-dropdown-label) {
+    padding-right: 1rem;
+}
+.rtl-direction :deep(.p-paginator .p-paginator-first) {
+    rotate: 180deg;
+}
+.rtl-direction :deep(.p-paginator .p-paginator-prev) {
+    rotate: 180deg;
+}
+.rtl-direction :deep(.p-paginator .p-paginator-next) {
+    rotate: 180deg;
+}
+.rtl-direction :deep(.p-paginator .p-paginator-last) {
+    rotate: 180deg;
 }
 </style>
