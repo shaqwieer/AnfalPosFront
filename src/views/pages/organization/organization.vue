@@ -9,6 +9,7 @@ import { useOrganizationStore } from '@/stores/organizationStore';
 import ImageLoader from '@/components/ImageLoader.vue';
 import { handleError } from '@/utilities/errorHandler';
 import placeHolderPhoto from '@/assets/images/placeholder.jpg';
+import { provide } from 'vue';
 
 const organizationStore = useOrganizationStore();
 const invoiceTemplates = computed(() => organizationStore.lookups.invoiceTemplates);
@@ -35,7 +36,8 @@ const paginatedEntities = computed(()=>{
 const totalRecords = ref(0);
 const rows = ref(12);
 const first = ref(0);
-onMounted(async () => {
+
+const getOrganizations = async ()=>{
     try {
         const response = await apiClient.get(`/Organizations`);
         entities.value = response.data.data;
@@ -44,6 +46,11 @@ onMounted(async () => {
     } catch (err) {
         handleError(err, mainStore.loading);
     }
+}
+provide('getOrganizations', getOrganizations);
+
+onMounted(async () => {
+    getOrganizations()
 });
 const updatePaginatedData = () => {
     paginatedEntities.value = entities.value.slice(first.value, first.value + rows.value);
