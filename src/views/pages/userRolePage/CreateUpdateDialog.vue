@@ -62,6 +62,7 @@ const typeSchema = yup.object({
         .email(t('CreateUpdateUsersRoles.emailInvalidError')) // Ensure the email is valid
         .required(t('CreateUpdateUsersRoles.requiredError')),
     roles: yup.mixed().required(t('CreateUpdateUsersRoles.requiredError')),
+    branches: yup.mixed().required(t('CreateUpdateUsersRoles.requiredError')),
     country: yup.mixed().required(t('CreateUpdateUsersRoles.requiredError')),
     organization: yup.mixed().required(t('CreateUpdateUsersRoles.requiredError')),
     status: yup.mixed().required(t('CreateUpdateUsersRoles.requiredError')),
@@ -69,7 +70,7 @@ const typeSchema = yup.object({
     confirmPassword: yup.string().oneOf([yup.ref('password'), null], t('CreateUpdateUsersRoles.passwordNotMatch'))
 });
 
-const informationInitial = ref({ firstName: '', lastName: '', email: '', roles: null, country: null, organization: null, status: null, password: '', confirmPassword: '' });
+const informationInitial = ref({ firstName: '', lastName: '', email: '', branches: null, roles: null, country: null, organization: null, status: null, password: '', confirmPassword: '' });
 
 const { handleSubmit, errors, resetForm, setValues, defineField } = useForm({
     validationSchema: typeSchema,
@@ -85,6 +86,8 @@ const [firstName, firstNameAttrs] = defineField('firstName');
 const [lastName, lastNameAttrs] = defineField('lastName');
 const [email, emailAttrs] = defineField('email');
 const [roles, rolesAttrs] = defineField('roles');
+const [branches, branchesAttrs] = defineField('branches');
+
 const [country, countryAttrs] = defineField('country');
 const [organization, organizationAttrs] = defineField('organization');
 
@@ -94,6 +97,8 @@ const [confirmPassword, confirmPasswordAttrs] = defineField('confirmPassword');
 let countries = [];
 let organizations = [];
 let rolesOptions = [];
+const branchesOptions = ref([]);
+const filterBranches = computed(() => { return branchesOptions.value.filter((e) => e.organizationId === organization?.value?.id)});
 
 const createData = handleSubmit(async (validatedInfo) => {
     const transformedInfo = {
@@ -105,9 +110,10 @@ const createData = handleSubmit(async (validatedInfo) => {
         organizationId: validatedInfo.organization.id,
         status: validatedInfo.status.name === 'Active' || validatedInfo.status.name === 'نشط' ? 'Active' : 'Blocked',
         password: validatedInfo.password,
-        confirmPassword: validatedInfo.confirmPassword
+        confirmPassword: validatedInfo.confirmPassword,
+        branchIds: validatedInfo.branches.map((e) => e.id), 
     };
-    props.createElement(transformedInfo,validatedInfo.country.name,validatedInfo.organization.name);
+    props.createElement(transformedInfo, validatedInfo.country.name, validatedInfo.organization.name);
     resetForm();
 });
 
@@ -122,6 +128,7 @@ const updateData = handleSubmit(async (validatedInfo) => {
         countryName: validatedInfo.country.name,
         organizationName: validatedInfo.organization.name,
         roles: validatedInfo.roles,
+        branchIds: validatedInfo.branches.map((e) => e.id), 
         status: validatedInfo.status.name === 'Active' || validatedInfo.status.name === 'نشط' ? 'Active' : 'Blocked'
     };
     const fullDto = { ...props.selectedData, ...transformedInfo };
@@ -139,7 +146,8 @@ const setFormValues = () => {
         status: statusObj,
         roles: rolesSelected,
         organization: organizations.find((e) => e.id === props.selectedData.organizationId),
-        country: countries.find((e) => e.id === props.selectedData.countryId)
+        country: countries.find((e) => e.id === props.selectedData.countryId),
+        branches: props.selectedData.branches?branchesOptions.value.filter((option) => props.selectedData.branches.map((e) => e.id).includes(option.id)):[]
     });
 };
 
@@ -151,6 +159,7 @@ watch(
             rolesOptions = userRolesLookups.roles;
             countries = userRolesLookups.countries;
             organizations = userRolesLookups.organizations;
+            branchesOptions.value = userRolesLookups.branches;
             if (props.load === true && props.IsAdd === false && props.selectedData) {
                 setFormValues();
             }
@@ -231,6 +240,32 @@ watch(
                 </div>
             </div>
             <div class="flex gap-2 border-1 p-4 border-round-lg">
+                <div class="field flex flex-column w-full">
+                    <label for="branches" class="mb-3 required">{{ t('CreateUpdateUsersRoles.branchLabel') }}</label>
+                    <MultiSelect
+                        v-model="branches"
+                        display="chip"
+                        v-bind="branchesAttrs"
+                        :virtualScrollerOptions="{ itemSize: 38 }"
+                        :invalid="!!errors.branches"
+                        :options="filterBranches"
+                        :maxSelectedLabels="3"
+                        filter
+                        optionLabel="name"
+                        :placeholder="t('CreateUpdateUsersRoles.branchesPlaceholder')"
+                        class="w-full"
+                    >
+                        <template #option="slotProps">
+                            <div class="flex align-items-center mx-auto gap-1">
+                                <div>{{ slotProps.option.name }}</div>
+                            </div>
+                        </template>
+                    </MultiSelect>
+                    <small v-if="errors.branches" class="text-red-600">{{ errors.branches }}</small>
+                </div>
+
+            </div>
+            <div class="flex gap-2 border-1 p-4 border-round-lg">
                 <div class="field flex flex-column w-4">
                     <label for="email" class="required">{{ t('CreateUpdateUsersRoles.email') }}</label>
                     <InputText id="email" v-model="email" v-bind="emailAttrs" autofocus :invalid="!!errors.email" />
@@ -249,12 +284,12 @@ watch(
                     <small v-if="errors.lastName" class="text-red-600">{{ errors.lastName }}</small>
                 </div>
             </div>
-            <div class="flex  gap-2 border-1 p-4 border-round-lg ">
+            <div class="flex gap-2 border-1 p-4 border-round-lg">
                 <div class="field flex flex-column w-full" v-if="IsAdd">
                     <label for="password" class="required">{{ t('CreateUpdateUsersRoles.passwordLabel') }}</label>
                     <IconField :iconPosition="rtl ? 'right' : 'left'" class="w-full mb-3 mt-1">
                         <InputIcon :class="passwordFieldType === 'password' ? 'pi pi-eye' : 'pi pi-eye-slash'" @click="togglePasswordVisibility" />
-                        <InputText id="password" v-model="password" v-bind="passwordAttrs" :type="passwordFieldType" class="w-full " :class="{ 'p-invalid': errors.password }" :placeholder="t('CreateUpdateUsersRoles.passwordLabel')" />
+                        <InputText id="password" v-model="password" v-bind="passwordAttrs" :type="passwordFieldType" class="w-full" :class="{ 'p-invalid': errors.password }" :placeholder="t('CreateUpdateUsersRoles.passwordLabel')" />
                     </IconField>
                     <span v-if="errors.password" class="text-red-600">{{ errors.password }}</span>
                 </div>
@@ -268,7 +303,7 @@ watch(
                             v-model="confirmPassword"
                             v-bind="confirmPasswordAttrs"
                             :type="passwordConfirmFieldType"
-                            class="w-full "
+                            class="w-full"
                             :class="{ 'p-invalid': errors.confirmPassword }"
                             :placeholder="t('CreateUpdateUsersRoles.confirmPasswordLabel')"
                         />

@@ -122,7 +122,8 @@
     "deleteTooltip": "حذف",
     "updateTooltip": "تحديث",
     "passwordTooltip": "كلمة المرور",
-    "mainData": "البيانات الاساسية "
+    "mainData": "البيانات الاساسية ",
+    "branchesName": "أسماء الفروع\t"
   },
   "CreateUpdateUsersRoles": {
     "header": "إضافة/تحديث المستخدمين والأدوار",
@@ -148,7 +149,9 @@
     "organizationPlaceholder": "أختار شركة",
     "email": "البريد الالكترونى",
     "firstName": "الاسم الأول",
-    "lastName": "الاسم الاخير"
+    "lastName": "الاسم الاخير",
+    "branchLabel": "الفروع",
+    "branchesPlaceholder": "أضافة فروع"
   },
   "labels": {
     "cancel": "الغاء",

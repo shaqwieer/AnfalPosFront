@@ -122,7 +122,8 @@
     "deleteTooltip": "Delete",
     "updateTooltip": "Update",
     "passwordTooltip": "Password",
-    "mainData": "Main Data"
+    "mainData": "Main Data",
+    "branchesName": "Branches Name\t"
   },
   "CreateUpdateUsersRoles": {
     "header": "Add/Update Users and Roles",
@@ -148,7 +149,9 @@
     "organization": "Organization",
     "email": "Email",
     "firstName": "First Name ",
-    "lastName": "Last Name"
+    "lastName": "Last Name",
+    "branchLabel": "Branches",
+    "branchesPlaceholder": "Add Branches"
   },
   "validations": {
     "invalidEmail": "Invalid email format.",
