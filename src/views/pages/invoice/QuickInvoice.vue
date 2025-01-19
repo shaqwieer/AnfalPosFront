@@ -67,7 +67,7 @@ const orders = ref<Order[]>([
 const statusColors = {
     cancelled: 'error',
     ready: 'success',
-    waiting: 'warning',
+    UnderRevision: 'warning',
     completed: 'info'
 };
 
@@ -110,6 +110,8 @@ onMounted(async () => {
         const response = await apiClient.get(`/Items/GetCategoriesForItems`);
         categories.value = response.data.data;
         selectedCategory.value = categories.value[0];
+        const response = await apiClient.post(`/Invoices/GetQuickInvoice`);
+        invoiceStore.HistoryOrders = response.data.data;
     } catch (err) {
         handleError(err, mainStore.loading);
     }
@@ -142,17 +144,17 @@ const navigateToDraft = () => {
                 <Button label="See All Orders" class="border-primary-200" outlined @click="navigateToHistory" />
             </div>
             <div class="grid">
-                <div v-for="order in orders" :key="order.id" class="col-12 md:col-6 lg:col-3">
+                <div v-for="order in invoiceStore.HistoryOrders.slice(0, 4)" :key="order.id" class="col-12 md:col-6 lg:col-3">
                     <Card unstyled class="bg-white p-3 border-round shadow-1">
                         <template #content>
                             <div class="flex justify-content-between">
                                 <div>
                                     <p class="font-semibold text-900">{{ order.customerName }}</p>
-                                    <p class="text-sm text-600">{{ order.time }} • {{ order.table }}</p>
+                                    <p class="text-sm text-600">{{ new Date(order.createdAt).toLocaleDateString(locale)  }}</p>
                                 </div>
                                 <span class="text-sm font-medium text-500">{{ order.id }}</span>
                             </div>
-                            <Badge :value="order.status" :severity="statusColors[order.status]" class="mt-2" />
+                            <Badge :value="order.currentStatus" :severity="statusColors[order.currentStatus]" class="mt-2" />
                         </template>
                     </Card>
                 </div>
