@@ -65,10 +65,12 @@ const orders = ref<Order[]>([
 ]);
 
 const statusColors = {
-    cancelled: 'error',
-    ready: 'success',
+    Rejected: 'error',
+    Returned: 'error',
+    Accepted: 'success',
+    Purchased: 'info',
     UnderRevision: 'warning',
-    completed: 'info'
+    Archived: 'info'
 };
 
 const subtotal = computed(() => invoiceStore.invoice.items.reduce((sum, item) => sum + item.finalDiscountAmount * item.quantity, 0));
