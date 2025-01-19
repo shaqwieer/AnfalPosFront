@@ -479,7 +479,7 @@ const router = createRouter({
                     component: () => import('@/views/pages/Invoice.vue')
                 },
                 {
-                    path: '/Quickinvoice',
+                    path: '/invoices/quick-invoice',
                     name: 'Quickinvoice',
                     component: () => import('@/views/pages/invoice/QuickInvoice.vue')
                 },
