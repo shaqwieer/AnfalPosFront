@@ -163,10 +163,10 @@ const updateData = handleSubmit(async (validatedInfo) => {
     formData.append('profitCenter', validatedInfo.profitCenter);
     formData.append('returnBillingType', validatedInfo.returnBillingType);
     formData.append('SalesOrganization', validatedInfo.SalesOrganization);
-    formData.append('sapCode', validatedInfo.sapCode);
+    formData.append('SapCode', validatedInfo.sapCode);
     formData.append('SapOrganization', validatedInfo.SapOrganization);
-    formData.append('sapPlant', validatedInfo.sapPlant);
-    formData.append('superOrganization', validatedInfo.superOrganization);
+    formData.append('SapPlant', validatedInfo.sapPlant);
+    formData.append('SuperOrganization', validatedInfo.superOrganization);
 
    saveData(formData);
     resetForm();
