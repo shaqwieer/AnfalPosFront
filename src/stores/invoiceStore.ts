@@ -111,75 +111,61 @@ export const useInvoiceStore = defineStore('invoice', {
             }
         ],
         HistoryOrders: [
+        {
+          id: 1420,
+          uniqueIdentifier: "9d9da600-fcf4-45f2-877f-e74e5101a1ae",
+          createdAt: "2025-01-16T15:46:53.934648Z",
+          billingDocId: "BillingDocId",
+          deliveryId: "DeliveryId",
+          currentStatus: "UnderRevision",
+          salesOrderId: "SalesOrderId",
+          customerId: 1831,
+          customerName: "mohamed shaqwieer",
+          customerPhoneNumber: "+966123322202",
+          totalAmount: 1172,
+          discountTotal: 86,
+          taxTotal: 0,
+          finalAmount: 1086,
+          items: [
             {
-                id: '001',
-                customer: {
-                    id: '001',
-                    name: 'John Doe',
-                    address: '123 Main St, Anytown, USA'
-                },
-                items: [
-                    {
-                        id: '001',
-                        product: {
-                            name: 'All-Season Tire 215/55R17',
-                            category: 'Tires'
-                        },
-                        selectedBatch: { id: '001', type: 'single', size: 1, price: 129.99 },
-                        discount: { type: 'percentage', value: 10 },
-                        quantity: 2
-                    },
-                    {
-                        id: '002',
-                        product: {
-                            id: '002',
-                            name: 'Summer-Season Tire 215/55R21',
-                            category: 'Tires'
-                        },
-                        selectedBatch: { id: '002', type: 'pack', size: 4, price: 299.99 },
-                        discount: { type: 'amount', value: 50 },
-                        quantity: 1
-                    }
-                ],
-                status: 'Completed',
-                total: 999.99,
-                createdAt: new Date('2023-01-01')
-            },
-            {
-                id: '002',
-                customer: {
-                    id: '002',
-                    name: 'Jane Smith',
-                    address: '456 Elm St, Anytown, USA'
-                },
-                items: [
-                    {
-                        id: '001',
-                        product: {
-                            name: 'All-Season Tire 215/55R17',
-                            category: 'Tires'
-                        },
-                        selectedBatch: { id: '001', type: 'single', size: 1, price: 129.99 },
-                        discount: { type: 'percentage', value: 10 },
-                        quantity: 2
-                    },
-                    {
-                        id: '002',
-                        product: {
-                            id: '002',
-                            name: 'Summer-Season Tire 215/55R21',
-                            category: 'Tires'
-                        },
-                        selectedBatch: { id: '002', type: 'pack', size: 4, price: 299.99 },
-                        discount: { type: 'amount', value: 50 },
-                        quantity: 1
-                    }
-                ],
-                status: 'Refunded',
-                total: 999.99,
-                createdAt: new Date('2023-01-01')
+              id: 2174,
+              createdAt: "2025-01-16T15:46:53.934648Z",
+              discountPercentage: 0,
+              finalDiscountAmount: 86,
+              price: 0,
+              quantity: 2,
+              sapDesc: "MANCERA MIDNIGHT GOLD 120ML"
             }
-        ],
+          ]
+        },
+        {
+          id: 1421,
+          uniqueIdentifier: "cb9b6f8c-b139-4ec4-9f62-f8dfa5edc519",
+          createdAt: "2025-01-16T21:42:34.167241Z",
+          billingDocId: "BillingDocId",
+          deliveryId: "DeliveryId",
+          currentStatus: "UnderRevision",
+          salesOrderId: "SalesOrderId",
+          customerId: 333,
+          customerName: "test",
+          customerPhoneNumber: "+966122222222",
+          totalAmount: 1172,
+          discountTotal: 0,
+          taxTotal: 0,
+          finalAmount: 1172,
+          items: [
+            {
+              id: 2175,
+              createdAt: "2025-01-16T21:42:34.167241Z",
+              discountPercentage: 0,
+              finalDiscountAmount: 0,
+              price: 0,
+              quantity: 2,
+              sapDesc: "MANCERA MIDNIGHT GOLD 120ML"
+            }
+          ]
+        }
+      ],
         products: <MenuItem[]>[
             {
                 id: '1',
