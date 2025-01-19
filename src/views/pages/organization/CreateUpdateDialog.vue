@@ -193,7 +193,7 @@ watch(
 <template>
     <Dialog v-model:visible="visible" :breakpoints="{ '640px': '25rem' }" :header="$t('organizationDialog.header')" :class="containerClass" :style="{ minWidth: '85rem' }" :modal="true" :closable="false">
         <TabView>
-            <TabPanel header="Basic Data">
+            <TabPanel :header="$t('organizationDialog.basicDataTab')">
                 <div class="flex flex-column gap-4 p-4">
                     <div class="flex justify-content-between w-full gap-2">
                         <div class="field flex flex-column w-6">
@@ -209,7 +209,7 @@ watch(
                     </div>
 
                     <div class="flex justify-content-between w-full gap-2">
-                        <div class="field flex flex-column w-3">
+                        <div class="field flex flex-column w-6">
                             <label for="organizationType" class="mb-3 required">{{ $t('organizationDialog.organizationType') }}</label>
                             <Dropdown
                                 v-model="organizationType"
@@ -230,7 +230,7 @@ watch(
                             </Dropdown>
                             <small v-if="errors.organizationType" class="text-red-600">{{ errors.organizationType }}</small>
                         </div>
-                        <div class="field flex flex-column w-3">
+                        <div class="field flex flex-column w-6">
                             <label for="invoiceTemplate" class="mb-3 required">{{ $t('organizationDialog.invoicesTemplate') }}</label>
                             <Dropdown
                                 v-model="invoiceTemplate"
@@ -251,7 +251,7 @@ watch(
                             </Dropdown>
                             <small v-if="errors.invoiceTemplate" class="text-red-600">{{ errors.invoiceTemplate }}</small>
                         </div>
-                        <div class="field flex flex-column w-6 border-1 p-3  border-round-lg botder-dashed bg-gray-50">
+                        <!-- <div class="field flex flex-column w-6 border-1 p-3  border-round-lg botder-dashed bg-gray-50">
                             <label for="sapConfiguration" class="mb-3 required">{{ $t('organizationDialog.sapConfiguration') }}</label>
                             <Dropdown
                                 v-model="sapConfiguration"
@@ -271,7 +271,7 @@ watch(
                                 </template>
                             </Dropdown>
                             <small v-if="errors.sapConfiguration" class="text-red-600">{{ errors.sapConfiguration }}</small>
-                        </div>
+                        </div> -->
                     </div>
                     <div class="flex justify-content-between w-full gap-2">
                         <div class="field flex flex-column w-6">
@@ -343,7 +343,7 @@ watch(
                     </div>
                 </div>
             </TabPanel>
-            <TabPanel header="Organization Settings" v-if="!IsAdd">
+            <TabPanel :header="$t('organizationDialog.organizationSettingsTab')" v-if="!IsAdd">
                 <OrganizationSettings :selectedData="selectedData" :closeDialog="closeDialog" />
             </TabPanel>
         </TabView>

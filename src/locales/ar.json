@@ -314,7 +314,9 @@
     "invoicesTemplatePlaceholder": "برجاء اختيار نوع الفاتورة",
     "sapConfiguration": "اعدادات SAP",
     "sapConfigurationplaceholder": "اختار أعددات SAP",
-    "logouploader": "الشعار الرسمى"
+    "logouploader": "الشعار الرسمى",
+    "basicDataTab" : "البيانات الاساسية",
+    "organizationSettingsTab" : "اعدادات المنظمة"
   },
   "uploader": {
     "mainlabel": "برجاء السحب والافلات هنا لأرفاق الملف",
@@ -368,5 +370,27 @@
     "email": "البريد",
     "id": "المعرف",
     "primaryPhone": "الهاتف"
+  },
+  "organizationConfig": {
+    "basePriceCode": "كود السعر الاساسى",
+    "cashBillingType": "نوع الفاتورة النقدية",
+    "cashSalesFocItemType": "نوع الصنف النقدى",
+    "cashSalesOrderType": "نوع الطلب",
+    "customerDiscountFixedCode": "كود الخصم العميل",
+    "customerDiscountPercentageCode": "كود الخصم النسبة",
+    "customerReturnOrderType": "نوع الطلب العميل",
+    "DistributionChannel": "قناة التوزيع",
+    "IncometermsClassification": "تصنيف شروط الدفع",
+    "OrganizationDivision": "قسم المنظومة",
+    "pricingProcedure": "معاملة السعر",
+    "profitCenter": "مركز الربح",
+    "returnBillingType": "نوع الفاتورة العميل",
+    "SalesOrganization": "منظومة البيع",
+    "sapCode":"كود SAP",
+    "SapOrganization": "منظومة SAP",
+    "sapPlant": "مخزن SAP",
+    "superOrganization": "منظومة الرئيسية"
+    
+
   }
 }

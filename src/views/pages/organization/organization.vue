@@ -243,4 +243,7 @@ const addData = async (data) => {
 :deep(.p-paginator) {
     background-color: transparent;
 }
+.h-2rem {
+    height: 3rem !important;
+}
 </style>
