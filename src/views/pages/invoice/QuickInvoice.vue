@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import apiClient from '../../../api/apiClient';
 import { handleError } from '../../../utilities/errorHandler';
-
+import PaymentDialog from './PaymentDialog.vue';
 import type { OrderItem, Order, Customer } from './types';
 import { useInvoiceStore } from '../../../stores/invoiceStore';
 import { useMainStore } from '../../../stores/mainStore';
@@ -19,7 +19,7 @@ const discountError = ref('');
 const selectedCommercialCustomer = ref('');
 const companyAddress = ref('');
 const mainStore = useMainStore();
-
+const paymentDialogVisible = ref(false);
 const commercialCustomers = ref<Customer[]>([
     {
         name: 'Acme Corp',
@@ -65,10 +65,12 @@ const orders = ref<Order[]>([
 ]);
 
 const statusColors = {
-    cancelled: 'error',
-    ready: 'success',
-    waiting: 'warning',
-    completed: 'info'
+    Rejected: 'error',
+    Returned: 'error',
+    Accepted: 'success',
+    Purchased: 'info',
+    UnderRevision: 'warning',
+    Archived: 'info'
 };
 
 const subtotal = computed(() => invoiceStore.invoice.items.reduce((sum, item) => sum + item.finalDiscountAmount * item.quantity, 0));
@@ -110,11 +112,28 @@ onMounted(async () => {
         const response = await apiClient.get(`/Items/GetCategoriesForItems`);
         categories.value = response.data.data;
         selectedCategory.value = categories.value[0];
+        const response2 = await apiClient.post(`/Invoices/GetQuickInvoice`);
+        invoiceStore.HistoryOrders = response2.data.data;
     } catch (err) {
         handleError(err, mainStore.loading);
     }
 });
-
+const search = (e) => {
+    setTimeout(() => {
+        if (!searchQuery.value.trim().length) {
+            var temp = selectedCategory.value 
+            selectedCategory.value = '';
+            selectedCategory.value = temp
+            //suggestions.value = [];
+        } else {
+            searchAPI();
+        }
+    }, 250);
+};
+const searchAPI = async () => {
+    const response = await apiClient.get(`/Items/SarchForItemsInQuickInvoice?searchTerm=${searchQuery.value}`);
+    invoiceStore.products = response.data.data;
+};
 const navigateToHistory = () => {
     router.push({ name: 'OrderHistory' });
 };
@@ -142,17 +161,17 @@ const navigateToDraft = () => {
                 <Button label="See All Orders" class="border-primary-200" outlined @click="navigateToHistory" />
             </div>
             <div class="grid">
-                <div v-for="order in orders" :key="order.id" class="col-12 md:col-6 lg:col-3">
+                <div v-for="order in invoiceStore.HistoryOrders.slice(0, 4)" :key="order.id" class="col-12 md:col-6 lg:col-3">
                     <Card unstyled class="bg-white p-3 border-round shadow-1">
                         <template #content>
                             <div class="flex justify-content-between">
                                 <div>
                                     <p class="font-semibold text-900">{{ order.customerName }}</p>
-                                    <p class="text-sm text-600">{{ order.time }} • {{ order.table }}</p>
+                                    <p class="text-sm text-600">{{ new Date(order.createdAt).toLocaleDateString(locale)  }}</p>
                                 </div>
                                 <span class="text-sm font-medium text-500">{{ order.id }}</span>
                             </div>
-                            <Badge :value="order.status" :severity="statusColors[order.status]" class="mt-2" />
+                            <Badge :value="order.currentStatus" :severity="statusColors[order.currentStatus]" class="mt-2" />
                         </template>
                     </Card>
                 </div>
@@ -254,11 +273,11 @@ const navigateToDraft = () => {
                     <div class="flex gap-3 mb-3">
                         <div class="flex align-items-center">
                             <RadioButton v-model="customerType" value="express" inputId="express" />
-                            <label for="express" class="ml-2">Express</label>
+                            <label for="express" class="ml-2">Walk-in</label>
                         </div>
                         <div class="flex align-items-center">
                             <RadioButton v-model="customerType" value="commercial" inputId="commercial" />
-                            <label for="commercial" class="ml-2">Commercial</label>
+                            <label for="commercial" class="ml-2">Business partner</label>
                         </div>
                     </div>
 
@@ -337,12 +356,13 @@ const navigateToDraft = () => {
                 <!-- Process Transaction Button -->
 
                 <div class="flex flex-column gap-2">
-                    <Button label="Complete Sale" @click="processTransaction" :disabled="selectedItems.length === 0 || (customerType === 'express' && !customerName) || (customerType === 'commercial' && !selectedCommercialCustomer)" />
-                    <Button label="Save as Draft" class="border-primary-200" outlined></Button>
+                    <Button label="Complete Sale" @click="processTransaction" :disabled="invoiceStore.invoice.items.length === 0" />
+                    <Button label="Save as Draft" class="border-primary-200" outlined @click="paymentDialogVisible = true"></Button>
                 </div>
             </template>
         </Card>
     </div>
+    <PaymentDialog v-model:visible="paymentDialogVisible" />
 </template>
 
 <style scoped>

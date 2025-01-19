@@ -113,6 +113,7 @@ const [superOrganization, superOrganizationAttrs] = defineField('superOrganizati
 
 const setFormValues = () => {
     var config = props.selectedData.configurations;
+    console.log(config);
     setValues({
         basePriceCode: config.basePriceCode,
         cashBillingType: config.cashBillingType,
@@ -121,15 +122,15 @@ const setFormValues = () => {
         customerDiscountFixedCode: config.customerDiscountFixedCode,
         customerDiscountPercentageCode: config.customerDiscountPercentageCode,
         customerReturnOrderType: config.customerReturnOrderType,
-        DistributionChannel: config.DistributionChannel,
-        IncotermsClassification: config.IncotermsClassification,
-        OrganizationDivision: config.OrganizationDivision,
+        DistributionChannel: config.distributionChannel,
+        IncotermsClassification: config.incotermsClassification,
+        OrganizationDivision: config.organizationDivision,
         pricingProcedure: config.pricingProcedure,
         profitCenter: config.profitCenter,
         returnBillingType: config.returnBillingType,
-        SalesOrganization: config.SalesOrganization,
+        SalesOrganization: config.salesOrganization,
         sapCode: config.sapCode,
-        SapOrganization: config.SapOrganization,
+        SapOrganization: config.sapOrganization,
         sapPlant: config.sapPlant,
         superOrganization: config.superOrganization,
     });
@@ -163,10 +164,10 @@ const updateData = handleSubmit(async (validatedInfo) => {
     formData.append('profitCenter', validatedInfo.profitCenter);
     formData.append('returnBillingType', validatedInfo.returnBillingType);
     formData.append('SalesOrganization', validatedInfo.SalesOrganization);
-    formData.append('sapCode', validatedInfo.sapCode);
+    formData.append('SapCode', validatedInfo.sapCode);
     formData.append('SapOrganization', validatedInfo.SapOrganization);
-    formData.append('sapPlant', validatedInfo.sapPlant);
-    formData.append('superOrganization', validatedInfo.superOrganization);
+    formData.append('SapPlant', validatedInfo.sapPlant);
+    formData.append('SuperOrganization', validatedInfo.superOrganization);
 
    saveData(formData);
     resetForm();
