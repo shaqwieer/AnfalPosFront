@@ -373,23 +373,26 @@
     "primaryPhone": "الهاتف"
   },
   "organizationConfig": {
-    "basePriceCode": "كود السعر الاساسى",
-    "cashBillingType": "نوع الفاتورة النقدية",
-    "cashSalesFocItemType": "نوع الصنف النقدى",
-    "cashSalesOrderType": "نوع الطلب",
-    "customerDiscountFixedCode": "كود الخصم العميل",
-    "customerDiscountPercentageCode": "كود الخصم النسبة",
-    "customerReturnOrderType": "نوع الطلب العميل",
+    "basePriceCode": "كود السعر الأساسي",
+    "cashBillingType": "نوع الفوترة النقدية",
+    "cashSalesFocItemType": "نوع عنصر المبيعات النقدية",
+    "cashSalesOrderType": "نوع أمر المبيعات النقدية",
+    "customerDiscountFixedCode": "كود الخصم الثابت للعميل",
+    "customerDiscountPercentageCode": "كود نسبة الخصم للعميل",
+    "customerReturnOrderType": "نوع أمر الإرجاع للعميل",
     "DistributionChannel": "قناة التوزيع",
-    "IncometermsClassification": "تصنيف شروط الدفع",
-    "OrganizationDivision": "قسم المنظومة",
-    "pricingProcedure": "معاملة السعر",
+    "IncometermsClassification": "تصنيف شروط التسليم",
+    "OrganizationDivision": "قسم المؤسسة",
+    "pricingProcedure": "إجراء التسعير",
     "profitCenter": "مركز الربح",
-    "returnBillingType": "نوع الفاتورة العميل",
-    "SalesOrganization": "منظومة البيع",
+    "returnBillingType": "نوع فوترة الإرجاع",
+    "SalesOrganization": "تنظيم المبيعات",
     "sapCode": "كود SAP",
-    "SapOrganization": "منظومة SAP",
-    "sapPlant": "مخزن SAP",
-    "superOrganization": "منظومة الرئيسية"
+    "SapOrganization": "مؤسسة SAP",
+    "sapPlant": "مصنع SAP",
+    "superOrganization": "المؤسسة العليا"
+  },
+  "availableBranch": {
+    "title": "الفروع المتاحة"
   }
 }

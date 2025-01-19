@@ -398,5 +398,10 @@
     "SapOrganization": "Sap Organization",
     "sapPlant": "Sap Plant",
     "superOrganization": "Super Organization"
+    
+    
+  },
+  "availableBranch": {
+    "title": "Available Branches"
   }
 }
