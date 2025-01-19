@@ -98,7 +98,9 @@ let countries = [];
 let organizations = [];
 let rolesOptions = [];
 const branchesOptions = ref([]);
-const filterBranches = computed(() => { return branchesOptions.value.filter((e) => e.organizationId === organization?.value?.id)});
+const filterBranches = computed(() => {
+    return branchesOptions.value.filter((e) => e.organizationId === organization?.value?.id);
+});
 
 const createData = handleSubmit(async (validatedInfo) => {
     const transformedInfo = {
@@ -111,7 +113,7 @@ const createData = handleSubmit(async (validatedInfo) => {
         status: validatedInfo.status.name === 'Active' || validatedInfo.status.name === 'نشط' ? 'Active' : 'Blocked',
         password: validatedInfo.password,
         confirmPassword: validatedInfo.confirmPassword,
-        branchIds: validatedInfo.branches.map((e) => e.id), 
+        branchIds: validatedInfo.branches.map((e) => e.id)
     };
     props.createElement(transformedInfo, validatedInfo.country.name, validatedInfo.organization.name);
     resetForm();
@@ -128,7 +130,7 @@ const updateData = handleSubmit(async (validatedInfo) => {
         countryName: validatedInfo.country.name,
         organizationName: validatedInfo.organization.name,
         roles: validatedInfo.roles,
-        branchIds: validatedInfo.branches.map((e) => e.id), 
+        branchIds: validatedInfo.branches.map((e) => e.id),
         status: validatedInfo.status.name === 'Active' || validatedInfo.status.name === 'نشط' ? 'Active' : 'Blocked'
     };
     const fullDto = { ...props.selectedData, ...transformedInfo };
@@ -147,7 +149,7 @@ const setFormValues = () => {
         roles: rolesSelected,
         organization: organizations.find((e) => e.id === props.selectedData.organizationId),
         country: countries.find((e) => e.id === props.selectedData.countryId),
-        branches: props.selectedData.branches?branchesOptions.value.filter((option) => props.selectedData.branches.map((e) => e.id).includes(option.id)):[]
+        branches: props.selectedData.branches ? branchesOptions.value.filter((option) => props.selectedData.branches.map((e) => e.id).includes(option.id)) : []
     });
 };
 
@@ -166,12 +168,25 @@ watch(
         }
     }
 );
+
+const branchs = ref([]);
+
+const getBranchs = () => {
+    // const response = await apiClient.get(`/${props.controllerName}`);
+    // branchs.value = response.data.data;
+    branchs.value = [
+        { countryCode: null, arabicName: 'المملكة السعودية العربية', englishName: 'Saudi Arabia', name: 'Saudi Arabia', region: null, id: 2, uniqueIdentifier: null, createdAt: null },
+        { countryCode: null, arabicName: 'المملكة السعودية العربية', englishName: 'Saudi Arabia', name: 'Saudi Arabia', region: null, id: 2, uniqueIdentifier: null, createdAt: null }
+    ];
+
+};
+getBranchs();
 </script>
 
 <template>
     <Dialog :breakpoints="{ '640px': '40rem' }" :header="t('CreateUpdateUsersRoles.header')" :class="containerClass" :style="{ width: '50rem' }" :modal="true" :closable="false">
         <div class="flex flex-column gap-3 p-4">
-            <div class="flex gap-2 border-1 p-4 border-round-lg">
+            <div class="flex gap-2 border-1 p-4 border-round-lg overflow-scroll scroll-container">
                 <div class="field flex flex-column w-4">
                     <label for="country" class="mb-3 required">{{ $t('CreateUpdateUsersRoles.country') }}</label>
                     <Dropdown
@@ -187,7 +202,7 @@ watch(
                     >
                         <template #option="slotProps">
                             <div class="flex align-items-center mx-auto gap-3">
-                                <div>{{ slotProps.option.name }}</div>
+                                <div>{{ slotProps.option }}</div>
                             </div>
                         </template>
                     </Dropdown>
@@ -238,7 +253,20 @@ watch(
                     </Dropdown>
                     <small v-if="errors.organization" class="text-red-600">{{ errors.organization }}</small>
                 </div>
+
+                <div class="field flex flex-column w-4">
+                    <label for="organization" class="mb-3 required">{{ $t('CreateUpdateUsersRoles.branchs') }}</label>
+                    <Dropdown v-model="branchs" v-bind="branchsAttrs" :virtualScrollerOptions="{ itemSize: 38 }" :options="branchs" filter :loading="false" optionLabel="name" :placeholder="t('CreateUpdateUsersRoles.branchs')" class="w-full">
+                        <template #option="slotProps">
+                            <div class="flex align-items-center mx-auto gap-3">
+                                <div>{{ slotProps.option.name }}</div>
+                            </div>
+                        </template>
+                    </Dropdown>
+                    <small v-if="errors.organization" class="text-red-600">{{ errors.branchs }}</small>
+                </div>
             </div>
+
             <div class="flex gap-2 border-1 p-4 border-round-lg">
                 <div class="field flex flex-column w-full">
                     <label for="branches" class="mb-3 required">{{ t('CreateUpdateUsersRoles.branchLabel') }}</label>
@@ -263,7 +291,6 @@ watch(
                     </MultiSelect>
                     <small v-if="errors.branches" class="text-red-600">{{ errors.branches }}</small>
                 </div>
-
             </div>
             <div class="flex gap-2 border-1 p-4 border-round-lg">
                 <div class="field flex flex-column w-4">
@@ -361,5 +388,10 @@ watch(
 }
 .ltr {
     direction: ltr;
+}
+
+.scroll-container::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
 }
 </style>

@@ -151,7 +151,8 @@
     "firstName": "الاسم الأول",
     "lastName": "الاسم الاخير",
     "branchLabel": "الفروع",
-    "branchesPlaceholder": "أضافة فروع"
+    "branchesPlaceholder": "أضافة فروع",
+    "branchs": "فروع"
   },
   "labels": {
     "cancel": "الغاء",
@@ -315,8 +316,8 @@
     "sapConfiguration": "اعدادات SAP",
     "sapConfigurationplaceholder": "اختار أعددات SAP",
     "logouploader": "الشعار الرسمى",
-    "basicDataTab" : "البيانات الاساسية",
-    "organizationSettingsTab" : "اعدادات المنظمة"
+    "basicDataTab": "البيانات الاساسية",
+    "organizationSettingsTab": "اعدادات المنظمة"
   },
   "uploader": {
     "mainlabel": "برجاء السحب والافلات هنا لأرفاق الملف",
@@ -386,11 +387,9 @@
     "profitCenter": "مركز الربح",
     "returnBillingType": "نوع الفاتورة العميل",
     "SalesOrganization": "منظومة البيع",
-    "sapCode":"كود SAP",
+    "sapCode": "كود SAP",
     "SapOrganization": "منظومة SAP",
     "sapPlant": "مخزن SAP",
     "superOrganization": "منظومة الرئيسية"
-    
-
   }
 }

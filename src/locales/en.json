@@ -151,7 +151,8 @@
     "firstName": "First Name ",
     "lastName": "Last Name",
     "branchLabel": "Branches",
-    "branchesPlaceholder": "Add Branches"
+    "branchesPlaceholder": "Add Branches",
+    "branchs": "Branchs"
   },
   "validations": {
     "invalidEmail": "Invalid email format.",
@@ -397,7 +398,5 @@
     "SapOrganization": "Sap Organization",
     "sapPlant": "Sap Plant",
     "superOrganization": "Super Organization"
-    
-    
   }
 }
