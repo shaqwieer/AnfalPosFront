@@ -321,7 +321,9 @@
     "invoicesTemplatePlaceholder": "Choose Invoice template",
     "sapConfiguration": "Sap Configuration",
     "sapConfigurationplaceholder": "Choose Sap Configuration",
-    "logouploader": "Logo"
+    "logouploader": "Logo",
+    "basicDataTab": "Basic Data",
+    "organizationSettingsTab": "Organization Settings"
   },
   "uploader": {
     "mainlabel": "Drag and drop your logo here or click to select",
@@ -375,5 +377,30 @@
     "email": "email",
     "id": "id",
     "primaryPhone": "Phone"
+  },
+  "organizationConfig": {
+    "basePriceCode": "Base Price Code",
+    "cashBillingType": "Cash Billing Type",
+    "cashSalesFocItemType": "Cash Sales For Item Type",
+    "cashSalesOrderType": "Cash Sales Order Type",
+    "customerDiscountFixedCode": "Customer Discount Fixed Code",
+    "customerDiscountPercentageCode": "Customer Discount Percentage Code",
+    "customerReturnOrderType": "Customer Return Order Type",
+    "DistributionChannel": "Distribution Channel",
+    "IncometermsClassification": "Income terms Classification",
+    "OrganizationDivision": "Organization Division",
+    "pricingProcedure": "Pricing Procedure",
+    "profitCenter": "Profit Center",
+    "returnBillingType": "Return Billing Type",
+    "SalesOrganization": "Sales Organization",
+    "sapCode": "Sap Code",
+    "SapOrganization": "Sap Organization",
+    "sapPlant": "Sap Plant",
+    "superOrganization": "Super Organization"
+    
+    
+  },
+  "availableBranch": {
+    "title": "Available Branches"
   }
 }
