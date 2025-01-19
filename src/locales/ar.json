@@ -314,7 +314,9 @@
     "invoicesTemplatePlaceholder": "برجاء اختيار نوع الفاتورة",
     "sapConfiguration": "اعدادات SAP",
     "sapConfigurationplaceholder": "اختار أعددات SAP",
-    "logouploader": "الشعار الرسمى"
+    "logouploader": "الشعار الرسمى",
+    "basicDataTab" : "البيانات الاساسية",
+    "organizationSettingsTab" : "اعدادات المنظمة"
   },
   "uploader": {
     "mainlabel": "برجاء السحب والافلات هنا لأرفاق الملف",
@@ -368,8 +370,5 @@
     "email": "البريد",
     "id": "المعرف",
     "primaryPhone": "الهاتف"
-  },
-  "availableBranch": {
-    "title": "الفروع المتاحة"
   }
 }

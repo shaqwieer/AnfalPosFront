@@ -8,6 +8,7 @@ import { useOrganizationStore } from '@/stores/organizationStore';
 import simpleuploader from '@/components/simpleuploader.vue';
 import { ImageIcon, XIcon } from 'lucide-vue-next';
 import placeHolderPhoto from '@/assets/images/placeholder.jpg';
+import OrganizationSettings from './OrganizationSettings.vue';
 const organizationStore = useOrganizationStore();
 
 const mainStore = useMainStore();
@@ -190,156 +191,162 @@ watch(
 </script>
 
 <template>
-    <Dialog v-model:visible="visible" :breakpoints="{ '640px': '25rem' }" :header="$t('organizationDialog.header')" :class="containerClass" :style="{ minWidth: '45rem' }" :modal="true" :closable="false">
-        <div class="flex flex-column gap-4 p-4">
-            <div class="flex justify-content-between w-full gap-2">
-                <div class="field flex flex-column w-6">
-                    <label for="englishName" class="required">{{ $t('cityDialog.englishNameLabel') }}</label>
-                    <InputText id="englishName" v-model="englishName" v-bind="englishNameAttrs" autofocus :invalid="!!errors.englishName" />
-                    <small v-if="errors.englishName" class="text-red-600">{{ errors.englishName }}</small>
-                </div>
-                <div class="field flex flex-column w-6">
-                    <label for="arabicName" class="required">{{ $t('cityDialog.arabicNameLabel') }}</label>
-                    <InputText id="arabicName" v-model="arabicName" v-bind="arabicNameAttrs" autofocus :invalid="!!errors.arabicName" />
-                    <small v-if="errors.arabicName" class="text-red-600">{{ errors.arabicName }}</small>
-                </div>
-            </div>
-
-            <div class="flex justify-content-between w-full gap-2">
-                <div class="field flex flex-column w-3">
-                    <label for="organizationType" class="mb-3 required">{{ $t('organizationDialog.organizationType') }}</label>
-                    <Dropdown
-                        v-model="organizationType"
-                        v-bind="organizationTypeAttrs"
-                        :virtualScrollerOptions="{ itemSize: 38 }"
-                        :options="organizationTypes"
-                        filter
-                        :loading="false"
-                        optionLabel="name"
-                        :placeholder="t('organizationDialog.organizationTypePlaceholder')"
-                        class="w-full"
-                    >
-                        <template #option="slotProps">
-                            <div class="flex align-items-center mx-auto gap-3">
-                                <div>{{ slotProps.option.name }}</div>
-                            </div>
-                        </template>
-                    </Dropdown>
-                    <small v-if="errors.organizationType" class="text-red-600">{{ errors.organizationType }}</small>
-                </div>
-                <div class="field flex flex-column w-3">
-                    <label for="invoiceTemplate" class="mb-3 required">{{ $t('organizationDialog.invoicesTemplate') }}</label>
-                    <Dropdown
-                        v-model="invoiceTemplate"
-                        v-bind="invoiceTemplateAttrs"
-                        :virtualScrollerOptions="{ itemSize: 38 }"
-                        :options="invoiceTemplates"
-                        filter
-                        :loading="false"
-                        optionLabel="name"
-                        :placeholder="t('organizationDialog.invoicesTemplatePlaceholder')"
-                        class="w-full"
-                    >
-                        <template #option="slotProps">
-                            <div class="flex align-items-center mx-auto gap-3">
-                                <div>{{ slotProps.option.name }}</div>
-                            </div>
-                        </template>
-                    </Dropdown>
-                    <small v-if="errors.invoiceTemplate" class="text-red-600">{{ errors.invoiceTemplate }}</small>
-                </div>
-                <div class="field flex flex-column w-6 border-1 p-3  border-round-lg botder-dashed bg-gray-50">
-                    <label for="sapConfiguration" class="mb-3 required">{{ $t('organizationDialog.sapConfiguration') }}</label>
-                    <Dropdown
-                        v-model="sapConfiguration"
-                        v-bind="sapConfigurationAttrs"
-                        :virtualScrollerOptions="{ itemSize: 38 }"
-                        :options="organizationConfigs"
-                        filter
-                        :loading="false"
-                        :optionLabel="(option) => `${option.sapPlant}-${option.sapCode}`"
-                        :placeholder="t('organizationDialog.sapConfigurationplaceholder')"
-                        class="w-full"
-                    >
-                        <template #option="slotProps">
-                            <div class="flex align-items-center mx-auto gap-3">
-                                <div>{{ `${slotProps.option.sapPlant}-${slotProps.option.sapCode}` }}</div>
-                            </div>
-                        </template>
-                    </Dropdown>
-                    <small v-if="errors.sapConfiguration" class="text-red-600">{{ errors.sapConfiguration }}</small>
-                </div>
-            </div>
-            <div class="flex justify-content-between w-full gap-2">
-                <div class="field flex flex-column w-6">
-                    <label for="invoiceTemplate" class="mb-3">{{ $t('organizationDialog.logouploader') }}</label>
-                    <div
-                        @dragover.prevent="dragover"
-                        @dragleave.prevent="dragleave"
-                        @drop.prevent="drop"
-                        :class="['max-w-md mx-auto  p-2  border-round-lg h-16m shadow-1 border-2 border-dashed border-round-lg  text-center transition-colors', isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400']"
-                    >
-                        <input type="file" ref="fileInput" @change="handleFileSelect" class="hidden" accept="image/*" />
-
-                        <div v-if="!selectedFile">
-                            <ImageIcon class="w-4rem mt-2 h-4rem mx-auto text-gray-400 mb-4" />
-                            <p class="text-gray-600 mb-4">{{ t('uploader.mainlabel') }}</p>
-                            <Button @click="$refs.fileInput.click()" text severity="info" class="mx-auto py-1 h-2rem">{{ t('uploader.secondarylabel') }}</Button>
+    <Dialog v-model:visible="visible" :breakpoints="{ '640px': '25rem' }" :header="$t('organizationDialog.header')" :class="containerClass" :style="{ minWidth: '85rem' }" :modal="true" :closable="false">
+        <TabView>
+            <TabPanel :header="$t('organizationDialog.basicDataTab')">
+                <div class="flex flex-column gap-4 p-4">
+                    <div class="flex justify-content-between w-full gap-2">
+                        <div class="field flex flex-column w-6">
+                            <label for="englishName" class="required">{{ $t('cityDialog.englishNameLabel') }}</label>
+                            <InputText id="englishName" v-model="englishName" v-bind="englishNameAttrs" autofocus :invalid="!!errors.englishName" />
+                            <small v-if="errors.englishName" class="text-red-600">{{ errors.englishName }}</small>
                         </div>
-
-                        <div v-else class="flex flex-column align-items-center">
-                            <img :src="previewUrl" alt="Logo preview" class="max-w-full max-h-16rem mb-4 border-round-lg" />
-                            <p class="text-sm text-gray-600 mb-2">{{ selectedFile.name }}</p>
-                            <Button severity="danger" text @click="removeFile">
-                                <XIcon class="w-1rem h-1rem" />
-                            </Button>
+                        <div class="field flex flex-column w-6">
+                            <label for="arabicName" class="required">{{ $t('cityDialog.arabicNameLabel') }}</label>
+                            <InputText id="arabicName" v-model="arabicName" v-bind="arabicNameAttrs" autofocus :invalid="!!errors.arabicName" />
+                            <small v-if="errors.arabicName" class="text-red-600">{{ errors.arabicName }}</small>
                         </div>
                     </div>
-                    <!-- <simpleuploader v-model:logoFile="logoFile" v-model:imageChanged="imageChanged" :PhotoString="selectedData.logoImageUrl" :IsUpdated="IsAdd" /> -->
-                </div>
-            </div>
 
-            <div class="flex justify-content-end gap-3 pt-2">
-                <Button
-                    :label="$t('cityDialog.addButton')"
-                    v-if="IsAdd"
-                    icon="pi pi-check"
-                    @click="
-                        () => {
-                            createData();
-                            selectedFile = null;
-                            logoFile = null;
-                        }
-                    "
-                />
-                <Button
-                    :label="$t('cityDialog.updateButton')"
-                    v-else
-                    icon="pi pi-check"
-                    @click="
-                        () => {
-                            updateData();
-                            logoFile = null;
-                            selectedFile = null;
-                        }
-                    "
-                />
-                <Button
-                    :label="$t('cityDialog.cancelButton')"
-                    severity="danger"
-                    icon="pi pi-times"
-                    outlined
-                    @click="
-                        () => {
-                            resetForm();
-                            logoFile = null;
-                            selectedFile = null;
-                            closeDialog();
-                        }
-                    "
-                />
-            </div>
-        </div>
+                    <div class="flex justify-content-between w-full gap-2">
+                        <div class="field flex flex-column w-6">
+                            <label for="organizationType" class="mb-3 required">{{ $t('organizationDialog.organizationType') }}</label>
+                            <Dropdown
+                                v-model="organizationType"
+                                v-bind="organizationTypeAttrs"
+                                :virtualScrollerOptions="{ itemSize: 38 }"
+                                :options="organizationTypes"
+                                filter
+                                :loading="false"
+                                optionLabel="name"
+                                :placeholder="t('organizationDialog.organizationTypePlaceholder')"
+                                class="w-full"
+                            >
+                                <template #option="slotProps">
+                                    <div class="flex align-items-center mx-auto gap-3">
+                                        <div>{{ slotProps.option.name }}</div>
+                                    </div>
+                                </template>
+                            </Dropdown>
+                            <small v-if="errors.organizationType" class="text-red-600">{{ errors.organizationType }}</small>
+                        </div>
+                        <div class="field flex flex-column w-6">
+                            <label for="invoiceTemplate" class="mb-3 required">{{ $t('organizationDialog.invoicesTemplate') }}</label>
+                            <Dropdown
+                                v-model="invoiceTemplate"
+                                v-bind="invoiceTemplateAttrs"
+                                :virtualScrollerOptions="{ itemSize: 38 }"
+                                :options="invoiceTemplates"
+                                filter
+                                :loading="false"
+                                optionLabel="name"
+                                :placeholder="t('organizationDialog.invoicesTemplatePlaceholder')"
+                                class="w-full"
+                            >
+                                <template #option="slotProps">
+                                    <div class="flex align-items-center mx-auto gap-3">
+                                        <div>{{ slotProps.option.name }}</div>
+                                    </div>
+                                </template>
+                            </Dropdown>
+                            <small v-if="errors.invoiceTemplate" class="text-red-600">{{ errors.invoiceTemplate }}</small>
+                        </div>
+                        <!-- <div class="field flex flex-column w-6 border-1 p-3  border-round-lg botder-dashed bg-gray-50">
+                            <label for="sapConfiguration" class="mb-3 required">{{ $t('organizationDialog.sapConfiguration') }}</label>
+                            <Dropdown
+                                v-model="sapConfiguration"
+                                v-bind="sapConfigurationAttrs"
+                                :virtualScrollerOptions="{ itemSize: 38 }"
+                                :options="organizationConfigs"
+                                filter
+                                :loading="false"
+                                :optionLabel="(option) => `${option.sapPlant}-${option.sapCode}`"
+                                :placeholder="t('organizationDialog.sapConfigurationplaceholder')"
+                                class="w-full"
+                            >
+                                <template #option="slotProps">
+                                    <div class="flex align-items-center mx-auto gap-3">
+                                        <div>{{ `${slotProps.option.sapPlant}-${slotProps.option.sapCode}` }}</div>
+                                    </div>
+                                </template>
+                            </Dropdown>
+                            <small v-if="errors.sapConfiguration" class="text-red-600">{{ errors.sapConfiguration }}</small>
+                        </div> -->
+                    </div>
+                    <div class="flex justify-content-between w-full gap-2">
+                        <div class="field flex flex-column w-6">
+                            <label for="invoiceTemplate" class="mb-3">{{ $t('organizationDialog.logouploader') }}</label>
+                            <div
+                                @dragover.prevent="dragover"
+                                @dragleave.prevent="dragleave"
+                                @drop.prevent="drop"
+                                :class="['max-w-md mx-auto  p-2  border-round-lg h-16m shadow-1 border-2 border-dashed border-round-lg  text-center transition-colors', isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400']"
+                            >
+                                <input type="file" ref="fileInput" @change="handleFileSelect" class="hidden" accept="image/*" />
+
+                                <div v-if="!selectedFile">
+                                    <ImageIcon class="w-4rem mt-2 h-4rem mx-auto text-gray-400 mb-4" />
+                                    <p class="text-gray-600 mb-4">{{ t('uploader.mainlabel') }}</p>
+                                    <Button @click="$refs.fileInput.click()" text severity="info" class="mx-auto py-1 h-2rem">{{ t('uploader.secondarylabel') }}</Button>
+                                </div>
+
+                                <div v-else class="flex flex-column align-items-center">
+                                    <img :src="previewUrl" alt="Logo preview" class="max-w-full max-h-16rem mb-4 border-round-lg" />
+                                    <p class="text-sm text-gray-600 mb-2">{{ selectedFile.name }}</p>
+                                    <Button severity="danger" text @click="removeFile">
+                                        <XIcon class="w-1rem h-1rem" />
+                                    </Button>
+                                </div>
+                            </div>
+                            <!-- <simpleuploader v-model:logoFile="logoFile" v-model:imageChanged="imageChanged" :PhotoString="selectedData.logoImageUrl" :IsUpdated="IsAdd" /> -->
+                        </div>
+                    </div>
+
+                    <div class="flex justify-content-end gap-3 pt-2">
+                        <Button
+                            :label="$t('cityDialog.addButton')"
+                            v-if="IsAdd"
+                            icon="pi pi-check"
+                            @click="
+                                () => {
+                                    createData();
+                                    selectedFile = null;
+                                    logoFile = null;
+                                }
+                            "
+                        />
+                        <Button
+                            :label="$t('cityDialog.updateButton')"
+                            v-else
+                            icon="pi pi-check"
+                            @click="
+                                () => {
+                                    updateData();
+                                    logoFile = null;
+                                    selectedFile = null;
+                                }
+                            "
+                        />
+                        <Button
+                            :label="$t('cityDialog.cancelButton')"
+                            severity="danger"
+                            icon="pi pi-times"
+                            outlined
+                            @click="
+                                () => {
+                                    resetForm();
+                                    
+                                    closeDialog();
+                                }
+                            "
+                        />
+                    </div>
+                </div>
+            </TabPanel>
+            <TabPanel :header="$t('organizationDialog.organizationSettingsTab')" v-if="!IsAdd">
+                <OrganizationSettings :selectedData="selectedData" :closeDialog="closeDialog" />
+            </TabPanel>
+        </TabView>
     </Dialog>
 </template>
 <style scoped>
@@ -352,4 +359,5 @@ watch(
 .max-w-md {
     max-width: 760px;
 }
+
 </style>
