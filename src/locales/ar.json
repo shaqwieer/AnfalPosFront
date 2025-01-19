@@ -368,5 +368,8 @@
     "email": "البريد",
     "id": "المعرف",
     "primaryPhone": "الهاتف"
+  },
+  "availableBranch": {
+    "title": "الفروع المتاحة"
   }
 }

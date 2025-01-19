@@ -375,5 +375,8 @@
     "email": "email",
     "id": "id",
     "primaryPhone": "Phone"
+  },
+  "availableBranch": {
+    "title": "Available Branches"
   }
 }

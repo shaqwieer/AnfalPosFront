@@ -516,6 +516,11 @@ const router = createRouter({
             ]
         },
         {
+            path: '/available-branches',
+            name: 'available-brancehs',
+            component: () => import('@/views/pages/availableBranch/availableBranch.vue')
+        },
+        {
             path: '/landing',
             name: 'landing',
             component: () => import('@/views/pages/Landing.vue')

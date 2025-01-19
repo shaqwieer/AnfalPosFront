@@ -73,12 +73,28 @@ export const useMainStore = defineStore({
                 //this.loading.resetLoading();
                 // this.loading.resetBarLoading();
 
-                router.push({ name: 'userRoles' });
+                router.push({ name: 'available-brancehs' });
             } catch (err) {
                 //this.loading.resetLoading();
                 // this.loading.resetBarLoading();
                 this.error = handleError(err, this.loading);
 
+            }
+        },
+        async chooseBranch(userPayload) {
+            try {
+                const response = await apiClient.post('/UserBranches/ChooseBranchFromAvailableBranches', userPayload);
+                const token = response.data.data;
+                var rememberMe = localStorage.getItem('rememberMe');
+                if (rememberMe==true) {
+                    saveToLocalStorage('token', token);
+                    localStorage.removeItem('refreshToken');
+                } else {
+                    sessionStorage.setItem('Token', token);
+                }
+                router.push({ name: 'userRoles' });
+            } catch (err) {
+                this.error = handleError(err, this.loading);
             }
         },
         logout() {
