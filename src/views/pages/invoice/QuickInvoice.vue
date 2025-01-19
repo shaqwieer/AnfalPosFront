@@ -155,7 +155,7 @@ const navigateToDraft = () => {
         <!-- Main Content -->
         <div class="flex flex-column gap-2 lg:w-8 w-full overflow-y-auto overflow-x-hidden">
             <div class="flex justify-content-between align-items-center">
-                <span class="text-2xl font-bold">Invoice Manager</span>
+                <span class="text-2xl font-bold">Orders </span>
                 <Button label="See All Orders" class="border-primary-200" outlined @click="navigateToHistory" />
             </div>
             <div class="grid">
@@ -185,13 +185,13 @@ const navigateToDraft = () => {
                     </div>
                 </div>
 
-                <div class="flex flex-row max-w-full overflow-x-auto bg-white sticky top-0">
+                <div class="flex flex-row max-w-full overflow-x-auto bg-white sticky top-0 border-bottom-1 surface-border">
                     <Button
                         v-for="category in categories"
                         :key="category"
                         :label="category.charAt(0).toUpperCase() + category.slice(1)"
                         outlined
-                        class="border-noround border-none min-w-max"
+                        class="min-w-max p-2 border-transparent hover:border-primary-400 hover:border-bottom-3 transition-colors transition-duration-150"
                         :class="{
                             'border-primary-400 border-bottom-3': selectedCategory === category
                         }"
@@ -200,12 +200,13 @@ const navigateToDraft = () => {
                 </div>
             </div>
 
-            <div class="grid">
+
+            <div class="grid overflow-y-auto max-h-screen">
                 <div v-for="item in filteredMenuItems.filter((i) => i.itemGroup === selectedCategory)" :key="item.id" class="col-12 sm:col-6 xl:col-4">
-                    <Card class="h-full">
+                    <Card class="h-full border-round shadow-2" >
                         <template #content>
-                            <div class="flex flex-column gap-4">
-                                <img :src="item.image" :alt="item.name" class="item-img border-round" />
+                            <div class="flex flex-column gap-4 p-3">
+                                <img :src="item.image ? item.image : '/src/assets/images/anfal.png'" :alt="item.name" class="item-img w-10rem h-10rem border-round mx-auto" />
                                 <div class="flex flex-column gap-2">
                                     <h3 class="font-semibold text-lg mb-2">{{ item.name }}</h3>
 
@@ -216,11 +217,11 @@ const navigateToDraft = () => {
                                 </div>
                             </div>
                             <div class="flex justify-content-center align-items-center border-top-1 surface-border pt-3 mt-3">
-                                <Button icon="pi pi-minus" @click="invoiceStore.decreaseItemInInvoice(item.id)" :disabled="!invoiceStore.invoice.items.find((i) => i.id === item.id)?.quantity" severity="danger" outlined />
+                                <Button icon="pi pi-minus" @click="invoiceStore.decreaseItemInInvoice(item.id)" :disabled="!invoiceStore.invoice.items.find((i) => i.id === item.id)?.quantity" severity="danger" outlined rounded />
                                 <span class="w-4rem text-center font-medium">
                                     {{ invoiceStore.invoice.items.find((i) => i.id === item.id)?.quantity || 0 }}
                                 </span>
-                                <Button icon="pi pi-plus" @click="invoiceStore.addItemToInvoice(item.id)" :disabled="item.totalStock === 0" severity="success" outlined />
+                                <Button icon="pi pi-plus" @click="invoiceStore.addItemToInvoice(item.id)" :disabled="item.totalStock === 0" severity="success" outlined rounded />
                             </div>
                         </template>
                     </Card>
