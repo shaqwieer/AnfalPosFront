@@ -110,8 +110,8 @@ onMounted(async () => {
         const response = await apiClient.get(`/Items/GetCategoriesForItems`);
         categories.value = response.data.data;
         selectedCategory.value = categories.value[0];
-        const response = await apiClient.post(`/Invoices/GetQuickInvoice`);
-        invoiceStore.HistoryOrders = response.data.data;
+        const response2 = await apiClient.post(`/Invoices/GetQuickInvoice`);
+        invoiceStore.HistoryOrders = response2.data.data;
     } catch (err) {
         handleError(err, mainStore.loading);
     }
