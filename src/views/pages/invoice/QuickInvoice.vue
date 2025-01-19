@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import apiClient from '../../../api/apiClient';
 import { handleError } from '../../../utilities/errorHandler';
-
+import PaymentDialog from './PaymentDialog.vue';
 import type { OrderItem, Order, Customer } from './types';
 import { useInvoiceStore } from '../../../stores/invoiceStore';
 import { useMainStore } from '../../../stores/mainStore';
@@ -19,7 +19,7 @@ const discountError = ref('');
 const selectedCommercialCustomer = ref('');
 const companyAddress = ref('');
 const mainStore = useMainStore();
-
+const paymentDialogVisible = ref(false);
 const commercialCustomers = ref<Customer[]>([
     {
         name: 'Acme Corp',
@@ -116,7 +116,22 @@ onMounted(async () => {
         handleError(err, mainStore.loading);
     }
 });
-
+const search = (e) => {
+    setTimeout(() => {
+        if (!searchQuery.value.trim().length) {
+            var temp = selectedCategory.value 
+            selectedCategory.value = '';
+            selectedCategory.value = temp
+            //suggestions.value = [];
+        } else {
+            searchAPI();
+        }
+    }, 250);
+};
+const searchAPI = async () => {
+    const response = await apiClient.get(`/Items/SarchForItemsInQuickInvoice?searchTerm=${searchQuery.value}`);
+    invoiceStore.products = response.data.data;
+};
 const navigateToHistory = () => {
     router.push({ name: 'OrderHistory' });
 };
@@ -256,11 +271,11 @@ const navigateToDraft = () => {
                     <div class="flex gap-3 mb-3">
                         <div class="flex align-items-center">
                             <RadioButton v-model="customerType" value="express" inputId="express" />
-                            <label for="express" class="ml-2">Express</label>
+                            <label for="express" class="ml-2">Walk-in</label>
                         </div>
                         <div class="flex align-items-center">
                             <RadioButton v-model="customerType" value="commercial" inputId="commercial" />
-                            <label for="commercial" class="ml-2">Commercial</label>
+                            <label for="commercial" class="ml-2">Business partner</label>
                         </div>
                     </div>
 
@@ -339,12 +354,13 @@ const navigateToDraft = () => {
                 <!-- Process Transaction Button -->
 
                 <div class="flex flex-column gap-2">
-                    <Button label="Complete Sale" @click="processTransaction" :disabled="selectedItems.length === 0 || (customerType === 'express' && !customerName) || (customerType === 'commercial' && !selectedCommercialCustomer)" />
-                    <Button label="Save as Draft" class="border-primary-200" outlined></Button>
+                    <Button label="Complete Sale" @click="processTransaction" :disabled="invoiceStore.invoice.items.length === 0" />
+                    <Button label="Save as Draft" class="border-primary-200" outlined @click="paymentDialogVisible = true"></Button>
                 </div>
             </template>
         </Card>
     </div>
+    <PaymentDialog v-model:visible="paymentDialogVisible" />
 </template>
 
 <style scoped>
