@@ -246,7 +246,11 @@
     "Country": "ادارة الدول",
     "editCountry": "تعديل الدولة",
     "addCountry": "اضافة دولة",
-    "emptyCountry": "لا يوجد دول"
+    "emptyCountry": "لا يوجد دول",
+    "PaymentMethod": "ادارة نوع الدفع الالكترونى",
+    "editPaymentMethod": "تعديل نوع الدفع الالكترونى",
+    "addPaymentMethod": "اضافة نوع الدفع الالكترونى",
+    "emptyPaymentMethod": "لا يوجد نوع دفع الالكترونى"
   },
   "pagination": {
     "currentPageReportTemplate": "عرض {first} إلى {last} من أصل {totalRecords} إدخالات"

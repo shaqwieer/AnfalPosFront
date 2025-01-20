@@ -253,7 +253,11 @@
     "Country": "Manage Countries",
     "editCountry": "Edit Country",
     "addCountry": "Add Country",
-    "emptyCountry": "No Countries exists"
+    "emptyCountry": "No Countries exists",
+    "PaymentMethod": "Manage Payment Methods",
+    "editPaymentMethod": "Edit Payment Method",
+    "addPaymentMethod": "Add Payment Method",
+    "emptyPaymentMethod": "No Payment Methods exists"
   },
   "pagination": {
     "currentPageReportTemplate": "Showing {first} to {last} of {totalRecords} entries"
