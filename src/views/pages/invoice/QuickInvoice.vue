@@ -21,39 +21,7 @@ const companyAddress = ref('');
 const mainStore = useMainStore();
 const paymentDialogVisible = ref(false);
 const commercialCustomers = ref<Customer[]>([
-    {
-        name: 'Acme Corp',
-        address: '123 Business St',
-        email: '',
-        primaryPhone: '',
-        secondaryPhone: '',
-        creditBalance: 0,
-        sapCustomer: '',
-        vatNumber: '',
-        isBusinessPartner: false
-    },
-    {
-        name: 'TechStart Inc',
-        address: '456 Innovation Ave',
-        email: '',
-        primaryPhone: '',
-        secondaryPhone: '',
-        creditBalance: 0,
-        sapCustomer: '',
-        vatNumber: '',
-        isBusinessPartner: false
-    },
-    {
-        name: 'Global Traders',
-        address: '789 Market Blvd',
-        email: '',
-        primaryPhone: '',
-        secondaryPhone: '',
-        creditBalance: 0,
-        sapCustomer: '',
-        vatNumber: '',
-        isBusinessPartner: false
-    }
+  
 ]);
 const categories = ref<string[]>([]);
 
@@ -109,15 +77,18 @@ watch(selectedCategory, async () => {
 
 onMounted(async () => {
     try {
-        const response = await apiClient.get(`/Items/GetCategoriesForItems`);
-        categories.value = response.data.data;
-        selectedCategory.value = categories.value[0];
-        const response2 = await apiClient.post(`/Invoices/GetQuickInvoice`);
-        invoiceStore.HistoryOrders = response2.data.data;
+        const [categoryResponse, invoiceResponse] = await Promise.all([
+            apiClient.get('/Items/GetCategoriesForItems'),
+            apiClient.post('/Invoices/GetQuickInvoice')
+        ]);
+        categories.value = categoryResponse.data.data;
+        selectedCategory.value = categories.value[0] || '';
+        invoiceStore.HistoryOrders = invoiceResponse.data.data;
     } catch (err) {
         handleError(err, mainStore.loading);
     }
 });
+
 const search = (e) => {
     setTimeout(() => {
         if (!searchQuery.value.trim().length) {
@@ -150,16 +121,26 @@ const navigateToDraft = () => {
 // watch([first, rows], () => {
 //     updatePaginatedData();
 // });
+
+const activeIndex = ref(0);
+
+function setActiveIndex(index) {
+    activeIndex.value = index;
+}
+
+const showMode = ref('Products');
+function updateShowMode(value) {
+    showMode.value = value;
+}
+
 </script>
 
 <template>
     <div class="flex flex-column lg:flex-row gap-2 overflow-auto">
         <!-- Main Content -->
         <div class="flex flex-column gap-2 lg:w-8 w-full overflow-y-auto overflow-x-hidden">
-            <div class="flex justify-content-between align-items-center">
-                <span class="text-2xl font-bold">Orders </span>
-                <Button label="See All Orders" class="border-primary-200" outlined @click="navigateToHistory" />
-            </div>
+            <div  v-show="showMode == 'Products'">
+                 <!--
             <div class="grid">
                 <div v-for="order in invoiceStore.HistoryOrders.slice(0, 4)" :key="order.id" class="col-12 md:col-6 lg:col-3">
                     <Card unstyled class="bg-white p-3 border-round shadow-1">
@@ -175,29 +156,29 @@ const navigateToDraft = () => {
                         </template>
                     </Card>
                 </div>
-            </div>
+            </div> -->
 
             <!-- Search Bar -->
-            <div class="flex flex-column gap-2 sticky top-0 surface-50 z-5">
-                <div class="flex flex-column sm:flex-row gap-2">
+             <div class="flex flex-column gap-2 sticky top-0 surface-50 z-5">
+                <div class="flex flex-column sm:flex-row gap-4">
                     <InputText v-model="searchQuery" id="productSearch" type="text" placeholder="Search Products..." class="w-full" />
-                    <div class="flex flex-row gap-2 min-w-max">
+                    <!-- <div class="flex flex-row gap-2 min-w-max">
                         <Button label="Order History" icon="pi pi-history" class="border-primary-200" outlined @click="navigateToHistory"></Button>
                         <Button label="Draft Orders" icon="pi pi-file" class="border-primary-200" outlined @click="navigateToDraft"></Button>
-                    </div>
+                    </div> -->
                 </div>
 
-                <div class="flex flex-row max-w-full overflow-x-auto bg-white sticky top-0 border-bottom-1 surface-border">
-                    <Button
-                        v-for="category in categories"
+                <div class="flex flex-row max-w-full overflow-x-auto bg-white sticky top-0 border-bottom-1 surface-border px-2">
+                    <Button v-for="category in categories"
                         :key="category"
                         :label="category.charAt(0).toUpperCase() + category.slice(1)"
+                        :icon="`pi pi-${category}`"
                         outlined
                         class="min-w-max p-2 border-transparent hover:border-primary-400 hover:border-bottom-3 transition-colors transition-duration-150"
-                        :class="{
-                            'border-primary-400 border-bottom-3': selectedCategory === category
-                        }"
+                        :class="{ 'border-primary-400 border-bottom-3': selectedCategory === category }"
                         @click="selectedCategory = category"
+                    
+                      
                     />
                 </div>
             </div>
@@ -205,13 +186,15 @@ const navigateToDraft = () => {
 
             <div class="grid overflow-y-auto max-h-screen">
                 <div v-for="item in filteredMenuItems.filter((i) => i.itemGroup === selectedCategory)" :key="item.id" class="col-12 sm:col-6 xl:col-4">
-                    <Card class="h-full border-round shadow-2" >
+                    <Card class="h-full border-round shadow-2" > 
                         <template #content>
                             <div class="flex flex-column gap-4 p-3">
-                                <img :src="item.image ? item.image : '/src/assets/images/anfal.png'" :alt="item.name" class="item-img w-10rem h-10rem border-round mx-auto" />
+                                <img :src="item.image ? item.image : '/src/assets/images/item.png'" :alt="item.name" class="item-img w-10rem h-10rem border-round mx-auto" />
                                 <div class="flex flex-column gap-2">
                                     <h3 class="font-semibold text-lg mb-2">{{ item.name }}</h3>
-
+                                    <span v-if="item.totalStock === 0" class="text-danger ml-2">
+            <i class="pi pi-exclamation-triangle"></i> Out of Stock
+        </span>
                                     <div class="flex flex-row gap-2 text-sm text-500 justify-content-between">
                                         <span>{{ item.totalStock }} Available</span>
                                         <span class="text-lg font-semibold text-primary">${{ item.price.toFixed(2) }}</span>
@@ -263,37 +246,44 @@ const navigateToDraft = () => {
             <!-- <div class="col-12 flex justify-content-center mt-4">
                 <Paginator :first="first" :rows="rows" :totalRecords="totalRecords" :rowsPerPageOptions="[6, 12, 18, 24]" @update:first="onFirstChange" @update:rows="onRowsChange" @page="onPageChange" />
             </div> -->
+            </div>
+           <div v-show="showMode == 'Customer'">
+            customer Card here
+           </div>
         </div>
 
+        
+
         <!-- Order Summary Card -->
-        <Card class="w-full lg:w-4 sticky top-0">
+        <Card class="w-full lg:w-6 sticky top-0">
             <template #content>
                 <!-- Customer Info -->
-                <div class="mb-4">
-                    <h2 class="text-xl font-bold mb-3">Customer Info</h2>
-                    <div class="flex gap-3 mb-3">
-                        <div class="flex align-items-center">
-                            <RadioButton v-model="customerType" value="express" inputId="express" />
-                            <label for="express" class="ml-2">Walk-in</label>
-                        </div>
-                        <div class="flex align-items-center">
-                            <RadioButton v-model="customerType" value="commercial" inputId="commercial" />
-                            <label for="commercial" class="ml-2">Business partner</label>
-                        </div>
+                <div class="mb-6">
+                    <div class="flex justify-content-between align-items-center w-full px-2">
+                        <Button label="Customer Name" severity="help" style="border-radius: 0.5rem; width: 90%;" class="mr-1" @click="updateShowMode('Customer')" />
+                        <Accordion 
+                            :activeIndex="activeIndex" 
+                            @update:activeIndex="setActiveIndex" 
+                            :multiple="true" 
+                            class="mt-2 mr-2 accordion-overlay"
+                        >
+                        <AccordionTab header="Actions">
+                            <ul class="list-none p-0 m-0">
+                                <li class="py-2 px-3 border-bottom-1 surface-border flex justify-content-between align-items-center">
+                                    <span class="font-semibold">New Order</span>
+                                    <Button icon="pi pi-pencil" class="p-button-rounded p-button-outlined p-button-sm" @click="() => {}" />
+                                </li>
+                                <li class="py-2 px-3 border-bottom-1 surface-border flex justify-content-between align-items-center">
+                                    <span class="font-semibold">Delete Order</span>
+                                    <Button icon="pi pi-trash" class="p-button-rounded p-button-outlined p-button-sm" @click="() => {}" />
+                                </li>
+                            </ul>
+                        </AccordionTab>
+                    </Accordion>
+
+
                     </div>
 
-                    <div v-if="customerType === 'express'">
-                        <InputText v-model="customerName" placeholder="Customer Name" class="w-full" />
-                    </div>
-                    <div v-else>
-                        <Dropdown v-model="selectedCommercialCustomer" :options="commercialCustomers" optionLabel="name" optionValue="id" placeholder="Select Customer" class="w-full mb-2" />
-
-                        <div v-if="selectedCommercialCustomer === 'new'" class="flex flex-column gap-2">
-                            <InputText v-model="customerName" placeholder="Company Name" />
-                            <InputText v-model="companyAddress" placeholder="Company Address" />
-                            <Button label="Add New Customer" icon="pi pi-plus" />
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Order Items -->
@@ -393,4 +383,24 @@ const navigateToDraft = () => {
 .highbutton {
     z-index: 1 !important;
 }
+.accordion-overlay {
+    position: relative; /* Establish the stacking context */
+    display: inline-block; /* Ensure proper alignment with surrounding elements */
+}
+
+.accordion-overlay .p-accordion-content {
+    position: absolute; /* Position the content over other elements */
+    top: 100%; /* Align the content below the header */
+    left: 0; /* Align with the left edge of the header */
+    z-index: 1000; /* Ensure it appears above other elements */
+    background-color: white; /* Match the background color of the design */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a shadow for better visibility */
+    border-radius: 0.5rem; /* Add rounded corners */
+    width: max-content; /* Adjust the width to fit the content */
+    padding: 0.5rem; /* Add padding for spacing */
+    overflow: hidden; /* Prevent content overflow */
+}
+
+
+
 </style>
