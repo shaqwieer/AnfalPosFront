@@ -5,6 +5,7 @@ import apiClient from '../api/apiClient';
 import router from '@/router/index.js';
 import { extractToValues, extractRouteList, removeEmptyItems } from '@/utilities/treeHelpers.js';
 import { handleError } from '@/utilities/errorHandler';
+import {jwtDecode} from 'jwt-decode';
 
 export const useMainStore = defineStore({
     id: 'main',
@@ -42,12 +43,23 @@ export const useMainStore = defineStore({
     },
     actions: {
         toggleRTL() {
-            if (this.language.value==='ar') {
+            if (this.language.value === 'ar') {
                 this.isRTL = true;
                 saveToLocalStorage('Rtl', this.isRTL);
             } else {
                 this.isRTL = false;
                 saveToLocalStorage('Rtl', this.isRTL);
+            }
+        },
+        hasBranchIdKey(token) {
+            try {
+                const decodedToken = jwtDecode(token);
+                if (decodedToken && Object.prototype.hasOwnProperty.call(decodedToken, 'BranchId')) {
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                return false;
             }
         },
         changeLanguage(language) {
@@ -73,12 +85,11 @@ export const useMainStore = defineStore({
                 //this.loading.resetLoading();
                 // this.loading.resetBarLoading();
 
-                router.push({ name: 'available-brancehs' });
+                router.push({ name: 'available-branches' });
             } catch (err) {
                 //this.loading.resetLoading();
                 // this.loading.resetBarLoading();
                 this.error = handleError(err, this.loading);
-
             }
         },
         async chooseBranch(userPayload) {
@@ -86,7 +97,7 @@ export const useMainStore = defineStore({
                 const response = await apiClient.post('/UserBranches/ChooseBranchFromAvailableBranches', userPayload);
                 const token = response.data.data;
                 var rememberMe = localStorage.getItem('rememberMe');
-                if (rememberMe==true) {
+                if (rememberMe == true) {
                     saveToLocalStorage('token', token);
                     localStorage.removeItem('refreshToken');
                 } else {
@@ -98,8 +109,8 @@ export const useMainStore = defineStore({
             }
         },
         logout() {
-            const rememberMe=localStorage.getItem('rememberMe') 
-            if (rememberMe== true) {
+            const rememberMe = localStorage.getItem('rememberMe');
+            if (rememberMe == true) {
                 localStorage.removeItem('token');
                 localStorage.removeItem('refreshToken');
             } else {
@@ -109,7 +120,6 @@ export const useMainStore = defineStore({
             this.pathsList = ['/pages/notfound', '/auth/login', '/auth/access', '/'];
             this.pageTree = [];
             router.push({ name: 'login' });
-
         },
         async getMenu() {
             try {

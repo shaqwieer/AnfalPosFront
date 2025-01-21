@@ -515,7 +515,7 @@ const router = createRouter({
         },
         {
             path: '/available-branches',
-            name: 'available-brancehs',
+            name: 'available-branches',
             component: () => import('@/views/pages/availableBranch/availableBranch.vue')
         },
         {
@@ -588,7 +588,8 @@ router.beforeEach(async (to, from, next) => {
     if (token && mainStore.pageTree.length == 0) {
         await mainStore.getMenu();
     }
-
+    const hasBranchIdKey = token ? mainStore.hasBranchIdKey(token) : false;
+    console.log(hasBranchIdKey);
     const isAllowed = mainStore.accessAllowed(to.path);
     console.log(`Navigating to: ${to.path}, Allowed: ${isAllowed}`);
 
@@ -598,8 +599,10 @@ router.beforeEach(async (to, from, next) => {
         next({ name: 'e-commerce' });
     } else if (token && !isAllowed) {
         next({ name: 'notfound' });
+    } else if (token && !hasBranchIdKey&& to.name !== 'available-branches') {
+        next({ name: 'available-branches' });
     } else {
-        next();
+         next();
     }
 });
 
