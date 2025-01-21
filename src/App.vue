@@ -3,7 +3,7 @@ import { computed, watch } from 'vue';
 import { useMainStore } from '@/stores/mainStore';
 import { useLoadingStore } from '@/stores/loaderStore';
 import { useToast } from 'primevue/usetoast';
-
+import loader from './components/loader.vue';
 const toast = useToast();
 import Loading from '@/components/Loading.vue';
 const loadingStore = useLoadingStore();
@@ -27,6 +27,7 @@ const containerClass = computed(() => ({
 
 <template>
     <div :class="containerClass">
+        <loader />
         <router-view />
     </div>
     <transition name="loader-fade">
