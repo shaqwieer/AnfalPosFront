@@ -9,6 +9,7 @@ import { useMainStore } from '../../../stores/mainStore';
 import { useRouter } from 'vue-router';
 import customerManagement from './masterInvoice/customer-management.vue';
 import OrderActionMenu from './masterInvoice/OrderActionMenu.vue';
+import OrderHistory from '../orders/OrderHistory.vue';
 const router = useRouter();
 const invoiceStore = useInvoiceStore();
 const selectedItems = ref<OrderItem[]>([]);
@@ -265,6 +266,9 @@ const handleOnClose = () => {
             </div>
            <div v-show="showMode == 'Customers'">
             <customerManagement  :view="currentView" @updateView="(newView) => currentView = newView"/>
+           </div>
+           <div v-show="showMode == 'Orders'">
+            <OrderHistory  :view="currentView" @updateView="(newView) => currentView = newView"/>
            </div>
         </div>
 
