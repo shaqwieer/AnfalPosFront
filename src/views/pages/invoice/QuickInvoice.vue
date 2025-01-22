@@ -200,7 +200,7 @@ const handleOnClose = () => {
             </div>
 
 
-            <div class="grid overflow-y-auto max-h-screen">
+            <div class="grid overflow-y-auto max-h-screen"> 
                 <div v-for="item in filteredMenuItems.filter((i) => i.itemGroup === selectedCategory)" :key="item.id" class="col-12 sm:col-6 xl:col-4">
                     <Card class="h-full border-round shadow-2" > 
                         <template #content>
@@ -343,11 +343,15 @@ const handleOnClose = () => {
                 </div>
 
                 <!-- Process Transaction Button -->
-
-                <div class="flex flex-column gap-2">
-                    <Button label="Complete Sale" @click="processTransaction" :disabled="invoiceStore.invoice.items.length === 0" />
-                    <Button label="Save as Draft" class="border-primary-200" outlined @click="paymentDialogVisible = true"></Button>
+                <div class="space-y-2 flex flex-column gap-2">
+                    <Button label="Save as Draft" class="w-full p-button-outlined border-primary-200 my-2" @click="processTransaction" :disabled="invoiceStore.invoice.items.length === 0" />
+                    <div class="flex gap-2">
+                    <Button label="Invoice" class="flex-1" @click="processTransaction" :disabled="invoiceStore.invoice.items.length === 0" />
+                    <Button label="Payment" class="flex-1 p-button-outlined" />
+                    </div>
                 </div>
+                
+            
             </template>
         </Card>
     </div>
