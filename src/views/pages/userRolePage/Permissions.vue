@@ -73,7 +73,7 @@ const saveData = () => {
             <div :class="['flex', containerClass]">
                 <DataTable
                     :paginator="true"
-                    :rows="7"
+                    :rows="5"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5,7, 10, 25]"
                     :value="permissions"

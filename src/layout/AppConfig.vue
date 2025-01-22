@@ -6,7 +6,6 @@ import { useMainStore } from '@/stores/mainStore';
 import { useI18n } from 'vue-i18n'; // Import useI18n hook
 import { setI18nLanguage } from '@/i18n';
 import { saveToLocalStorage } from '@/utilities/localStorage';
-const { t } = useI18n();
 const layoutStore = useMainStore();
 const rtlValue = computed(() => layoutStore.isRTL);
 const rtlValueText = computed(() => (layoutStore.isRTL ? 'rtl' : 'ltr'));

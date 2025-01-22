@@ -3,6 +3,14 @@ import { useLayout } from '@/layout/composables/layout';
 const {onProfileSidebarToggle} = useLayout();
 import { useMainStore } from '@/stores/mainStore';
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n'; // Import useI18n hook
+import { useRouter } from 'vue-router';
+const router = useRouter();
+const goToPage = () => {
+    router.push({ name: 'available-branches' }); // Navigate to a named route
+};
+const { t } = useI18n();
+
 const mainStore = useMainStore();
 const rtlValueText = computed(() => (mainStore.isRTL ? 'rtl' : 'ltr'));
 const logOut=()=>{
@@ -15,18 +23,18 @@ const { layoutState } = useLayout();
 <template>
     <Sidebar v-model:visible="layoutState.profileSidebarVisible.value" :position="'right'" class="layout-profile-sidebar w-full sm:w-25rem">
         <div class="flex flex-column mx-auto md:mx-0" :dir="rtlValueText">
-            <span class="mb-2 font-semibold">Welcome</span>
+            <span class="mb-2 font-semibold">{{ t("profileBar.welcome") }}</span>
             <span class="text-color-secondary font-medium mb-5">Isabella Andolini</span>
 
             <ul class="list-none m-0 p-0">
                 <li>
                     <a class="cursor-pointer flex surface-border mb-3 p-3 align-items-center border-1 surface-border border-round hover:surface-hover transition-colors transition-duration-150">
                         <span>
-                            <i class="pi pi-user text-xl text-primary"></i>
+                            <i class="pi pi-table text-xl text-primary"></i>
                         </span>
-                        <div class="mx-3">
-                            <span class="mb-2 font-semibold">Profile</span>
-                            <p class="text-color-secondary m-0">Lorem ipsum date visale</p>
+                        <div class="mx-3" @click="goToPage()">
+                            <span class="mb-2 font-semibold">{{ t("profileBar.branches") }}</span>
+                            <p class="text-color-secondary m-0">{{ t("profileBar.branchesDesc") }}</p>
                         </div>
                     </a>
                 </li>
@@ -58,8 +66,8 @@ const { layoutState } = useLayout();
                             <i class="pi pi-power-off text-xl text-primary"></i>
                         </span>
                         <div class="mx-3" @click="logOut()">
-                            <span class="mb-2 font-semibold">Sign Out</span>
-                            <p class="text-color-secondary m-0">Sed ut perspiciatis</p>
+                            <span class="mb-2 font-semibold">{{ t("profileBar.logout") }}</span>
+                            <p class="text-color-secondary m-0">{{ t("profileBar.logoutDesc") }}</p>
                         </div>
                     </a>
                 </li>

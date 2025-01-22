@@ -9,6 +9,26 @@ const router = createRouter({
             component: AppLayout,
             children: [
                 {
+                    path: 'invoices/draft',
+                    name: 'DraftOrders',
+                    component: () => import('@/views/pages/orders/DraftOrders.vue')
+                },
+                {
+                    path: 'invoices/history',
+                    name: 'OrderHistory',
+                    component: () => import('@/views/pages/orders/OrderHistory.vue')
+                },
+                {
+                    path: 'sap/items',
+                    name: 'ItemsPage',
+                    component: () => import('@/views/pages/ItemsPage.vue')
+                },
+                {
+                    path: 'customer-list',
+                    name: 'CustomerList',
+                    component: () => import('@/views/pages/CustomerList.vue')
+                },
+                {
                     path: '/invoices/quick-invoice',
                     name: 'Quickinvoice',
                     meta: {
@@ -31,6 +51,14 @@ const router = createRouter({
                         breadcrumb: ['Companies']
                     },
                     component: () => import('@/views/pages/organization/organization.vue')
+                },
+                {
+                    path: '/settings/invoices/payment-methods',
+                    name: 'PaymentMethods',
+                    meta: {
+                        breadcrumb: ['PaymentMethods']
+                    },
+                    component: () => import('@/views/pages/paymentMethods/paymentMethods.vue')
                 },
                 {
                     path: '/settings/plants/cities',
@@ -80,6 +108,16 @@ const router = createRouter({
                     },
                     component: () => import('@/views/pages/userRolePage/userRole.vue')
                 },
+                // {
+                //     path: '/pages/invoice',
+                //     name: 'invoice',
+                //     component: () => import('@/views/pages/Invoice.vue')
+                // },
+                // {
+                //     path: '/Quickinvoice2',
+                //     name: 'Quickinvoice2',
+                //     component: () => import('@/views/pages/oldInvoice/QuickInvoice.vue')
+                // },
                 {
                     path: '/',
                     name: 'e-commerce',
@@ -472,52 +510,12 @@ const router = createRouter({
                     path: '/pages/help',
                     name: 'help',
                     component: () => import('@/views/pages/Help.vue')
-                },
-                {
-                    path: '/pages/invoice',
-                    name: 'invoice',
-                    component: () => import('@/views/pages/Invoice.vue')
-                },
-                {
-                    path: '/invoices/quick-invoice',
-                    name: 'Quickinvoice',
-                    component: () => import('@/views/pages/invoice/QuickInvoice.vue')
-                },
-                {
-                    path: '/Quickinvoice2',
-                    name: 'Quickinvoice2',
-                    component: () => import('@/views/pages/oldInvoice/QuickInvoice.vue')
-                },
-                {
-                    path: 'orders/draft',
-                    name: 'DraftOrders',
-                    component: () => import('@/views/pages/orders/DraftOrders.vue')
-                },
-                {
-                    path: 'orders/history',
-                    name: 'OrderHistory',
-                    component: () => import('@/views/pages/orders/OrderHistory.vue')
-                },
-                {
-                    path: 'sap/items',
-                    name: 'ItemsPage',
-                    component: () => import('@/views/pages/ItemsPage.vue')
-                },
-                {
-                    path: 'customer-list',
-                    name: 'CustomerList',
-                    component: () => import('@/views/pages/CustomerList.vue')
-                },
-                // {
-                //     path: '/branch-list',
-                //     name: 'branchPage',
-                //     component: () => import('@/views/pages/branchPage.vue')
-                // },
+                }
             ]
         },
         {
             path: '/available-branches',
-            name: 'available-brancehs',
+            name: 'available-branches',
             component: () => import('@/views/pages/availableBranch/availableBranch.vue')
         },
         {
@@ -590,7 +588,8 @@ router.beforeEach(async (to, from, next) => {
     if (token && mainStore.pageTree.length == 0) {
         await mainStore.getMenu();
     }
-
+    const hasBranchIdKey = token ? mainStore.hasBranchIdKey(token) : false;
+    console.log(hasBranchIdKey);
     const isAllowed = mainStore.accessAllowed(to.path);
     console.log(`Navigating to: ${to.path}, Allowed: ${isAllowed}`);
 
@@ -600,8 +599,10 @@ router.beforeEach(async (to, from, next) => {
         next({ name: 'e-commerce' });
     } else if (token && !isAllowed) {
         next({ name: 'notfound' });
+    } else if (token && !hasBranchIdKey&& to.name !== 'available-branches') {
+        next({ name: 'available-branches' });
     } else {
-        next();
+         next();
     }
 });
 
