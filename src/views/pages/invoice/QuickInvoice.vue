@@ -3,10 +3,12 @@ import { ref, computed, onMounted, watch } from 'vue';
 import apiClient from '../../../api/apiClient';
 import { handleError } from '../../../utilities/errorHandler';
 import PaymentDialog from './PaymentDialog.vue';
-import type { OrderItem, Order, Customer } from './types';
+import type { OrderItem, Order, Customer, InvoiceViewItem } from './types';
 import { useInvoiceStore } from '../../../stores/invoiceStore';
 import { useMainStore } from '../../../stores/mainStore';
 import { useRouter } from 'vue-router';
+import customerManagement from './masterInvoice/customer-management.vue';
+import OrderActionMenu from './masterInvoice/OrderActionMenu.vue';
 const router = useRouter();
 const invoiceStore = useInvoiceStore();
 const selectedItems = ref<OrderItem[]>([]);
@@ -127,10 +129,20 @@ const activeIndex = ref(0);
 function setActiveIndex(index) {
     activeIndex.value = index;
 }
-
+const viewModes = ref<InvoiceViewItem[]>([
+    { viewMode: 'Products' },
+    { viewMode: 'Customers' },
+    { viewMode: 'Orders' }
+]);
 const showMode = ref('Products');
-function updateShowMode(value) {
-    showMode.value = value;
+function updateShowMode() {
+    showMode.value = showMode.value;
+}
+const currentView = ref('list')
+const showactions = ref(false);
+
+const handleOnClose = () => {
+    showactions.value=false;
 }
 
 </script>
@@ -138,7 +150,17 @@ function updateShowMode(value) {
 <template>
     <div class="flex flex-column lg:flex-row gap-2 overflow-auto">
         <!-- Main Content -->
+         
         <div class="flex flex-column gap-2 lg:w-8 w-full overflow-y-auto overflow-x-hidden">
+            <div class="flex flex-column sm:flex-row gap-4">
+                    <InputText v-model="searchQuery" id="productSearch" type="text" placeholder="Search Products..." class="w-full" />
+                     <div class="flex flex-row gap-2 min-w-max">
+                      <Dropdown v-model="showMode" :options="viewModes" optionLabel="viewMode" optionValue="viewMode" placeholder="Select a view" class="w-full" @change="updateShowMode" /> 
+
+                        <!-- <Button label="Order History" icon="pi pi-history" class="border-primary-200" outlined @click="navigateToHistory"></Button>
+                        <Button label="Draft Orders" icon="pi pi-file" class="border-primary-200" outlined @click="navigateToDraft"></Button> -->
+                    </div> 
+                </div>
             <div  v-show="showMode == 'Products'">
                  <!--
             <div class="grid">
@@ -160,13 +182,7 @@ function updateShowMode(value) {
 
             <!-- Search Bar -->
              <div class="flex flex-column gap-2 sticky top-0 surface-50 z-5">
-                <div class="flex flex-column sm:flex-row gap-4">
-                    <InputText v-model="searchQuery" id="productSearch" type="text" placeholder="Search Products..." class="w-full" />
-                    <!-- <div class="flex flex-row gap-2 min-w-max">
-                        <Button label="Order History" icon="pi pi-history" class="border-primary-200" outlined @click="navigateToHistory"></Button>
-                        <Button label="Draft Orders" icon="pi pi-file" class="border-primary-200" outlined @click="navigateToDraft"></Button>
-                    </div> -->
-                </div>
+               
 
                 <div class="flex flex-row max-w-full overflow-x-auto bg-white sticky top-0 border-bottom-1 surface-border px-2">
                     <Button v-for="category in categories"
@@ -247,8 +263,8 @@ function updateShowMode(value) {
                 <Paginator :first="first" :rows="rows" :totalRecords="totalRecords" :rowsPerPageOptions="[6, 12, 18, 24]" @update:first="onFirstChange" @update:rows="onRowsChange" @page="onPageChange" />
             </div> -->
             </div>
-           <div v-show="showMode == 'Customer'">
-            customer Card here
+           <div v-show="showMode == 'Customers'">
+            <customerManagement  :view="currentView" @updateView="(newView) => currentView = newView"/>
            </div>
         </div>
 
@@ -260,34 +276,16 @@ function updateShowMode(value) {
                 <!-- Customer Info -->
                 <div class="mb-6">
                     <div class="flex justify-content-between align-items-center w-full px-2">
-                        <Button label="Customer Name" severity="help" style="border-radius: 0.5rem; width: 90%;" class="mr-1" @click="updateShowMode('Customer')" />
-                        <Accordion 
-                            :activeIndex="activeIndex" 
-                            @update:activeIndex="setActiveIndex" 
-                            :multiple="true" 
-                            class="mt-2 mr-2 accordion-overlay"
-                        >
-                        <AccordionTab header="Actions">
-                            <ul class="list-none p-0 m-0">
-                                <li class="py-2 px-3 border-bottom-1 surface-border flex justify-content-between align-items-center">
-                                    <span class="font-semibold">New Order</span>
-                                    <Button icon="pi pi-pencil" class="p-button-rounded p-button-outlined p-button-sm" @click="() => {}" />
-                                </li>
-                                <li class="py-2 px-3 border-bottom-1 surface-border flex justify-content-between align-items-center">
-                                    <span class="font-semibold">Delete Order</span>
-                                    <Button icon="pi pi-trash" class="p-button-rounded p-button-outlined p-button-sm" @click="() => {}" />
-                                </li>
-                            </ul>
-                        </AccordionTab>
-                    </Accordion>
-
-
+                        <Button label="Customer Name" severity="help" style="border-radius: 0.5rem; width: 90%;" class="mr-1" @click=" showMode == 'Customers' ? showMode = 'Products' : showMode = 'Customers'" />
+                        <Button icon="pi pi-cog" class="p-button-sm ml-1 px-2 mr-1"  severity="help" style="border-radius: 0.5rem;" @click="showactions = !showactions"/> 
+                   
                     </div>
 
                 </div>
 
                 <!-- Order Items -->
                 <div class="">
+                    <OrderActionMenu :onClose="handleOnClose" v-if="showactions==true"/>
                     <div class="flex justify-content-between align-items-center mb-3">
                         <h3 class="text-xl font-bold">Order Details</h3>
                         <Button icon="pi pi-trash" label="Clear All" @click="invoiceStore.clearInvoiceItems" :disabled="invoiceStore.invoice.items.length === 0" severity="danger" text />
@@ -353,7 +351,8 @@ function updateShowMode(value) {
             </template>
         </Card>
     </div>
-    <PaymentDialog v-model:visible="paymentDialogVisible" />
+    <PaymentDialog v-model:visible="paymentDialogVisible"   
+        />
 </template>
 
 <style scoped>

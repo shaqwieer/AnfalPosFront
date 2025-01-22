@@ -45,3 +45,7 @@ export interface Customer {
     vatNumber: string;
     isBusinessPartner: boolean;
 }
+
+export interface InvoiceViewItem {
+    viewMode : string;
+}
