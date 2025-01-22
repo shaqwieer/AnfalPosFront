@@ -16,6 +16,7 @@ export interface Invoice {
     items: OrderItem[];
     total?: number | null;
     time?: string | null;
+    isDraft?: boolean | false;
 }
 
 export interface OrderItem {
@@ -24,6 +25,7 @@ export interface OrderItem {
     finalDiscountAmount: number;
     existpercentage: number;
     quantity: number;
+    price: number;
 }
 
 export interface Order {

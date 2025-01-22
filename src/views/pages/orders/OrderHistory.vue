@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-column gap-2">
-        <PageTopBar :title="'Order History'" v-model:value="isGrid" :hasAddButton="false"></PageTopBar>
+        <PageTopBar :fromInvoice='fromInvoice' :title="'Order History'" v-model:value="isGrid" :hasAddButton="false"></PageTopBar>
         <div class="card" v-if="isGrid == 'list'">
             <DataTable
                 :value="invoiceStore.HistoryOrders"
@@ -68,7 +68,7 @@
         </div>
         <div v-else>
             <div class="grid">
-                <div class="col-6 sm:col-6 md:col-4 xl:col-3" v-for="item in invoiceStore.HistoryOrders" :key="item.id">
+                <div class="col-md-6 mr-2 p-3 " v-for="item in invoiceStore.HistoryOrders" :key="item.id">
                     <div class="card">
                         <div class="flex flex-column gap-4">
                             <span class="font-bold text-3xl">Order #{{ item.id }}</span>
@@ -149,6 +149,16 @@ const mainStore = useMainStore();
 const isGrid = ref('list');
 const selectedOrder = ref(null)
 const display = ref(false);
+
+const props = defineProps({
+    fromInvoice: {
+        type: Boolean,
+        default: false
+    }
+});
+
+
+
 onMounted(async () => {
     try {
         const response = await apiClient.post(`/Invoices/GetQuickInvoice`);

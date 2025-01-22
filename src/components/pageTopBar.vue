@@ -1,6 +1,7 @@
 <template>
     <div class="flex flex-column w-full">
-        <div class="flex justify-content-between card p-4 align-items-center">
+
+        <div class="flex justify-content-between card p-4 align-items-center" v-if="fromInvoice == false">
             <span class="text-2xl font-bold">{{ props.title }}</span>
             <div class="flex gap-3">
                 <IconField v-if="simple && hasSearch" iconPosition="left">
@@ -38,7 +39,7 @@
             </div>
         </div>
         <div v-if="!simple" class="flex justify-content-between mx-3">
-            <IconField iconPosition="left" class="w-9 flex">
+            <IconField iconPosition="left" class="w-9 flex" v-if="fromInvoice == false">
                 <InputText type="text" v-model="searchText" :placeholder="t('labels.search')" class="w-full" />
                 <InputIcon class="pi pi-search" />
             </IconField>
@@ -94,6 +95,10 @@ const props = defineProps({
         default: ''
     },
     simple: {
+        type: Boolean,
+        default: false
+    },
+    fromInvoice: {
         type: Boolean,
         default: false
     }

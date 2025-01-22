@@ -10,6 +10,8 @@ import { useRouter } from 'vue-router';
 import customerManagement from './masterInvoice/customer-management.vue';
 import OrderActionMenu from './masterInvoice/OrderActionMenu.vue';
 import OrderHistory from '../orders/OrderHistory.vue';
+import customerList from '../customerList.vue'
+import invoiceDialog from './masterInvoice/invoiceDialog.vue';
 const router = useRouter();
 const invoiceStore = useInvoiceStore();
 const selectedItems = ref<OrderItem[]>([]);
@@ -63,7 +65,8 @@ const total = computed(() => {
 
 const filteredMenuItems = computed(() => invoiceStore.products.filter((item) => item.name.toLowerCase().includes(searchQuery.value.toLowerCase())));
 
-const processTransaction = async () => {
+const processTransaction = async (isDraft: boolean) => {
+    invoiceStore.invoice.isDraft = isDraft;
     await apiClient.post(`Invoices/CreateQuickInvoice`, invoiceStore.invoice);
     console.log('Processing transaction:', invoiceStore.invoice);
 };
@@ -145,7 +148,7 @@ const showactions = ref(false);
 const handleOnClose = () => {
     showactions.value=false;
 }
-
+const showInvoiceDialog = ref(false);
 </script>
 
 <template>
@@ -163,23 +166,7 @@ const handleOnClose = () => {
                     </div> 
                 </div>
             <div  v-show="showMode == 'Products'">
-                 <!--
-            <div class="grid">
-                <div v-for="order in invoiceStore.HistoryOrders.slice(0, 4)" :key="order.id" class="col-12 md:col-6 lg:col-3">
-                    <Card unstyled class="bg-white p-3 border-round shadow-1">
-                        <template #content>
-                            <div class="flex justify-content-between">
-                                <div>
-                                    <p class="font-semibold text-900">{{ order.customerName }}</p>
-                                    <p class="text-sm text-600">{{ new Date(order.createdAt).toLocaleDateString(locale)  }}</p>
-                                </div>
-                                <span class="text-sm font-medium text-500">{{ order.id }}</span>
-                            </div>
-                            <Badge :value="order.currentStatus" :severity="statusColors[order.currentStatus]" class="mt-2" />
-                        </template>
-                    </Card>
-                </div>
-            </div> -->
+               
 
             <!-- Search Bar -->
              <div class="flex flex-column gap-2 sticky top-0 surface-50 z-5">
@@ -229,46 +216,12 @@ const handleOnClose = () => {
                     </Card>
                 </div>
             </div>
-            <!-- Menu Tabs -->
-            <!-- <TabView :scrollable="true" @update:activeIndex="(i) => (selectedCategory = categories[i])" class="overflow-auto">
-                <TabPanel v-for="category in categories" :key="category" :header="category.charAt(0).toUpperCase() + category.slice(1)" headerClass="sticky top-0">
-                    <div class="grid">
-                        <div v-for="item in filteredMenuItems.filter((i) => i.itemGroup === category)" :key="item.id" class="col-12 sm:col-6 xl:col-4">
-                            <Card>
-                                <template #content>
-                                    <div class="flex flex-column gap-4">
-                                        <img :src="item.image" :alt="item.name" class="item-img border-round" />
-                                        <div class="flex flex-column gap-2">
-                                            <h3 class="font-semibold text-lg mb-2">{{ item.name }}</h3>
-
-                                            <div class="flex flex-row gap-2 text-sm text-500 justify-content-between">
-                                                <span>{{ item.totalStock }} Available</span>
-                                                <span class="text-lg font-semibold text-primary">${{ item.price.toFixed(2) }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-content-center align-items-center border-top-1 surface-border pt-3 mt-3 z-1">
-                                        <Button class="highbutton" icon="pi pi-minus" @click="invoiceStore.decreaseItemInInvoice(item.id)" :disabled="!invoiceStore.invoice.items.find((i) => i.id === item.id)?.quantity" severity="danger" outlined />
-                                        <span class="w-4rem text-center font-medium">
-                                            {{ invoiceStore.invoice.items.find((i) => i.id === item.id)?.quantity || 0 }}
-                                        </span>
-                                        <Button class="highbutton" icon="pi pi-plus" @click="invoiceStore.addItemToInvoice(item.id)" :disabled="item.totalStock === 0" severity="success" outlined />
-                                    </div>
-                                </template>
-                            </Card>
-                        </div>
-                    </div>
-                </TabPanel>
-            </TabView> -->
-            <!-- <div class="col-12 flex justify-content-center mt-4">
-                <Paginator :first="first" :rows="rows" :totalRecords="totalRecords" :rowsPerPageOptions="[6, 12, 18, 24]" @update:first="onFirstChange" @update:rows="onRowsChange" @page="onPageChange" />
-            </div> -->
-            </div>
+                   </div>
            <div v-show="showMode == 'Customers'">
             <customerManagement  :view="currentView" @updateView="(newView) => currentView = newView"/>
-           </div>
+            </div>
            <div v-show="showMode == 'Orders'">
-            <OrderHistory  :view="currentView" @updateView="(newView) => currentView = newView"/>
+            <OrderHistory :fromInvoice="true"  :view="currentView" @updateView="(newView) => currentView = newView"/>
            </div>
         </div>
 
@@ -280,8 +233,8 @@ const handleOnClose = () => {
                 <!-- Customer Info -->
                 <div class="mb-6">
                     <div class="flex justify-content-between align-items-center w-full px-2">
-                        <Button label="Customer Name" severity="help" style="border-radius: 0.5rem; width: 90%;" class="mr-1" @click=" showMode == 'Customers' ? showMode = 'Products' : showMode = 'Customers'" />
-                        <Button icon="pi pi-cog" class="p-button-sm ml-1 px-2 mr-1"  severity="help" style="border-radius: 0.5rem;" @click="showactions = !showactions"/> 
+                        <Button label="Customer Name"  class="w-full p-button-outlined border-primary-200 my-2 bg-primary" @click=" showMode == 'Customers' ? showMode = 'Products' : showMode = 'Customers'" />
+                        <Button icon="pi pi-ellipsis-v" class="p-button-sm ml-1 px-2 mr-1 bg-primary"    @click="showactions = !showactions"/> 
                    
                     </div>
 
@@ -348,17 +301,24 @@ const handleOnClose = () => {
 
                 <!-- Process Transaction Button -->
                 <div class="space-y-2 flex flex-column gap-2">
-                    <Button label="Save as Draft" class="w-full p-button-outlined border-primary-200 my-2" @click="processTransaction" :disabled="invoiceStore.invoice.items.length === 0" />
+                    <Button label="Save as Draft" class="w-full p-button-outlined border-primary-200 my-2" @click="processTransaction(true)" :disabled="invoiceStore.invoice.items.length === 0" />
                     <div class="flex gap-2">
-                    <Button label="Invoice" class="flex-1" @click="processTransaction" :disabled="invoiceStore.invoice.items.length === 0" />
-                    <Button label="Payment" class="flex-1 p-button-outlined" />
+                    <Button label="Invoice" class="flex-1" @click="processTransaction(false)" :disabled="invoiceStore.invoice.items.length === 0" />
+                    <Button label="Payment" class="flex-1 p-button-outlined" @click="showInvoiceDialog = true" />
                     </div>
                 </div>
                 
             
             </template>
         </Card>
+        <Dialog v-model:visible="showInvoiceDialog" :style="{ width: '50vw' , height: '90vh' }" >
+            <invoiceDialog :modelValue="showInvoiceDialog"
+            :orderItems="invoiceStore.invoice.items"
+            :customer-name="invoiceStore.invoice.customer.name"
+            :invoice-number="'1'" />
+        </Dialog>
     </div>
+    
     <PaymentDialog v-model:visible="paymentDialogVisible"   
         />
 </template>
