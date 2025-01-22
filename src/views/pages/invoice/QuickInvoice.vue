@@ -12,6 +12,8 @@ import OrderActionMenu from './masterInvoice/OrderActionMenu.vue';
 import OrderHistory from '../orders/OrderHistory.vue';
 import customerList from '../customerList.vue'
 import invoiceDialog from './masterInvoice/invoiceDialog.vue';
+import orderHistory from './masterInvoice/orderHistory.vue';
+import orderlist from './masterInvoice/orderlist.vue';
 const router = useRouter();
 const invoiceStore = useInvoiceStore();
 const selectedItems = ref<OrderItem[]>([]);
@@ -152,9 +154,10 @@ const showInvoiceDialog = ref(false);
 </script>
 
 <template>
+    <orderHistory />
     <div class="flex flex-column lg:flex-row gap-2 overflow-auto">
         <!-- Main Content -->
-         
+        
         <div class="flex flex-column gap-2 lg:w-8 w-full overflow-y-auto overflow-x-hidden">
             <div class="flex flex-column sm:flex-row gap-4">
                     <InputText v-model="searchQuery" id="productSearch" type="text" placeholder="Search Products..." class="w-full" />
@@ -171,20 +174,17 @@ const showInvoiceDialog = ref(false);
             <!-- Search Bar -->
              <div class="flex flex-column gap-2 sticky top-0 surface-50 z-5">
                
-
-                <div class="flex flex-row max-w-full overflow-x-auto bg-white sticky top-0 border-bottom-1 surface-border px-2">
-                    <Button v-for="category in categories"
-                        :key="category"
-                        :label="category.charAt(0).toUpperCase() + category.slice(1)"
-                        :icon="`pi pi-${category}`"
-                        outlined
-                        class="min-w-max p-2 border-transparent hover:border-primary-400 hover:border-bottom-3 transition-colors transition-duration-150"
-                        :class="{ 'border-primary-400 border-bottom-3': selectedCategory === category }"
-                        @click="selectedCategory = category"
-                    
-                      
-                    />
+                <div class="flex flex-wrap gap-2">
+                    <button
+                    v-for="category in categories"
+                    :key="category"
+                     @click="selectedCategory = category"
+                    class="p-button p-button-outlined p-button-sm text-xs"
+                    >
+                    {{ category }}
+                    </button>
                 </div>
+              
             </div>
 
 
@@ -216,7 +216,7 @@ const showInvoiceDialog = ref(false);
                     </Card>
                 </div>
             </div>
-                   </div>
+         </div>
            <div v-show="showMode == 'Customers'">
             <customerManagement  :view="currentView" @updateView="(newView) => currentView = newView"/>
             </div>
@@ -312,10 +312,11 @@ const showInvoiceDialog = ref(false);
             </template>
         </Card>
         <Dialog v-model:visible="showInvoiceDialog" :style="{ width: '50vw' , height: '90vh' }" >
-            <invoiceDialog :modelValue="showInvoiceDialog"
+            <!-- <invoiceDialog :modelValue="showInvoiceDialog"
             :orderItems="invoiceStore.invoice.items"
             :customer-name="invoiceStore.invoice.customer.name"
-            :invoice-number="'1'" />
+            :invoice-number="'1'" /> -->
+            
         </Dialog>
     </div>
     
