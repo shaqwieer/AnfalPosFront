@@ -37,6 +37,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/invoice/QuickInvoice.vue')
                 },
                 {
+                    path: '/work-board',
+                    name: 'Work Board',
+                    component: () => import('@/views/pages/kanbanBoard/KanbanBoard.vue')
+                },
+                {
                     path: '/plants',
                     name: 'Plants',
                     meta: {
@@ -108,11 +113,7 @@ const router = createRouter({
                     },
                     component: () => import('@/views/pages/userRolePage/userRole.vue')
                 },
-                {
-                    path: '/pages/kanban',
-                    name: 'kanban',
-                    component: () => import('@/views/pages/kanbanBoard/KanbanBoard.vue')
-                },
+
                 // {
                 //     path: '/Quickinvoice2',
                 //     name: 'Quickinvoice2',
