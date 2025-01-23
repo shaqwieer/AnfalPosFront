@@ -148,56 +148,74 @@ const showInvoiceDialog = ref(false);
             <orderHistory />
 
             <!-- Main Content -->
-            <div class="flex flex-column gap-2 w-full overflow-y-auto overflow-x-hidden">
-                <div class="flex flex-column sm:flex-row gap-4">
-                    <InputText v-model="searchQuery" id="productSearch" type="text" placeholder="Search Products..." class="w-full" />
+            <div class="flex flex-column gap-2 w-full relative overflow-y-auto overflow-x-hidden min-h-90px">
+                <div class="test flex flex-column sm:flex-row gap-4">
+                    <InputText v-model="searchQuery" id="productSearch" type="text" placeholder="Search Products..." class="w-full shadow-none" />
                     <div class="flex flex-row gap-2 min-w-max">
-                        <Dropdown v-model="showMode" :options="viewModes" optionLabel="viewMode" optionValue="viewMode" placeholder="Select a view" class="w-full" @change="updateShowMode" />
+                        <Dropdown v-model="showMode" :options="viewModes" optionLabel="viewMode" optionValue="viewMode" placeholder="Select a view" class="w-full shadow-none" @change="updateShowMode" />
 
                         <!-- <Button label="Order History" icon="pi pi-history" class="border-primary-200" outlined @click="navigateToHistory"></Button>
                         <Button label="Draft Orders" icon="pi pi-file" class="border-primary-200" outlined @click="navigateToDraft"></Button> -->
                     </div>
                 </div>
-                <div v-show="showMode == 'Products'">
+
+                <div v-show="showMode == 'Products'" class="sticky top-0 z-5 surface-50">
                     <!-- Search Bar -->
-                    <div class="flex flex-column gap-2 sticky top-0 surface-50 z-5">
+                    <div class="flex flex-column gap-2 pb-3 pt-2 pl-3 pr-3">
                         <div class="flex flex-wrap gap-2">
-                            <button v-for="category in categories" :key="category" @click="selectedCategory = category" class="p-button p-button-outlined p-button-sm text-xs">
+                            <button
+                                v-for="category in categories"
+                                :key="category"
+                                @click="selectedCategory = category"
+                                class="p-button p-button-sm text-xs shadow-none font-bold"
+                                :class="`${selectedCategory == category ? 'bg-primary' : 'p-button-outlined'}`"
+                            >
                                 {{ category }}
                             </button>
                         </div>
                     </div>
+                </div>
 
-                    <div class="grid overflow-y-auto max-h-screen">
-                        <div v-for="item in filteredMenuItems.filter((i) => i.itemGroup === selectedCategory)" :key="item.id" class="col-12 sm:col-6 xl:col-4">
-                            <Card class="h-full border-round shadow-2">
-                                <template #content>
-                                    <div class="flex flex-column gap-4 p-3">
-                                        <img :src="item.image ? item.image : '/src/assets/images/item.png'" :alt="item.name" class="item-img w-10rem h-10rem border-round mx-auto" />
-                                        <div class="flex flex-column gap-2">
-                                            <h3 class="font-semibold text-lg mb-2">{{ item.name }}</h3>
-                                            <span v-if="item.totalStock === 0" class="text-danger ml-2"> <i class="pi pi-exclamation-triangle"></i> Out of Stock </span>
-                                            <div class="flex flex-row gap-2 text-sm text-500 justify-content-between">
-                                                <span>{{ item.totalStock }} Available</span>
-                                                <span class="text-lg font-semibold text-primary">${{ item.price.toFixed(2) }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="flex justify-content-center align-items-center border-top-1 surface-border pt-3 mt-3">
-                                        <Button icon="pi pi-minus" @click="invoiceStore.decreaseItemInInvoice(item.id)" :disabled="!invoiceStore.invoice.items.find((i) => i.id === item.id)?.quantity" severity="danger" outlined rounded />
-                                        <span class="w-4rem text-center font-medium">
-                                            {{ invoiceStore.invoice.items.find((i) => i.id === item.id)?.quantity || 0 }}
-                                        </span>
-                                        <Button icon="pi pi-plus" @click="invoiceStore.addItemToInvoice(item.id)" :disabled="item.totalStock === 0" severity="success" outlined rounded />
-                                    </div>
-                                </template>
-                            </Card>
-                        </div>
+                <!-- Header with Actions -->
+                <div v-if="showMode === 'Products'" class="mb-4 flex justify-content-between align-items-center flex-row-reverse pl-4 pr-4">
+                    <div class="flex gap-2">
+                        <Button icon="pi pi-list" :class="{ 'p-button-primary': currentView === 'list' }" @click="currentView = 'list'" />
+                        <Button icon="pi pi-th-large" :class="{ 'p-button-primary': currentView === 'grid' }" @click="currentView = 'grid'" />
                     </div>
                 </div>
+
+                <div v-show="showMode == 'Products'" class="grid m-auto max-h-screen mt-0 gap-4 justify-content-between pl-4 pr-4">
+                    <div v-for="item in filteredMenuItems.filter((i) => i.itemGroup === selectedCategory)" :key="item.id" class="max-w-200px max-h-326px p-0">
+                        <Card class="h-full border-round shadow-2 flex align-center justify-center">
+                            <template #content>
+                                <div class="flex flex-column gap-2 p-0">
+                                    <img :src="item.image ? item.image : '/src/assets/images/item.png'" :alt="item.name" class="item-img w-full h-full border-round mx-auto" />
+                                    <div class="flex flex-column gap-2">
+                                        <h3 class="font-semibold mb-0 text-base">{{ item.name }}</h3>
+                                        <span v-if="item.totalStock === 0" class="text-danger ml-2"> <i class="pi pi-exclamation-triangle"></i> Out of Stock </span>
+                                        <div class="flex flex-row gap-2 text-sm text-500 justify-content-between">
+                                            <span class="text-base font-semibold text-primary">${{ item.price.toFixed(2) }}</span>
+
+                                            <span>{{ item.totalStock }} Available</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div v-if="item.totalStock > 0" class="w-full totalStock flex justify-content-center align-items-between border-top-1 surface-border pt-3 mt-3">
+                                    <Button class="p-0" icon="pi pi-minus" @click="invoiceStore.decreaseItemInInvoice(item.id)" :disabled="!invoiceStore.invoice.items.find((i) => i.id === item.id)?.quantity" severity="danger" outlined rounded />
+                                    <span class="w-4rem text-center font-medium">
+                                        {{ invoiceStore.invoice.items.find((i) => i.id === item.id)?.quantity || 0 }}
+                                    </span>
+                                    <Button icon="pi pi-plus" @click="invoiceStore.addItemToInvoice(item.id)" :disabled="item.totalStock === 0" severity="success" outlined rounded />
+                                </div>
+                            </template>
+                        </Card>
+                    </div>
+                </div>
+
                 <div v-show="showMode == 'Customers'">
                     <customerManagement :view="currentView" @updateView="(newView) => (currentView = newView)" />
                 </div>
+
                 <div v-show="showMode == 'Orders'">
                     <OrderHistory :fromInvoice="true" :view="currentView" @updateView="(newView) => (currentView = newView)" />
                 </div>
@@ -299,10 +317,33 @@ const showInvoiceDialog = ref(false);
 
     <PaymentDialog v-model:visible="paymentDialogVisible" />
 </template>
+<style>
+.totalStock Button {
+    width: 30px;
+    height: 30px;
+}
+.p-card-body {
+    padding: 0px;
+    display: flex;
+}
 
+.p-card-content {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 0.75rem;
+}
+</style>
 <style scoped>
 .p-tabview-nav {
     border: none;
+}
+
+.max-w-200px {
+    max-width: 200px;
+}
+.max-h-326px {
+    max-height: 326px;
 }
 
 .p-tabview-nav-link {
@@ -346,5 +387,8 @@ const showInvoiceDialog = ref(false);
 }
 .h-86vh {
     height: 86vh;
+}
+.min-h-90px {
+    min-height: 90px;
 }
 </style>
