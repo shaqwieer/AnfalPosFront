@@ -8,7 +8,7 @@ import { useInvoiceStore } from '../../../stores/invoiceStore';
 import { useMainStore } from '../../../stores/mainStore';
 import { useRouter } from 'vue-router';
 import customerManagement from './masterInvoice/customer-management.vue';
-import OrderActionMenu from './masterInvoice/OrderActionMenu.vue';
+import OrderActionMenu from './masterInvoice/orderActionMenu.vue';
 import OrderHistory from '../orders/OrderHistory.vue';
 import customerList from '../customerList.vue'
 import invoiceDialog from './masterInvoice/invoiceDialog.vue';
