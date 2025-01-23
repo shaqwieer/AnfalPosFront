@@ -143,7 +143,7 @@ const showInvoiceDialog = ref(false);
 </script>
 
 <template>
-    <div class="flex gap-3 flex-column lg:flex-row ">
+    <div class="flex gap-3 flex-column lg:flex-row">
         <div class="lg:w-8 flex flex-column h-86vh gap-2 overflow-auto">
             <orderHistory />
 
@@ -212,7 +212,7 @@ const showInvoiceDialog = ref(false);
         </div>
 
         <!-- Order Summary Card -->
-        <Card class="lg:w-4 h-full sticky top-0 ">
+        <Card class="lg:w-4 h-full sticky top-0">
             <template #content>
                 <!-- Customer Info -->
                 <div class="mb-6">
@@ -231,91 +231,6 @@ const showInvoiceDialog = ref(false);
                     </div>
 
                     <div style="height: 313px" class="overflow-y-auto max-h-30rem">
-                        <div v-for="item in invoiceStore.invoice.items" :key="item.id" class="mb-2 p-3 surface-ground border-round">
-                            <div class="flex justify-content-between align-items-center">
-                                <div class="flex align-items-center gap-2">
-                                    <img :src="'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202025-01-15%20at%209.10.24%20PM-Y1GVfaII2ikT6z3XAanB72VCYKJAVF.jpeg'" :alt="item.itemName" class="w-3rem h-3rem border-round" />
-                                    <div>
-                                        <p class="font-medium">{{ item.itemName }}</p>
-                                        <p class="text-sm text-600">${{ item.finalDiscountAmount.toFixed(2) }} each</p>
-                                    </div>
-                                </div>
-                                <div class="flex align-items-center gap-2">
-                                    <Button icon="pi pi-minus" @click="invoiceStore.decreaseItemInInvoice(item.id)" severity="danger" text />
-                                    <span class="font-medium">{{ item.quantity }}</span>
-                                    <Button icon="pi pi-plus" @click="invoiceStore.addItemToInvoice(item.id)" severity="success" text />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div v-for="item in invoiceStore.invoice.items" :key="item.id" class="mb-2 p-3 surface-ground border-round">
-                            <div class="flex justify-content-between align-items-center">
-                                <div class="flex align-items-center gap-2">
-                                    <img :src="'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202025-01-15%20at%209.10.24%20PM-Y1GVfaII2ikT6z3XAanB72VCYKJAVF.jpeg'" :alt="item.itemName" class="w-3rem h-3rem border-round" />
-                                    <div>
-                                        <p class="font-medium">{{ item.itemName }}</p>
-                                        <p class="text-sm text-600">${{ item.finalDiscountAmount.toFixed(2) }} each</p>
-                                    </div>
-                                </div>
-                                <div class="flex align-items-center gap-2">
-                                    <Button icon="pi pi-minus" @click="invoiceStore.decreaseItemInInvoice(item.id)" severity="danger" text />
-                                    <span class="font-medium">{{ item.quantity }}</span>
-                                    <Button icon="pi pi-plus" @click="invoiceStore.addItemToInvoice(item.id)" severity="success" text />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div v-for="item in invoiceStore.invoice.items" :key="item.id" class="mb-2 p-3 surface-ground border-round">
-                            <div class="flex justify-content-between align-items-center">
-                                <div class="flex align-items-center gap-2">
-                                    <img :src="'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202025-01-15%20at%209.10.24%20PM-Y1GVfaII2ikT6z3XAanB72VCYKJAVF.jpeg'" :alt="item.itemName" class="w-3rem h-3rem border-round" />
-                                    <div>
-                                        <p class="font-medium">{{ item.itemName }}</p>
-                                        <p class="text-sm text-600">${{ item.finalDiscountAmount.toFixed(2) }} each</p>
-                                    </div>
-                                </div>
-                                <div class="flex align-items-center gap-2">
-                                    <Button icon="pi pi-minus" @click="invoiceStore.decreaseItemInInvoice(item.id)" severity="danger" text />
-                                    <span class="font-medium">{{ item.quantity }}</span>
-                                    <Button icon="pi pi-plus" @click="invoiceStore.addItemToInvoice(item.id)" severity="success" text />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div v-for="item in invoiceStore.invoice.items" :key="item.id" class="mb-2 p-3 surface-ground border-round">
-                            <div class="flex justify-content-between align-items-center">
-                                <div class="flex align-items-center gap-2">
-                                    <img :src="'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202025-01-15%20at%209.10.24%20PM-Y1GVfaII2ikT6z3XAanB72VCYKJAVF.jpeg'" :alt="item.itemName" class="w-3rem h-3rem border-round" />
-                                    <div>
-                                        <p class="font-medium">{{ item.itemName }}</p>
-                                        <p class="text-sm text-600">${{ item.finalDiscountAmount.toFixed(2) }} each</p>
-                                    </div>
-                                </div>
-                                <div class="flex align-items-center gap-2">
-                                    <Button icon="pi pi-minus" @click="invoiceStore.decreaseItemInInvoice(item.id)" severity="danger" text />
-                                    <span class="font-medium">{{ item.quantity }}</span>
-                                    <Button icon="pi pi-plus" @click="invoiceStore.addItemToInvoice(item.id)" severity="success" text />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div v-for="item in invoiceStore.invoice.items" :key="item.id" class="mb-2 p-3 surface-ground border-round">
-                            <div class="flex justify-content-between align-items-center">
-                                <div class="flex align-items-center gap-2">
-                                    <img :src="'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202025-01-15%20at%209.10.24%20PM-Y1GVfaII2ikT6z3XAanB72VCYKJAVF.jpeg'" :alt="item.itemName" class="w-3rem h-3rem border-round" />
-                                    <div>
-                                        <p class="font-medium">{{ item.itemName }}</p>
-                                        <p class="text-sm text-600">${{ item.finalDiscountAmount.toFixed(2) }} each</p>
-                                    </div>
-                                </div>
-                                <div class="flex align-items-center gap-2">
-                                    <Button icon="pi pi-minus" @click="invoiceStore.decreaseItemInInvoice(item.id)" severity="danger" text />
-                                    <span class="font-medium">{{ item.quantity }}</span>
-                                    <Button icon="pi pi-plus" @click="invoiceStore.addItemToInvoice(item.id)" severity="success" text />
-                                </div>
-                            </div>
-                        </div>
-
                         <div v-for="item in invoiceStore.invoice.items" :key="item.id" class="mb-2 p-3 surface-ground border-round">
                             <div class="flex justify-content-between align-items-center">
                                 <div class="flex align-items-center gap-2">
