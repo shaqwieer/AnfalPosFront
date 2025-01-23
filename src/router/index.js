@@ -37,6 +37,11 @@ const router = createRouter({
                     component: () => import('@/views/pages/invoice/QuickInvoice.vue')
                 },
                 {
+                    path: '/work-board',
+                    name: 'Work Board',
+                    component: () => import('@/views/pages/kanbanBoard/KanbanBoard.vue')
+                },
+                {
                     path: '/plants',
                     name: 'Plants',
                     meta: {
@@ -108,11 +113,7 @@ const router = createRouter({
                     },
                     component: () => import('@/views/pages/userRolePage/userRole.vue')
                 },
-                // {
-                //     path: '/pages/invoice',
-                //     name: 'invoice',
-                //     component: () => import('@/views/pages/Invoice.vue')
-                // },
+
                 // {
                 //     path: '/Quickinvoice2',
                 //     name: 'Quickinvoice2',
@@ -599,10 +600,10 @@ router.beforeEach(async (to, from, next) => {
         next({ name: 'e-commerce' });
     } else if (token && !isAllowed) {
         next({ name: 'notfound' });
-    } else if (token && !hasBranchIdKey&& to.name !== 'available-branches') {
+    } else if (token && !hasBranchIdKey && to.name !== 'available-branches') {
         next({ name: 'available-branches' });
     } else {
-         next();
+        next();
     }
 });
 
