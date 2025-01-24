@@ -151,7 +151,8 @@
     "firstName": "First Name ",
     "lastName": "Last Name",
     "branchLabel": "Branches",
-    "branchesPlaceholder": "Add Branches"
+    "branchesPlaceholder": "Add Branches",
+    "branchs": "Branchs"
   },
   "validations": {
     "invalidEmail": "Invalid email format.",
@@ -401,10 +402,15 @@
     "SapOrganization": "Sap Organization",
     "sapPlant": "Sap Plant",
     "superOrganization": "Super Organization"
-    
-    
   },
   "availableBranch": {
     "title": "Available Branches"
+  },
+  "profileBar": {
+    "welcome": "Welcome",
+    "logout": "Sign Out",
+    "logoutDesc": "Do You Want To Sign Out ?",
+    "branches": "Available Branches",
+    "branchesDesc": "Go To Available Branch For The Cuurent user"
   }
 }

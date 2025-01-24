@@ -151,7 +151,8 @@
     "firstName": "الاسم الأول",
     "lastName": "الاسم الاخير",
     "branchLabel": "الفروع",
-    "branchesPlaceholder": "أضافة فروع"
+    "branchesPlaceholder": "أضافة فروع",
+    "branchs": "فروع"
   },
   "labels": {
     "cancel": "الغاء",
@@ -319,8 +320,8 @@
     "sapConfiguration": "اعدادات SAP",
     "sapConfigurationplaceholder": "اختار أعددات SAP",
     "logouploader": "الشعار الرسمى",
-    "basicDataTab" : "البيانات الاساسية",
-    "organizationSettingsTab" : "اعدادات المنظمة"
+    "basicDataTab": "البيانات الاساسية",
+    "organizationSettingsTab": "اعدادات المنظمة"
   },
   "uploader": {
     "mainlabel": "برجاء السحب والافلات هنا لأرفاق الملف",
@@ -397,5 +398,12 @@
   },
   "availableBranch": {
     "title": "الفروع المتاحة"
+  },
+  "profileBar": {
+    "welcome": "مرحبا",
+    "logout": "تسجيل الخروج",
+    "logoutDesc": "هل تريد تسجيل الخروج ؟",
+    "branches": "الفروع المتاحة",
+    "branchesDesc": "اذهب الى الفروع المتاحة للمستخدم الحالى"
   }
 }

@@ -35,7 +35,7 @@
             </div>
         </div>
         <div v-if="!simple" class="flex justify-content-between mx-3">
-            <IconField iconPosition="left" class="w-9 flex">
+            <IconField iconPosition="left" class="w-9 flex" v-if="fromInvoice == false">
                 <InputText type="text" v-model="searchText" :placeholder="t('labels.search')" class="w-full" />
                 <InputIcon class="pi pi-search" />
             </IconField>
@@ -91,6 +91,10 @@ const props = defineProps({
         default: ''
     },
     simple: {
+        type: Boolean,
+        default: false
+    },
+    fromInvoice: {
         type: Boolean,
         default: false
     }
