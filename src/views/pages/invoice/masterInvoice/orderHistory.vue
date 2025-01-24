@@ -130,47 +130,56 @@ const orders: Order[] = [
         </div>
 
         <!-- Accordion Content -->
-        <div :class="`overflow-hidden transition-all transition-duration-200 transition-linear  ${isAccordionOpen ? 'h-0' : 'h-230px'}`">
+        <div :class="`overflow-hidden transition-all transition-duration-200 transition-linear  ${isAccordionOpen ? 'h-0' : 'h-200px'}`">
             <div class="overflow-x-auto Scrollbar">
                 <div class="flex gap-3 p-3" style="min-width: max-content">
                     <div
                         v-for="order in orders"
                         :key="order.id"
                         class="surface-card border-round-lg shadow-1 hover:shadow-3 cursor-pointer transition-all transition-duration-150 relative overflow-hidden"
-                        style="width: 200px"
+                        style="width: 250px"
                         @click="selectedOrder = order"
                     >
                         <!-- Draft Label -->
-                        <div v-if="order.isDraft" class="absolute top-0 right-0 bg-yellow-500 text-900 text-xs font-semibold px-2 py-1 border-radius-bottom-left">Draft 0</div>
 
-                        <div class="p-3">
-                            <!-- Icon -->
-                            <div class="flex align-items-center justify-content-center w-3rem h-3rem bg-blue-100 border-circle mb-2 mx-auto">
-                                <i class="pi pi-file-edit text-blue-600 text-xl"></i>
+                        <div class="flex flex-column gap-3 p-4">
+                            <div class="flex flex-row justify-content-between align-items-center">
+                                <div class="flex flex-row align-items-center gap-2">
+                                    <i class="pi pi-file text-blue-600 text-2xl"></i>
+                                    <span class="font-semibold text-900 text-center text-lg">Order #{{ order.id }}</span>
+                                </div>
+                                <div v-if="order.isDraft" class="border-1 border-yellow-600 text-yellow-600 text-sm font-semibold px-2 py-1 border-round-xl"><i class="pi pi-file-edit text-yellow-600 text-sm"></i> Draft</div>
                             </div>
-
-                            <!-- Order Details -->
-                            <h3 class="font-medium text-center text-sm mb-1">#{{ order.id }}</h3>
-                            <p class="text-xs text-600 text-center mb-1 text-overflow-ellipsis overflow-hidden white-space-nowrap">
-                                {{ order.customer }}
-                            </p>
-                            <p class="text-xs text-600 text-center mb-1">{{ order.date }}</p>
-
-                            <!-- Status Badge -->
-                            <div class="flex justify-content-center mb-1">
-                                <span
-                                    class="text-xs px-2 py-1 border-round"
+                            <div class="flex flex-row justify-content-between align-items-center">
+                                <span class="text-md text-500 text-center text-overflow-ellipsis overflow-hidden white-space-nowrap">
+                                    {{ order.customer }}
+                                </span>
+                                <span class="text-md text-500 text-center">{{ order.date }}</span>
+                            </div>
+                            <hr class="my-0 border-top-2 border-none border-200" />
+                            <div class="flex flex-row justify-content-between align-items-center">
+                                <div class="flex flex-row align-items-center gap-2">
+                                    <i
+                                        class="pi text-xl"
+                                        :class="{
+                                            ' text-green-500 pi-verified': order.status === 'Accepted',
+                                            ' text-red-500 pi-exclamation-circle': order.status === 'Rejected'
+                                        }"
+                                    ></i>
+                                    <span
+                                    class="text-md border-round"
                                     :class="{
-                                        'bg-green-100 text-green-900': order.status === 'Accepted',
-                                        'bg-red-100 text-red-900': order.status === 'Rejected'
+                                        'text-green-600': order.status === 'Accepted',
+                                        'text-red-600': order.status === 'Rejected'
                                     }"
                                 >
+
                                     {{ order.status }}
                                 </span>
+                                </div>
+                               
+                                <span class="text-xl font-semibold text-primary-800 text-center">{{ order.total }}</span>
                             </div>
-
-                            <!-- Total -->
-                            <p class="text-center font-medium text-sm">{{ order.total }}</p>
                         </div>
                     </div>
                 </div>
@@ -231,6 +240,4 @@ const orders: Order[] = [
 .h-230px {
     height: 230px;
 }
-
-
 </style>

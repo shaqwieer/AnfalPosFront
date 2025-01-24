@@ -138,74 +138,105 @@ const showMode = ref('Products');
 function updateShowMode() {
     showMode.value = showMode.value;
 }
-const currentView = ref('list');
 const showactions = ref(false);
 
 const handleOnClose = () => {
     showactions.value = false;
 };
 const showInvoiceDialog = ref(false);
+const currentView = ref('grid');
+const options = ref([
+    { icon: 'pi pi-bars', value: 'list' },
+    { icon: 'pi pi-th-large', value: 'grid' }
+]);
 </script>
 
 <template>
     <div class="flex gap-3 flex-column lg:flex-row relative w-full">
         <div class="lg:w-8 flex flex-column h-86vh gap-2 overflow-auto">
             <orderHistory />
-
             <!-- Main Content -->
-            <div class="flex flex-column gap-2 w-full relative overflow-y-auto overflow-x-hidden min-h-90px px-4">
-                <div class="test flex flex-column sm:flex-row gap-4">
-                    <InputText v-model="searchQuery" id="productSearch" type="text" placeholder="Search Products..." class="w-full shadow-none" />
+            <div class="flex flex-column gap-2 w-full relative overflow-y-auto overflow-x-hidden min-h-90px">
+                <div class="flex flex-column sm:flex-row gap-2">
                     <div class="flex flex-row gap-2 min-w-max">
                         <Dropdown v-model="showMode" :options="viewModes" optionLabel="viewMode" optionValue="viewMode" placeholder="Select a view" class="w-full shadow-none" @change="updateShowMode" />
 
                         <!-- <Button label="Order History" icon="pi pi-history" class="border-primary-200" outlined @click="navigateToHistory"></Button>
                         <Button label="Draft Orders" icon="pi pi-file" class="border-primary-200" outlined @click="navigateToDraft"></Button> -->
                     </div>
+                    <InputText v-model="searchQuery" id="productSearch" type="text" placeholder="Search Products..." class="w-full shadow-none" />
+                    <SelectButton  v-model="currentView" :options="options" optionLabel="value" dataKey="value" optionValue="value" :allowEmpty="false" aria-labelledby="custom" :class="['flex', mainStore.isRTL ? 'flex-row-reverse' : 'flex-row']">
+                        <template #option="slotProps">
+                            <i :class="slotProps.option.icon"></i>
+                        </template>
+                    </SelectButton>
                 </div>
 
                 <div v-show="showMode == 'Products'" class="sticky top-0 z-5 surface-50">
                     <!-- Search Bar -->
-                    <div class="flex flex-column gap-2 pb-3 pt-2 pl-3 pr-3">
+                    <div class="flex flex-column gap-2 pb-2 px-1">
                         <div class="flex flex-wrap gap-2">
-                            <button
+                            <Button
                                 v-for="category in categories"
                                 :key="category"
                                 @click="selectedCategory = category"
-                                class="p-button p-button-sm text-xs shadow-none font-bold"
-                                :class="`${selectedCategory == category ? 'bg-primary' : 'p-button-outlined'}`"
+                                class=" text-sm shadow-none font-semibold border-1 border-200 px-3 py-2"
+                                :class="`${selectedCategory == category ? 'bg-primary':'bg-white text-900'}`"
+                                size="large"
                             >
                                 {{ category }}
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Header with Actions -->
-                <div v-if="showMode === 'Products'" class="mb-3 flex justify-content-between align-items-center flex-row-reverse">
+                <!-- <div v-if="showMode === 'Products'" class="mb-3 flex justify-content-between align-items-center flex-row-reverse">
                     <div class="flex gap-2">
                         <Button icon="pi pi-list" class="shadow-none" :class="{ 'p-button-primary': currentView === 'list', 'p-button-outlined': currentView === 'grid' }" @click="currentView = 'list'" />
                         <Button icon="pi pi-th-large" class="shadow-none" :class="{ 'p-button-primary': currentView === 'grid', 'p-button-outlined': currentView === 'list' }" @click="currentView = 'grid'" />
                     </div>
-                </div>
+                </div> -->
 
                 <div v-if="currentView == 'grid' && showMode == 'Products'" class="Products grid max-h-screen mt-0 gap-3 pl-3 pr-3">
                     <div v-for="item in filteredMenuItems.filter((i) => i.itemGroup === selectedCategory)" :key="item.id" class="Product-item p-0">
-                        <Card class="h-full border-round shadow-2 flex justify-content-between">
+                        <Card class="h-full border-round shadow-none border-1 border-300 hover:shadow-1 hover:border-primary-300 flex justify-content-between">
                             <template #content>
-                                <div class="flex flex-column gap-2 p-0">
-                                    <img :src="item.image ? item.image : 'https://qas.anfalpos.com/demo/images/product/blue-t-shirt.jpg'" :alt="item.name" class="item-img w-full h-full border-round mx-auto" />
-                                    <div class="flex flex-column gap-2">
-                                        <h3 class="font-semibold mb-0 text-base">{{ item.name }}</h3>
-                                        <span v-if="item.totalStock === 0" class="text-danger ml-2"> <i class="pi pi-exclamation-triangle"></i> Out of Stock </span>
-                                        <div class="flex flex-row gap-2 text-sm text-500 justify-content-between">
-                                            <span class="text-base font-semibold text-primary">${{ item.price.toFixed(2) }}</span>
-
-                                            <span>{{ item.totalStock }} Available</span>
+                                <div class="flex flex-column gap-2 p-0 h-full">
+                                    <img :src="item.image ? item.image : 'https://qas.anfalpos.com/demo/images/product/blue-t-shirt.jpg'" :alt="item.name" class="item-img border-round mx-auto" />
+                                    <div class="flex flex-column gap-2 h-full justify-content-between">
+                                        <span className="font-medium text-lg leading-none">{{ item.name }}</span>
+                                        <div className="flex align-items-center justify-content-between mb-2">
+                                            <span className="text-xl font-bold text-primary">${{ item.price.toFixed(2) }}</span>
+                                            <Badge v-if="item.totalStock === 0" value="Out of Stock" severity="danger"></Badge>
+                                            <Badge v-else :value="item.totalStock + ' Available'" severity="secondary"></Badge>
                                         </div>
                                     </div>
                                 </div>
-                                <div v-if="item.totalStock > 0" class="w-full totalStock flex justify-content-evenly align-items-between border-top-1 surface-border pt-3 mt-3">
+                                <div class="flex flex-row justify-content-between align-items-center w-full h-3rem border-1 border-200 border-round">
+                                    <Button
+                                        class="p-0 shadow-none h-full border-right-1 border-noround-right border-200 cursor-pointer"
+                                        icon="pi pi-minus"
+                                        @click="invoiceStore.decreaseItemInInvoice(item.id)"
+                                        :disabled="!invoiceStore.invoice.items.find((i) => i.id === item.id)?.quantity"
+                                        severity="danger"
+                                        text
+                                    />
+                                    <div class="">
+                                        <span class="w-full text-center font-medium">
+                                            {{ invoiceStore.invoice.items.find((i) => i.id === item.id)?.quantity || 'Empty' }}
+                                        </span>
+                                    </div>
+                                    <Button
+                                        class="p-0 shadow-none h-full border-noround-left border-left-1 border-200 cursor-pointer"
+                                        icon="pi pi-plus"
+                                        @click="invoiceStore.addItemToInvoice(item.id)"
+                                        :disabled="item.totalStock === 0"
+                                        severity="success"
+                                        text
+                                    />
+                                </div>
+                                <!-- <div v-if="item.totalStock > 0" class="w-full totalStock flex justify-content-evenly align-items-between border-top-1 surface-border pt-3 mt-3">
                                     <Button
                                         class="p-0 shadow-none"
                                         icon="pi pi-minus"
@@ -219,7 +250,7 @@ const showInvoiceDialog = ref(false);
                                         {{ invoiceStore.invoice.items.find((i) => i.id === item.id)?.quantity || 0 }}
                                     </span>
                                     <Button class="p-0 shadow-none" icon="pi pi-plus" @click="invoiceStore.addItemToInvoice(item.id)" :disabled="item.totalStock === 0" severity="success" outlined rounded />
-                                </div>
+                                </div> -->
                             </template>
                         </Card>
                     </div>
@@ -241,7 +272,8 @@ const showInvoiceDialog = ref(false);
                         <Column field="totalStock" header="totalStock">
                             <template #body="slotProps">
                                 <div>
-                                    {{ slotProps.data.totalStock > 0 ? `${slotProps.data.totalStock} Available` : 'Out of Stock' }}
+                                    <Badge v-if="slotProps.data.totalStock === 0" value="Out of Stock" severity="danger"></Badge>
+                                    <Badge v-else :value="slotProps.data.totalStock + ' Available'" severity="secondary"></Badge>
                                 </div>
                             </template>
                         </Column>
@@ -254,7 +286,7 @@ const showInvoiceDialog = ref(false);
 
                         <Column field="quantity" header="quantity">
                             <template #body="slotProps">
-                                <div style="min-width: 90px" :class="slotProps.data.totalStock > 0 ? 'blac' : 'opacity-40 cursor-no-drop'" class="w-full gap-1 totalStock flex justify-content-between align-items-center">
+                                <!-- <div style="min-width: 90px" :class="slotProps.data.totalStock > 0 ? 'blac' : 'opacity-40 cursor-no-drop'" class="w-full gap-1 totalStock flex justify-content-between align-items-center">
                                     <Button
                                         class="p-0 shadow-none"
                                         icon="pi pi-minus"
@@ -268,6 +300,29 @@ const showInvoiceDialog = ref(false);
                                         {{ invoiceStore.invoice.items.find((i) => i.id === slotProps.data.id)?.quantity || 0 }}
                                     </span>
                                     <Button class="p-0 shadow-none" icon="pi pi-plus" @click="invoiceStore.addItemToInvoice(slotProps.data.id)" :disabled="slotProps.data.totalStock === 0" severity="success" outlined rounded />
+                                </div> -->
+                                <div style="min-width: 90px" class="flex flex-row justify-content-between align-items-center w-full h-3rem border-1 border-200 border-round">
+                                    <Button
+                                        class="p-0 shadow-none h-full border-right-1 border-noround-right border-200 cursor-pointer"
+                                        icon="pi pi-minus"
+                                        @click="invoiceStore.decreaseItemInInvoice(slotProps.data.id)"
+                                        :disabled="!invoiceStore.invoice.items.find((i) => i.id === slotProps.data.id)?.quantity"
+                                        severity="danger"
+                                        text
+                                    />
+                                    <div class="">
+                                        <span class="w-full text-center font-medium">
+                                            {{ invoiceStore.invoice.items.find((i) => i.id === slotProps.data.id)?.quantity || 'Empty' }}
+                                        </span>
+                                    </div>
+                                    <Button
+                                        class="p-0 shadow-none h-full border-noround-left border-left-1 border-200 cursor-pointer"
+                                        icon="pi pi-plus"
+                                        @click="invoiceStore.addItemToInvoice(slotProps.data.id)"
+                                        :disabled="slotProps.data.totalStock === 0"
+                                        severity="success"
+                                        text
+                                    />
                                 </div>
                             </template>
                         </Column>
@@ -444,7 +499,7 @@ const showInvoiceDialog = ref(false);
     border-bottom: 2px solid var(--primary-color) !important;
 } */
 .item-img {
-    width: 50%;
+    width: 100%;
     align-self: center;
     aspect-ratio: 1/1;
 }
