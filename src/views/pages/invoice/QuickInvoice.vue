@@ -164,7 +164,7 @@ const showInvoiceDialog = ref(false);
                     </div>
                 </div>
 
-                <div v-show="showMode == 'Products'" class="sticky  top-0 z-5 surface-50">
+                <div v-show="showMode == 'Products'" class="sticky top-0 z-5 surface-50">
                     <!-- Search Bar -->
                     <div class="flex flex-column gap-2 pb-3 pt-2 pl-3 pr-3">
                         <div class="flex flex-wrap gap-2">
@@ -189,7 +189,7 @@ const showInvoiceDialog = ref(false);
                     </div>
                 </div>
 
-                <div v-if="currentView == 'grid' && showMode == 'Products'" class="Products grid max-h-screen mt-0 gap-3 pl-3 pr-3 ">
+                <div v-if="currentView == 'grid' && showMode == 'Products'" class="Products grid max-h-screen mt-0 gap-3 pl-3 pr-3">
                     <div v-for="item in filteredMenuItems.filter((i) => i.itemGroup === selectedCategory)" :key="item.id" class="Product-item p-0">
                         <Card class="h-full border-round shadow-2 flex justify-content-between">
                             <template #content>
@@ -313,57 +313,6 @@ const showInvoiceDialog = ref(false);
                     </div>
 
                     <div class="Orders-items overflow-y-auto max-h-30rem">
-                        <div v-for="item in invoiceStore.invoice.items" :key="item.id" class="mb-2 p-3 surface-ground border-round">
-                            <div class="flex justify-content-between align-items-center">
-                                <div class="flex align-items-center gap-2">
-                                    <img :src="'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202025-01-15%20at%209.10.24%20PM-Y1GVfaII2ikT6z3XAanB72VCYKJAVF.jpeg'" :alt="item.itemName" class="w-3rem h-3rem border-round" />
-                                    <div>
-                                        <p class="font-medium">{{ item.itemName }}</p>
-                                        <p class="text-sm text-600">${{ item.finalDiscountAmount.toFixed(2) }} each</p>
-                                    </div>
-                                </div>
-                                <div class="flex align-items-center gap-2">
-                                    <Button icon="pi pi-minus" @click="invoiceStore.decreaseItemInInvoice(item.id)" severity="danger" text />
-                                    <span class="font-medium">{{ item.quantity }}</span>
-                                    <Button icon="pi pi-plus" @click="invoiceStore.addItemToInvoice(item.id)" severity="success" text />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div v-for="item in invoiceStore.invoice.items" :key="item.id" class="mb-2 p-3 surface-ground border-round">
-                            <div class="flex justify-content-between align-items-center">
-                                <div class="flex align-items-center gap-2">
-                                    <img :src="'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202025-01-15%20at%209.10.24%20PM-Y1GVfaII2ikT6z3XAanB72VCYKJAVF.jpeg'" :alt="item.itemName" class="w-3rem h-3rem border-round" />
-                                    <div>
-                                        <p class="font-medium">{{ item.itemName }}</p>
-                                        <p class="text-sm text-600">${{ item.finalDiscountAmount.toFixed(2) }} each</p>
-                                    </div>
-                                </div>
-                                <div class="flex align-items-center gap-2">
-                                    <Button icon="pi pi-minus" @click="invoiceStore.decreaseItemInInvoice(item.id)" severity="danger" text />
-                                    <span class="font-medium">{{ item.quantity }}</span>
-                                    <Button icon="pi pi-plus" @click="invoiceStore.addItemToInvoice(item.id)" severity="success" text />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div v-for="item in invoiceStore.invoice.items" :key="item.id" class="mb-2 p-3 surface-ground border-round">
-                            <div class="flex justify-content-between align-items-center">
-                                <div class="flex align-items-center gap-2">
-                                    <img :src="'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202025-01-15%20at%209.10.24%20PM-Y1GVfaII2ikT6z3XAanB72VCYKJAVF.jpeg'" :alt="item.itemName" class="w-3rem h-3rem border-round" />
-                                    <div>
-                                        <p class="font-medium">{{ item.itemName }}</p>
-                                        <p class="text-sm text-600">${{ item.finalDiscountAmount.toFixed(2) }} each</p>
-                                    </div>
-                                </div>
-                                <div class="flex align-items-center gap-2">
-                                    <Button icon="pi pi-minus" @click="invoiceStore.decreaseItemInInvoice(item.id)" severity="danger" text />
-                                    <span class="font-medium">{{ item.quantity }}</span>
-                                    <Button icon="pi pi-plus" @click="invoiceStore.addItemToInvoice(item.id)" severity="success" text />
-                                </div>
-                            </div>
-                        </div>
-
                         <div v-for="item in invoiceStore.invoice.items" :key="item.id" class="mb-2 p-3 surface-ground border-round">
                             <div class="flex justify-content-between align-items-center">
                                 <div class="flex align-items-center gap-2">
@@ -533,6 +482,6 @@ const showInvoiceDialog = ref(false);
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, auto));
     justify-items: center;
-    justify-content: space-evenly ;
+    justify-content: space-evenly;
 }
 </style>
