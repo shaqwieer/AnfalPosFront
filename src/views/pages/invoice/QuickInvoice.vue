@@ -194,7 +194,7 @@ const showInvoiceDialog = ref(false);
                         <Card class="h-full border-round shadow-2 flex justify-content-between">
                             <template #content>
                                 <div class="flex flex-column gap-2 p-0">
-                                    <img :src="item.image ? item.image : '/src/assets/images/item.png'" :alt="item.name" class="item-img w-full h-full border-round mx-auto" />
+                                    <img :src="item.image ? item.image : 'https://qas.anfalpos.com/demo/images/product/blue-t-shirt.jpg'" :alt="item.name" class="item-img w-full h-full border-round mx-auto" />
                                     <div class="flex flex-column gap-2">
                                         <h3 class="font-semibold mb-0 text-base">{{ item.name }}</h3>
                                         <span v-if="item.totalStock === 0" class="text-danger ml-2"> <i class="pi pi-exclamation-triangle"></i> Out of Stock </span>
@@ -231,7 +231,7 @@ const showInvoiceDialog = ref(false);
                         <Column field="image" header="Image" class="p-2">
                             <template #body="slotProps">
                                 <div class="flex">
-                                    <img :src="slotProps.data.image ? slotProps.data.image : '/src/assets/images/item.png'" width="50px" :alt="slotProps.data.name" class="border-round" />
+                                    <img :src="slotProps.data.image ? slotProps.data.image : 'https://qas.anfalpos.com/demo/images/product/blue-t-shirt.jpg'" width="50px" height="50px" :alt="slotProps.data.name" class="border-round" />
                                 </div>
                             </template>
                         </Column>
@@ -254,7 +254,7 @@ const showInvoiceDialog = ref(false);
 
                         <Column field="quantity" header="quantity">
                             <template #body="slotProps">
-                                <div style="min-width: 74px" :class="slotProps.data.totalStock > 0 ? 'blac' : 'opacity-40 cursor-no-drop'" class="w-full gap-1 totalStock flex justify-content-between align-items-center">
+                                <div style="min-width: 90px" :class="slotProps.data.totalStock > 0 ? 'blac' : 'opacity-40 cursor-no-drop'" class="w-full gap-1 totalStock flex justify-content-between align-items-center">
                                     <Button
                                         class="p-0 shadow-none"
                                         icon="pi pi-minus"
@@ -316,7 +316,7 @@ const showInvoiceDialog = ref(false);
                         <div v-for="item in invoiceStore.invoice.items" :key="item.id" class="mb-2 p-3 surface-ground border-round">
                             <div class="flex justify-content-between align-items-center">
                                 <div class="flex align-items-center gap-2">
-                                    <img :src="'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202025-01-15%20at%209.10.24%20PM-Y1GVfaII2ikT6z3XAanB72VCYKJAVF.jpeg'" :alt="item.itemName" class="w-3rem h-3rem border-round" />
+                                    <img :src="'https://qas.anfalpos.com/demo/images/product/blue-t-shirt.jpg'" :alt="item.itemName" class="w-3rem h-3rem border-round" />
                                     <div>
                                         <p class="font-medium">{{ item.itemName }}</p>
                                         <p class="text-sm text-600">${{ item.finalDiscountAmount.toFixed(2) }} each</p>
