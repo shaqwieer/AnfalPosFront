@@ -482,6 +482,7 @@ const showInvoiceDialog = ref(false);
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, auto));
     justify-items: center;
-    justify-content: space-evenly;
+    justify-content: start;
+    padding-bottom: 20px;
 }
 </style>
