@@ -14,6 +14,11 @@ import customerList from '../customerList.vue';
 import invoiceDialog from './masterInvoice/invoiceDialog.vue';
 import orderHistory from './masterInvoice/orderHistory.vue';
 import orderlist from './masterInvoice/orderlist.vue';
+
+import ScrollPanel from 'primevue/scrollpanel';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+
 const router = useRouter();
 const invoiceStore = useInvoiceStore();
 const selectedItems = ref<OrderItem[]>([]);
@@ -143,12 +148,12 @@ const showInvoiceDialog = ref(false);
 </script>
 
 <template>
-    <div class="flex gap-3 flex-column lg:flex-row">
+    <div class="flex gap-3 flex-column lg:flex-row relative w-full">
         <div class="lg:w-8 flex flex-column h-86vh gap-2 overflow-auto">
             <orderHistory />
 
             <!-- Main Content -->
-            <div class="flex flex-column gap-2 w-full relative overflow-y-auto overflow-x-hidden min-h-90px">
+            <div class="flex flex-column gap-2 w-full relative overflow-y-auto overflow-x-hidden min-h-90px px-4">
                 <div class="test flex flex-column sm:flex-row gap-4">
                     <InputText v-model="searchQuery" id="productSearch" type="text" placeholder="Search Products..." class="w-full shadow-none" />
                     <div class="flex flex-row gap-2 min-w-max">
@@ -159,7 +164,7 @@ const showInvoiceDialog = ref(false);
                     </div>
                 </div>
 
-                <div v-show="showMode == 'Products'" class="sticky top-0 z-5 surface-50">
+                <div v-show="showMode == 'Products'" class="sticky  top-0 z-5 surface-50">
                     <!-- Search Bar -->
                     <div class="flex flex-column gap-2 pb-3 pt-2 pl-3 pr-3">
                         <div class="flex flex-wrap gap-2">
@@ -177,16 +182,16 @@ const showInvoiceDialog = ref(false);
                 </div>
 
                 <!-- Header with Actions -->
-                <div v-if="showMode === 'Products'" class="mb-4 flex justify-content-between align-items-center flex-row-reverse pl-4 pr-4">
+                <div v-if="showMode === 'Products'" class="mb-3 flex justify-content-between align-items-center flex-row-reverse">
                     <div class="flex gap-2">
-                        <Button icon="pi pi-list" :class="{ 'p-button-primary': currentView === 'list' }" @click="currentView = 'list'" />
-                        <Button icon="pi pi-th-large" :class="{ 'p-button-primary': currentView === 'grid' }" @click="currentView = 'grid'" />
+                        <Button icon="pi pi-list" class="shadow-none" :class="{ 'p-button-primary': currentView === 'list', 'p-button-outlined': currentView === 'grid' }" @click="currentView = 'list'" />
+                        <Button icon="pi pi-th-large" class="shadow-none" :class="{ 'p-button-primary': currentView === 'grid', 'p-button-outlined': currentView === 'list' }" @click="currentView = 'grid'" />
                     </div>
                 </div>
 
-                <div v-show="showMode == 'Products'" class="grid m-auto max-h-screen mt-0 gap-4 justify-content-between pl-4 pr-4">
-                    <div v-for="item in filteredMenuItems.filter((i) => i.itemGroup === selectedCategory)" :key="item.id" class="max-w-200px max-h-326px p-0">
-                        <Card class="h-full border-round shadow-2 flex align-center justify-center">
+                <div v-if="currentView == 'grid' && showMode == 'Products'" class="Products grid max-h-screen mt-0 gap-3 pl-3 pr-3 ">
+                    <div v-for="item in filteredMenuItems.filter((i) => i.itemGroup === selectedCategory)" :key="item.id" class="Product-item p-0">
+                        <Card class="h-full border-round shadow-2 flex justify-content-between">
                             <template #content>
                                 <div class="flex flex-column gap-2 p-0">
                                     <img :src="item.image ? item.image : '/src/assets/images/item.png'" :alt="item.name" class="item-img w-full h-full border-round mx-auto" />
@@ -200,17 +205,76 @@ const showInvoiceDialog = ref(false);
                                         </div>
                                     </div>
                                 </div>
-                                <div v-if="item.totalStock > 0" class="w-full totalStock flex justify-content-center align-items-between border-top-1 surface-border pt-3 mt-3">
-                                    <Button class="p-0" icon="pi pi-minus" @click="invoiceStore.decreaseItemInInvoice(item.id)" :disabled="!invoiceStore.invoice.items.find((i) => i.id === item.id)?.quantity" severity="danger" outlined rounded />
+                                <div v-if="item.totalStock > 0" class="w-full totalStock flex justify-content-evenly align-items-between border-top-1 surface-border pt-3 mt-3">
+                                    <Button
+                                        class="p-0 shadow-none"
+                                        icon="pi pi-minus"
+                                        @click="invoiceStore.decreaseItemInInvoice(item.id)"
+                                        :disabled="!invoiceStore.invoice.items.find((i) => i.id === item.id)?.quantity"
+                                        severity="danger"
+                                        outlined
+                                        rounded
+                                    />
                                     <span class="w-4rem text-center font-medium">
                                         {{ invoiceStore.invoice.items.find((i) => i.id === item.id)?.quantity || 0 }}
                                     </span>
-                                    <Button icon="pi pi-plus" @click="invoiceStore.addItemToInvoice(item.id)" :disabled="item.totalStock === 0" severity="success" outlined rounded />
+                                    <Button class="p-0 shadow-none" icon="pi pi-plus" @click="invoiceStore.addItemToInvoice(item.id)" :disabled="item.totalStock === 0" severity="success" outlined rounded />
                                 </div>
                             </template>
                         </Card>
                     </div>
                 </div>
+
+                <!-- Customer List/Grid View -->
+                <ScrollPanel v-if="currentView == 'list' && showMode == 'Products'" class="w-full">
+                    <DataTable :value="filteredMenuItems.filter((i) => i.itemGroup === selectedCategory)" class="p-datatable-sm">
+                        <Column field="image" header="Image" class="p-2">
+                            <template #body="slotProps">
+                                <div class="flex">
+                                    <img :src="slotProps.data.image ? slotProps.data.image : '/src/assets/images/item.png'" width="50px" :alt="slotProps.data.name" class="border-round" />
+                                </div>
+                            </template>
+                        </Column>
+
+                        <Column field="name" header="name"></Column>
+
+                        <Column field="totalStock" header="totalStock">
+                            <template #body="slotProps">
+                                <div>
+                                    {{ slotProps.data.totalStock > 0 ? `${slotProps.data.totalStock} Available` : 'Out of Stock' }}
+                                </div>
+                            </template>
+                        </Column>
+
+                        <Column field="price" header="price">
+                            <template #body="slotProps">
+                                <div>${{ slotProps.data.price.toFixed(2) }}</div>
+                            </template>
+                        </Column>
+
+                        <Column field="quantity" header="quantity">
+                            <template #body="slotProps">
+                                <div style="min-width: 74px" :class="slotProps.data.totalStock > 0 ? 'blac' : 'opacity-40 cursor-no-drop'" class="w-full gap-1 totalStock flex justify-content-between align-items-center">
+                                    <Button
+                                        class="p-0 shadow-none"
+                                        icon="pi pi-minus"
+                                        @click="invoiceStore.decreaseItemInInvoice(slotProps.data.id)"
+                                        :disabled="!invoiceStore.invoice.items.find((i) => i.id === slotProps.data.id)?.quantity"
+                                        severity="danger"
+                                        outlined
+                                        rounded
+                                    />
+                                    <span class="text-center font-medium">
+                                        {{ invoiceStore.invoice.items.find((i) => i.id === slotProps.data.id)?.quantity || 0 }}
+                                    </span>
+                                    <Button class="p-0 shadow-none" icon="pi pi-plus" @click="invoiceStore.addItemToInvoice(slotProps.data.id)" :disabled="slotProps.data.totalStock === 0" severity="success" outlined rounded />
+                                </div>
+                            </template>
+                        </Column>
+                    </DataTable>
+                </ScrollPanel>
+
+                <!-- other tabs -->
 
                 <div v-show="showMode == 'Customers'">
                     <customerManagement :view="currentView" @updateView="(newView) => (currentView = newView)" />
@@ -230,25 +294,76 @@ const showInvoiceDialog = ref(false);
         </div>
 
         <!-- Order Summary Card -->
-        <Card class="lg:w-4 h-full sticky top-0">
+        <Card class="lg:w-4 sticky top-0">
             <template #content>
                 <!-- Customer Info -->
-                <div class="mb-6">
-                    <div class="flex justify-content-between align-items-center w-full px-2">
-                        <Button label="Customer Name" class="w-full p-button-outlined border-primary-200 my-2 bg-primary" @click="showMode == 'Customers' ? (showMode = 'Products') : (showMode = 'Customers')" />
-                        <Button icon="pi pi-ellipsis-v" class="p-button-sm ml-1 px-2 mr-1 bg-primary" @click="showactions = !showactions" />
+                <div class="mb-6 w-full">
+                    <div class="flex justify-content-between align-items-center w-full">
+                        <Button label="Customer Name" class="w-full p-button-outlined bg-primary" @click="showMode == 'Customers' ? (showMode = 'Products') : (showMode = 'Customers')" />
+                        <Button icon="pi pi-ellipsis-v" class="p-button-sm ml-1 bg-primary" @click="showactions = !showactions" />
                     </div>
                 </div>
 
                 <!-- Order Items -->
-                <div style="height: 351px">
+                <div class="w-full h-full">
                     <OrderActionMenu :onClose="handleOnClose" v-if="showactions == true" />
                     <div class="flex justify-content-between align-items-center mb-3">
                         <h3 class="text-xl font-bold">Order Details</h3>
                         <Button icon="pi pi-trash" label="Clear All" @click="invoiceStore.clearInvoiceItems" :disabled="invoiceStore.invoice.items.length === 0" severity="danger" text />
                     </div>
 
-                    <div style="height: 313px" class="overflow-y-auto max-h-30rem">
+                    <div class="Orders-items overflow-y-auto max-h-30rem">
+                        <div v-for="item in invoiceStore.invoice.items" :key="item.id" class="mb-2 p-3 surface-ground border-round">
+                            <div class="flex justify-content-between align-items-center">
+                                <div class="flex align-items-center gap-2">
+                                    <img :src="'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202025-01-15%20at%209.10.24%20PM-Y1GVfaII2ikT6z3XAanB72VCYKJAVF.jpeg'" :alt="item.itemName" class="w-3rem h-3rem border-round" />
+                                    <div>
+                                        <p class="font-medium">{{ item.itemName }}</p>
+                                        <p class="text-sm text-600">${{ item.finalDiscountAmount.toFixed(2) }} each</p>
+                                    </div>
+                                </div>
+                                <div class="flex align-items-center gap-2">
+                                    <Button icon="pi pi-minus" @click="invoiceStore.decreaseItemInInvoice(item.id)" severity="danger" text />
+                                    <span class="font-medium">{{ item.quantity }}</span>
+                                    <Button icon="pi pi-plus" @click="invoiceStore.addItemToInvoice(item.id)" severity="success" text />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-for="item in invoiceStore.invoice.items" :key="item.id" class="mb-2 p-3 surface-ground border-round">
+                            <div class="flex justify-content-between align-items-center">
+                                <div class="flex align-items-center gap-2">
+                                    <img :src="'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202025-01-15%20at%209.10.24%20PM-Y1GVfaII2ikT6z3XAanB72VCYKJAVF.jpeg'" :alt="item.itemName" class="w-3rem h-3rem border-round" />
+                                    <div>
+                                        <p class="font-medium">{{ item.itemName }}</p>
+                                        <p class="text-sm text-600">${{ item.finalDiscountAmount.toFixed(2) }} each</p>
+                                    </div>
+                                </div>
+                                <div class="flex align-items-center gap-2">
+                                    <Button icon="pi pi-minus" @click="invoiceStore.decreaseItemInInvoice(item.id)" severity="danger" text />
+                                    <span class="font-medium">{{ item.quantity }}</span>
+                                    <Button icon="pi pi-plus" @click="invoiceStore.addItemToInvoice(item.id)" severity="success" text />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-for="item in invoiceStore.invoice.items" :key="item.id" class="mb-2 p-3 surface-ground border-round">
+                            <div class="flex justify-content-between align-items-center">
+                                <div class="flex align-items-center gap-2">
+                                    <img :src="'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202025-01-15%20at%209.10.24%20PM-Y1GVfaII2ikT6z3XAanB72VCYKJAVF.jpeg'" :alt="item.itemName" class="w-3rem h-3rem border-round" />
+                                    <div>
+                                        <p class="font-medium">{{ item.itemName }}</p>
+                                        <p class="text-sm text-600">${{ item.finalDiscountAmount.toFixed(2) }} each</p>
+                                    </div>
+                                </div>
+                                <div class="flex align-items-center gap-2">
+                                    <Button icon="pi pi-minus" @click="invoiceStore.decreaseItemInInvoice(item.id)" severity="danger" text />
+                                    <span class="font-medium">{{ item.quantity }}</span>
+                                    <Button icon="pi pi-plus" @click="invoiceStore.addItemToInvoice(item.id)" severity="success" text />
+                                </div>
+                            </div>
+                        </div>
+
                         <div v-for="item in invoiceStore.invoice.items" :key="item.id" class="mb-2 p-3 surface-ground border-round">
                             <div class="flex justify-content-between align-items-center">
                                 <div class="flex align-items-center gap-2">
@@ -268,9 +383,7 @@ const showInvoiceDialog = ref(false);
                     </div>
                 </div>
 
-                <hr />
-
-                <div style="height: 274px">
+                <div style="height: 274px" class="w-full">
                     <!-- Order Summary -->
                     <div class="surface-ground p-3 border-round">
                         <h3 class="text-lg font-bold mb-3">Order Summary</h3>
@@ -315,6 +428,16 @@ const showInvoiceDialog = ref(false);
         </Card>
     </div>
 
+    <div class="footer flex justify-content-between align-items-center fixed bottom-0 h-2rem bg-gray-200 font-medium text-black-alpha-90">
+        <div>User: Customer Name</div>
+
+        <div>Terminal: POS-001</div>
+
+        <div>Version: 1.0.0</div>
+
+        <div>Connected to SAP ERP</div>
+    </div>
+
     <PaymentDialog v-model:visible="paymentDialogVisible" />
 </template>
 <style>
@@ -322,16 +445,23 @@ const showInvoiceDialog = ref(false);
     width: 30px;
     height: 30px;
 }
+
 .p-card-body {
     padding: 0px;
     display: flex;
+    height: 100%;
 }
-
+.cursor-no-drop {
+    cursor: no-drop;
+}
 .p-card-content {
     display: flex;
     align-items: center;
     flex-direction: column;
     padding: 0.75rem;
+    min-width: 100%;
+
+    justify-content: space-between;
 }
 </style>
 <style scoped>
@@ -340,14 +470,18 @@ const showInvoiceDialog = ref(false);
 }
 
 .max-w-200px {
-    max-width: 200px;
-}
-.max-h-326px {
-    max-height: 326px;
+    width: 200px;
 }
 
 .p-tabview-nav-link {
     border: none !important;
+}
+.footer {
+    width: -webkit-fill-available;
+    padding-left: 2px;
+
+    padding-right: 0px;
+    margin-right: 26px;
 }
 /* .p-tabview-scrollable .p-tabview-nav-container {
     position: sticky !important;
@@ -390,5 +524,15 @@ const showInvoiceDialog = ref(false);
 }
 .min-h-90px {
     min-height: 90px;
+}
+.Orders-items {
+    max-height: 371px !important;
+}
+
+.Products {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, auto));
+    justify-items: center;
+    justify-content: space-evenly ;
 }
 </style>
