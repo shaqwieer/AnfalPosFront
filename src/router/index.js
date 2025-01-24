@@ -37,6 +37,14 @@ const router = createRouter({
                     component: () => import('@/views/pages/invoice/QuickInvoice.vue')
                 },
                 {
+                    path: '/invoices/payments',
+                    name: 'Payments',
+                    meta: {
+                        breadcrumb: ['Payments']
+                    },
+                    component: () => import('@/views/pages/payments/payments.vue')
+                },
+                {
                     path: '/work-board',
                     name: 'Work Board',
                     component: () => import('@/views/pages/kanbanBoard/KanbanBoard.vue')
