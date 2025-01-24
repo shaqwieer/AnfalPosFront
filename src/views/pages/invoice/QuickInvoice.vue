@@ -165,7 +165,7 @@ const options = ref([
                         <Button label="Draft Orders" icon="pi pi-file" class="border-primary-200" outlined @click="navigateToDraft"></Button> -->
                     </div>
                     <InputText v-model="searchQuery" id="productSearch" type="text" placeholder="Search Products..." class="w-full shadow-none" />
-                    <SelectButton  v-model="currentView" :options="options" optionLabel="value" dataKey="value" optionValue="value" :allowEmpty="false" aria-labelledby="custom" :class="['flex', mainStore.isRTL ? 'flex-row-reverse' : 'flex-row']">
+                    <SelectButton v-model="currentView" :options="options" optionLabel="value" dataKey="value" optionValue="value" :allowEmpty="false" aria-labelledby="custom" :class="['flex', mainStore.isRTL ? 'flex-row-reverse' : 'flex-row']">
                         <template #option="slotProps">
                             <i :class="slotProps.option.icon"></i>
                         </template>
@@ -180,8 +180,8 @@ const options = ref([
                                 v-for="category in categories"
                                 :key="category"
                                 @click="selectedCategory = category"
-                                class=" text-sm shadow-none font-semibold border-1 border-200 px-3 py-2"
-                                :class="`${selectedCategory == category ? 'bg-primary':'bg-white text-900'}`"
+                                class="text-sm shadow-none font-semibold border-1 border-200 px-3 py-2"
+                                :class="`${selectedCategory == category ? 'bg-primary' : 'bg-white text-900'}`"
                                 size="large"
                             >
                                 {{ category }}
@@ -445,6 +445,9 @@ const options = ref([
     <PaymentDialog v-model:visible="paymentDialogVisible" />
 </template>
 <style>
+.p-selectbutton div {
+    box-shadow: none;
+}
 .totalStock Button {
     width: 30px;
     height: 30px;

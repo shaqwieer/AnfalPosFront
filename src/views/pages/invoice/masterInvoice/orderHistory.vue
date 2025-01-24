@@ -237,7 +237,7 @@ const orders: Order[] = [
 .h-0 {
     height: 0px;
 }
-.h-230px {
-    height: 230px;
+.h-200px {
+    height: 200px;
 }
 </style>
