@@ -1,17 +1,14 @@
 <template>
     <div class="flex flex-column w-full">
-        <div class="flex justify-content-between card p-4 align-items-center">
+        <div class="flex justify-content-between card bg-primary p-4 align-items-center">
             <span class="text-2xl font-bold">{{ props.title }}</span>
-            <div class="flex gap-3">
+            <div class="flex gap-3 flex-grow-1">
                 <IconField v-if="simple && hasSearch" iconPosition="left">
                     <InputText type="text" v-model="searchText" :placeholder="t('labels.search')" class="w-full" />
                     <InputIcon class="pi pi-search" />
                 </IconField>
 
-                <IconField v-if="hasReload" iconPosition="left">
-                  
-                    <slot name="action"></slot>
-                </IconField>
+                <slot v-if="hasReload" name="action"></slot>
 
                 <Button
                     size="small"
