@@ -167,17 +167,16 @@ const orders: Order[] = [
                                         }"
                                     ></i>
                                     <span
-                                    class="text-md border-round"
-                                    :class="{
-                                        'text-green-600': order.status === 'Accepted',
-                                        'text-red-600': order.status === 'Rejected'
-                                    }"
-                                >
-
-                                    {{ order.status }}
-                                </span>
+                                        class="text-md border-round"
+                                        :class="{
+                                            'text-green-600': order.status === 'Accepted',
+                                            'text-red-600': order.status === 'Rejected'
+                                        }"
+                                    >
+                                        {{ order.status }}
+                                    </span>
                                 </div>
-                               
+
                                 <span class="text-xl font-semibold text-primary-800 text-center">{{ order.total }}</span>
                             </div>
                         </div>

@@ -198,7 +198,7 @@ const options = ref([
                     </div>
                 </div> -->
 
-                <div v-if="currentView == 'grid' && showMode == 'Products'" class="Products grid max-h-screen mt-0 gap-3 pl-3 pr-3">
+                <div v-if="currentView == 'grid' && showMode == 'Products'" class="Products grid max-h-screen mt-0 gap-3 px-3">
                     <div v-for="item in filteredMenuItems.filter((i) => i.itemGroup === selectedCategory)" :key="item.id" class="Product-item p-0">
                         <Card class="h-full border-round shadow-none border-1 border-300 hover:shadow-1 hover:border-primary-300 flex justify-content-between">
                             <template #content>
@@ -257,7 +257,7 @@ const options = ref([
                 </div>
 
                 <!-- Customer List/Grid View -->
-                <ScrollPanel v-if="currentView == 'list' && showMode == 'Products'" class="w-full">
+                <ScrollPanel v-if="currentView == 'list' && showMode == 'Products'">
                     <DataTable :value="filteredMenuItems.filter((i) => i.itemGroup === selectedCategory)" class="p-datatable-sm">
                         <Column field="image" header="Image" class="p-2">
                             <template #body="slotProps">
@@ -336,7 +336,7 @@ const options = ref([
                 </div>
 
                 <div v-show="showMode == 'Orders'">
-                    <OrderHistory :fromInvoice="true" :view="currentView" @updateView="(newView) => (currentView = newView)" />
+                    <OrderHistory :fromInvoice="true" :view="currentView" :currentView="currentView" @updateView="(newView) => (currentView = newView)" />
                 </div>
             </div>
 
@@ -352,16 +352,24 @@ const options = ref([
         <Card class="lg:w-4 sticky top-0">
             <template #content>
                 <!-- Customer Info -->
-                <div class="mb-6 w-full">
+                <div class="h-7rem w-full flex">
                     <div class="flex justify-content-between align-items-center w-full">
-                        <Button label="Customer Name" class="w-full p-button-outlined bg-primary" @click="showMode == 'Customers' ? (showMode = 'Products') : (showMode = 'Customers')" />
-                        <Button icon="pi pi-ellipsis-v" class="p-button-sm ml-1 bg-primary" @click="showactions = !showactions" />
+                        <div class="flex align-items-center justify-content-start flex-row-reverse cursor-pointer font-bold text-2xl text-black-alpha-90" @click="showMode == 'Customers' ? (showMode = 'Products') : (showMode = 'Customers')">
+                            Mohamed Shaqwieer
+                        </div>
+
+                        <!-- <Button icon="pi pi-chevron-down" class="p-button-sm transition-transform transition-duration-150 shadow-none" @click="showactions = !showactions" :class="{ 'transform rotate-180': showactions }" /> -->
+                        <div class="menu-button flex align-items-center justify-content-start flex-row-reverse cursor-pointer" @click="showactions = !showactions">
+                            <i class="pi pi-chevron-down mr-2 transition-transform transition-duration-150" :class="{ 'rotate-open-menu': !showactions }"></i>
+                        </div>
                     </div>
                 </div>
 
+                <hr class="w-full mt-0" />
+
                 <!-- Order Items -->
-                <div class="w-full h-full">
-                    <OrderActionMenu :onClose="handleOnClose" v-if="showactions == true" />
+                <div class="w-full h-full relative">
+                    <OrderActionMenu :onClose="handleOnClose" :class="`${showactions ? 'h-200' : 'h-0'} overflow-hidden transition-all transition-duration-200 transition-linear   absolute w-full bg-red z-5 border-0`" />
                     <div class="flex justify-content-between align-items-center mb-3">
                         <h3 class="text-xl font-bold">Order Details</h3>
                         <Button icon="pi pi-trash" label="Clear All" @click="invoiceStore.clearInvoiceItems" :disabled="invoiceStore.invoice.items.length === 0" severity="danger" text />
@@ -540,7 +548,18 @@ const options = ref([
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, auto));
     justify-items: center;
-    justify-content: start;
     padding-bottom: 20px;
+}
+.h-0 {
+    height: 0%;
+}
+.h-200 {
+    height: 100%;
+}
+.menu-button {
+    width: 100px;
+}
+.rotate-open-menu {
+    transform: rotate(-90deg);
 }
 </style>

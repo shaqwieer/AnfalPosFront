@@ -191,7 +191,7 @@ const goToRoute = (e) => {
 <template>
     <div :class="['layout-topbar', { rtl: rtl }]">
         <div class="topbar-start">
-            <Button type="button" class="topbar-menubutton p-link p-trigger" @click="onMenuToggle">
+            <Button type="button" class="topbar-menubutton p-link p-trigger shadow-none" @click="onMenuToggle">
                 <i class="pi pi-bars"></i>
             </Button>
 

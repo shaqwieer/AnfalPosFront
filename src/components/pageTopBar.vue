@@ -2,7 +2,9 @@
     <div class="flex flex-column w-full">
         <div class="flex justify-content-between card bg-primary p-4 align-items-center">
             <span class="text-2xl font-bold">{{ props.title }}</span>
-            <div class="flex gap-3 flex-grow-1">
+            <slot name="close"></slot>
+
+            <div class="flex gap-3 flex-grow-1" v-if="(simple && hasSearch) || hasReload || hasAddButton">
                 <IconField v-if="simple && hasSearch" iconPosition="left">
                     <InputText type="text" v-model="searchText" :placeholder="t('labels.search')" class="w-full" />
                     <InputIcon class="pi pi-search" />
