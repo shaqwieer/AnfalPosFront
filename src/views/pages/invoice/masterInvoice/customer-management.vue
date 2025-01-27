@@ -10,18 +10,19 @@ import Card from 'primevue/card';
 import ScrollPanel from 'primevue/scrollpanel';
 import ToggleButton from 'primevue/togglebutton';
 import Dropdown from 'primevue/dropdown';
+import { Customer } from '../types';
 
-interface Customer {
-    id: string;
-    name: string;
-    email: string;
-    phone: string;
-    address: string;
-    plateNo?: string;
-    type: 'walk-in' | 'business';
-    cr?: string;
-    vatRegNo?: string;
-}
+// interface Customer {
+//     id: string;
+//     name: string;
+//     email: string;
+//     phone: string;
+//     address: string;
+//     plateNo?: string;
+//     type: 'walk-in' | 'business';
+//     cr?: string;
+//     vatRegNo?: string;
+// }
 
 // Props
 const props = defineProps<{

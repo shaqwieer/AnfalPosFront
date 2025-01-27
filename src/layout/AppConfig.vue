@@ -83,6 +83,7 @@ const onRippleChange = (value) => {
     $primevue.config.ripple = value;
 };
 const { locale } = useI18n(); // Access i18n instance
+const { t } = useI18n(); // Access i18n instance
 
 const languages = ref([
     { name: 'Arabic', value: 'ar' },
@@ -148,7 +149,7 @@ const changeColorScheme = (colorScheme) => {
         }"
     >
         <div class="p-2" :dir="rtlValueText">
-            <h5 :class="containerClass">{{ t('themes') }}</h5>
+            <h5 :class="containerClass">{{ $t('themes') }}</h5>
             <div class="flex flex-wrap row-gap-3">
                 <div v-for="(theme, i) in componentThemes" :key="i" class="w-3">
                     <Button
@@ -170,17 +171,17 @@ const changeColorScheme = (colorScheme) => {
                 </div>
                 <Button icon="pi pi-plus" type="button" @click="incrementScale()" class="w-2rem h-2rem ml-2" text rounded :disabled="layoutConfig.scale.value === scales[scales.length - 1]"></Button>
             </div>
-            <h5 :class="containerClass">{{ t('language') }}</h5>
+            <h5 :class="containerClass">{{ $t('language') }}</h5>
             <div class="flex align-items-center">
-                <Dropdown v-model="language" :options="languages" @update:modelValue="onLanguageChange" optionLabel="name" :placeholder="t('selectLanguage')" checkmark :highlightOnSelect="false" class="w-full md:w-14rem" />
+                <Dropdown v-model="language" :options="languages" @update:modelValue="onLanguageChange" optionLabel="name" :placeholder="$t('selectLanguage')" checkmark :highlightOnSelect="false" class="w-full md:w-14rem" />
             </div>
             <!-- note i make false  -->
             <template v-if="!simple&&false">
-                <h5 :class="containerClass">{{ t('menuType') }}</h5>
+                <h5 :class="containerClass">{{ $t('menuType') }}</h5>
                 <div class="flex flex-wrap row-gap-3">
                     <div class="flex align-items-center gap-2 w-6">
                         <RadioButton name="menuMode" value="static" v-model="layoutConfig.menuMode.value" inputId="mode1"></RadioButton>
-                        <label for="mode1" :class="containerClass">{{ t('static') }}</label>
+                        <label for="mode1" :class="containerClass">{{ $t('static') }}</label>
                     </div>
 
                     <!-- <div class="flex align-items-center gap-2 w-6">
@@ -189,7 +190,7 @@ const changeColorScheme = (colorScheme) => {
                     </div> -->
                     <div class="flex align-items-center gap-2 w-6">
                         <RadioButton name="menuMode" value="slim" v-model="layoutConfig.menuMode.value" inputId="mode3"></RadioButton>
-                        <label for="mode3" :class="containerClass">{{ t('slim') }}</label>
+                        <label for="mode3" :class="containerClass">{{ $t('slim') }}</label>
                     </div>
                     <div class="flex align-items-center gap-2 w-6">
                         <RadioButton name="menuMode" value="slim-plus" v-model="layoutConfig.menuMode.value" inputId="mode4"></RadioButton>
@@ -201,63 +202,63 @@ const changeColorScheme = (colorScheme) => {
                     </div> -->
                     <div class="flex align-items-center gap-2 w-6">
                         <RadioButton name="menuMode" value="drawer" v-model="layoutConfig.menuMode.value" inputId="mode6"></RadioButton>
-                        <label for="mode6" :class="containerClass">{{ t('drawer') }}</label>
+                        <label for="mode6" :class="containerClass">{{ $t('drawer') }}</label>
                     </div>
                     <div class="flex align-items-center gap-2 w-6">
                         <RadioButton name="menuMode" value="horizontal" v-model="layoutConfig.menuMode.value" inputId="mode2"></RadioButton>
-                        <label for="mode2" :class="containerClass">{{ t('horizontal') }}</label>
+                        <label for="mode2" :class="containerClass">{{ $t('horizontal') }}</label>
                     </div>
                 </div>
-                <h5 :class="containerClass">{{ t('menuTheme') }}</h5>
+                <h5 :class="containerClass">{{ $t('menuTheme') }}</h5>
                 <div class="field-radiobutton">
                     <RadioButton :checked="layoutConfig.menuTheme === 'colorScheme'" name="menuTheme" value="colorScheme" v-model="layoutConfig.menuTheme.value" inputId="mode1"></RadioButton>
-                    <label for="mode1" :class="containerClass">{{ t('colorScheme') }}</label>
+                    <label for="mode1" :class="containerClass">{{ $t('colorScheme') }}</label>
                 </div>
 
                 <div class="field-radiobutton">
                     <RadioButton :checked="layoutConfig.menuTheme === 'primaryColor'" name="menuTheme" value="primaryColor" v-model="layoutConfig.menuTheme.value" inputId="mode2"></RadioButton>
-                    <label for="mode2" :class="containerClass">{{ t('primaryColor') }}</label>
+                    <label for="mode2" :class="containerClass">{{ $t('primaryColor') }}</label>
                 </div>
                 <div class="field-radiobutton">
                     <RadioButton :checked="layoutConfig.menuTheme === 'transparent'" name="menuTheme" value="transparent" v-model="layoutConfig.menuTheme.value" inputId="mode3"></RadioButton>
-                    <label for="mode2" :class="containerClass">{{ t('transparent') }}</label>
+                    <label for="mode2" :class="containerClass">{{ $t('transparent') }}</label>
                 </div>
             </template>
 
-            <h5 :class="containerClass">{{ t('colorScheme') }}</h5>
+            <h5 :class="containerClass">{{ $t('colorScheme') }}</h5>
             <div class="grid">
                 <div class="field-radiobutton col-6">
                     <RadioButton v-model="colorScheme" name="colorScheme" value="light" @change="() => changeColorScheme('light')" inputId="outlined_input"></RadioButton>
-                    <label for="outlined_input" :class="containerClass">{{ t('colorSchemeOptions.light') }}</label>
+                    <label for="outlined_input" :class="containerClass">{{ $t('colorSchemeOptions.light') }}</label>
                 </div>
                 <div class="field-radiobutton col-6">
                     <RadioButton v-model="colorScheme" name="colorScheme" value="dim" @change="() => changeColorScheme('dim')" inputId="filled_input"></RadioButton>
-                    <label for="filled_input" :class="containerClass">{{ t('colorSchemeOptions.dim') }}</label>
+                    <label for="filled_input" :class="containerClass">{{ $t('colorSchemeOptions.dim') }}</label>
                 </div>
                 <div class="field-radiobutton pt-0 col-12">
                     <RadioButton v-model="colorScheme" name="colorScheme" value="dark" @change="() => changeColorScheme('dark')" inputId="filled_input"></RadioButton>
-                    <label for="filled_input" :class="containerClass">{{ t('colorSchemeOptions.dark') }}</label>
+                    <label for="filled_input" :class="containerClass">{{ $t('colorSchemeOptions.dark') }}</label>
                 </div>
             </div>
 
             <template v-if="!simple">
-                <h5 class="mt-1" :class="containerClass">{{ t('inputStyle') }}</h5>
+                <h5 class="mt-1" :class="containerClass">{{ $t('inputStyle') }}</h5>
                 <div class="flex">
                     <div class="field-radiobutton flex-1">
                         <RadioButton :modelValue="inputStyle" name="inputStyle" value="outlined" inputId="outlined_input" @update:modelValue="onInputStyleChange"></RadioButton>
-                        <label for="outlined_input" :class="containerClass">{{ t('outlined') }}</label>
+                        <label for="outlined_input" :class="containerClass">{{ $t('outlined') }}</label>
                     </div>
                     <div class="field-radiobutton flex-1">
                         <RadioButton :modelValue="inputStyle" name="inputStyle" value="filled" inputId="filled_input" @update:modelValue="onInputStyleChange"></RadioButton>
-                        <label for="filled_input" :class="containerClass">{{ t('filled') }}</label>
+                        <label for="filled_input" :class="containerClass">{{ $t('filled') }}</label>
                     </div>
                 </div>
                 <div v-if="false">
-                    <h5 :class="containerClass">{{ t('rtl') }}</h5>
+                    <h5 :class="containerClass">{{ $t('rtl') }}</h5>
                     <InputSwitch :modelValue="rtlValue" @update:modelValue="toggleLayoutDirection" />
                 </div>
 
-                <h5 :class="containerClass">{{ t('rippleEffect') }}</h5>
+                <h5 :class="containerClass">{{ $t('rippleEffect') }}</h5>
                 <InputSwitch :modelValue="rippleActive" @update:modelValue="onRippleChange"></InputSwitch>
             </template>
         </div>

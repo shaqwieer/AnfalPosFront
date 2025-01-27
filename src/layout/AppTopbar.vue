@@ -52,6 +52,7 @@ const showProfileSidebar = () => {
     onProfileSidebarToggle();
 };
 const onConfigButtonClick = () => {
+   
     onConfigSidebarToggle();
 };
 const changeColorScheme = (colorScheme) => {

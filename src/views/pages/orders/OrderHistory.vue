@@ -258,7 +258,7 @@ const props = defineProps({
     }
 });
 
-const timeBarFill = ref(40);
+const timeBarFill = ref(50);
 const widthStyle = computed(() => {
     if (timeBarFill.value >= 100) return '100%';
 
@@ -306,5 +306,4 @@ onMounted(async () => {
     overflow: hidden;  
     text-overflow: ellipsis;
 }
-
 </style>

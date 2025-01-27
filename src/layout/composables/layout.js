@@ -98,6 +98,8 @@ export function useLayout() {
     };
 
     const onConfigSidebarToggle = () => {
+        console.log("ssssssssssssss")
+        
         layoutState.configSidebarVisible = !layoutState.configSidebarVisible;
     };
 
