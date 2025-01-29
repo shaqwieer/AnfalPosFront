@@ -176,7 +176,7 @@ const changeColorScheme = (colorScheme) => {
                 <Dropdown v-model="language" :options="languages" @update:modelValue="onLanguageChange" optionLabel="name" :placeholder="$t('selectLanguage')" checkmark :highlightOnSelect="false" class="w-full md:w-14rem" />
             </div>
             <!-- note i make false  -->
-            <template v-if="!simple&&false">
+            <template v-if="!simple">
                 <h5 :class="containerClass">{{ $t('menuType') }}</h5>
                 <div class="flex flex-wrap row-gap-3">
                     <div class="flex align-items-center gap-2 w-6">
@@ -192,18 +192,18 @@ const changeColorScheme = (colorScheme) => {
                         <RadioButton name="menuMode" value="slim" v-model="layoutConfig.menuMode.value" inputId="mode3"></RadioButton>
                         <label for="mode3" :class="containerClass">{{ $t('slim') }}</label>
                     </div>
-                    <div class="flex align-items-center gap-2 w-6">
+                    <!-- <div class="flex align-items-center gap-2 w-6">
                         <RadioButton name="menuMode" value="slim-plus" v-model="layoutConfig.menuMode.value" inputId="mode4"></RadioButton>
                         <label for="mode3">Slim +</label>
-                    </div>
+                    </div> -->
                     <!-- <div class="flex align-items-center gap-2 w-6">
                         <RadioButton name="menuMode" value="reveal" v-model="layoutConfig.menuMode.value" inputId="mode5"></RadioButton>
                         <label for="mode4">Reveal</label>
                     </div> -->
-                    <div class="flex align-items-center gap-2 w-6">
+                    <!-- <div class="flex align-items-center gap-2 w-6">
                         <RadioButton name="menuMode" value="drawer" v-model="layoutConfig.menuMode.value" inputId="mode6"></RadioButton>
                         <label for="mode6" :class="containerClass">{{ $t('drawer') }}</label>
-                    </div>
+                    </div> -->
                     <div class="flex align-items-center gap-2 w-6">
                         <RadioButton name="menuMode" value="horizontal" v-model="layoutConfig.menuMode.value" inputId="mode2"></RadioButton>
                         <label for="mode2" :class="containerClass">{{ $t('horizontal') }}</label>
