@@ -412,5 +412,16 @@
     "logoutDesc": "Do You Want To Sign Out ?",
     "branches": "Available Branches",
     "branchesDesc": "Go To Available Branch For The Cuurent user"
+  },
+  "POS": {
+    "BusinessEntityName": "Business Entity Name",
+    "name": "name",
+    "Status": "Status",
+    "Start": "shift Start",
+    "End": "shift End",
+    "cashStart": "cash Start",
+    "CashEnd ": "Cash End",
+    "discrepancyAmount": "Sales",
+    "OpeningClosing": "Opening/Closing"
   }
 }

@@ -14,6 +14,7 @@ import customerList from '../customerList.vue';
 import invoiceDialog from './masterInvoice/invoiceDialog.vue';
 import orderHistory from './masterInvoice/orderHistory.vue';
 import orderlist from './masterInvoice/orderlist.vue';
+import POS from './POS.vue';
 
 import ScrollPanel from 'primevue/scrollpanel';
 import DataTable from 'primevue/datatable';
@@ -149,10 +150,22 @@ const options = ref([
     { icon: 'pi pi-bars', value: 'list' },
     { icon: 'pi pi-th-large', value: 'grid' }
 ]);
+
+const tab = ref('POS');
 </script>
 
 <template>
-    <div class="flex gap-3 flex-column lg:flex-row relative w-full">
+    <div class="flex w-full gap-5 h-5rem mb-4">
+        <div class="w-full h-5rem flex border-round justify-content-center align-items-center cursor-pointer" :class="`${tab === 'POS' ? 'bg-primary' : 'bg-gray-100'}`" @click="tab = 'POS'">POS</div>
+
+        <div class="w-full h-5rem flex border-round justify-content-center align-items-center cursor-pointer" :class="`${tab === 'Quick-Invoice' ? 'bg-primary' : 'bg-gray-100'}`" @click="tab = 'Quick-Invoice'">Quick Invoice</div>
+    </div>
+
+    <div v-if="tab === 'POS'">
+        <POS />
+    </div>
+
+    <div v-if="tab === 'Quick-Invoice'" class="flex gap-3 flex-column lg:flex-row relative w-full">
         <div class="lg:w-8 flex flex-column h-86vh gap-2 overflow-auto">
             <orderHistory />
             <!-- Main Content -->

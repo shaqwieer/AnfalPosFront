@@ -4,7 +4,7 @@
             <span class="text-2xl font-bold">{{ props.title }}</span>
             <slot name="close"></slot>
 
-            <div class="flex gap-3 flex-grow-1" v-if="(simple && hasSearch) || hasReload || hasAddButton">
+            <div class="flex gap-3 " v-if="(simple && hasSearch) || hasReload || hasAddButton">
                 <IconField v-if="simple && hasSearch" iconPosition="left">
                     <InputText type="text" v-model="searchText" :placeholder="t('labels.search')" class="w-full" />
                     <InputIcon class="pi pi-search" />
@@ -25,7 +25,7 @@
                 <Button
                     v-if="hasAddButton"
                     size="small"
-                    class="min-w-max flex gap-2"
+                    class="min-w-max flex gap-2  bg-white text-black-alpha-80"
                     @click="
                         () => {
                             props.addButton();
