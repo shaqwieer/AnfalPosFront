@@ -26,7 +26,7 @@ const router = createRouter({
                 {
                     path: 'customer-list',
                     name: 'CustomerList',
-                    component: () => import('@/views/pages/CustomerList.vue')
+                    component: () => import('@/views/pages/customer/VANCustomers.vue')
                 },
                 {
                     path: '/invoices/quick-invoice',

@@ -122,6 +122,8 @@ import { fab } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 library.add(fab, far, fas);
 
+import '@/assets/sap-theme.css';
+import '@/assets/style.css';
 import '@/assets/styles.scss';
 
 const pinia = createPinia();
