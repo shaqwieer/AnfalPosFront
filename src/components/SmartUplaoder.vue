@@ -73,7 +73,7 @@
   <style scoped>
   /* Add any additional custom styles here */
   .p-fileupload-content {
-    @apply flex items-center justify-center min-h-10rem;
+    @apply flex align-items-center justify-content-center min-h-10rem;
   }
   
   .max-w-20rem {

@@ -45,7 +45,7 @@ getCustomers();
     <div class="">
         <div class="card">
             <div class="flex flex-column md:flex-row md:align-items-start md:justify-content-between mb-3">
-                <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex flex-wrap align-items-center justify-content-between gap-2">
                     <Button icon="pi pi-refresh" @click="getCustomers" rounded raised />
                 </div>
             </div>

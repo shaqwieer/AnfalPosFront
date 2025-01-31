@@ -79,7 +79,7 @@ const handleReject = (customer: any) => {
       <!-- Add Dashboard Button -->
       <template #actions>
         <button @click="(e) => handleDashboard(customer, e)"
-                class="px-3 py-1.5 text-blue-600 hover:bg-blue-50 rounded-lg flex items-center space-x-1">
+                class="px-3 py-1.5 text-blue-600 hover:bg-blue-50 border-round-lg flex align-items-center space-x-1">
           <span class="material-icons text-sm">dashboard</span>
           <span>Dashboard</span>
         </button>
