@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { formatPrice, formatDate } from '../../../utils/formatting'
 import CustomerForm from './CustomerForm.vue'
 
 const props = defineProps<{

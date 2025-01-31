@@ -107,17 +107,17 @@
         </div>
         <div
             v-else
-            class="relative flex flex-row-reverse gap-1 items-center max-w-min"
+            class="relative flex flex-row-reverse gap-1 align-items-center max-w-min"
         >
             <div
                 v-if="mediaRecorder && !isPaused && pausable"
-                class="group flex relative justify-center"
+                class="group flex relative justify-content-center"
             >
                 <button
                     :disabled="sendingAudio"
                     @click="pauseRecording"
                     type="button"
-                    class="text-orange-500 border border-orange-500 hover:bg-orange-300 focus:ring-4 focus:outline-none focus:ring-orange-500 font-medium rounded-full text-sm p-2 text-center inline-flex items-center dark:border-orange-500 dark:text-orange-500 dark:focus:ring-orange-500 dark:hover:bg-orange-500"
+                    class="text-orange-500 border border-orange-500 hover:bg-orange-300 focus:ring-4 focus:outline-none focus:ring-orange-500 font-medium rounded-full text-sm p-2 text-center inline-flex align-items-center dark:border-orange-500 dark:text-orange-500 dark:focus:ring-orange-500 dark:hover:bg-orange-500"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -136,19 +136,19 @@
                 </button>
 
                 <span
-                    class="group-hover:opacity-100 transition-opacity bg-surface-700 px-3 py-2 text-sm text-white rounded-md absolute -translate-y-full opacity-0 m-4 mx-auto"
+                    class="group-hover:opacity-100 transition-opacity bg-surface-700 px-3 py-2 text-sm text-white border-round-md absolute -translate-y-full opacity-0 m-4 mx-auto"
                     >{{ pauseText }}</span
                 >
             </div>
             <div
                 v-if="!mediaRecorder || isPaused"
-                class="group flex relative justify-center"
+                class="group flex relative justify-content-center"
             >
                 <button
                     :disabled="sendingAudio"
                     @click="startRecording"
                     type="button"
-                    class="text-green-500 border border-green-500 hover:bg-green-300 focus:ring-4 focus:outline-none focus:ring-green-500 font-medium rounded-full text-sm p-2 text-center inline-flex items-center dark:border-green-500 dark:text-green-500 dark:focus:ring-green-500 dark:hover:bg-green-500"
+                    class="text-green-500 border border-green-500 hover:bg-green-300 focus:ring-4 focus:outline-none focus:ring-green-500 font-medium rounded-full text-sm p-2 text-center inline-flex align-items-center dark:border-green-500 dark:text-green-500 dark:focus:ring-green-500 dark:hover:bg-green-500"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -181,19 +181,19 @@
                     </svg>
                 </button>
                 <span
-                    class="group-hover:opacity-100 transition-opacity bg-surface-700 px-3 py-2 text-sm text-white rounded-md absolute -translate-y-full opacity-0 m-4 mx-auto"
+                    class="group-hover:opacity-100 transition-opacity bg-surface-700 px-3 py-2 text-sm text-white border-round-md absolute -translate-y-full opacity-0 m-4 mx-auto"
                     >{{ startText }}</span
                 >
             </div>
             <div
                 v-if="mediaRecorder"
-                class="group flex relative justify-center"
+                class="group flex relative justify-content-center"
             >
                 <button
                     :disabled="sendingAudio"
                     @click="stopRecording"
                     type="button"
-                    class="text-red-500 border border-red-500 hover:bg-red-300 focus:ring-4 focus:outline-none focus:ring-red-500 font-medium rounded-full text-sm p-2 text-center inline-flex items-center dark:border-red-500 dark:text-red-500 dark:focus:ring-red-500 dark:hover:bg-red-500"
+                    class="text-red-500 border border-red-500 hover:bg-red-300 focus:ring-4 focus:outline-none focus:ring-red-500 font-medium rounded-full text-sm p-2 text-center inline-flex align-items-center dark:border-red-500 dark:text-red-500 dark:focus:ring-red-500 dark:hover:bg-red-500"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -211,7 +211,7 @@
                     </svg>
                 </button>
                 <span
-                    class="group-hover:opacity-100 transition-opacity bg-surface-700 px-3 py-2 text-sm text-white rounded-md absolute -translate-y-full opacity-0 m-4 mx-auto"
+                    class="group-hover:opacity-100 transition-opacity bg-surface-700 px-3 py-2 text-sm text-white border-round-md absolute -translate-y-full opacity-0 m-4 mx-auto"
                     >{{ stopText }}</span
                 >
             </div>
@@ -222,7 +222,7 @@
             ></audio>
             <div
                 v-else
-                class="flex flex-row-reverse gap-1 items-center w-[300px] h-[54px] p-4 rounded-full bg-surface-0"
+                class="flex flex-row-reverse gap-1 align-items-center w-[300px] h-[54px] p-4 rounded-full bg-surface-0"
             >
                 <span v-if="sendingAudio">{{ sendingText }}</span>
                 <span v-else
@@ -285,12 +285,12 @@
                     ></div>
                 </div>
             </div>
-            <div v-if="audioUrl" class="group flex relative justify-center">
+            <div v-if="audioUrl" class="group flex relative justify-content-center">
                 <button
                     :disabled="sendingAudio"
                     @click="deleteAudio"
                     type="button"
-                    class="text-red-500 border border-red-500 hover:bg-red-300 focus:ring-4 focus:outline-none focus:ring-red-500 font-medium rounded-full text-sm p-2 text-center inline-flex items-center dark:border-red-500 dark:text-red-500 dark:focus:ring-red-500 dark:hover:bg-red-500"
+                    class="text-red-500 border border-red-500 hover:bg-red-300 focus:ring-4 focus:outline-none focus:ring-red-500 font-medium rounded-full text-sm p-2 text-center inline-flex align-items-center dark:border-red-500 dark:text-red-500 dark:focus:ring-red-500 dark:hover:bg-red-500"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -308,16 +308,16 @@
                     </svg>
                 </button>
                 <span
-                    class="group-hover:opacity-100 transition-opacity bg-surface-700 px-3 py-2 text-sm text-white rounded-md absolute -translate-y-full opacity-0 m-4 mx-auto"
+                    class="group-hover:opacity-100 transition-opacity bg-surface-700 px-3 py-2 text-sm text-white border-round-md absolute -translate-y-full opacity-0 m-4 mx-auto"
                     >{{ deleteText }}</span
                 >
             </div>
-            <div v-if="audioUrl" class="group flex relative justify-center">
+            <div v-if="audioUrl" class="group flex relative justify-content-center">
                 <button
                     :disabled="sendingAudio"
                     @click="sendAudioCallback"
                     type="button"
-                    class="text-green-500 border border-green-500 hover:bg-green-300 focus:ring-4 focus:outline-none focus:ring-green-500 font-medium rounded-full text-sm p-2 text-center inline-flex items-center dark:border-green-500 dark:text-green-500 dark:focus:ring-green-500 dark:hover:bg-green-500"
+                    class="text-green-500 border border-green-500 hover:bg-green-300 focus:ring-4 focus:outline-none focus:ring-green-500 font-medium rounded-full text-sm p-2 text-center inline-flex align-items-center dark:border-green-500 dark:text-green-500 dark:focus:ring-green-500 dark:hover:bg-green-500"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -335,7 +335,7 @@
                     </svg>
                 </button>
                 <span
-                    class="group-hover:opacity-100 transition-opacity bg-surface-700 px-3 py-2 text-sm text-white rounded-md absolute -translate-y-full opacity-0 m-4 mx-auto"
+                    class="group-hover:opacity-100 transition-opacity bg-surface-700 px-3 py-2 text-sm text-white border-round-md absolute -translate-y-full opacity-0 m-4 mx-auto"
                     >{{ sendText }}</span
                 >
             </div>

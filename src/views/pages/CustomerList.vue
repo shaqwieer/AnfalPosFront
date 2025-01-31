@@ -2,7 +2,7 @@
     <div class="flex flex-column gap-2">
         <PageTopBar v-model:searchText="filters['global'].value" :hasAddButton="false" :hasReload="true" :hasSearch="false" :title="t(`items.title`)" :addText="t('baseLookup.createButtonLabel')" simple :addButton="openCreateDialog">
             <template #action>
-                <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex flex-wrap align-items-center justify-content-between gap-2">
                     <Button icon="pi pi-refresh" rounded raised @click="getCustomers" />
                 </div>
             </template>

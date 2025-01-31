@@ -56,7 +56,7 @@ const handleShareWhatsApp = () => {
 </script>
 
 <template>
-  <div v-if="modelValue" class="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black-alpha-60 z-50">
+  <div v-if="modelValue" class="fixed top-0 left-0 w-full h-full flex align-items-center justify-content-center bg-black-alpha-60 z-50">
     <div class="bg-white border-round-lg shadow-2 w-full max-w-7xl max-h-90vh flex flex-column">
       <!-- Header -->
       <div class="p-4 bg-blue-500 text-white border-round-top-lg">

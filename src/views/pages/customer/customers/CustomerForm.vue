@@ -157,7 +157,7 @@ const initMap = async () => {
           searchBox.innerHTML = `
             <div class="relative">
               <input type="text" 
-                     class="w-64 px-4 py-2 pr-10 rounded-lg border bg-white"
+                     class="w-64 px-4 py-2 pr-10 border-round-lg border bg-white"
                      placeholder="Search address...">
               <span class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                 search
@@ -317,10 +317,10 @@ watch(leftColumnTab, (newTab) => {
 </script>
 
 <template>
-  <div v-if="show" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-xl w-full max-w-7xl max-h-[90vh] flex flex-col">
+  <div v-if="show" class="fixed inset-0 bg-black bg-opacity-50 flex align-items-center justify-content-center z-50">
+    <div class="bg-white border-round-xl w-full max-w-7xl max-h-[90vh] flex flex-column">
       <!-- Header -->
-      <div class="p-4 border-b flex items-center justify-between">
+      <div class="p-4 border-b flex align-items-center justify-content-between">
         <h2 class="text-xl font-semibold">
           {{ readOnly ? 'Customer Details' : customer ? 'Edit Customer' : 'New Customer' }}
         </h2>
@@ -331,14 +331,14 @@ watch(leftColumnTab, (newTab) => {
 
       <form @submit.prevent="handleSubmit" class="flex-1 overflow-hidden">
         <!-- Single column layout -->
-        <div class="h-full flex flex-col">
+        <div class="h-full flex flex-column">
           <!-- Tabs -->
           <div class="flex border-b overflow-x-auto">
             <button v-for="tab in leftTabs"
                     :key="tab.id"
                     type="button"
                     @click="leftColumnTab = tab.id"
-                    class="px-4 py-2 flex items-center space-x-2 relative whitespace-nowrap"
+                    class="px-4 py-2 flex align-items-center space-x-2 relative whitespace-nowrap"
                     :class="leftColumnTab === tab.id ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700'">
               <span class="material-icons text-sm">{{ tab.icon }}</span>
               <span>{{ tab.name }}</span>
@@ -357,7 +357,7 @@ watch(leftColumnTab, (newTab) => {
                        type="text" 
                        required
                        :disabled="readOnly"
-                       class="w-full rounded-lg border">
+                       class="w-full border-round-lg border">
               </div>
               <div>
                 <label class="block text-sm font-medium mb-1">Mobile Number</label>
@@ -365,14 +365,14 @@ watch(leftColumnTab, (newTab) => {
                        type="tel" 
                        required
                        :disabled="readOnly"
-                       class="w-full rounded-lg border">
+                       class="w-full border-round-lg border">
               </div>
               <div>
                 <label class="block text-sm font-medium mb-1">Email</label>
                 <input v-model="formData.email" 
                        type="email"
                        :disabled="readOnly"
-                       class="w-full rounded-lg border">
+                       class="w-full border-round-lg border">
               </div>
             </div>
 
@@ -383,14 +383,14 @@ watch(leftColumnTab, (newTab) => {
                 <input v-model="formData.cr" 
                        type="text"
                        :disabled="readOnly"
-                       class="w-full rounded-lg border">
+                       class="w-full border-round-lg border">
               </div>
               <div>
                 <label class="block text-sm font-medium mb-1">VAT Number</label>
                 <input v-model="formData.vat" 
                        type="text"
                        :disabled="readOnly"
-                       class="w-full rounded-lg border">
+                       class="w-full border-round-lg border">
               </div>
             </div>
 
@@ -408,14 +408,14 @@ watch(leftColumnTab, (newTab) => {
                          step="1000"
                          required
                          :disabled="readOnly"
-                         class="w-full rounded-lg border">
+                         class="w-full border-round-lg border">
                 </div>
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1">Payment Terms</label>
                   <select v-model="formData.paymentTerms"
                           required
                           :disabled="readOnly"
-                          class="w-full rounded-lg border">
+                          class="w-full border-round-lg border">
                     <option v-for="term in paymentTermsOptions"
                             :key="term.value"
                             :value="term.value">
@@ -426,7 +426,7 @@ watch(leftColumnTab, (newTab) => {
               </div>
 
               <!-- Bank Information -->
-              <div class="bg-gray-50 p-4 rounded-lg space-y-4">
+              <div class="bg-gray-50 p-4 border-round-lg space-y-4">
                 <h4 class="font-medium">Bank Information</h4>
                 <div class="grid grid-cols-2 gap-4">
                   <div>
@@ -434,21 +434,21 @@ watch(leftColumnTab, (newTab) => {
                     <input v-model="formData.bankName" 
                            type="text"
                            :disabled="readOnly"
-                           class="w-full rounded-lg border">
+                           class="w-full border-round-lg border">
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
                     <input v-model="formData.bankAccount" 
                            type="text"
                            :disabled="readOnly"
-                           class="w-full rounded-lg border">
+                           class="w-full border-round-lg border">
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">IBAN</label>
                     <input v-model="formData.iban" 
                            type="text"
                            :disabled="readOnly"
-                           class="w-full rounded-lg border" 
+                           class="w-full border-round-lg border" 
                            placeholder="SA...">
                   </div>
                   <div>
@@ -456,7 +456,7 @@ watch(leftColumnTab, (newTab) => {
                     <input v-model="formData.swiftCode" 
                            type="text"
                            :disabled="readOnly"
-                           class="w-full rounded-lg border">
+                           class="w-full border-round-lg border">
                   </div>
                 </div>
               </div>
@@ -467,7 +467,7 @@ watch(leftColumnTab, (newTab) => {
                 <textarea v-model="formData.financialNotes"
                          rows="3"
                          :disabled="readOnly"
-                         class="w-full rounded-lg border"
+                         class="w-full border-round-lg border"
                          placeholder="Add any financial notes or special payment arrangements..."></textarea>
               </div>
             </div>
@@ -475,12 +475,12 @@ watch(leftColumnTab, (newTab) => {
             <!-- Address Information -->
             <div v-show="leftColumnTab === 'address'" class="space-y-6">
               <!-- Map View -->
-              <div class="h-[300px] rounded-lg border overflow-hidden relative">
+              <div class="h-[300px] border-round-lg border overflow-hidden relative">
                 <div ref="mapRef" class="w-full h-full"></div>
                 
                 <!-- Search Results Dropdown -->
                 <div v-if="!readOnly && searchResults.length > 0"
-                     class="absolute top-16 left-12 w-64 bg-white rounded-lg shadow-lg border z-[1000] max-h-48 overflow-y-auto">
+                     class="absolute top-16 left-12 w-64 bg-white border-round-lg shadow-5 border z-[1000] max-h-48 overflow-y-auto">
                   <div v-for="result in searchResults"
                        :key="result.place_id"
                        class="p-2 hover:bg-gray-50 cursor-pointer"
@@ -503,7 +503,7 @@ watch(leftColumnTab, (newTab) => {
                   <input v-model="formData.location.lat"
                          type="number"
                          step="0.000001"
-                         class="w-full rounded-lg border"
+                         class="w-full border-round-lg border"
                          readonly>
                 </div>
                 <div>
@@ -511,7 +511,7 @@ watch(leftColumnTab, (newTab) => {
                   <input v-model="formData.location.lng"
                          type="number"
                          step="0.000001"
-                         class="w-full rounded-lg border"
+                         class="w-full border-round-lg border"
                          readonly>
                 </div>
               </div>
@@ -523,42 +523,42 @@ watch(leftColumnTab, (newTab) => {
                   <input v-model="formData.buildingNumber" 
                          type="text"
                          :disabled="readOnly"
-                         class="w-full rounded-lg border">
+                         class="w-full border-round-lg border">
                 </div>
                 <div>
                   <label class="block text-sm font-medium mb-1">Street Name</label>
                   <input v-model="formData.streetName" 
                          type="text"
                          :disabled="readOnly"
-                         class="w-full rounded-lg border">
+                         class="w-full border-round-lg border">
                 </div>
                 <div>
                   <label class="block text-sm font-medium mb-1">District</label>
                   <input v-model="formData.district" 
                          type="text"
                          :disabled="readOnly"
-                         class="w-full rounded-lg border">
+                         class="w-full border-round-lg border">
                 </div>
                 <div>
                   <label class="block text-sm font-medium mb-1">City</label>
                   <input v-model="formData.city" 
                          type="text"
                          :disabled="readOnly"
-                         class="w-full rounded-lg border">
+                         class="w-full border-round-lg border">
                 </div>
                 <div>
                   <label class="block text-sm font-medium mb-1">Postal Code</label>
                   <input v-model="formData.postalCode" 
                          type="text"
                          :disabled="readOnly"
-                         class="w-full rounded-lg border">
+                         class="w-full border-round-lg border">
                 </div>
                 <div>
                   <label class="block text-sm font-medium mb-1">Additional Number</label>
                   <input v-model="formData.additionalNumber" 
                          type="text"
                          :disabled="readOnly"
-                         class="w-full rounded-lg border">
+                         class="w-full border-round-lg border">
                 </div>
               </div>
 
@@ -566,7 +566,7 @@ watch(leftColumnTab, (newTab) => {
               <div v-if="!readOnly" class="flex justify-end">
                 <button type="button"
                         @click="getCurrentLocation"
-                        class="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        class="px-3 py-1.5 text-sm bg-blue-600 text-white border-round-lg hover:bg-blue-700">
                   <span class="material-icons align-middle text-sm mr-1">my_location</span>
                   Get Current Location
                 </button>
@@ -587,7 +587,7 @@ watch(leftColumnTab, (newTab) => {
               <textarea v-model="formData.notes"
                         rows="4"
                         :disabled="readOnly"
-                        class="w-full rounded-lg border"
+                        class="w-full border-round-lg border"
                         placeholder="Add any additional notes..."></textarea>
             </div>
           </div>
@@ -597,12 +597,12 @@ watch(leftColumnTab, (newTab) => {
         <div class="p-4 border-t flex justify-end space-x-3">
           <button type="button"
                   @click="$emit('close')"
-                  class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                  class="px-4 py-2 border border-round-lg hover:bg-gray-50">
             {{ readOnly ? 'Close' : 'Cancel' }}
           </button>
           <button v-if="!readOnly"
                   type="submit"
-                  class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                  class="px-4 py-2 bg-blue-600 text-white border-round-lg hover:bg-blue-700">
             {{ customer ? 'Update Customer' : 'Create Customer' }}
           </button>
         </div>

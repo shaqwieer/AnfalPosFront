@@ -188,7 +188,7 @@ const initMap = async () => {
         searchBox.innerHTML = `
           <div class="relative">
             <input type="text" 
-                   class="w-64 px-4 py-2 pr-10 rounded-lg border bg-white"
+                   class="w-64 px-4 py-2 pr-10 border-round-lg border bg-white"
                    placeholder="Search address...">
             <span class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
               search
@@ -337,10 +337,10 @@ watch(leftColumnTab, (newTab) => {
 </script>
 
 <template>
-  <div v-if="show" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-xl w-full max-w-7xl max-h-[90vh] flex flex-col">
+  <div v-if="show" class="fixed inset-0 bg-black bg-opacity-50 flex align-items-center justify-content-center z-50">
+    <div class="bg-white border-round-xl w-full max-w-7xl max-h-[90vh] flex flex-column">
       <!-- Header -->
-      <div class="p-4 border-b flex items-center justify-between">
+      <div class="p-4 border-b flex align-items-center justify-content-between">
         <h2 class="text-xl font-semibold">Edit Customer</h2>
         <button @click="$emit('close')" class="p-2 hover:bg-gray-100 rounded-full">
           <span class="material-icons">close</span>
@@ -349,14 +349,14 @@ watch(leftColumnTab, (newTab) => {
 
       <form @submit.prevent="handleSubmit" class="flex-1 overflow-hidden">
         <!-- Single column layout -->
-        <div class="h-full flex flex-col">
+        <div class="h-full flex flex-column">
           <!-- Tabs -->
           <div class="flex border-b overflow-x-auto">
             <button v-for="tab in leftTabs"
                     :key="tab.id"
                     type="button"
                     @click="leftColumnTab = tab.id"
-                    class="px-4 py-2 flex items-center space-x-2 relative whitespace-nowrap"
+                    class="px-4 py-2 flex align-items-center space-x-2 relative whitespace-nowrap"
                     :class="leftColumnTab === tab.id ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700'">
               <span class="material-icons text-sm">{{ tab.icon }}</span>
               <span>{{ tab.name }}</span>
@@ -374,20 +374,20 @@ watch(leftColumnTab, (newTab) => {
                 <input v-model="editedCustomer.name" 
                        type="text" 
                        required
-                       class="w-full rounded-lg border">
+                       class="w-full border-round-lg border">
               </div>
               <div>
                 <label class="block text-sm font-medium mb-1">Mobile Number</label>
                 <input v-model="editedCustomer.mobile" 
                        type="tel" 
                        required
-                       class="w-full rounded-lg border">
+                       class="w-full border-round-lg border">
               </div>
               <div>
                 <label class="block text-sm font-medium mb-1">Email</label>
                 <input v-model="editedCustomer.email" 
                        type="email"
-                       class="w-full rounded-lg border">
+                       class="w-full border-round-lg border">
               </div>
             </div>
 
@@ -397,13 +397,13 @@ watch(leftColumnTab, (newTab) => {
                 <label class="block text-sm font-medium mb-1">CR Number</label>
                 <input v-model="editedCustomer.cr" 
                        type="text"
-                       class="w-full rounded-lg border">
+                       class="w-full border-round-lg border">
               </div>
               <div>
                 <label class="block text-sm font-medium mb-1">VAT Number</label>
                 <input v-model="editedCustomer.vat" 
                        type="text"
-                       class="w-full rounded-lg border">
+                       class="w-full border-round-lg border">
               </div>
             </div>
 
@@ -420,13 +420,13 @@ watch(leftColumnTab, (newTab) => {
                          min="0"
                          step="1000"
                          required
-                         class="w-full rounded-lg border">
+                         class="w-full border-round-lg border">
                 </div>
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1">Payment Terms</label>
                   <select v-model="editedCustomer.paymentTerms"
                           required
-                          class="w-full rounded-lg border">
+                          class="w-full border-round-lg border">
                     <option v-for="term in paymentTermsOptions"
                             :key="term.value"
                             :value="term.value">
@@ -437,24 +437,24 @@ watch(leftColumnTab, (newTab) => {
               </div>
 
               <!-- Bank Information -->
-              <div class="bg-gray-50 p-4 rounded-lg space-y-4">
+              <div class="bg-gray-50 p-4 border-round-lg space-y-4">
                 <h4 class="font-medium">Bank Information</h4>
                 <div class="grid grid-cols-2 gap-4">
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Bank Name</label>
-                    <input v-model="editedCustomer.bankName" type="text" class="w-full rounded-lg border">
+                    <input v-model="editedCustomer.bankName" type="text" class="w-full border-round-lg border">
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
-                    <input v-model="editedCustomer.bankAccount" type="text" class="w-full rounded-lg border">
+                    <input v-model="editedCustomer.bankAccount" type="text" class="w-full border-round-lg border">
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">IBAN</label>
-                    <input v-model="editedCustomer.iban" type="text" class="w-full rounded-lg border" placeholder="SA...">
+                    <input v-model="editedCustomer.iban" type="text" class="w-full border-round-lg border" placeholder="SA...">
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">SWIFT Code</label>
-                    <input v-model="editedCustomer.swiftCode" type="text" class="w-full rounded-lg border">
+                    <input v-model="editedCustomer.swiftCode" type="text" class="w-full border-round-lg border">
                   </div>
                 </div>
               </div>
@@ -464,7 +464,7 @@ watch(leftColumnTab, (newTab) => {
                 <label class="block text-sm font-medium text-gray-700 mb-1">Financial Notes</label>
                 <textarea v-model="editedCustomer.financialNotes"
                          rows="3"
-                         class="w-full rounded-lg border"
+                         class="w-full border-round-lg border"
                          placeholder="Add any financial notes or special payment arrangements..."></textarea>
               </div>
             </div>
@@ -472,12 +472,12 @@ watch(leftColumnTab, (newTab) => {
             <!-- Address Information -->
             <div v-show="leftColumnTab === 'address'" class="space-y-6">
               <!-- Map View -->
-              <div class="h-[300px] rounded-lg border overflow-hidden relative">
+              <div class="h-[300px] border-round-lg border overflow-hidden relative">
                 <div ref="mapRef" class="w-full h-full"></div>
                 
                 <!-- Search Results Dropdown -->
                 <div v-if="searchResults.length > 0"
-                     class="absolute top-16 left-12 w-64 bg-white rounded-lg shadow-lg border z-[1000] max-h-48 overflow-y-auto">
+                     class="absolute top-16 left-12 w-64 bg-white border-round-lg shadow-5 border z-[1000] max-h-48 overflow-y-auto">
                   <div v-for="result in searchResults"
                        :key="result.place_id"
                        class="p-2 hover:bg-gray-50 cursor-pointer"
@@ -500,7 +500,7 @@ watch(leftColumnTab, (newTab) => {
                   <input v-model="editedCustomer.location.lat"
                          type="number"
                          step="0.000001"
-                         class="w-full rounded-lg border"
+                         class="w-full border-round-lg border"
                          readonly>
                 </div>
                 <div>
@@ -508,7 +508,7 @@ watch(leftColumnTab, (newTab) => {
                   <input v-model="editedCustomer.location.lng"
                          type="number"
                          step="0.000001"
-                         class="w-full rounded-lg border"
+                         class="w-full border-round-lg border"
                          readonly>
                 </div>
               </div>
@@ -519,37 +519,37 @@ watch(leftColumnTab, (newTab) => {
                   <label class="block text-sm font-medium mb-1">Building Number</label>
                   <input v-model="editedCustomer.buildingNumber" 
                          type="text"
-                         class="w-full rounded-lg border">
+                         class="w-full border-round-lg border">
                 </div>
                 <div>
                   <label class="block text-sm font-medium mb-1">Street Name</label>
                   <input v-model="editedCustomer.streetName" 
                          type="text"
-                         class="w-full rounded-lg border">
+                         class="w-full border-round-lg border">
                 </div>
                 <div>
                   <label class="block text-sm font-medium mb-1">District</label>
                   <input v-model="editedCustomer.district" 
                          type="text"
-                         class="w-full rounded-lg border">
+                         class="w-full border-round-lg border">
                 </div>
                 <div>
                   <label class="block text-sm font-medium mb-1">City</label>
                   <input v-model="editedCustomer.city" 
                          type="text"
-                         class="w-full rounded-lg border">
+                         class="w-full border-round-lg border">
                 </div>
                 <div>
                   <label class="block text-sm font-medium mb-1">Postal Code</label>
                   <input v-model="editedCustomer.postalCode" 
                          type="text"
-                         class="w-full rounded-lg border">
+                         class="w-full border-round-lg border">
                 </div>
                 <div>
                   <label class="block text-sm font-medium mb-1">Additional Number</label>
                   <input v-model="editedCustomer.additionalNumber" 
                          type="text"
-                         class="w-full rounded-lg border">
+                         class="w-full border-round-lg border">
                 </div>
               </div>
 
@@ -557,7 +557,7 @@ watch(leftColumnTab, (newTab) => {
               <div class="flex justify-end">
                 <button type="button"
                         @click="getCurrentLocation"
-                        class="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        class="px-3 py-1.5 text-sm bg-blue-600 text-white border-round-lg hover:bg-blue-700">
                   <span class="material-icons align-middle text-sm mr-1">my_location</span>
                   Get Current Location
                 </button>
@@ -576,7 +576,7 @@ watch(leftColumnTab, (newTab) => {
               <h3 class="text-lg font-medium">Additional Notes</h3>
               <textarea v-model="editedCustomer.notes"
                         rows="4"
-                        class="w-full rounded-lg border"
+                        class="w-full border-round-lg border"
                         placeholder="Add any additional notes..."></textarea>
             </div>
           </div>
@@ -586,11 +586,11 @@ watch(leftColumnTab, (newTab) => {
         <div class="p-4 border-t flex justify-end space-x-3">
           <button type="button"
                   @click="$emit('close')"
-                  class="px-4 py-2 border rounded-lg hover:bg-gray-50">
+                  class="px-4 py-2 border border-round-lg hover:bg-gray-50">
             Cancel
           </button>
           <button type="submit"
-                  class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                  class="px-4 py-2 bg-blue-600 text-white border-round-lg hover:bg-blue-700">
             Save Changes
           </button>
         </div>
