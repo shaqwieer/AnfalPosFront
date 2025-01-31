@@ -1,0 +1,314 @@
+/* Theme System */
+:root {
+  color-scheme: light;
+  
+  /* Light Theme (Default) */
+  --sap-primary: #0070f2;
+  --sap-primary-hover: #0058c3;
+  --sap-background: #f5f6f7;
+  --sap-surface: #ffffff;
+  --sap-border: #e5e7eb;
+  --sap-text: #32363a;
+  --sap-text-secondary: #6a6d70;
+  --sap-success: #107e3e;
+  --sap-warning: #e9730c;
+  --sap-error: #bb0000;
+  --sap-info: #0070f2;
+  --sap-hover: rgba(0, 0, 0, 0.04);
+  --sap-disabled: rgba(0, 0, 0, 0.12);
+  --sap-overlay: rgba(0, 0, 0, 0.5);
+  --card-shadow: rgba(17, 12, 46, 0.05) 0px 48px 100px 0px;
+  --card-shadow-hover: rgba(17, 12, 46, 0.1) 0px 48px 100px 0px;
+  --scrollbar-width: 6px;
+  --scrollbar-track-color: transparent;
+  --scrollbar-thumb-color: #e5e7eb;
+  --scrollbar-thumb-hover-color: #d1d5db;
+}
+
+/* Dim Theme */
+[data-theme="dim"] {
+  color-scheme: dark;
+  
+  --sap-primary: #3b82f6;
+  --sap-primary-hover: #2563eb;
+  --sap-background: #1a1b1e;
+  --sap-surface: #2c2e33;
+  --sap-border: #404348;
+  --sap-text: #e5e7eb;
+  --sap-text-secondary: #9ca3af;
+  --sap-success: #22c55e;
+  --sap-warning: #f59e0b;
+  --sap-error: #ef4444;
+  --sap-info: #3b82f6;
+  --sap-hover: rgba(255, 255, 255, 0.04);
+  --sap-disabled: rgba(255, 255, 255, 0.12);
+  --sap-overlay: rgba(0, 0, 0, 0.7);
+  --card-shadow: rgba(0, 0, 0, 0.2) 0px 8px 24px;
+  --card-shadow-hover: rgba(0, 0, 0, 0.3) 0px 12px 32px;
+  --scrollbar-thumb-color: #4b5563;
+  --scrollbar-thumb-hover-color: #6b7280;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  color-scheme: dark;
+  
+  --sap-primary: #3b82f6;
+  --sap-primary-hover: #2563eb;
+  --sap-background: #000000;
+  --sap-surface: #18181b;
+  --sap-border: #27272a;
+  --sap-text: #f4f4f5;
+  --sap-text-secondary: #a1a1aa;
+  --sap-success: #22c55e;
+  --sap-warning: #f59e0b;
+  --sap-error: #ef4444;
+  --sap-info: #3b82f6;
+  --sap-hover: rgba(255, 255, 255, 0.04);
+  --sap-disabled: rgba(255, 255, 255, 0.12);
+  --sap-overlay: rgba(0, 0, 0, 0.8);
+  --card-shadow: rgba(0, 0, 0, 0.3) 0px 8px 24px;
+  --card-shadow-hover: rgba(0, 0, 0, 0.4) 0px 12px 32px;
+  --scrollbar-thumb-color: #3f3f46;
+  --scrollbar-thumb-hover-color: #52525b;
+}
+
+/* Global Styles */
+body {
+  background-color: var(--sap-background);
+  color: var(--sap-text);
+}
+
+/* Modern Scrollbar Styles */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+  height: var(--scrollbar-width);
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--scrollbar-track-color);
+  border-radius: calc(var(--scrollbar-width) / 2);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb-color);
+  border-radius: calc(var(--scrollbar-width) / 2);
+  transition: background-color 0.2s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover-color);
+}
+
+/* Button Styles */
+.sap-button {
+  @apply rounded-md font-medium transition-all duration-200 ease-in-out;
+  background-color: var(--sap-primary);
+  color: var(--sap-surface);
+  transform: translateY(0);
+}
+
+.sap-button:hover {
+  background-color: var(--sap-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px var(--sap-overlay);
+}
+
+.sap-button-secondary {
+  @apply rounded-md font-medium transition-all duration-200;
+  background-color: var(--sap-surface);
+  border: 1px solid var(--sap-border);
+  color: var(--sap-text);
+}
+
+.sap-button-secondary:hover {
+  background-color: var(--sap-hover);
+  border-color: var(--sap-primary);
+  color: var(--sap-primary);
+}
+
+/* Card Styles */
+.sap-card {
+  @apply rounded-xl transition-all duration-300;
+  background-color: var(--sap-surface);
+  border: 1px solid var(--sap-border);
+  box-shadow: var(--card-shadow);
+}
+
+.sap-card:hover {
+  box-shadow: var(--card-shadow-hover);
+}
+
+/* Service Card */
+.service-card {
+  @apply rounded-xl p-4 transition-all duration-300;
+  background-color: var(--sap-surface);
+  border: 1px solid var(--sap-border);
+  box-shadow: var(--card-shadow);
+  position: relative;
+  isolation: isolate;
+}
+
+.service-card:hover {
+  box-shadow: var(--card-shadow-hover);
+  border-color: var(--sap-primary);
+  transform: translateY(-2px);
+}
+
+.service-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 0.75rem;
+  padding: 1px;
+  background: linear-gradient(to bottom right, transparent, var(--sap-primary));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 0;
+}
+
+.service-card:hover::before {
+  opacity: 1;
+}
+
+/* Order Card */
+.order-card {
+  @apply rounded-xl p-4 transition-all duration-300;
+  background-color: var(--sap-surface);
+  border: 1px solid var(--sap-border);
+  box-shadow: var(--card-shadow);
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+}
+
+.order-card:hover {
+  box-shadow: var(--card-shadow-hover);
+  border-color: var(--sap-primary);
+  transform: translateY(-2px);
+}
+
+.order-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 0.75rem;
+  padding: 1px;
+  background: linear-gradient(to bottom right, transparent, var(--sap-primary));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 0;
+}
+
+.order-card:hover::before {
+  opacity: 1;
+}
+
+/* Input Styles */
+.sap-input {
+  @apply rounded-lg px-4 py-2.5 w-full transition-all duration-200;
+  border: 1px solid var(--sap-border);
+  color: var(--sap-text);
+  background-color: var(--sap-surface);
+}
+
+.sap-input:focus {
+  border-color: var(--sap-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--sap-primary), 0.15);
+}
+
+.sap-input:disabled {
+  background-color: var(--sap-disabled);
+  cursor: not-allowed;
+}
+
+/* Dialog Styles */
+.sap-dialog {
+  background-color: var(--sap-surface);
+  border: 1px solid var(--sap-border);
+  box-shadow: var(--card-shadow);
+}
+
+.sap-dialog-overlay {
+  background-color: var(--sap-overlay);
+}
+
+/* Status Tags */
+.sap-tag {
+  @apply rounded-full px-3 py-1 text-xs font-medium transition-all duration-200;
+  backdrop-filter: blur(8px);
+}
+
+/* Category Pills */
+.category-pill {
+  @apply rounded-full px-4 py-2 text-sm font-medium transition-all duration-200;
+  background-color: var(--sap-hover);
+  color: var(--sap-text);
+}
+
+.category-pill.active {
+  background-color: var(--sap-primary);
+  color: var(--sap-surface);
+}
+
+.category-pill:hover:not(.active) {
+  background-color: var(--sap-hover);
+}
+
+/* Table Styles */
+.sap-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.sap-table th {
+  background-color: var(--sap-background);
+  color: var(--sap-text-secondary);
+  font-weight: 500;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--sap-border);
+}
+
+.sap-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--sap-border);
+  color: var(--sap-text);
+}
+
+.sap-table tr:hover td {
+  background-color: var(--sap-hover);
+}
+
+/* Theme Transition */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Media Queries */
+@media (max-width: 640px) {
+  .custom-scrollbar {
+    scrollbar-width: none;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
