@@ -39,23 +39,25 @@ const emit = defineEmits(['view-details', 'edit-customer', 'submit-approval', 'a
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case 'active': return 'bg-green-100 text-green-800'
-    case 'pending': return 'bg-yellow-100 text-yellow-800'
-    case 'rejected': return 'bg-red-100 text-red-800'
-    default: return 'bg-gray-100 text-gray-800'
+    case 'active': return 'bg-green-100 text-green-700'
+    case 'pending': return 'bg-yellow-100 text-yellow-700'
+    case 'rejected': return 'bg-red-100 text-red-700'
+    default: return 'bg-gray-100 text-700'
   }
 }
 
 const getApprovalStatusColor = (status: string) => {
   switch (status) {
-    case 'approved': return 'bg-green-100 text-green-800'
-    case 'pending': return 'bg-yellow-100 text-yellow-800'
-    case 'rejected': return 'bg-red-100 text-red-800'
-    default: return 'bg-gray-100 text-gray-800'
+    case 'approved': return 'bg-green-100 text-green-700'
+    case 'pending': return 'bg-yellow-100 text-yellow-700'
+    case 'rejected': return 'bg-red-100 text-red-700'
+    default: return 'bg-gray-100 text-700'
   }
 }
 
 const handleVisit = (event: Event) => {
+  console.log(props.customer);
+  
   event.stopPropagation()
   router.push({
     name: 'customer-visit',
@@ -65,75 +67,75 @@ const handleVisit = (event: Event) => {
 </script>
 
 <template>
-  <div class="bg-white border-round-lg shadow-3 border hover:border-blue-500 transition-all duration-200">
+  <div class="surface-card border-round-lg shadow-2 border-1 surface-border hover:border-primary transition-colors duration-200">
     <div class="p-4">
       <!-- Customer Header -->
-      <div class="flex items-start justify-content-between mb-4">
+      <div class="flex align-items-start justify-content-between mb-4">
         <div>
-          <div class="flex align-items-center space-x-2">
-            <span class="font-medium text-gray-900">{{ customer.name }}</span>
-            <span class="px-2 py-0.5 text-xs rounded-full"
+          <div class="flex align-items-center gap-2">
+            <span class="font-medium text-900">{{ customer.name }}</span>
+            <span class="px-2 py-1 text-xs border-round-lg"
                   :class="getStatusColor(customer.status)">
               {{ customer.status }}
             </span>
-            <span class="px-2 py-0.5 text-xs rounded-full"
+            <span class="px-2 py-1 text-xs border-round-lg"
                   :class="getApprovalStatusColor(customer.approvalStatus)">
               {{ customer.approvalStatus }}
             </span>
           </div>
-          <div class="mt-1 text-sm text-gray-500">{{ customer.id }}</div>
+          <div class="mt-1 text-sm text-600">{{ customer.id }}</div>
         </div>
         <div class="text-right">
-          <div class="text-sm text-gray-500">Credit Limit</div>
-          <div class="font-bold text-blue-600">{{ formatPrice(customer.creditLimit) }}</div>
-          <div class="text-sm text-gray-500">Balance: {{ formatPrice(customer.balance) }}</div>
+          <div class="text-sm text-600">Credit Limit</div>
+          <div class="font-bold text-primary">{{ formatPrice(customer.creditLimit) }}</div>
+          <div class="text-sm text-600">Balance: {{ formatPrice(customer.balance) }}</div>
         </div>
       </div>
 
       <!-- Customer Info -->
       <div class="grid grid-cols-2 gap-4 text-sm">
         <div>
-          <div class="text-gray-500">Contact</div>
+          <div class="text-600">Contact</div>
           <div class="font-medium">{{ customer.mobile }}</div>
-          <div class="text-sm text-gray-500">{{ customer.email }}</div>
+          <div class="text-sm text-600">{{ customer.email }}</div>
         </div>
         <div>
-          <div class="text-gray-500">Business Info</div>
+          <div class="text-600">Business Info</div>
           <div class="font-medium">CR: {{ customer.cr }}</div>
-          <div class="text-sm text-gray-500">VAT: {{ customer.vat }}</div>
+          <div class="text-sm text-600">VAT: {{ customer.vat }}</div>
         </div>
       </div>
 
       <!-- Location -->
       <div class="mt-4">
-        <div class="text-sm text-gray-500">Location</div>
+        <div class="text-sm text-600">Location</div>
         <div class="font-medium">{{ customer.location.address }}</div>
       </div>
 
       <!-- Footer -->
-      <div class="mt-4 pt-4 border-t flex align-items-center justify-content-between">
-        <div class="text-sm text-gray-500">
+      <div class="mt-4 pt-4 border-top-1 surface-border flex align-items-center justify-content-between">
+        <div class="text-sm text-600">
           Created: {{ formatDate(customer.createdDate) }}
         </div>
-        <div class="flex align-items-center space-x-3">
+        <div class="flex align-items-center gap-2">
           <!-- View Button -->
           <button @click.stop="$emit('view-details', customer)"
-                  class="px-3 py-1.5 text-blue-600 hover:bg-blue-50 border-round-lg flex align-items-center space-x-1">
-            <span class="material-icons text-sm">visibility</span>
+                  class="p-button p-button-text p-button-primary flex align-items-center gap-1">
+            <i class="pi pi-eye"></i>
             <span>View</span>
           </button>
 
           <!-- Edit Button -->
           <button @click.stop="$emit('edit-customer', customer)"
-                  class="px-3 py-1.5 text-gray-600 hover:bg-gray-50 border-round-lg flex align-items-center space-x-1">
-            <span class="material-icons text-sm">edit</span>
+                  class="p-button p-button-text flex align-items-center gap-1">
+            <i class="pi pi-pencil"></i>
             <span>Edit</span>
           </button>
 
           <!-- Visit Button -->
           <button @click="handleVisit"
-                  class="px-3 py-1.5 text-green-600 hover:bg-green-50 border-round-lg flex align-items-center space-x-1">
-            <span class="material-icons text-sm">store</span>
+                  class="p-button p-button-text p-button-success flex align-items-center gap-1">
+            <i class="pi pi-home"></i>
             <span>Visit</span>
           </button>
 
@@ -143,13 +145,13 @@ const handleVisit = (event: Event) => {
           <!-- Approval Actions -->
           <template v-if="customer.approvalStatus === 'pending'">
             <button @click.stop="$emit('approve', customer)"
-                    class="px-3 py-1.5 text-green-600 hover:bg-green-50 border-round-lg flex align-items-center space-x-1">
-              <span class="material-icons text-sm">check_circle</span>
+                    class="p-button p-button-text p-button-success flex align-items-center gap-1">
+              <i class="pi pi-check-circle"></i>
               <span>Approve</span>
             </button>
             <button @click.stop="$emit('reject', customer)"
-                    class="px-3 py-1.5 text-red-600 hover:bg-red-50 border-round-lg flex align-items-center space-x-1">
-              <span class="material-icons text-sm">cancel</span>
+                    class="p-button p-button-text p-button-danger flex align-items-center gap-1">
+              <i class="pi pi-times-circle"></i>
               <span>Reject</span>
             </button>
           </template>
@@ -157,8 +159,9 @@ const handleVisit = (event: Event) => {
           <!-- Submit for Approval Button -->
           <button v-if="customer.status === 'draft'"
                   @click.stop="$emit('submit-approval', customer)"
-                  class="px-4 py-2 bg-blue-600 text-white border-round-lg hover:bg-blue-700">
-            Submit for Approval
+                  class="p-button p-button-primary flex align-items-center gap-1">
+            <i class="pi pi-send"></i>
+            <span>Submit for Approval</span>
           </button>
         </div>
       </div>

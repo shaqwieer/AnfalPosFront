@@ -29,6 +29,16 @@ const router = createRouter({
                     component: () => import('@/views/pages/customer/VANCustomers.vue')
                 },
                 {
+                    path: 'customer-visit',
+                    name: 'customer-visit',
+                    component: () => import('@/views/pages/customer/customers/VANCustomerVisit.vue')
+                },
+                {
+                    path: 'customer-dashboard',
+                    name: 'customer-dashboard',
+                    component: () => import('@/views/pages/customer/customers/CustomerDashboard.vue')
+                },
+                {
                     path: '/invoices/quick-invoice',
                     name: 'Quickinvoice',
                     meta: {

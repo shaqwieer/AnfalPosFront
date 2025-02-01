@@ -134,10 +134,10 @@ const getDocumentStatus = (doc: any) => {
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case 'valid': return 'bg-green-100 text-green-800'
-    case 'expiring': return 'bg-yellow-100 text-yellow-800'
-    case 'expired': return 'bg-red-100 text-red-800'
-    default: return 'bg-gray-100 text-gray-800'
+    case 'valid': return 'bg-green-100 text-green-700'
+    case 'expiring': return 'bg-yellow-100 text-yellow-700'
+    case 'expired': return 'bg-red-100 text-red-700'
+    default: return 'bg-gray-100 text-700'
   }
 }
 
@@ -163,55 +163,55 @@ const isPDFFile = (mimeType: string) => {
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="flex flex-column gap-6">
     <!-- Header with Upload Button -->
     <div class="flex align-items-center justify-content-between">
       <div>
-        <h3 class="text-lg font-medium">Documents & Attachments</h3>
-        <p class="text-sm text-gray-500">Manage customer documents and certifications</p>
+        <h3 class="text-lg font-medium text-900">Documents & Attachments</h3>
+        <p class="text-sm text-600">Manage customer documents and certifications</p>
       </div>
       <button v-if="!readOnly"
               @click="showUploadDialog = true"
-              class="px-4 py-2 bg-blue-600 text-white border-round-lg hover:bg-blue-700">
-        <span class="material-icons align-middle mr-1">upload_file</span>
+              class="p-button p-button-primary">
+        <i class="pi pi-upload mr-2"></i>
         Upload Document
       </button>
     </div>
 
     <!-- Documents Table -->
-    <div class="bg-white border-round-lg border overflow-hidden">
+    <div class="surface-card border-round-lg border-1 surface-border overflow-hidden">
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+        <table class="w-full">
+          <thead class="surface-100">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Document Type</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">File Name</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Upload Date</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Expiry Date</th>
-              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
-              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Actions</th>
+              <th class="text-left text-xs font-medium text-700 uppercase px-6 py-3">Document Type</th>
+              <th class="text-left text-xs font-medium text-700 uppercase px-6 py-3">File Name</th>
+              <th class="text-left text-xs font-medium text-700 uppercase px-6 py-3">Upload Date</th>
+              <th class="text-left text-xs font-medium text-700 uppercase px-6 py-3">Expiry Date</th>
+              <th class="text-center text-xs font-medium text-700 uppercase px-6 py-3">Status</th>
+              <th class="text-center text-xs font-medium text-700 uppercase px-6 py-3">Actions</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-200">
+          <tbody class="divide-y-1 surface-border">
             <template v-for="type in documentTypes" :key="type.id">
               <tr v-if="documentsByType[type.id]?.length">
                 <template v-for="doc in documentsByType[type.id]" :key="doc.id">
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex align-items-center">
-                      <span class="material-icons text-gray-400 mr-2">description</span>
+                      <i class="pi pi-file text-600 mr-2"></i>
                       <div>
-                        <div class="font-medium text-gray-900">{{ type.name }}</div>
-                        <div class="text-sm text-gray-500">
+                        <div class="font-medium text-900">{{ type.name }}</div>
+                        <div class="text-sm text-600">
                           {{ type.required ? 'Required' : 'Optional' }}
                         </div>
                       </div>
                     </div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm font-medium text-gray-900">{{ doc.name }}</div>
-                    <div class="text-xs text-gray-500">{{ doc.notes }}</div>
+                    <div class="text-sm font-medium text-900">{{ doc.name }}</div>
+                    <div class="text-xs text-600">{{ doc.notes }}</div>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-600">
                     {{ formatDate(doc.uploadDate) }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm">
@@ -219,7 +219,7 @@ const isPDFFile = (mimeType: string) => {
                          :class="{
                            'text-red-600': getDocumentStatus(doc) === 'expired',
                            'text-yellow-600': getDocumentStatus(doc) === 'expiring',
-                           'text-gray-500': getDocumentStatus(doc) === 'valid'
+                           'text-600': getDocumentStatus(doc) === 'valid'
                          }">
                       {{ formatDate(doc.expiryDate) }}
                       <div class="text-xs">
@@ -229,24 +229,24 @@ const isPDFFile = (mimeType: string) => {
                         <span v-else>Expired</span>
                       </div>
                     </div>
-                    <div v-else class="text-gray-500">N/A</div>
+                    <div v-else class="text-600">N/A</div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
-                    <span class="px-2 py-1 text-xs rounded-full"
+                    <span class="px-2 py-1 text-xs border-round-full"
                           :class="getStatusColor(getDocumentStatus(doc))">
                       {{ getDocumentStatus(doc).toUpperCase() }}
                     </span>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
-                    <div class="flex align-items-center justify-content-center space-x-2">
+                    <div class="flex align-items-center justify-content-center gap-2">
                       <button @click.prevent="viewDocument(doc)"
-                              class="p-2 text-blue-600 hover:bg-blue-50 rounded-full">
-                        <span class="material-icons">visibility</span>
+                              class="p-button p-button-text p-button-rounded">
+                        <i class="pi pi-eye"></i>
                       </button>
                       <button v-if="!readOnly"
                               @click.prevent="deleteDocument(doc.id)"
-                              class="p-2 text-red-600 hover:bg-red-50 rounded-full">
-                        <span class="material-icons">delete</span>
+                              class="p-button p-button-text p-button-rounded p-button-danger">
+                        <i class="pi pi-trash"></i>
                       </button>
                     </div>
                   </td>
@@ -256,10 +256,10 @@ const isPDFFile = (mimeType: string) => {
               <tr v-else>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex align-items-center">
-                    <span class="material-icons text-gray-400 mr-2">description</span>
+                    <i class="pi pi-file text-600 mr-2"></i>
                     <div>
-                      <div class="font-medium text-gray-900">{{ type.name }}</div>
-                      <div class="text-sm text-gray-500">
+                      <div class="font-medium text-900">{{ type.name }}</div>
+                      <div class="text-sm text-600">
                         {{ type.required ? 'Required' : 'Optional' }}
                       </div>
                     </div>
@@ -272,8 +272,8 @@ const isPDFFile = (mimeType: string) => {
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
                   <button v-if="!readOnly"
                           @click="showUploadDialog = true; selectedType = type.id"
-                          class="text-blue-600 hover:text-blue-700">
-                    <span class="material-icons">upload_file</span>
+                          class="p-button p-button-text p-button-rounded">
+                    <i class="pi pi-upload"></i>
                   </button>
                 </td>
               </tr>
@@ -285,21 +285,21 @@ const isPDFFile = (mimeType: string) => {
 
     <!-- Upload Dialog -->
     <div v-if="showUploadDialog"
-         class="fixed inset-0 bg-black bg-opacity-50 flex align-items-center justify-content-center z-[60]">
-      <div class="bg-white border-round-xl w-full max-w-lg">
-        <div class="p-4 border-b flex align-items-center justify-content-between">
-          <h3 class="text-lg font-medium">Upload Document</h3>
-          <button @click="resetUploadForm" class="p-2 hover:bg-gray-100 rounded-full">
-            <span class="material-icons">close</span>
+         class="fixed inset-0 bg-black-alpha-50 flex align-items-center justify-content-center z-5">
+      <div class="surface-card border-round-xl w-full max-w-lg">
+        <div class="p-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
+          <h3 class="text-lg font-medium text-900">Upload Document</h3>
+          <button @click="resetUploadForm" class="p-button p-button-text p-button-rounded">
+            <i class="pi pi-times"></i>
           </button>
         </div>
 
         <div class="p-6">
-          <form @submit.prevent="uploadDocument" class="space-y-4">
+          <form @submit.prevent="uploadDocument" class="flex flex-column gap-4">
             <!-- Document Type -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Document Type</label>
-              <select v-model="selectedType" required class="w-full border-round-lg border">
+              <label class="block text-sm font-medium text-700 mb-1">Document Type</label>
+              <select v-model="selectedType" required class="w-full p-inputtext">
                 <option value="">Select document type</option>
                 <option v-for="type in documentTypes"
                         :key="type.id"
@@ -312,8 +312,8 @@ const isPDFFile = (mimeType: string) => {
 
             <!-- File Upload -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Document File</label>
-              <div class="flex align-items-center space-x-2">
+              <label class="block text-sm font-medium text-700 mb-1">Document File</label>
+              <div class="flex align-items-center gap-2">
                 <input type="file"
                        @change="handleFileSelect"
                        required
@@ -321,47 +321,47 @@ const isPDFFile = (mimeType: string) => {
                        accept=".pdf,.jpg,.jpeg,.png"
                        id="document-file" />
                 <label for="document-file"
-                       class="px-4 py-2 border border-round-lg bg-gray-50 hover:bg-gray-100 cursor-pointer flex align-items-center">
-                  <span class="material-icons mr-2">upload_file</span>
+                       class="p-button p-button-outlined flex align-items-center gap-2">
+                  <i class="pi pi-upload"></i>
                   {{ selectedFile ? selectedFile.name : 'Choose File' }}
                 </label>
                 <button v-if="selectedFile"
                         type="button"
                         @click="selectedFile = null"
-                        class="p-2 text-red-500 hover:bg-red-50 rounded-full">
-                  <span class="material-icons">close</span>
+                        class="p-button p-button-text p-button-rounded p-button-danger">
+                  <i class="pi pi-times"></i>
                 </button>
               </div>
             </div>
 
             <!-- Expiry Date -->
             <div v-if="selectedType && documentTypes.find(t => t.id === selectedType)?.hasExpiry">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
+              <label class="block text-sm font-medium text-700 mb-1">Expiry Date</label>
               <input type="date"
                      v-model="expiryDate"
                      required
-                     class="w-full border-round-lg border"
+                     class="w-full p-inputtext"
                      :min="new Date().toISOString().split('T')[0]">
             </div>
 
             <!-- Notes -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+              <label class="block text-sm font-medium text-700 mb-1">Notes</label>
               <textarea v-model="documentNotes"
                         rows="3"
-                        class="w-full border-round-lg border"
+                        class="w-full p-inputtextarea"
                         placeholder="Add any notes about this document..."></textarea>
             </div>
 
             <!-- Actions -->
-            <div class="flex justify-end space-x-3 pt-4">
+            <div class="flex justify-content-end gap-2 pt-4">
               <button type="button"
                       @click="resetUploadForm"
-                      class="px-4 py-2 border border-round-lg hover:bg-gray-50">
+                      class="p-button p-button-outlined">
                 Cancel
               </button>
               <button type="submit"
-                      class="px-4 py-2 bg-blue-600 text-white border-round-lg hover:bg-blue-700">
+                      class="p-button p-button-primary">
                 Upload Document
               </button>
             </div>
@@ -372,12 +372,12 @@ const isPDFFile = (mimeType: string) => {
 
     <!-- Document Viewer Dialog -->
     <div v-if="showViewer && viewingDocument"
-         class="fixed inset-0 bg-black bg-opacity-50 flex align-items-center justify-content-center z-[60]">
-      <div class="bg-white border-round-xl w-full max-w-4xl max-h-[90vh] flex flex-column">
-        <div class="p-4 border-b flex align-items-center justify-content-between">
-          <h3 class="text-lg font-medium">Document Preview</h3>
-          <button @click="closeViewer" class="p-2 hover:bg-gray-100 rounded-full">
-            <span class="material-icons">close</span>
+         class="fixed inset-0 bg-black-alpha-50 flex align-items-center justify-content-center z-5">
+      <div class="surface-card border-round-xl w-full max-w-4xl max-h-90vh flex flex-column">
+        <div class="p-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
+          <h3 class="text-lg font-medium text-900">Document Preview</h3>
+          <button @click="closeViewer" class="p-button p-button-text p-button-rounded">
+            <i class="pi pi-times"></i>
           </button>
         </div>
 
@@ -386,14 +386,14 @@ const isPDFFile = (mimeType: string) => {
           <div class="h-full flex flex-column">
             <!-- Preview Header -->
             <div class="mb-4">
-              <h4 class="font-medium">{{ viewingDocument.name }}</h4>
-              <p class="text-sm text-gray-500">
+              <h4 class="font-medium text-900">{{ viewingDocument.name }}</h4>
+              <p class="text-sm text-600">
                 Uploaded on {{ formatDate(viewingDocument.uploadDate) }}
               </p>
             </div>
 
             <!-- Preview Content -->
-            <div class="flex-1 bg-gray-100 border-round-lg overflow-hidden">
+            <div class="flex-1 surface-100 border-round-lg overflow-hidden">
               <!-- Image Preview -->
               <img v-if="isImageFile(viewingDocument.mimeType)"
                    :src="viewingDocument.url"
@@ -408,9 +408,9 @@ const isPDFFile = (mimeType: string) => {
               </iframe>
 
               <!-- Fallback Preview -->
-              <div v-else class="h-full flex align-items-center justify-content-center text-gray-500">
+              <div v-else class="h-full flex align-items-center justify-content-center text-600">
                 <div class="text-center">
-                  <span class="material-icons text-6xl mb-2">description</span>
+                  <i class="pi pi-file text-6xl mb-2"></i>
                   <p>Preview not available</p>
                   <p class="text-sm">Download to view this document</p>
                 </div>
@@ -419,15 +419,15 @@ const isPDFFile = (mimeType: string) => {
           </div>
         </div>
 
-        <div class="p-4 border-t flex justify-end space-x-3">
+        <div class="p-4 border-top-1 surface-border flex justify-content-end gap-2">
           <button @click="closeViewer"
-                  class="px-4 py-2 border border-round-lg hover:bg-gray-50">
+                  class="p-button p-button-outlined">
             Close
           </button>
           <a :href="viewingDocument.url"
              download
-             class="px-4 py-2 bg-blue-600 text-white border-round-lg hover:bg-blue-700">
-            <span class="material-icons align-middle mr-1">download</span>
+             class="p-button p-button-primary">
+            <i class="pi pi-download mr-2"></i>
             Download
           </a>
         </div>
