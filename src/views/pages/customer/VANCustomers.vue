@@ -96,7 +96,7 @@ const toggleView = () => {
 <template>
   <div class="h-full flex flex-column">
     <!-- Header -->
-    <div class="p-6">
+    <div class="px-6">
       <div class="max-w-7xl mx-auto">
         <div class="flex align-items-center justify-content-between mb-6">
           <h1 class="text-2xl font-bold text-gray-900">Customers</h1>
@@ -135,26 +135,28 @@ const toggleView = () => {
         </div>
 
         <!-- Tabs -->
-        <div class="bg-white border-round-lg shadow-3 border-1  mb-6   bg-white rounded-lg shadow-sm border hover:border-blue-500 transition-all duration-200 ">
-          <div class="border-b px-4">
-            <div class="flex space-x-4">
-              <button
+        <div class="bg-white border-round-lg border-1 mb-6 bg-white rounded-lg shadow-none border-1 border-gray-200 mb-6">
+          <div class="border-b px-3  border-bottom-1 border-gray-200">
+            <div class="flex space-x-4 w-full">
+              <div
                 v-for="tab in ['all', 'active', 'pending', 'rejected']"
                 :key="tab"
                 @click="activeTab = tab"
-                class="py-3 px-4 focus:outline-none border-b-2 transition-colors capitalize"
-                :class="activeTab === tab ? 'border-blue-600 text-blue-600' : 'border-transparent'"
+                class="py-3 px-4 focus:outline-none border-b-2 transition-colors capitalize cursor-pointer"
+                :class="activeTab === tab ? 'border-blue-600 text-blue-600 border-bottom-2 border-blue-600' : 'border-transparent'"
               >
                 {{ tab }}
-              </button>
+              </div>
             </div>
           </div>
 
           <!-- Search -->
           <div class="p-4">
-            <div class="relative">
-              <input v-model="searchQuery" type="text" class="w-full pl-10 pr-4 py-2 border-round-lg border-1" placeholder="Search by name, ID, mobile, CR, or VAT..." />
-              <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"> search </span>
+            <div class="relative" style="height: 42px">
+              <input v-model="searchQuery" type="text" class="w-full pl-5 pl-10 h-full pr-4 py-2 border-round-lg border-gray-300 border-1" placeholder="Search by name, ID, mobile, CR, or VAT..." />
+              <span class="material-icons absolute top-1/2 -translate-y-1/2 text-gray-400" style="left: 10px; top: 50%; transform: translatey(-50%)">
+                <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
+              </span>
             </div>
           </div>
         </div>
