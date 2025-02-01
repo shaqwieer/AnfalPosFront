@@ -66,12 +66,12 @@ const formData = ref({
 
 // Left column tabs
 const leftTabs = [
-  { id: 'basic', name: 'Basic Information', icon: 'person' },
-  { id: 'business', name: 'Business Information', icon: 'business' },
-  { id: 'financial', name: 'Financial Information', icon: 'account_balance' },
-  { id: 'address', name: 'Address Information', icon: 'location_on' },
+  { id: 'basic', name: 'Basic Information', icon: 'user' },
+  { id: 'business', name: 'Business Information', icon: 'building' },
+  { id: 'financial', name: 'Financial Information', icon: 'wallet' },
+  { id: 'address', name: 'Address Information', icon: 'map-marker' },
   { id: 'documents', name: 'Documents', icon: 'folder' },
-  { id: 'notes', name: 'Notes', icon: 'notes' }
+  { id: 'notes', name: 'Notes', icon: 'file-edit' }
 ]
 
 // Payment terms options
@@ -87,17 +87,14 @@ const paymentTermsOptions = [
 const initMap = async () => {
   if (!mapRef.value || map.value) return
 
-  // Wait for the map container to be rendered
   await nextTick()
 
   try {
-    // Create map centered on customer location or default
     map.value = L.map(mapRef.value).setView(
       [formData.value.location.lat, formData.value.location.lng], 
       mapZoom.value
     )
 
-    // Add base layers
     const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
     })
@@ -106,45 +103,36 @@ const initMap = async () => {
       attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
     })
 
-    // Add layers to map
     osmLayer.addTo(map.value)
     
-    // Add layer control
     const baseLayers = {
       "Street": osmLayer,
       "Satellite": satelliteLayer
     }
     L.control.layers(baseLayers).addTo(map.value)
 
-    // Add zoom control in top right
     L.control.zoom({
       position: 'topright'
     }).addTo(map.value)
 
-    // Add scale control
     L.control.scale({
       imperial: false,
       position: 'bottomright'
     }).addTo(map.value)
 
-    // Add marker
     marker.value = L.marker(
       [formData.value.location.lat, formData.value.location.lng],
       { draggable: !props.readOnly }
     ).addTo(map.value)
 
-    // Handle marker drag if not in read-only mode
     if (!props.readOnly) {
       marker.value.on('dragend', async () => {
         const position = marker.value?.getLatLng()
         if (!position) return
-
-        // Update location in form
         await reverseGeocode(position.lat, position.lng)
       })
     }
 
-    // Add search control if not in read-only mode
     if (!props.readOnly) {
       const searchControl = L.Control.extend({
         options: {
@@ -156,21 +144,19 @@ const initMap = async () => {
           
           searchBox.innerHTML = `
             <div class="relative">
-              <input type="text" 
-                     class="w-64 px-4 py-2 pr-10 border-round-lg border bg-white"
-                     placeholder="Search address...">
-              <span class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                search
+              <span class="p-input-icon-left w-full">
+                <i class="pi pi-search"></i>
+                <input type="text" 
+                       class="p-inputtext w-full"
+                       placeholder="Search address...">
               </span>
             </div>
           `
           
           const input = searchBox.querySelector('input')
           
-          // Prevent map zoom when scrolling the input
           L.DomEvent.disableClickPropagation(container)
           
-          // Handle search
           let timeout: NodeJS.Timeout
           input?.addEventListener('input', (e) => {
             const target = e.target as HTMLInputElement
@@ -202,7 +188,6 @@ const searchAddress = async (query: string) => {
       map.value?.setView([lat, lon], 16)
       marker.value?.setLatLng([lat, lon])
       
-      // Update form with address details
       await reverseGeocode(lat, lon)
     }
   } catch (error) {
@@ -224,7 +209,6 @@ const reverseGeocode = async (lat: number, lng: number) => {
       address: data.display_name
     }
 
-    // Update address fields
     updateAddressFromGeocoding(data)
   } catch (error) {
     console.error('Error reverse geocoding:', error)
@@ -256,13 +240,11 @@ const getCurrentLocation = async () => {
 
     const { latitude, longitude } = position.coords
 
-    // Update map and marker
     if (map.value && marker.value) {
       map.value.setView([latitude, longitude], 16)
       marker.value.setLatLng([latitude, longitude])
     }
 
-    // Update form and get address
     await reverseGeocode(latitude, longitude)
   } catch (error: any) {
     console.error('Error getting location:', error)
@@ -285,13 +267,7 @@ const getCurrentLocation = async () => {
 
 const handleSubmit = () => {
   if (props.readOnly) return
-
-  emit('submit', {
-    ...formData.value,
-    status: 'draft',
-    approvalStatus: 'pending',
-    createdDate: new Date().toISOString().split('T')[0]
-  })
+  emit('submit', formData.value)
 }
 
 const handleAttachmentsUpdate = (attachments: any[]) => {
@@ -299,14 +275,12 @@ const handleAttachmentsUpdate = (attachments: any[]) => {
   formData.value.attachments = attachments
 }
 
-// Initialize map when component mounts
 onMounted(() => {
   if (leftColumnTab.value === 'address') {
     initMap()
   }
 })
 
-// Watch for tab changes to initialize map when needed
 watch(leftColumnTab, (newTab) => {
   if (newTab === 'address' && !map.value) {
     nextTick(() => {
@@ -317,15 +291,15 @@ watch(leftColumnTab, (newTab) => {
 </script>
 
 <template>
-  <div v-if="show" class="fixed inset-0 bg-black bg-opacity-50 flex align-items-center justify-content-center z-50">
-    <div class="bg-white border-round-xl w-full max-w-7xl max-h-[90vh] flex flex-column">
+  <div v-if="show" class="fixed inset-0 bg-black-alpha-50 flex align-items-center justify-content-center z-5">
+    <div class="surface-card border-round-xl w-full max-w-7xl max-h-90vh flex flex-column">
       <!-- Header -->
-      <div class="p-4 border-b flex align-items-center justify-content-between">
-        <h2 class="text-xl font-semibold">
+      <div class="p-4 border-bottom-1 surface-border flex align-items-center justify-content-between">
+        <h2 class="text-xl font-semibold text-900">
           {{ readOnly ? 'Customer Details' : customer ? 'Edit Customer' : 'New Customer' }}
         </h2>
-        <button @click="$emit('close')" class="p-2 hover:bg-gray-100 rounded-full">
-          <span class="material-icons">close</span>
+        <button @click="$emit('close')" class="p-button p-button-text p-button-rounded">
+          <i class="pi pi-times"></i>
         </button>
       </div>
 
@@ -333,89 +307,89 @@ watch(leftColumnTab, (newTab) => {
         <!-- Single column layout -->
         <div class="h-full flex flex-column">
           <!-- Tabs -->
-          <div class="flex border-b overflow-x-auto">
+          <div class="flex border-bottom-1 surface-border overflow-x-auto">
             <button v-for="tab in leftTabs"
                     :key="tab.id"
                     type="button"
                     @click="leftColumnTab = tab.id"
-                    class="px-4 py-2 flex align-items-center space-x-2 relative whitespace-nowrap"
-                    :class="leftColumnTab === tab.id ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700'">
-              <span class="material-icons text-sm">{{ tab.icon }}</span>
+                    class="px-4 py-2 flex align-items-center gap-2 relative whitespace-nowrap"
+                    :class="leftColumnTab === tab.id ? 'text-primary' : 'text-600 hover:text-700'">
+              <i class="pi" :class="`pi-${tab.icon}`"></i>
               <span>{{ tab.name }}</span>
               <div v-if="leftColumnTab === tab.id" 
-                   class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+                   class="absolute bottom-0 left-0 right-0 h-2px bg-primary"></div>
             </button>
           </div>
 
           <!-- Tab Content - Scrollable -->
           <div class="flex-1 overflow-y-auto p-6">
             <!-- Basic Information -->
-            <div v-show="leftColumnTab === 'basic'" class="space-y-4">
+            <div v-show="leftColumnTab === 'basic'" class="flex flex-column gap-4">
               <div>
-                <label class="block text-sm font-medium mb-1">Customer Name</label>
+                <label class="block text-sm font-medium text-700 mb-1">Customer Name</label>
                 <input v-model="formData.name" 
                        type="text" 
                        required
                        :disabled="readOnly"
-                       class="w-full border-round-lg border">
+                       class="w-full p-inputtext">
               </div>
               <div>
-                <label class="block text-sm font-medium mb-1">Mobile Number</label>
+                <label class="block text-sm font-medium text-700 mb-1">Mobile Number</label>
                 <input v-model="formData.mobile" 
                        type="tel" 
                        required
                        :disabled="readOnly"
-                       class="w-full border-round-lg border">
+                       class="w-full p-inputtext">
               </div>
               <div>
-                <label class="block text-sm font-medium mb-1">Email</label>
+                <label class="block text-sm font-medium text-700 mb-1">Email</label>
                 <input v-model="formData.email" 
                        type="email"
                        :disabled="readOnly"
-                       class="w-full border-round-lg border">
+                       class="w-full p-inputtext">
               </div>
             </div>
 
             <!-- Business Information -->
-            <div v-show="leftColumnTab === 'business'" class="space-y-4">
+            <div v-show="leftColumnTab === 'business'" class="flex flex-column gap-4">
               <div>
-                <label class="block text-sm font-medium mb-1">CR Number</label>
+                <label class="block text-sm font-medium text-700 mb-1">CR Number</label>
                 <input v-model="formData.cr" 
                        type="text"
                        :disabled="readOnly"
-                       class="w-full border-round-lg border">
+                       class="w-full p-inputtext">
               </div>
               <div>
-                <label class="block text-sm font-medium mb-1">VAT Number</label>
+                <label class="block text-sm font-medium text-700 mb-1">VAT Number</label>
                 <input v-model="formData.vat" 
                        type="text"
                        :disabled="readOnly"
-                       class="w-full border-round-lg border">
+                       class="w-full p-inputtext">
               </div>
             </div>
 
             <!-- Financial Information -->
-            <div v-show="leftColumnTab === 'financial'" class="space-y-6">
-              <h3 class="text-lg font-medium text-gray-900">Financial Information</h3>
+            <div v-show="leftColumnTab === 'financial'" class="flex flex-column gap-6">
+              <h3 class="text-lg font-medium text-900">Financial Information</h3>
               
               <!-- Credit and Payment Terms -->
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Credit Limit (SAR)</label>
+              <div class="grid">
+                <div class="col-12 md:col-6">
+                  <label class="block text-sm font-medium text-700 mb-1">Credit Limit (SAR)</label>
                   <input v-model="formData.creditLimit"
                          type="number"
                          min="0"
                          step="1000"
                          required
                          :disabled="readOnly"
-                         class="w-full border-round-lg border">
+                         class="w-full p-inputtext">
                 </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Payment Terms</label>
+                <div class="col-12 md:col-6">
+                  <label class="block text-sm font-medium text-700 mb-1">Payment Terms</label>
                   <select v-model="formData.paymentTerms"
                           required
                           :disabled="readOnly"
-                          class="w-full border-round-lg border">
+                          class="w-full p-inputtext">
                     <option v-for="term in paymentTermsOptions"
                             :key="term.value"
                             :value="term.value">
@@ -426,67 +400,67 @@ watch(leftColumnTab, (newTab) => {
               </div>
 
               <!-- Bank Information -->
-              <div class="bg-gray-50 p-4 border-round-lg space-y-4">
-                <h4 class="font-medium">Bank Information</h4>
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Bank Name</label>
+              <div class="surface-100 p-4 border-round-lg flex flex-column gap-4">
+                <h4 class="font-medium text-900">Bank Information</h4>
+                <div class="grid">
+                  <div class="col-12 md:col-6">
+                    <label class="block text-sm font-medium text-700 mb-1">Bank Name</label>
                     <input v-model="formData.bankName" 
                            type="text"
                            :disabled="readOnly"
-                           class="w-full border-round-lg border">
+                           class="w-full p-inputtext">
                   </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
+                  <div class="col-12 md:col-6">
+                    <label class="block text-sm font-medium text-700 mb-1">Account Number</label>
                     <input v-model="formData.bankAccount" 
                            type="text"
                            :disabled="readOnly"
-                           class="w-full border-round-lg border">
+                           class="w-full p-inputtext">
                   </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">IBAN</label>
+                  <div class="col-12 md:col-6">
+                    <label class="block text-sm font-medium text-700 mb-1">IBAN</label>
                     <input v-model="formData.iban" 
                            type="text"
                            :disabled="readOnly"
-                           class="w-full border-round-lg border" 
+                           class="w-full p-inputtext" 
                            placeholder="SA...">
                   </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">SWIFT Code</label>
+                  <div class="col-12 md:col-6">
+                    <label class="block text-sm font-medium text-700 mb-1">SWIFT Code</label>
                     <input v-model="formData.swiftCode" 
                            type="text"
                            :disabled="readOnly"
-                           class="w-full border-round-lg border">
+                           class="w-full p-inputtext">
                   </div>
                 </div>
               </div>
 
               <!-- Financial Notes -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Financial Notes</label>
+                <label class="block text-sm font-medium text-700 mb-1">Financial Notes</label>
                 <textarea v-model="formData.financialNotes"
                          rows="3"
                          :disabled="readOnly"
-                         class="w-full border-round-lg border"
+                         class="w-full p-inputtextarea"
                          placeholder="Add any financial notes or special payment arrangements..."></textarea>
               </div>
             </div>
 
             <!-- Address Information -->
-            <div v-show="leftColumnTab === 'address'" class="space-y-6">
+            <div v-show="leftColumnTab === 'address'" class="flex flex-column gap-6">
               <!-- Map View -->
-              <div class="h-[300px] border-round-lg border overflow-hidden relative">
+              <div class="h-300px border-round-lg border-1 surface-border overflow-hidden relative">
                 <div ref="mapRef" class="w-full h-full"></div>
                 
                 <!-- Search Results Dropdown -->
                 <div v-if="!readOnly && searchResults.length > 0"
-                     class="absolute top-16 left-12 w-64 bg-white border-round-lg shadow-5 border z-[1000] max-h-48 overflow-y-auto">
+                     class="absolute top-4rem left-3rem w-20rem surface-card border-round-lg shadow-5 border-1 surface-border z-5 max-h-12rem overflow-y-auto">
                   <div v-for="result in searchResults"
                        :key="result.place_id"
-                       class="p-2 hover:bg-gray-50 cursor-pointer"
+                       class="p-2 hover:surface-100 cursor-pointer"
                        @click="selectSearchResult(result)">
-                    <div class="font-medium">{{ result.display_name }}</div>
-                    <div class="text-xs text-gray-500">{{ result.type }}</div>
+                    <div class="font-medium text-900">{{ result.display_name }}</div>
+                    <div class="text-xs text-600">{{ result.type }}</div>
                   </div>
                 </div>
               </div>
@@ -497,77 +471,77 @@ watch(leftColumnTab, (newTab) => {
               </div>
 
               <!-- Location Info -->
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium mb-1">Latitude</label>
+              <div class="grid">
+                <div class="col-12 md:col-6">
+                  <label class="block text-sm font-medium text-700 mb-1">Latitude</label>
                   <input v-model="formData.location.lat"
                          type="number"
                          step="0.000001"
-                         class="w-full border-round-lg border"
+                         class="w-full p-inputtext"
                          readonly>
                 </div>
-                <div>
-                  <label class="block text-sm font-medium mb-1">Longitude</label>
+                <div class="col-12 md:col-6">
+                  <label class="block text-sm font-medium text-700 mb-1">Longitude</label>
                   <input v-model="formData.location.lng"
                          type="number"
                          step="0.000001"
-                         class="w-full border-round-lg border"
+                         class="w-full p-inputtext"
                          readonly>
                 </div>
               </div>
 
               <!-- Address Fields -->
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium mb-1">Building Number</label>
+              <div class="grid">
+                <div class="col-12 md:col-6">
+                  <label class="block text-sm font-medium text-700 mb-1">Building Number</label>
                   <input v-model="formData.buildingNumber" 
                          type="text"
                          :disabled="readOnly"
-                         class="w-full border-round-lg border">
+                         class="w-full p-inputtext">
                 </div>
-                <div>
-                  <label class="block text-sm font-medium mb-1">Street Name</label>
+                <div class="col-12 md:col-6">
+                  <label class="block text-sm font-medium text-700 mb-1">Street Name</label>
                   <input v-model="formData.streetName" 
                          type="text"
                          :disabled="readOnly"
-                         class="w-full border-round-lg border">
+                         class="w-full p-inputtext">
                 </div>
-                <div>
-                  <label class="block text-sm font-medium mb-1">District</label>
+                <div class="col-12 md:col-6">
+                  <label class="block text-sm font-medium text-700 mb-1">District</label>
                   <input v-model="formData.district" 
                          type="text"
                          :disabled="readOnly"
-                         class="w-full border-round-lg border">
+                         class="w-full p-inputtext">
                 </div>
-                <div>
-                  <label class="block text-sm font-medium mb-1">City</label>
+                <div class="col-12 md:col-6">
+                  <label class="block text-sm font-medium text-700 mb-1">City</label>
                   <input v-model="formData.city" 
                          type="text"
                          :disabled="readOnly"
-                         class="w-full border-round-lg border">
+                         class="w-full p-inputtext">
                 </div>
-                <div>
-                  <label class="block text-sm font-medium mb-1">Postal Code</label>
+                <div class="col-12 md:col-6">
+                  <label class="block text-sm font-medium text-700 mb-1">Postal Code</label>
                   <input v-model="formData.postalCode" 
                          type="text"
                          :disabled="readOnly"
-                         class="w-full border-round-lg border">
+                         class="w-full p-inputtext">
                 </div>
-                <div>
-                  <label class="block text-sm font-medium mb-1">Additional Number</label>
+                <div class="col-12 md:col-6">
+                  <label class="block text-sm font-medium text-700 mb-1">Additional Number</label>
                   <input v-model="formData.additionalNumber" 
                          type="text"
                          :disabled="readOnly"
-                         class="w-full border-round-lg border">
+                         class="w-full p-inputtext">
                 </div>
               </div>
 
               <!-- Current Location Button -->
-              <div v-if="!readOnly" class="flex justify-end">
+              <div v-if="!readOnly" class="flex justify-content-end">
                 <button type="button"
                         @click="getCurrentLocation"
-                        class="px-3 py-1.5 text-sm bg-blue-600 text-white border-round-lg hover:bg-blue-700">
-                  <span class="material-icons align-middle text-sm mr-1">my_location</span>
+                        class="p-button p-button-primary">
+                  <i class="pi pi-map-marker mr-2"></i>
                   Get Current Location
                 </button>
               </div>
@@ -582,27 +556,27 @@ watch(leftColumnTab, (newTab) => {
             </div>
 
             <!-- Notes -->
-            <div v-show="leftColumnTab === 'notes'" class="space-y-4">
-              <h3 class="text-lg font-medium">Additional Notes</h3>
+            <div v-show="leftColumnTab === 'notes'" class="flex flex-column gap-4">
+              <h3 class="text-lg font-medium text-900">Additional Notes</h3>
               <textarea v-model="formData.notes"
                         rows="4"
                         :disabled="readOnly"
-                        class="w-full border-round-lg border"
+                        class="w-full p-inputtextarea"
                         placeholder="Add any additional notes..."></textarea>
             </div>
           </div>
         </div>
 
         <!-- Form Actions -->
-        <div class="p-4 border-t flex justify-end space-x-3">
+        <div class="p-4 border-top-1 surface-border flex justify-content-end gap-2">
           <button type="button"
                   @click="$emit('close')"
-                  class="px-4 py-2 border border-round-lg hover:bg-gray-50">
+                  class="p-button p-button-outlined">
             {{ readOnly ? 'Close' : 'Cancel' }}
           </button>
           <button v-if="!readOnly"
                   type="submit"
-                  class="px-4 py-2 bg-blue-600 text-white border-round-lg hover:bg-blue-700">
+                  class="p-button p-button-primary">
             {{ customer ? 'Update Customer' : 'Create Customer' }}
           </button>
         </div>
@@ -612,15 +586,6 @@ watch(leftColumnTab, (newTab) => {
 </template>
 
 <style scoped>
-/* Map container styles */
-.map-container {
-  position: relative;
-  width: 100%;
-  height: 300px;
-  border-radius: 0.5rem;
-  overflow: hidden;
-}
-
 /* Map-specific styles */
 .leaflet-container {
   z-index: 1;
@@ -633,23 +598,23 @@ watch(leftColumnTab, (newTab) => {
 
 .leaflet-control-search input:focus {
   outline: none;
-  border-color: var(--sap-primary);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-color-alpha-10);
 }
 
 .leaflet-control-fullscreen a {
   background: white;
-  color: #666;
+  color: var(--text-color-secondary);
 }
 
 .leaflet-control-fullscreen a:hover {
-  background: #f8f9fa;
+  background: var(--surface-100);
 }
 
 .leaflet-control-layers {
   border: none !important;
-  box-shadow: 0 1px 5px rgba(0,0,0,0.2) !important;
-  border-radius: 8px !important;
+  box-shadow: var(--card-shadow) !important;
+  border-radius: var(--border-radius) !important;
 }
 
 .leaflet-control-layers-toggle {
@@ -660,28 +625,5 @@ watch(leftColumnTab, (newTab) => {
 .leaflet-touch .leaflet-control-layers-toggle {
   width: 34px !important;
   height: 34px !important;
-}
-
-/* Search Results */
-.search-results {
-  scrollbar-width: thin;
-  scrollbar-color: #e5e7eb transparent;
-}
-
-.search-results::-webkit-scrollbar {
-  width: 6px;
-}
-
-.search-results::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.search-results::-webkit-scrollbar-thumb {
-  background-color: #e5e7eb;
-  border-radius: 3px;
-}
-
-.search-results::-webkit-scrollbar-thumb:hover {
-  background-color: #d1d5db;
 }
 </style>

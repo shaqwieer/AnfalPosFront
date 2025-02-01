@@ -2,7 +2,6 @@
 import { ref, computed } from 'vue'
 import { useVanStore } from '../../../../stores/vanStore'
 import { useRouter } from 'vue-router'
-//import VANPOS from '../VANPOS.vue'
 
 const props = defineProps<{
   customer: any
@@ -53,180 +52,196 @@ const formatDate = (date: string): string => {
   <div v-if="customer" class="p-6 max-w-7xl mx-auto">
     <!-- Header -->
     <div class="flex align-items-center justify-content-between mb-6">
-      <div class="flex align-items-center space-x-4">
+      <div class="flex align-items-center gap-4">
         <button @click="goBack" 
-                class="p-2 hover:bg-gray-100 rounded-full">
-          <span class="material-icons">arrow_back</span>
+                class="p-button p-button-text p-button-rounded">
+          <i class="pi pi-arrow-left"></i>
         </button>
         <div>
-          <h1 class="text-2xl font-bold text-gray-900">Visit: {{ customer.name }}</h1>
-          <p class="text-sm text-gray-500">{{ customer.id }}</p>
+          <h1 class="text-4xl font-bold text-900">Visit: {{ customer.name }}</h1>
+          <p class="text-sm text-600">{{ customer.id }}</p>
         </div>
       </div>
     </div>
 
     <!-- Content -->
-    <div class="space-y-6">
+    <div class="flex flex-column gap-6">
       <!-- Quick Stats -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white border-round-lg p-6 border">
-          <div class="flex align-items-center justify-content-between">
-            <div>
-              <div class="text-sm text-blue-600">Credit Limit</div>
-              <div class="text-2xl font-bold text-blue-700">
-                {{ formatPrice(customer.creditLimit) }}
+      <div class="grid">
+        <div class="col-12 md:col-4">
+          <div class="surface-card border-round-lg p-6 border-1 surface-border">
+            <div class="flex align-items-center justify-content-between">
+              <div>
+                <div class="text-sm text-primary">Credit Limit</div>
+                <div class="text-2xl font-bold text-primary-700">
+                  {{ formatPrice(customer.creditLimit) }}
+                </div>
               </div>
+              <i class="pi pi-wallet text-3xl text-primary"></i>
             </div>
-            <span class="material-icons text-3xl text-blue-600">account_balance</span>
           </div>
         </div>
-        <div class="bg-white border-round-lg p-6 border">
-          <div class="flex align-items-center justify-content-between">
-            <div>
-              <div class="text-sm text-green-600">Available Credit</div>
-              <div class="text-2xl font-bold text-green-700">
-                {{ formatPrice(customer.creditLimit - customer.balance) }}
+        <div class="col-12 md:col-4">
+          <div class="surface-card border-round-lg p-6 border-1 surface-border">
+            <div class="flex align-items-center justify-content-between">
+              <div>
+                <div class="text-sm text-green-600">Available Credit</div>
+                <div class="text-2xl font-bold text-green-700">
+                  {{ formatPrice(customer.creditLimit - customer.balance) }}
+                </div>
               </div>
+              <i class="pi pi-money-bill text-3xl text-green-600"></i>
             </div>
-            <span class="material-icons text-3xl text-green-600">savings</span>
           </div>
         </div>
-        <div class="bg-white border-round-lg p-6 border">
-          <div class="flex align-items-center justify-content-between">
-            <div>
-              <div class="text-sm text-purple-600">Current Balance</div>
-              <div class="text-2xl font-bold text-purple-700">
-                {{ formatPrice(customer.balance) }}
+        <div class="col-12 md:col-4">
+          <div class="surface-card border-round-lg p-6 border-1 surface-border">
+            <div class="flex align-items-center justify-content-between">
+              <div>
+                <div class="text-sm text-purple-600">Current Balance</div>
+                <div class="text-2xl font-bold text-purple-700">
+                  {{ formatPrice(customer.balance) }}
+                </div>
               </div>
+              <i class="pi pi-credit-card text-3xl text-purple-600"></i>
             </div>
-            <span class="material-icons text-3xl text-purple-600">payments</span>
           </div>
         </div>
       </div>
 
       <!-- Visit Actions -->
-      <div class="bg-white border-round-lg border">
-        <div class="p-4 border-b">
-          <h2 class="text-lg font-medium">Visit Actions</h2>
+      <div class="surface-card border-round-lg border-1 surface-border">
+        <div class="p-4 border-bottom-1 surface-border">
+          <h2 class="text-xl font-medium text-900">Visit Actions</h2>
         </div>
         <div class="p-6">
           <div v-if="visitStatus === 'not_started'" class="text-center">
             <button @click="startVisit"
-                    class="px-6 py-3 bg-blue-600 text-white border-round-lg hover:bg-blue-700">
-              <span class="material-icons align-middle mr-2">play_arrow</span>
+                    class="p-button p-button-primary">
+              <i class="pi pi-play mr-2"></i>
               Start Visit
             </button>
           </div>
 
-          <div v-else-if="visitStatus === 'in_progress'" class="space-y-6">
+          <div v-else-if="visitStatus === 'in_progress'" class="flex flex-column gap-6">
             <!-- Action Buttons -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <button @click="handleNewOrder"
-                      class="p-6 bg-blue-50 text-blue-600 border-round-lg hover:bg-blue-100 flex flex-column align-items-center">
-                <span class="material-icons text-4xl mb-2">shopping_cart</span>
-                <span class="text-lg">New Order</span>
-                <span class="text-sm text-blue-500">Create a new sales order</span>
-              </button>
-              <button class="p-6 bg-orange-50 text-orange-600 border-round-lg hover:bg-orange-100 flex flex-column align-items-center">
-                <span class="material-icons text-4xl mb-2">assignment_return</span>
-                <span class="text-lg">Return</span>
-                <span class="text-sm text-orange-500">Process product returns</span>
-              </button>
-              <button class="p-6 bg-green-50 text-green-600 border-round-lg hover:bg-green-100 flex flex-column align-items-center">
-                <span class="material-icons text-4xl mb-2">payments</span>
-                <span class="text-lg">Payment</span>
-                <span class="text-sm text-green-500">Collect payment</span>
-              </button>
+            <div class="grid">
+              <div class="col-12 md:col-4">
+                <button @click="handleNewOrder"
+                        class="p-6 w-full surface-card border-round-lg hover:surface-100 flex flex-column align-items-center gap-2 border-1 surface-border">
+                  <i class="pi pi-shopping-cart text-4xl text-primary mb-2"></i>
+                  <span class="text-lg text-900">New Order</span>
+                  <span class="text-sm text-600">Create a new sales order</span>
+                </button>
+              </div>
+              <div class="col-12 md:col-4">
+                <button class="p-6 w-full surface-card border-round-lg hover:surface-100 flex flex-column align-items-center gap-2 border-1 surface-border">
+                  <i class="pi pi-replay text-4xl text-orange-500 mb-2"></i>
+                  <span class="text-lg text-900">Return</span>
+                  <span class="text-sm text-600">Process product returns</span>
+                </button>
+              </div>
+              <div class="col-12 md:col-4">
+                <button class="p-6 w-full surface-card border-round-lg hover:surface-100 flex flex-column align-items-center gap-2 border-1 surface-border">
+                  <i class="pi pi-dollar text-4xl text-green-500 mb-2"></i>
+                  <span class="text-lg text-900">Payment</span>
+                  <span class="text-sm text-600">Collect payment</span>
+                </button>
+              </div>
             </div>
 
             <!-- Complete Visit Button -->
             <div class="text-center">
               <button @click="completeVisit"
-                      class="px-6 py-3 bg-green-600 text-white border-round-lg hover:bg-green-700">
-                <span class="material-icons align-middle mr-2">check_circle</span>
+                      class="p-button p-button-success">
+                <i class="pi pi-check-circle mr-2"></i>
                 Complete Visit
               </button>
             </div>
           </div>
 
           <div v-else class="text-center text-green-600 py-6">
-            <span class="material-icons text-6xl mb-2">task_alt</span>
+            <i class="pi pi-check-circle text-6xl mb-2"></i>
             <p class="text-xl">Visit Completed</p>
           </div>
         </div>
       </div>
 
       <!-- Visit Notes -->
-      <div class="bg-white border-round-lg border">
-        <div class="p-4 border-b">
-          <h2 class="text-lg font-medium">Visit Notes</h2>
+      <div class="surface-card border-round-lg border-1 surface-border">
+        <div class="p-4 border-bottom-1 surface-border">
+          <h2 class="text-xl font-medium text-900">Visit Notes</h2>
         </div>
         <div class="p-6">
           <textarea
             rows="4"
-            class="w-full border-round-lg border p-3"
+            class="w-full p-inputtextarea"
             placeholder="Enter visit notes..."
           ></textarea>
         </div>
       </div>
 
       <!-- Customer Details -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="grid">
         <!-- Contact Information -->
-        <div class="bg-white border-round-lg border">
-          <div class="p-4 border-b">
-            <h2 class="text-lg font-medium">Contact Information</h2>
-          </div>
-          <div class="p-6 space-y-4">
-            <div class="flex align-items-center space-x-3">
-              <span class="material-icons text-gray-400">phone</span>
-              <div>
-                <div class="font-medium">Mobile</div>
-                <div class="text-gray-600">{{ customer.mobile }}</div>
-              </div>
+        <div class="col-12 lg:col-6">
+          <div class="surface-card border-round-lg border-1 surface-border h-full">
+            <div class="p-4 border-bottom-1 surface-border">
+              <h2 class="text-xl font-medium text-900">Contact Information</h2>
             </div>
-            <div class="flex align-items-center space-x-3">
-              <span class="material-icons text-gray-400">email</span>
-              <div>
-                <div class="font-medium">Email</div>
-                <div class="text-gray-600">{{ customer.email }}</div>
+            <div class="p-6 flex flex-column gap-4">
+              <div class="flex align-items-center gap-3">
+                <i class="pi pi-phone text-600"></i>
+                <div>
+                  <div class="font-medium text-900">Mobile</div>
+                  <div class="text-600">{{ customer.mobile }}</div>
+                </div>
               </div>
-            </div>
-            <div class="flex align-items-center space-x-3">
-              <span class="material-icons text-gray-400">language</span>
-              <div>
-                <div class="font-medium">Website</div>
-                <div class="text-gray-600">{{ customer.website || 'N/A' }}</div>
+              <div class="flex align-items-center gap-3">
+                <i class="pi pi-envelope text-600"></i>
+                <div>
+                  <div class="font-medium text-900">Email</div>
+                  <div class="text-600">{{ customer.email }}</div>
+                </div>
+              </div>
+              <div class="flex align-items-center gap-3">
+                <i class="pi pi-globe text-600"></i>
+                <div>
+                  <div class="font-medium text-900">Website</div>
+                  <div class="text-600">{{ customer.website || 'N/A' }}</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Business Information -->
-        <div class="bg-white border-round-lg border">
-          <div class="p-4 border-b">
-            <h2 class="text-lg font-medium">Business Information</h2>
-          </div>
-          <div class="p-6 space-y-4">
-            <div class="flex align-items-center space-x-3">
-              <span class="material-icons text-gray-400">business</span>
-              <div>
-                <div class="font-medium">CR Number</div>
-                <div class="text-gray-600">{{ customer.cr }}</div>
-              </div>
+        <div class="col-12 lg:col-6">
+          <div class="surface-card border-round-lg border-1 surface-border h-full">
+            <div class="p-4 border-bottom-1 surface-border">
+              <h2 class="text-xl font-medium text-900">Business Information</h2>
             </div>
-            <div class="flex align-items-center space-x-3">
-              <span class="material-icons text-gray-400">receipt</span>
-              <div>
-                <div class="font-medium">VAT Number</div>
-                <div class="text-gray-600">{{ customer.vat }}</div>
+            <div class="p-6 flex flex-column gap-4">
+              <div class="flex align-items-center gap-3">
+                <i class="pi pi-building text-600"></i>
+                <div>
+                  <div class="font-medium text-900">CR Number</div>
+                  <div class="text-600">{{ customer.cr }}</div>
+                </div>
               </div>
-            </div>
-            <div class="flex align-items-center space-x-3">
-              <span class="material-icons text-gray-400">location_on</span>
-              <div>
-                <div class="font-medium">Location</div>
-                <div class="text-gray-600">{{ customer.location.address }}</div>
+              <div class="flex align-items-center gap-3">
+                <i class="pi pi-file text-600"></i>
+                <div>
+                  <div class="font-medium text-900">VAT Number</div>
+                  <div class="text-600">{{ customer.vat }}</div>
+                </div>
+              </div>
+              <div class="flex align-items-center gap-3">
+                <i class="pi pi-map-marker text-600"></i>
+                <div>
+                  <div class="font-medium text-900">Location</div>
+                  <div class="text-600">{{ customer.location.address }}</div>
+                </div>
               </div>
             </div>
           </div>
@@ -235,6 +250,6 @@ const formatDate = (date: string): string => {
     </div>
   </div>
   <div v-else class="p-6 text-center">
-    <p class="text-gray-500">Customer not found</p>
+    <p class="text-600">Customer not found</p>
   </div>
 </template>

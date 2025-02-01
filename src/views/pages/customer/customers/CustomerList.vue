@@ -39,8 +39,7 @@ const handleEditCustomer = (customer: any) => {
 };
 
 const handleSaveCustomer = (updatedCustomer: any) => {
-  // Find and update the customer in the list
-  const index = props.customers.findIndex((c) => c.id === updatedCustomer.id);
+  const index = props.customers.findIndex(c => c.id === updatedCustomer.id)
   if (index !== -1) {
     props.customers[index] = updatedCustomer;
   }
@@ -49,7 +48,7 @@ const handleSaveCustomer = (updatedCustomer: any) => {
 };
 
 const handleDashboard = (customer: any, event: Event) => {
-  event.stopPropagation(); // Prevent card click event
+  event.stopPropagation()
   router.push({
     name: 'customer-dashboard',
     params: { id: customer.id }
@@ -66,24 +65,20 @@ const handleReject = (customer: any) => {
 </script>
 
 <template>
-  <div class="space-y-4 overflow-y-auto custom-scrollbar">
-    <CustomerCard
-      v-for="customer in filteredCustomers"
-      :key="customer.id"
-      :customer="customer"
-      class="mb-5 shadow-none rounded-lg border-1 border-gray-200"
-      @view-details="$emit('view-details', customer)"
-      @edit-customer="handleEditCustomer"
-      @submit-approval="$emit('submit-approval', customer)"
-      @approve="handleApprove"
-      @reject="handleReject"
-    >
+  <div class="flex flex-column gap-4">
+    <CustomerCard v-for="customer in filteredCustomers"
+                 :key="customer.id"
+                 :customer="customer"
+                 @view-details="$emit('view-details', customer)"
+                 @edit-customer="handleEditCustomer"
+                 @submit-approval="$emit('submit-approval', customer)"
+                 @approve="handleApprove"
+                 @reject="handleReject">
       <!-- Add Dashboard Button -->
       <template #actions>
-        <div @click="(e) => handleDashboard(customer, e)" class="px-3 py-1.5 text-blue-600 hover:bg-blue-50 border-round-lg flex align-items-center space-x-1">
-          <span class="material-icons text-sm">
-            <font-awesome-icon :icon="['fas', 'table-columns']" />
-          </span>
+        <button @click="(e) => handleDashboard(customer, e)"
+                class="p-button p-button-text p-button-primary flex align-items-center gap-1">
+          <i class="pi pi-chart-line"></i>
           <span>Dashboard</span>
         </div>
       </template>
@@ -93,44 +88,3 @@ const handleReject = (customer: any) => {
     <EditCustomerDialog v-if="showEditDialog" :show="showEditDialog" :customer="selectedCustomer" @close="showEditDialog = false" @save="handleSaveCustomer" />
   </div>
 </template>
-
-<style scoped>
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: #e5e7eb transparent;
-}
-
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #e5e7eb;
-  border-radius: 3px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: #d1d5db;
-}
-
-/* Ensure smooth scrolling */
-.space-y-4 {
-  scroll-behavior: smooth;
-}
-
-/* Add padding to bottom to ensure last card is fully visible */
-.space-y-4 {
-  padding-bottom: 1rem;
-}
-
-/* Improve touch scrolling on mobile */
-@media (hover: none) {
-  .custom-scrollbar {
-    -webkit-overflow-scrolling: touch;
-  }
-}
-</style>
