@@ -374,7 +374,13 @@
     "creditBalance": "رصيد الائتمان",
     "email": "البريد",
     "id": "المعرف",
-    "primaryPhone": "الهاتف"
+    "primaryPhone": "الهاتف",
+    "Contact": "الاتصال",
+    "mobile": "الهاتف",
+    "Business_Info": "معلومات الشركة",
+    "Credit_Limit": "حد الائتمان",
+    "Balance": "توازن",
+    "Status": "الحاله"
   },
   "organizationConfig": {
     "basePriceCode": "كود السعر الأساسي",

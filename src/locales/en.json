@@ -381,7 +381,13 @@
     "creditBalance": "credit Balance",
     "email": "email",
     "id": "id",
-    "primaryPhone": "Phone"
+    "primaryPhone": "Phone",
+    "Contact": "Contact",
+    "mobile": "mobile",
+    "Business_Info": "Business Info",
+    "Credit_Limit": "Credit Limit",
+    "Balance": "Balance",
+    "Status": "Status"
   },
   "organizationConfig": {
     "basePriceCode": "Base Price Code",
