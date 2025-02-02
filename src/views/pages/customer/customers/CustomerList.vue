@@ -17,20 +17,21 @@ const showEditDialog = ref(false);
 const selectedCustomer = ref(null);
 
 const filteredCustomers = computed(() => {
-  return props.customers.filter((customer) => {
-    const matchesTab =
-      props.activeTab === 'all' || (props.activeTab === 'active' && customer.status === 'active') || (props.activeTab === 'pending' && customer.status === 'pending') || (props.activeTab === 'rejected' && customer.status === 'rejected');
+  return props.customers
+  // return props.customers.filter((customer) => {
+  //   const matchesTab =
+  //     props.activeTab === 'all' || (props.activeTab === 'active' && customer.status === 'active') || (props.activeTab === 'pending' && customer.status === 'pending') || (props.activeTab === 'rejected' && customer.status === 'rejected');
 
-    const matchesSearch =
-      !props.searchQuery ||
-      customer.name.toLowerCase().includes(props.searchQuery.toLowerCase()) ||
-      customer.id.toLowerCase().includes(props.searchQuery.toLowerCase()) ||
-      customer.mobile.includes(props.searchQuery) ||
-      customer.cr?.includes(props.searchQuery) ||
-      customer.vat?.includes(props.searchQuery);
+  //   const matchesSearch =
+  //     !props.searchQuery ||
+  //     customer.name.toLowerCase().includes(props.searchQuery.toLowerCase()) ||
+  //     customer.id.toLowerCase().includes(props.searchQuery.toLowerCase()) ||
+  //     customer.mobile.includes(props.searchQuery) ||
+  //     customer.cr?.includes(props.searchQuery) ||
+  //     customer.vat?.includes(props.searchQuery);
 
-    return matchesTab && matchesSearch;
-  });
+  //   return matchesTab && matchesSearch;
+  // });
 });
 
 const handleEditCustomer = (customer: any) => {

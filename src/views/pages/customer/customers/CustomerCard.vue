@@ -1,43 +1,15 @@
-<script setup lang="ts">
+<script setup lang="js">
 import { formatPrice, formatDate } from '../../../../utilities/formatting';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
-const props = defineProps<{
-  customer: {
-    id: string;
-    name: string;
-    type: string;
-    mobile: string;
-    email: string;
-    cr: string;
-    vat: string;
-    buildingNumber: string;
-    streetName: string;
-    district: string;
-    city: string;
-    postalCode: string;
-    additionalNumber: string;
-    creditLimit: number;
-    balance: number;
-    status: string;
-    approvalStatus: string;
-    approvedBy?: string;
-    approvedDate?: string;
-    createdBy: string;
-    createdDate: string;
-    location: {
-      lat: number;
-      lng: number;
-      address: string;
-    };
-  };
-}>();
-
+const props = defineProps({
+  customer: Object
+});
 const emit = defineEmits(['view-details', 'edit-customer', 'submit-approval', 'approve', 'reject']);
 
-const getStatusColor = (status: string) => {
+const getStatusColor = (status) => {
   switch (status) {
     case 'active':
       return 'bg-green-100 text-green-700';
@@ -50,7 +22,7 @@ const getStatusColor = (status: string) => {
   }
 };
 
-const getApprovalStatusColor = (status: string) => {
+const getApprovalStatusColor = (status) => {
   switch (status) {
     case 'approved':
       return 'bg-green-100 text-green-700';
@@ -63,7 +35,7 @@ const getApprovalStatusColor = (status: string) => {
   }
 };
 
-const handleVisit = (event: Event) => {
+const handleVisit = (event) => {
   console.log(props.customer);
 
   event.stopPropagation();
@@ -93,8 +65,8 @@ const handleVisit = (event: Event) => {
         </div>
         <div class="text-right">
           <div class="text-sm text-600">Credit Limit</div>
-          <div class="font-bold text-primary">{{ formatPrice(customer.creditLimit) }}</div>
-          <div class="text-sm text-600">Balance: {{ formatPrice(customer.balance) }}</div>
+          <!-- <div class="font-bold text-primary">{{ formatPrice(customer.creditLimit) }}</div>
+          <div class="text-sm text-600">Balance: {{ formatPrice(customer.balance) }}</div> -->
         </div>
       </div>
 
@@ -107,15 +79,15 @@ const handleVisit = (event: Event) => {
         </div>
         <div class="w-full">
           <div class="text-600 w-full">Business Info</div>
-          <div class="font-medium">CR: {{ customer.cr }}</div>
-          <div class="text-sm text-600">VAT: {{ customer.vat }}</div>
+          <!-- <div class="font-medium">CR: {{ customer.cr }}</div> -->
+          <!-- <div class="text-sm text-600">VAT: {{ customer.vat }}</div> -->
         </div>
       </div>
 
       <!-- Location -->
       <div class="mt-4">
         <div class="text-sm text-600">Location</div>
-        <div class="font-medium">{{ customer.location.address }}</div>
+        <!-- <div class="font-medium">{{ customer.location.address }}</div> -->
       </div>
 
       <!-- Footer -->
