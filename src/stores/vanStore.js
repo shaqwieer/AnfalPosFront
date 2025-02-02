@@ -39,6 +39,7 @@ export const useVanStore = defineStore('van', () => {
     const item = inventory.value.find(i => i.productId === productId)
     return item ? item.quantity >= requestedQty : false
   }
+  
 
   // Update inventory quantity
   const updateInventory = (productId, quantity) => {

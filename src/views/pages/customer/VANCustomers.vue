@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useVanStore } from '../../../stores/vanStore';
+import { ref, computed, onMounted } from 'vue';
+import { useVanStore } from '@/stores/vanStore.js';
+import { useCustomerStore } from '@/stores/customerStore.js';
+
 import CustomerList from './customers/CustomerList.vue';
 import CustomerForm from './customers/CustomerForm.vue';
 import CustomerDetails from './customers/CustomerDetails.vue';
@@ -8,6 +10,8 @@ import EditCustomerDialog from './customers/EditCustomerDialog.vue';
 import { vanCustomers } from './customers/VANCustomerSampleData';
 
 const vanStore = useVanStore();
+const customerStore = useCustomerStore();
+
 const activeTab = ref('active');
 const searchQuery = ref('');
 const showNewCustomerForm = ref(false);
@@ -15,10 +19,14 @@ const selectedCustomer = ref(null);
 const showDetails = ref(false);
 const showEditDialog = ref(false);
 // const viewMode = ref<'cards' | 'list'>('cards');
-const viewMode = ref<'cards' | 'list'>('list');
+const viewMode = ref<'cards' | 'list'>('cards');
 
+onMounted(async () => {
+  await customerStore.GetCustomerBasedOnBranchType()
+})
 // Initialize customers with sample data
-const customers = ref(vanCustomers);
+const customers = computed(()=>customerStore.customers);
+
 
 const handleSubmitCustomer = (customer: any) => {
   // Add the new customer to the list
