@@ -40,7 +40,7 @@ const choosedBranch = async (availableBranch) => {
         formData.append('ProfitCenter', availableBranch.profitCenter ?? '');
         formData.append('CajoNumber', availableBranch.cajoNumber ?? '');
         formData.append('CashCustomer', availableBranch.cashCustomer ?? '');
-        formData.append('BranchTypeName', availableBranch.branchTypeName ?? '');
+        formData.append('BranchTypeId', availableBranch.branchTypeId ?? '');
         await mainStore.chooseBranch(formData);
         loading.value = false;
     } catch (err) {
