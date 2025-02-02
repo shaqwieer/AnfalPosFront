@@ -290,18 +290,16 @@ const { t, locale } = useI18n();
             :rowsPerPageOptions="[5, 10, 25]"
             :currentPageReportTemplate="''"
           >
-            <!-- <template #header>
-              <span class="text-lg font-bold text-primary"> test </span>
-            </template> -->
-
             <template #empty>
               <div class="flex justify-content-center align-items-center font-bold text-lg">
                 {{ t(`Customer.empty`) }}
               </div></template
             >
 
-            <Column field="name" :header="t('Customer.name')" class="" :sortable="true">
-             
+            <Column field="name" class="" :sortable="true">
+              <template #header>
+                <span class="text-lg font-bold text-primary"> {{ t('Customer.name') }} </span>
+              </template>
 
               <template #body="slotProps">
                 <div class="flex flex-column align-items-start">
@@ -429,9 +427,15 @@ const { t, locale } = useI18n();
   </div>
 </template>
 
+<style></style>
+
 <style scoped>
 /* Custom scrollbar styles can be kept or removed as PrimeFlex doesn't provide scrollbar styling */
 .translate-y-50 {
   transform: translateY(-50%);
+}
+
+:deep(.p-datatable .p-datatable-thead > tr > th) {
+  background-color: red;
 }
 </style>
