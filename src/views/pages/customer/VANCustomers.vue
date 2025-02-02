@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useVanStore } from '../../../stores/vanStore';
 import CustomerList from './customers/CustomerList.vue';
 import CustomerForm from './customers/CustomerForm.vue';
@@ -14,7 +14,8 @@ const showNewCustomerForm = ref(false);
 const selectedCustomer = ref(null);
 const showDetails = ref(false);
 const showEditDialog = ref(false);
-const viewMode = ref<'cards' | 'list'>('cards');
+// const viewMode = ref<'cards' | 'list'>('cards');
+const viewMode = ref<'cards' | 'list'>('list');
 
 // Initialize customers with sample data
 const customers = ref(vanCustomers);
@@ -57,7 +58,7 @@ const handleSubmitApproval = (customer: any) => {
       status: 'pending',
       approvalStatus: 'pending',
       submittedBy: vanStore.vanInfo.driver,
-      submittedDate: new Date().toISOString().split('T')[0],
+      submittedDate: new Date().toISOString().split('T')[0]
     };
   }
 };
@@ -70,7 +71,7 @@ const handleApprove = (customer: any) => {
       status: 'active',
       approvalStatus: 'approved',
       approvedBy: vanStore.vanInfo.driver,
-      approvedDate: new Date().toISOString().split('T')[0],
+      approvedDate: new Date().toISOString().split('T')[0]
     };
   }
 };
@@ -83,7 +84,7 @@ const handleReject = (customer: any) => {
       status: 'rejected',
       approvalStatus: 'rejected',
       approvedBy: vanStore.vanInfo.driver,
-      approvedDate: new Date().toISOString().split('T')[0],
+      approvedDate: new Date().toISOString().split('T')[0]
     };
   }
 };
@@ -91,12 +92,24 @@ const handleReject = (customer: any) => {
 const toggleView = () => {
   viewMode.value = viewMode.value === 'cards' ? 'list' : 'cards';
 };
+
+import { useI18n } from 'vue-i18n';
+import apiClientx from '../../../api/apiClient';
+import { useMainStore } from '../../../stores/mainStore';
+
+const mainStore = useMainStore();
+const rtl = computed(() => mainStore.isRTL);
+const containerClass = computed(() => ({
+  rtl: mainStore.isRTL,
+  ltr: !mainStore.isRTL
+}));
+const { t, locale } = useI18n();
 </script>
 
 <template>
   <div class="h-full flex flex-column">
     <!-- Header -->
-    <div class="p-6">
+    <div class="px-6">
       <div class="max-w-7xl mx-auto">
         <div class="flex align-items-center justify-content-between mb-6">
           <h1 class="text-900 text-4xl font-bold">Customers</h1>
@@ -121,10 +134,7 @@ const toggleView = () => {
               </div>
             </div>
 
-            <button
-              @click="showNewCustomerForm = true"
-              class="p-button p-button-primary flex align-items-center gap-2"
-            >
+            <button @click="showNewCustomerForm = true" class="p-button p-button-primary flex align-items-center gap-2">
               <i class="pi pi-plus"></i>
               <span>New Customer</span>
             </button>
@@ -135,28 +145,23 @@ const toggleView = () => {
         <div class="surface-card border-round-lg mb-4 shadow-1 border-1 surface-border">
           <div class="border-bottom-1 surface-border">
             <div class="flex">
-              <button
+              <div
                 v-for="tab in ['all', 'active', 'pending', 'rejected']"
                 :key="tab"
                 @click="activeTab = tab"
-                class="py-3 px-4 focus:outline-none border-bottom-2 font-medium transition-colors duration-200 capitalize"
+                class="py-3 px-4 focus:outline-none cursor-pointer border-bottom-2 font-medium transition-colors duration-200 capitalize"
                 :class="activeTab === tab ? 'border-primary text-primary' : 'border-transparent text-700 hover:text-900'"
               >
                 {{ tab }}
-              </button>
+              </div>
             </div>
           </div>
 
           <!-- Search -->
           <div class="p-4">
-            <span class="p-input-icon-left w-full">
-              <i class="pi pi-search"></i>
-              <input
-                v-model="searchQuery"
-                type="text"
-                class="p-inputtext w-full"
-                placeholder="Search by name, ID, mobile, CR, or VAT..."
-              />
+            <span class="relative p-input-icon-left w-full">
+              <span class="absolute top-50 translate-y-50" style="left: 9px"><i class="pi pi-search"></i></span>
+              <input v-model="searchQuery" type="text" class="p-inputtext w-full pl-5" placeholder="Search by name, ID, mobile, CR, or VAT..." />
             </span>
           </div>
         </div>
@@ -168,56 +173,21 @@ const toggleView = () => {
       <div class="h-full overflow-y-auto px-6 pb-6">
         <div class="max-w-7xl mx-auto">
           <!-- List View -->
-          <div
-            v-if="viewMode === 'list'"
-            class="surface-card border-round-lg shadow-2 border-1 surface-border overflow-hidden"
-          >
+          <!-- <div v-if="viewMode === 'list'" class="surface-card border-round-lg shadow-2 border-1 surface-border overflow-hidden">
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
                 <tr>
-                  <th
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                  >
-                    Customer
-                  </th>
-                  <th
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                  >
-                    Contact
-                  </th>
-                  <th
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
-                  >
-                    Business Info
-                  </th>
-                  <th
-                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase"
-                  >
-                    Credit Limit
-                  </th>
-                  <th
-                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase"
-                  >
-                    Balance
-                  </th>
-                  <th
-                    class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
-                  >
-                    Status
-                  </th>
-                  <th
-                    class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
-                  >
-                    Actions
-                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Business Info</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Credit Limit</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Balance</th>
+                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
+                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
-                <tr
-                  v-for="customer in customers"
-                  :key="customer.id"
-                  class="hover:bg-gray-50 transition-colors"
-                >
+                <tr v-for="customer in customers" :key="customer.id" class="hover:bg-gray-50 transition-colors">
                   <td class="px-6 py-4">
                     <div class="font-medium text-gray-900">
                       {{ customer.name }}
@@ -239,7 +209,7 @@ const toggleView = () => {
                       {{
                         new Intl.NumberFormat('en-US', {
                           style: 'currency',
-                          currency: 'SAR',
+                          currency: 'SAR'
                         }).format(customer.creditLimit)
                       }}
                     </div>
@@ -249,7 +219,7 @@ const toggleView = () => {
                       {{
                         new Intl.NumberFormat('en-US', {
                           style: 'currency',
-                          currency: 'SAR',
+                          currency: 'SAR'
                         }).format(customer.balance)
                       }}
                     </div>
@@ -259,12 +229,9 @@ const toggleView = () => {
                       <span
                         class="px-2 py-1 text-xs rounded-full"
                         :class="{
-                          'bg-green-100 text-green-800':
-                            customer.status === 'active',
-                          'bg-yellow-100 text-yellow-800':
-                            customer.status === 'pending',
-                          'bg-red-100 text-red-800':
-                            customer.status === 'rejected',
+                          'bg-green-100 text-green-800': customer.status === 'active',
+                          'bg-yellow-100 text-yellow-800': customer.status === 'pending',
+                          'bg-red-100 text-red-800': customer.status === 'rejected'
                         }"
                       >
                         {{ customer.status }}
@@ -272,12 +239,9 @@ const toggleView = () => {
                       <span
                         class="px-2 py-1 text-xs rounded-full"
                         :class="{
-                          'bg-green-100 text-green-800':
-                            customer.approvalStatus === 'approved',
-                          'bg-yellow-100 text-yellow-800':
-                            customer.approvalStatus === 'pending',
-                          'bg-red-100 text-red-800':
-                            customer.approvalStatus === 'rejected',
+                          'bg-green-100 text-green-800': customer.approvalStatus === 'approved',
+                          'bg-yellow-100 text-yellow-800': customer.approvalStatus === 'pending',
+                          'bg-red-100 text-red-800': customer.approvalStatus === 'rejected'
                         }"
                       >
                         {{ customer.approvalStatus }}
@@ -285,39 +249,21 @@ const toggleView = () => {
                     </div>
                   </td>
                   <td class="px-6 py-4">
-                    <div
-                      class="flex align-items-center justify-content-center space-x-2"
-                    >
-                      <button
-                        @click="handleViewDetails(customer)"
-                        class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full"
-                      >
+                    <div class="flex align-items-center justify-content-center space-x-2">
+                      <button @click="handleViewDetails(customer)" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full">
                         <i class="pi pi-eye"></i>
                       </button>
-                      <button
-                        @click="handleEditCustomer(customer)"
-                        class="p-1.5 text-gray-600 hover:bg-gray-50 rounded-full"
-                      >
+                      <button @click="handleEditCustomer(customer)" class="p-1.5 text-gray-600 hover:bg-gray-50 rounded-full">
                         <i class="pi pi-pencil"></i>
                       </button>
-                      <button
-                        v-if="customer.status === 'draft'"
-                        @click="handleSubmitApproval(customer)"
-                        class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full"
-                      >
+                      <button v-if="customer.status === 'draft'" @click="handleSubmitApproval(customer)" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full">
                         <i class="pi pi-send"></i>
                       </button>
                       <template v-if="customer.approvalStatus === 'pending'">
-                        <button
-                          @click="handleApprove(customer)"
-                          class="p-1.5 text-green-600 hover:bg-green-50 rounded-full"
-                        >
+                        <button @click="handleApprove(customer)" class="p-1.5 text-green-600 hover:bg-green-50 rounded-full">
                           <i class="pi pi-check-circle"></i>
                         </button>
-                        <button
-                          @click="handleReject(customer)"
-                          class="p-1.5 text-red-600 hover:bg-red-50 rounded-full"
-                        >
+                        <button @click="handleReject(customer)" class="p-1.5 text-red-600 hover:bg-red-50 rounded-full">
                           <i class="pi pi-times-circle"></i>
                         </button>
                       </template>
@@ -326,7 +272,134 @@ const toggleView = () => {
                 </tr>
               </tbody>
             </table>
-          </div>
+          </div> -->
+
+          <!-- ----------------------------------------------------------- -->
+
+          <DataTable
+            class="surface-card border-round-lg mb-4 shadow-1 border-1 surface-border"
+            v-if="viewMode === 'list'"
+            :value="customers"
+            dataKey="id"
+            :paginator="customers.length > 10 ? true : false"
+            :rows="10"
+            :globalFilterFields="['name', 'id']"
+            :paginatorTemplate="
+              mainStore.isRTL ? 'RowsPerPageDropdown NextPageLink LastPageLink  PageLinks FirstPageLink PrevPageLink  CurrentPageReport ' : 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
+            "
+            :rowsPerPageOptions="[5, 10, 25]"
+            :currentPageReportTemplate="''"
+          >
+            <!-- <template #header>
+              <span class="text-lg font-bold text-primary"> test </span>
+            </template> -->
+
+            <template #empty>
+              <div class="flex justify-content-center align-items-center font-bold text-lg">
+                {{ t(`Customer.empty`) }}
+              </div></template
+            >
+
+            <Column field="name" :header="t('Customer.name')" class="" :sortable="true">
+             
+
+              <template #body="slotProps">
+                <div class="flex flex-column align-items-start">
+                  <div class="font-semibold text-md">{{ slotProps.data.name }}</div>
+                  <div class="text-sm text-gray-500">{{ slotProps.data.id }}</div>
+                </div>
+              </template>
+            </Column>
+
+            <Column field="Contact" :header="t('Customer.Contact')" class="" :sortable="true">
+              <template #body="slotProps">
+                <div class="flex flex-column align-items-start">
+                  <span class="text-md">{{ slotProps.data.mobile }}</span>
+                  <span class="text-md">{{ slotProps.data.email }}</span>
+                </div>
+              </template>
+            </Column>
+
+            <Column field="Business Info" :header="t('Customer.Business_Info')" class="" :sortable="true">
+              <template #body="slotProps">
+                <div class="flex flex-column justify-content-start align-items-start">
+                  <div class="text-md">CR: {{ slotProps.data.cr }}</div>
+                  <div class="text-md">VAT: {{ slotProps.data.vat }}</div>
+                </div>
+              </template>
+            </Column>
+
+            <Column field="Credit Limit" :header="t('Customer.Credit_Limit')" class="" :sortable="true">
+              <template #body="slotProps">
+                <div class="flex flex-column justify-content-start align-items-start">
+                  <div class="font-semibold text-md">SAR {{ slotProps.data.creditLimit }}</div>
+                </div>
+              </template>
+            </Column>
+
+            <Column field="Balance" :header="t('Customer.Balance')" class="" :sortable="true">
+              <template #body="slotProps">
+                <div class="flex flex-column justify-content-start align-items-start">
+                  <div class="font-semibold text-md">SAR {{ slotProps.data.balance }}</div>
+                </div>
+              </template>
+            </Column>
+
+            <Column field="Status" :header="t('Customer.Status')" class="" :sortable="true">
+              <template #body="slotProps">
+                <div class="flex flex-column align-items-center space-y-1 gap-2">
+                  <span
+                    class="px-2 py-1 text-xs rounded-full"
+                    :class="{
+                      'bg-green-100 text-green-800  border-round-lg': slotProps.data.status === 'active',
+                      'bg-yellow-100 text-yellow-800  border-round-lg': slotProps.data.status === 'pending',
+                      'bg-red-100 text-red-800  border-round-lg': slotProps.data.status === 'rejected'
+                    }"
+                  >
+                    {{ slotProps.data.status }}
+                  </span>
+                  <span
+                    class="px-2 py-1 text-xs rounded-full"
+                    :class="{
+                      'bg-green-100 text-green-800  border-round-lg': slotProps.data.approvalStatus === 'approved',
+                      'bg-yellow-100 text-yellow-800  border-round-lg': slotProps.data.approvalStatus === 'pending',
+                      'bg-red-100 text-red-800  border-round-lg': slotProps.data.approvalStatus === 'rejected'
+                    }"
+                  >
+                    {{ slotProps.data.approvalStatus }}
+                  </span>
+                </div>
+              </template>
+            </Column>
+
+            <Column field="actions" :header="t('labels.actions')">
+              <template #body="slotProps">
+                <div class="flex align-items-center gap-2 justify-content-start">
+                  <div @click="handleViewDetails(slotProps.data)" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full">
+                    <i class="pi pi-eye"></i>
+                  </div>
+
+                  <div @click="handleEditCustomer(slotProps.data)" class="p-1.5 text-gray-600 hover:bg-gray-50 rounded-full">
+                    <i class="pi pi-pencil"></i>
+                  </div>
+
+                  <div v-if="slotProps.data.status === 'draft'" @click="handleSubmitApproval(slotProps.data)" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full">
+                    <i class="pi pi-send"></i>
+                  </div>
+
+                  <template v-if="slotProps.data.approvalStatus === 'pending'">
+                    <div @click="handleApprove(slotProps.data)" class="p-1.5 text-green-600 hover:bg-green-50 rounded-full">
+                      <i class="pi pi-check-circle"></i>
+                    </div>
+
+                    <div @click="handleReject(slotProps.data)" class="p-1.5 text-red-600 hover:bg-red-50 rounded-full">
+                      <i class="pi pi-times-circle"></i>
+                    </div>
+                  </template>
+                </div>
+              </template>
+            </Column>
+          </DataTable>
 
           <!-- Card View -->
           <div v-else>
@@ -341,35 +414,24 @@ const toggleView = () => {
               @reject="handleReject"
             />
           </div>
+
+          <!-- ----------------------------------------------------------- -->
         </div>
       </div>
     </div>
 
     <!-- Dialogs -->
-    <CustomerForm
-      v-if="showNewCustomerForm"
-      :show="showNewCustomerForm"
-      @close="showNewCustomerForm = false"
-      @submit="handleSubmitCustomer"
-    />
+    <CustomerForm v-if="showNewCustomerForm" :show="showNewCustomerForm" @close="showNewCustomerForm = false" @submit="handleSubmitCustomer" />
 
-    <CustomerDetails
-      v-if="showDetails"
-      :show="showDetails"
-      :customer="selectedCustomer"
-      @close="showDetails = false"
-    />
+    <CustomerDetails v-if="showDetails" :show="showDetails" :customer="selectedCustomer" @close="showDetails = false" />
 
-    <EditCustomerDialog
-      v-if="showEditDialog"
-      :show="showEditDialog"
-      :customer="selectedCustomer"
-      @close="showEditDialog = false"
-      @save="handleSaveCustomer"
-    />
+    <EditCustomerDialog v-if="showEditDialog" :show="showEditDialog" :customer="selectedCustomer" @close="showEditDialog = false" @save="handleSaveCustomer" />
   </div>
 </template>
 
 <style scoped>
 /* Custom scrollbar styles can be kept or removed as PrimeFlex doesn't provide scrollbar styling */
+.translate-y-50 {
+  transform: translateY(-50%);
+}
 </style>
