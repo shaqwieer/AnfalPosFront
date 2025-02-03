@@ -11,11 +11,11 @@ const emit = defineEmits(['view-details', 'edit-customer', 'submit-approval', 'a
 
 const getStatusColor = (status) => {
   switch (status) {
-    case 'active':
+    case 7:
       return 'bg-green-100 text-green-700';
-    case 'pending':
+    case 6:
       return 'bg-yellow-100 text-yellow-700';
-    case 'rejected':
+    case 8:
       return 'bg-red-100 text-red-700';
     default:
       return 'bg-gray-100 text-700';
@@ -59,22 +59,20 @@ const test = () => {
         <div>
           <div class="flex align-items-center gap-2">
             <span class="font-medium text-900">{{ customer.name }}</span>
-            <span class="px-2 py-1 text-xs border-round-lg" :class="getStatusColor(customer.statusName)">
-              {{ customer.statusName }}
+            <span class="px-2 py-1 text-xs border-round-lg" :class="getStatusColor(customer.statusId)">
+              {{ customer.statusId === 7 ? 'Approved' : status === 6 ? 'Pending' : 'Rejected' }}
             </span>
 
             <span class="px-2 py-1 text-xs border-round-lg" :class="getApprovalStatusColor(customer.statusName)">
               {{ customer.statusName }}
             </span>
           </div>
-          <div class="mt-1 text-sm text-600">{{ customer.id }}</div>
+          <div class="mt-1 text-sm text-600">CUS-{{ customer.id }}</div>
         </div>
 
         <div class="text-right">
           <div class="text-sm text-600">Credit Limit</div>
           <div class="font-bold text-primary">SAR {{ formatPrice(customer.creditLimit) }}</div>
-          <!-- empty -->
-          <div class="text-sm text-600">Balance: SAR {{ formatPrice(customer.balance ? customer.balance : '5000') }}</div>
         </div>
       </div>
 
@@ -82,7 +80,7 @@ const test = () => {
       <div class="flex justify-content-between text-sm">
         <div class="w-full">
           <div class="text-600">Contact</div>
-          <div class="font-medium">{{ customer.contactMobileNumber }}</div>
+          <div class="font-semibold text-md">{{ customer.contactMobileNumber }}</div>
           <div class="text-sm text-600">{{ customer.email }}</div>
         </div>
         <div class="w-full">

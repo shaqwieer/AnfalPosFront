@@ -95,7 +95,44 @@ const paginatedCustomers = computed(() => {
   //     preferredDays: 'Monday, Thursday',
   //     primaryPhone: '+966512345678',
   //     sapCustomer: 'L2S002',
-  //     statusId: 5,
+  //     statusId: 8,
+  //     statusName: 'Rejected',
+  //     streetName: 'Prince Sultan Street',
+  //     swiftCode: 'SNBKSARI',
+  //     uniqueIdentifier: 'a123456b-78cd-90ef-12gh-3456ijklmnop',
+  //     vatNumber: '400000654321007',
+  //     website: 'https://www.jeddahfactory.com'
+  //   },
+  //   {
+  //     accountNumber: 'SA98765432123423423421098',
+  //     additionalNotes: 'Hiasgh priority',
+  //     additionalNumber: '654234321',
+  //     altitude: '300',
+  //     bankName: 'Saudi Nati ank',
+  //     buildingNumber: '456',
+  //     city: 'Jeddah',
+  //     contactEmail: 'info@business.com',
+  //     contactMobileNumber: '+966512345678',
+  //     contactPersonName: 'Mohammed Saeed',
+  //     crNumber: '2020202020',
+  //     createdAt: '2025-02-10T10:10:10.123456Z',
+  //     creditLimit: 75000,
+  //     district: 'Al Hamra',
+  //     email: 'customer2@example.com',
+  //     financeNotes: 'Eligible for discount',
+  //     iban: 'SA6543210987654321098765',
+  //     id: 3,
+  //     industry: 'Manufacturing',
+  //     isBusinessPartner: true,
+  //     latitude: '21.4858',
+  //     name: 'مصنع جدة للمنتجات',
+  //     paymentTerm: 'Net 45',
+  //     position: 'Finance Manager',
+  //     postalCode: '21442',
+  //     preferredDays: 'Monday, Thursday',
+  //     primaryPhone: '+966512345678',
+  //     sapCustomer: 'L2S002',
+  //     statusId: 6,
   //     statusName: 'Pending',
   //     streetName: 'Prince Sultan Street',
   //     swiftCode: 'SNBKSARI',
@@ -112,10 +149,7 @@ const onPageChange = (event: { page: number }) => {
 };
 const filteredCustomers = computed(() => {
   return paginatedCustomers.value.filter((customer) => {
-    const matchesTab =
-      props.activeTab === 'all' ||
-      (props.activeTab === 'active' && customer.statusName === 'Approved') ||
-      (props.activeTab === 'pending' && customer.statusName === 'Pending');
+    const matchesTab = props.activeTab === 'all' || (props.activeTab === 'active' && customer.statusName === 'Approved') || (props.activeTab === 'pending' && customer.statusName === 'Pending')|| (props.activeTab === 'rejected' && customer.statusName === 'Rejected');
 
     const matchesSearch =
       !props.searchQuery ||
@@ -179,7 +213,6 @@ const handleReject = (customer: any) => {
         </div>
       </template>
     </CustomerCard>
-
 
     <Paginator :rows="rowsPerPage" :totalRecords="props.customers.length" @page="onPageChange" />
 
