@@ -117,6 +117,52 @@ const CustomerStatus = {
   Approved: 7,
   Rejected: 8
 };
+
+const rowsPerPage = ref(10);
+const currentPage = ref(0);
+
+// const filteredCustomers = computed(() => {
+//   const filtered = customers.value.filter((customer) => {
+//     const matchesTab =
+//       activeTab.value === 'all' ||
+//       (activeTab.value === 'active' && customer.statusId === CustomerStatus.Approved) ||
+//       (activeTab.value === 'pending' && customer.statusId === CustomerStatus.Pending) ||
+//       (activeTab.value === 'rejected' && customer.statusId === CustomerStatus.Rejected);
+
+//     const matchesSearch =
+//       !searchQuery.value || // إذا كان searchQuery فارغًا، يعتبر الشرط صحيحًا
+//       customer.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+//       customer.id.toString().toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+//       customer.primaryPhone.includes(searchQuery.value) ||
+//       customer.crNumber?.includes(searchQuery.value);
+
+//     return matchesTab && matchesSearch;
+//   });
+
+//   return filtered;
+
+// });
+
+const filteredCustomers = computed(() => {
+  const filtered = customers.value.filter((customer) => {
+    const matchesTab =
+      activeTab.value === 'all' ||
+      (activeTab.value === 'active' && customer.statusId === CustomerStatus.Approved) ||
+      (activeTab.value === 'pending' && customer.statusId === CustomerStatus.Pending) ||
+      (activeTab.value === 'rejected' && customer.statusId === CustomerStatus.Rejected);
+
+    const matchesSearch =
+      !searchQuery.value ||
+      customer.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      customer.id.toString().toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      customer.primaryPhone.includes(searchQuery.value) ||
+      customer.crNumber?.includes(searchQuery.value);
+
+    return matchesTab && matchesSearch;
+  });
+
+  return filtered;
+});
 </script>
 
 <template>
@@ -288,13 +334,12 @@ const CustomerStatus = {
           </div> -->
 
           <!-- ----------------------------------------------------------- -->
-
           <DataTable
             class="surface-card border-round-lg mb-4 shadow-1 border-1 surface-border"
             v-if="viewMode === 'list'"
-            :value="customers"
+            :value="filteredCustomers"
             dataKey="id"
-            :paginator="customers.length > 10 ? true : false"
+            :paginator="true"
             :rows="10"
             :globalFilterFields="['name', 'id']"
             :paginatorTemplate="
