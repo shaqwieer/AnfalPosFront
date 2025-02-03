@@ -9,26 +9,32 @@ const props = defineProps({
 });
 const emit = defineEmits(['view-details', 'edit-customer', 'submit-approval', 'approve', 'reject']);
 
-const getStatusColor = (status) => {
-  switch (status) {
-    case 7:
-      return 'bg-green-100 text-green-700';
-    case 6:
-      return 'bg-yellow-100 text-yellow-700';
-    case 8:
-      return 'bg-red-100 text-red-700';
-    default:
-      return 'bg-gray-100 text-700';
-  }
+const CustomerStatus = {
+  Pending: 6,
+  Approved: 7,
+  Rejected: 8
 };
+
+// const getStatusColor = (status) => {
+//   switch (status) {
+//     case CustomerStatus.Approved:
+//       return 'bg-green-100 text-green-700';
+//     case CustomerStatus.Pending:
+//       return 'bg-yellow-100 text-yellow-700';
+//     case CustomerStatus.Rejected:
+//       return 'bg-red-100 text-red-700';
+//     default:
+//       return 'bg-gray-100 text-700';
+//   }
+// };
 
 const getApprovalStatusColor = (status) => {
   switch (status) {
-    case 'Approved':
+    case CustomerStatus.Approved:
       return 'bg-green-100 text-green-700';
-    case 'Pending':
+    case CustomerStatus.Pending:
       return 'bg-yellow-100 text-yellow-700';
-    case 'Rejected':
+    case CustomerStatus.Rejected:
       return 'bg-red-100 text-red-700';
     default:
       return 'bg-gray-100 text-700';
@@ -44,9 +50,6 @@ const handleVisit = (event) => {
     params: { id: props.customer.id }
   });
 };
-const test = () => {
-  console.log(props.customer);
-};
 </script>
 
 <template>
@@ -59,11 +62,11 @@ const test = () => {
         <div>
           <div class="flex align-items-center gap-2">
             <span class="font-medium text-900">{{ customer.name }}</span>
-            <span class="px-2 py-1 text-xs border-round-lg" :class="getStatusColor(customer.statusId)">
-              {{ customer.statusId === 7 ? 'Approved' : status === 6 ? 'Pending' : 'Rejected' }}
-            </span>
+            <!-- <span class="px-2 py-1 text-xs border-round-lg" :class="getStatusColor(customer.statusId)">
+              {{ customer.statusId === CustomerStatus.Approved ? 'Approved' : customer.statusId === CustomerStatus.Pending ? 'Pending' : 'Rejected' }}
+            </span> -->
 
-            <span class="px-2 py-1 text-xs border-round-lg" :class="getApprovalStatusColor(customer.statusName)">
+            <span class="px-2 py-0 text-xs border-round-lg" :class="getApprovalStatusColor(customer.statusId)">
               {{ customer.statusName }}
             </span>
           </div>
@@ -73,6 +76,7 @@ const test = () => {
         <div class="text-right">
           <div class="text-sm text-600">Credit Limit</div>
           <div class="font-bold text-primary">SAR {{ formatPrice(customer.creditLimit) }}</div>
+          <div class="text-sm">Balance: SAR {{ customer.balance ? customer.balance : '25,000.00' }}</div>
         </div>
       </div>
 

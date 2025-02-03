@@ -19,14 +19,13 @@ const selectedCustomer = ref(null);
 const showDetails = ref(false);
 const showEditDialog = ref(false);
 // const viewMode = ref<'cards' | 'list'>('cards');
-const viewMode = ref<'cards' | 'list'>('cards');
+const viewMode = ref<'cards' | 'list'>('list');
 
 onMounted(async () => {
-  await customerStore.GetCustomerBasedOnBranchType()
-})
+  await customerStore.GetCustomerBasedOnBranchType();
+});
 // Initialize customers with sample data
-const customers = computed(()=>customerStore.customers);
-
+const customers = computed(() => customerStore.customers);
 
 const handleSubmitCustomer = (customer: any) => {
   // Add the new customer to the list
@@ -112,6 +111,12 @@ const containerClass = computed(() => ({
   ltr: !mainStore.isRTL
 }));
 const { t, locale } = useI18n();
+
+const CustomerStatus = {
+  Pending: 6,
+  Approved: 7,
+  Rejected: 8
+};
 </script>
 
 <template>
@@ -306,31 +311,34 @@ const { t, locale } = useI18n();
 
             <Column field="name" class="" :sortable="true">
               <template #header>
-                <span class="text-lg font-bold text-primary"> {{ t('Customer.name') }} </span>
+                <span class="text-lg font-bold"> {{ t('Customer.name') }} </span>
               </template>
 
               <template #body="slotProps">
                 <div class="flex flex-column align-items-start">
-                  <div class="font-semibold text-md">{{ slotProps.data.name }}</div>
-                  <div class="text-sm text-gray-500">{{ slotProps.data.id }}</div>
+                  <div class="font-semibold text-lg">{{ slotProps.data.name }}</div>
+                  <div class="text-sm text-gray-500">CUS-{{ slotProps.data.id }}</div>
                 </div>
               </template>
             </Column>
 
-            <Column field="Contact" :header="t('Customer.Contact')" class="" :sortable="true">
+            <Column field="Contact" class="">
+              <template #header>
+                <span class="text-lg font-bold"> {{ t('Customer.Contact') }} </span>
+              </template>
               <template #body="slotProps">
                 <div class="flex flex-column align-items-start">
-                  <span class="text-md">{{ slotProps.data.mobile }}</span>
+                  <span class="text-md">{{ slotProps.data.contactMobileNumber }}</span>
                   <span class="text-md">{{ slotProps.data.email }}</span>
                 </div>
               </template>
             </Column>
 
-            <Column field="Business Info" :header="t('Customer.Business_Info')" class="" :sortable="true">
+            <Column field="Business Info" :header="t('Customer.Business_Info')" class="">
               <template #body="slotProps">
                 <div class="flex flex-column justify-content-start align-items-start">
-                  <div class="text-md">CR: {{ slotProps.data.cr }}</div>
-                  <div class="text-md">VAT: {{ slotProps.data.vat }}</div>
+                  <div class="text-md">CR: {{ slotProps.data.crNumber }}</div>
+                  <div class="text-md">VAT: {{ slotProps.data.vatNumber }}</div>
                 </div>
               </template>
             </Column>
@@ -343,36 +351,37 @@ const { t, locale } = useI18n();
               </template>
             </Column>
 
-            <Column field="Balance" :header="t('Customer.Balance')" class="" :sortable="true">
+            <Column field="Balance" :header="t('Customer.Balance')" class="">
               <template #body="slotProps">
                 <div class="flex flex-column justify-content-start align-items-start">
-                  <div class="font-semibold text-md">SAR {{ slotProps.data.balance }}</div>
+                  <!-- empty -->
+                  <div class="font-semibold text-md">SAR {{ slotProps.data.balance ? slotProps.data.balance : '25,000.00' }}</div>
                 </div>
               </template>
             </Column>
 
-            <Column field="Status" :header="t('Customer.Status')" class="" :sortable="true">
+            <Column field="statusName" :header="t('Customer.Status')" class="">
               <template #body="slotProps">
                 <div class="flex flex-column align-items-center space-y-1 gap-2">
-                  <span
+                  <!-- <span
                     class="px-2 py-1 text-xs rounded-full"
                     :class="{
-                      'bg-green-100 text-green-800  border-round-lg': slotProps.data.status === 'active',
-                      'bg-yellow-100 text-yellow-800  border-round-lg': slotProps.data.status === 'pending',
-                      'bg-red-100 text-red-800  border-round-lg': slotProps.data.status === 'rejected'
+                      'bg-green-100 text-green-800  border-round-lg': slotProps.data.statusName === 'Approved',
+                      'bg-yellow-100 text-yellow-800  border-round-lg': slotProps.data.statusName === 'Pending',
+                      'bg-red-100 text-red-800  border-round-lg': slotProps.data.statusName === 'Rejected'
                     }"
                   >
-                    {{ slotProps.data.status }}
-                  </span>
+                    {{ slotProps.data.statusName }}
+                  </span> -->
                   <span
-                    class="px-2 py-1 text-xs rounded-full"
+                    class="px-2 py-0 text-xs border-round-lg"
                     :class="{
-                      'bg-green-100 text-green-800  border-round-lg': slotProps.data.approvalStatus === 'approved',
-                      'bg-yellow-100 text-yellow-800  border-round-lg': slotProps.data.approvalStatus === 'pending',
-                      'bg-red-100 text-red-800  border-round-lg': slotProps.data.approvalStatus === 'rejected'
+                      'bg-green-100 text-green-800  border-round-lg': slotProps.data.statusId === CustomerStatus.Approved,
+                      'bg-yellow-100 text-yellow-800  border-round-lg': slotProps.data.statusId === CustomerStatus.Pending,
+                      'bg-red-100 text-red-800  border-round-lg': slotProps.data.statusId === CustomerStatus.Rejected
                     }"
                   >
-                    {{ slotProps.data.approvalStatus }}
+                    {{ slotProps.data.statusName }}
                   </span>
                 </div>
               </template>
@@ -435,8 +444,6 @@ const { t, locale } = useI18n();
   </div>
 </template>
 
-<style></style>
-
 <style scoped>
 /* Custom scrollbar styles can be kept or removed as PrimeFlex doesn't provide scrollbar styling */
 .translate-y-50 {
@@ -444,6 +451,7 @@ const { t, locale } = useI18n();
 }
 
 :deep(.p-datatable .p-datatable-thead > tr > th) {
-  background-color: red;
+  /* background-color: red; */
+  /* border-radius: 20px; */
 }
 </style>
