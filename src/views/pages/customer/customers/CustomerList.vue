@@ -8,6 +8,12 @@ const props = defineProps<{
   customers: any[];
 }>();
 
+const CustomerStatus = {
+  Pending: 6,
+  Approved: 7,
+  Rejected: 8
+};
+
 const emit = defineEmits(['view-details', 'submit-approval', 'edit-customer', 'approve', 'reject']);
 
 const showEditDialog = ref(false);
@@ -60,7 +66,7 @@ const handleReject = (customer: any) => {
       <template #actions>
         <div @click="(e) => handleDashboard(customer, e)" class="p-button p-button-text p-button-primary flex align-items-center gap-1">
           <i class="pi pi-chart-line"></i>
-          <span>Dashboard</span>
+          <span>{{ $t(`Dashboard`) }}</span>
         </div>
       </template>
     </CustomerCard>

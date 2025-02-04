@@ -16,14 +16,13 @@ const showNewCustomerForm = ref(false);
 const selectedCustomer = ref(null);
 const showEditDialog = ref(false);
 // const viewMode = ref<'cards' | 'list'>('cards');
-const viewMode = ref<'cards' | 'list'>('cards');
+const viewMode = ref<'cards' | 'list'>('list');
 
 onMounted(async () => {
-  await Promise.all([customerStore.GetCustomerBasedOnBranchType()]);
-})
+  await customerStore.GetCustomerBasedOnBranchType();
+});
 // Initialize customers with sample data
-const customers = computed(()=>customerStore.customers);
-
+const customers = computed(() => customerStore.customers);
 
 const handleSubmitCustomer = (customer: any) => {
 
@@ -162,7 +161,9 @@ const filteredCustomers = computed(() => {
     <div class="px-6">
       <div class="max-w-7xl mx-auto">
         <div class="flex align-items-center justify-content-between mb-6">
-          <h1 class="text-900 text-4xl font-bold">Customers</h1>
+          <h1 class="text-900 text-4xl font-bold">
+            {{ t(`Customer.Customers`) }}
+          </h1>
           <div class="flex gap-2 align-items-center">
             <!-- View Toggle -->
             <div class="flex gap-2 align-items-center surface-100 border-round-lg p-1">
@@ -186,7 +187,7 @@ const filteredCustomers = computed(() => {
 
             <button @click="showNewCustomerForm = true" class="p-button p-button-primary flex align-items-center gap-2">
               <i class="pi pi-plus"></i>
-              <span>New Customer</span>
+              <span> {{ t(`Customer.New`) }}</span>
             </button>
           </div>
         </div>
@@ -194,6 +195,8 @@ const filteredCustomers = computed(() => {
         <!-- Tabs -->
         <div class="surface-card border-round-lg mb-4 shadow-1 border-1 surface-border">
           <div class="border-bottom-1 surface-border">
+            <!-- v-for="tab in [`${t(`Customer.all`)}`, `${t(`Customer.active`)}`, `${t(`Customer.pending`)}`, `${t(`Customer.rejected`)}`]" -->
+
             <div class="flex">
               <div
                 v-for="tab in ['all', 'active', 'pending', 'rejected']"
@@ -202,7 +205,7 @@ const filteredCustomers = computed(() => {
                 class="py-3 px-4 focus:outline-none cursor-pointer border-bottom-2 font-medium transition-colors duration-200 capitalize"
                 :class="activeTab === tab ? 'border-primary text-primary' : 'border-transparent text-700 hover:text-900'"
               >
-                {{ tab }}
+                {{ t(`Customer.${tab}`) }}
               </div>
             </div>
           </div>
@@ -211,7 +214,7 @@ const filteredCustomers = computed(() => {
           <div class="p-4">
             <span class="relative p-input-icon-left w-full">
               <span class="absolute top-50 translate-y-50" style="left: 9px"><i class="pi pi-search"></i></span>
-              <input v-model="searchQuery" type="text" class="p-inputtext w-full pl-5" placeholder="Search by name, ID, mobile, CR, or VAT..." />
+              <input v-model="searchQuery" type="text" class="p-inputtext w-full pl-5" :placeholder="`${t('Customer.placeholder')}`" />
             </span>
           </div>
         </div>
@@ -222,7 +225,6 @@ const filteredCustomers = computed(() => {
     <div class="flex-1 overflow-hidden">
       <div class="h-full overflow-y-auto px-6 pb-6">
         <div class="max-w-7xl mx-auto">
-
           <DataTable
             class="surface-card border-round-lg mb-4 shadow-1 border-1 surface-border"
             v-if="viewMode === 'list'"
@@ -240,31 +242,34 @@ const filteredCustomers = computed(() => {
 
             <Column field="name" class="" :sortable="true">
               <template #header>
-                <span class="text-lg font-bold text-primary"> {{ t('Customer.name') }} </span>
+                <span class="text-lg font-bold"> {{ t('Customer.name') }} </span>
               </template>
 
               <template #body="slotProps">
                 <div class="flex flex-column align-items-start">
-                  <div class="font-semibold text-md">{{ slotProps.data.name }}</div>
-                  <div class="text-sm text-gray-500">{{ slotProps.data.id }}</div>
+                  <div class="font-semibold text-lg">{{ slotProps.data.name }}</div>
+                  <div class="text-sm text-gray-500">CUS-{{ slotProps.data.id }}</div>
                 </div>
               </template>
             </Column>
 
-            <Column field="Contact" :header="t('Customer.Contact')" class="" :sortable="true">
+            <Column field="Contact" class="">
+              <template #header>
+                <span class="text-lg font-bold"> {{ t('Customer.Contact') }} </span>
+              </template>
               <template #body="slotProps">
                 <div class="flex flex-column align-items-start">
-                  <span class="text-md">{{ slotProps.data.mobile }}</span>
+                  <span class="text-md">{{ slotProps.data.contactMobileNumber }}</span>
                   <span class="text-md">{{ slotProps.data.email }}</span>
                 </div>
               </template>
             </Column>
 
-            <Column field="Business Info" :header="t('Customer.Business_Info')" class="" :sortable="true">
+            <Column field="Business Info" :header="t('Customer.Business_Info')" class="">
               <template #body="slotProps">
                 <div class="flex flex-column justify-content-start align-items-start">
-                  <div class="text-md">CR: {{ slotProps.data.cr }}</div>
-                  <div class="text-md">VAT: {{ slotProps.data.vat }}</div>
+                  <div class="text-md">CR: {{ slotProps.data.crNumber }}</div>
+                  <div class="text-md">VAT: {{ slotProps.data.vatNumber }}</div>
                 </div>
               </template>
             </Column>
@@ -277,36 +282,37 @@ const filteredCustomers = computed(() => {
               </template>
             </Column>
 
-            <Column field="Balance" :header="t('Customer.Balance')" class="" :sortable="true">
+            <Column field="Balance" :header="t('Customer.Balance')" class="">
               <template #body="slotProps">
                 <div class="flex flex-column justify-content-start align-items-start">
-                  <div class="font-semibold text-md">SAR {{ slotProps.data.balance }}</div>
+                  <!-- empty -->
+                  <div class="font-semibold text-md">SAR {{ slotProps.data.balance ? slotProps.data.balance : '25,000.00' }}</div>
                 </div>
               </template>
             </Column>
 
-            <Column field="Status" :header="t('Customer.Status')" class="" :sortable="true">
+            <Column field="statusName" :header="t('Customer.Status')" class="">
               <template #body="slotProps">
                 <div class="flex flex-column align-items-center space-y-1 gap-2">
-                  <span
+                  <!-- <span
                     class="px-2 py-1 text-xs rounded-full"
                     :class="{
-                      'bg-green-100 text-green-800  border-round-lg': slotProps.data.status === 'active',
-                      'bg-yellow-100 text-yellow-800  border-round-lg': slotProps.data.status === 'pending',
-                      'bg-red-100 text-red-800  border-round-lg': slotProps.data.status === 'rejected'
+                      'bg-green-100 text-green-800  border-round-lg': slotProps.data.statusName === 'Approved',
+                      'bg-yellow-100 text-yellow-800  border-round-lg': slotProps.data.statusName === 'Pending',
+                      'bg-red-100 text-red-800  border-round-lg': slotProps.data.statusName === 'Rejected'
                     }"
                   >
-                    {{ slotProps.data.status }}
-                  </span>
+                    {{ slotProps.data.statusName }}
+                  </span> -->
                   <span
-                    class="px-2 py-1 text-xs rounded-full"
+                    class="px-2 py-0 text-xs border-round-lg"
                     :class="{
-                      'bg-green-100 text-green-800  border-round-lg': slotProps.data.approvalStatus === 'approved',
-                      'bg-yellow-100 text-yellow-800  border-round-lg': slotProps.data.approvalStatus === 'pending',
-                      'bg-red-100 text-red-800  border-round-lg': slotProps.data.approvalStatus === 'rejected'
+                      'bg-green-100 text-green-800  border-round-lg': slotProps.data.statusId === CustomerStatus.Approved,
+                      'bg-yellow-100 text-yellow-800  border-round-lg': slotProps.data.statusId === CustomerStatus.Pending,
+                      'bg-red-100 text-red-800  border-round-lg': slotProps.data.statusId === CustomerStatus.Rejected
                     }"
                   >
-                    {{ slotProps.data.approvalStatus }}
+                    {{ slotProps.data.statusName }}
                   </span>
                 </div>
               </template>
@@ -314,25 +320,26 @@ const filteredCustomers = computed(() => {
 
             <Column field="actions" :header="t('labels.actions')">
               <template #body="slotProps">
-                <div class="flex align-items-center gap-2 justify-content-start">
-                  <div @click="handleViewDetails(slotProps.data)" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full">
+                <div class="flex align-items-center gap-3 justify-content-start">
+                  <div @click="handleViewDetails(slotProps.data)" class="p-1.5 text-blue-600 hover:bg-blue-50 cursor-pointer rounded-full">
                     <i class="pi pi-eye"></i>
                   </div>
 
-                  <div @click="handleEditCustomer(slotProps.data)" class="p-1.5 text-gray-600 hover:bg-gray-50 rounded-full">
+                  <div @click="handleEditCustomer(slotProps.data)" class="p-1.5 text-gray-600 hover:bg-gray-50 cursor-pointer rounded-full">
                     <i class="pi pi-pencil"></i>
                   </div>
 
-                  <div v-if="slotProps.data.status === 'draft'" @click="handleSubmitApproval(slotProps.data)" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full">
+                  <!-- v-if="slotProps.data.status === 'draft'" -->
+                  <div v-if="slotProps.data.statusId === 8" @click="handleSubmitApproval(slotProps.data)" class="p-1.5 cursor-pointer text-blue-600 hover:bg-blue-50 rounded-full">
                     <i class="pi pi-send"></i>
                   </div>
 
-                  <template v-if="slotProps.data.approvalStatus === 'pending'">
-                    <div @click="handleApprove(slotProps.data)" class="p-1.5 text-green-600 hover:bg-green-50 rounded-full">
+                  <template v-if="slotProps.data.statusId === 6">
+                    <div @click="handleApprove(slotProps.data)" class="p-1.5 cursor-pointer text-green-600 hover:bg-green-50 rounded-full">
                       <i class="pi pi-check-circle"></i>
                     </div>
 
-                    <div @click="handleReject(slotProps.data)" class="p-1.5 text-red-600 hover:bg-red-50 rounded-full">
+                    <div @click="handleReject(slotProps.data)" class="p-1.5 cursor-pointer text-red-600 hover:bg-red-50 rounded-full">
                       <i class="pi pi-times-circle"></i>
                     </div>
                   </template>
@@ -364,8 +371,6 @@ const filteredCustomers = computed(() => {
   </div>
 </template>
 
-<style></style>
-
 <style scoped>
 /* Custom scrollbar styles can be kept or removed as PrimeFlex doesn't provide scrollbar styling */
 .translate-y-50 {
@@ -373,6 +378,7 @@ const filteredCustomers = computed(() => {
 }
 
 :deep(.p-datatable .p-datatable-thead > tr > th) {
-  background-color: red;
+  /* background-color: red; */
+  /* border-radius: 20px; */
 }
 </style>
