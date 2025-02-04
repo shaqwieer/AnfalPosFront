@@ -380,7 +380,22 @@
     "Business_Info": "معلومات الشركة",
     "Credit_Limit": "حد الائتمان",
     "Balance": "توازن",
-    "Status": "الحاله"
+    "Status": "الحاله",
+    "Customers": "العملاء",
+    "all": "الكل",
+    "active": "تم الموافقة",
+    "pending": "قيد الانتظار",
+    "rejected": "تم الرفض",
+    "New": "عميل جديد",
+    "Location": "العنوان",
+    "Created": "وقت الانشاء",
+    "View": "عرض",
+    "Visit": "زيارة",
+    "Edit": "تعديل",
+    "Approve": "موافقة",
+    "Reject": "رفض",
+    "Submit_for_Approval": "تقديم للموافقة",
+    "placeholder": "ابحث حسب الاسم أو ID أو الهاتف المحمول أو CR أو VAT..."
   },
   "organizationConfig": {
     "basePriceCode": "كود السعر الأساسي",
@@ -421,5 +436,6 @@
     "discrepancyAmount": "مبيعات",
     "CashEnd ": "مبلغ الانتهاء",
     "OpeningClosing": "الفتح والاغلاق"
-  }
+  },
+  "Dashboard": "لوحة التحكم"
 }

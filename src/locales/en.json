@@ -387,7 +387,22 @@
     "Business_Info": "Business Info",
     "Credit_Limit": "Credit Limit",
     "Balance": "Balance",
-    "Status": "Status"
+    "Status": "Status",
+    "Customers": "Customers",
+    "all": "all",
+    "active": "active",
+    "pending": "pending",
+    "rejected": "rejected",
+    "New": "New Customer",
+    "Location": "Location",
+    "Created": "Created",
+    "View": "View",
+    "Edit": "Edit",
+    "Visit": "Visit",
+    "Approve": "Approve",
+    "Reject": "Reject",
+    "Submit_for_Approval": "Submit for Approval",
+    "placeholder": "Search by name, ID, mobile, CR, or VAT..."
   },
   "organizationConfig": {
     "basePriceCode": "Base Price Code",
@@ -429,5 +444,6 @@
     "CashEnd ": "Cash End",
     "discrepancyAmount": "Sales",
     "OpeningClosing": "Opening/Closing"
-  }
+  },
+  "Dashboard": "Dashboard"
 }

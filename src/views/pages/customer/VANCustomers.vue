@@ -118,9 +118,6 @@ const CustomerStatus = {
   Rejected: 8
 };
 
-const rowsPerPage = ref(10);
-const currentPage = ref(0);
-
 // const filteredCustomers = computed(() => {
 //   const filtered = customers.value.filter((customer) => {
 //     const matchesTab =
@@ -171,7 +168,9 @@ const filteredCustomers = computed(() => {
     <div class="px-6">
       <div class="max-w-7xl mx-auto">
         <div class="flex align-items-center justify-content-between mb-6">
-          <h1 class="text-900 text-4xl font-bold">Customers</h1>
+          <h1 class="text-900 text-4xl font-bold">
+            {{ t(`Customer.Customers`) }}
+          </h1>
           <div class="flex gap-2 align-items-center">
             <!-- View Toggle -->
             <div class="flex gap-2 align-items-center surface-100 border-round-lg p-1">
@@ -195,7 +194,7 @@ const filteredCustomers = computed(() => {
 
             <button @click="showNewCustomerForm = true" class="p-button p-button-primary flex align-items-center gap-2">
               <i class="pi pi-plus"></i>
-              <span>New Customer</span>
+              <span> {{ t(`Customer.New`) }}</span>
             </button>
           </div>
         </div>
@@ -203,6 +202,8 @@ const filteredCustomers = computed(() => {
         <!-- Tabs -->
         <div class="surface-card border-round-lg mb-4 shadow-1 border-1 surface-border">
           <div class="border-bottom-1 surface-border">
+            <!-- v-for="tab in [`${t(`Customer.all`)}`, `${t(`Customer.active`)}`, `${t(`Customer.pending`)}`, `${t(`Customer.rejected`)}`]" -->
+
             <div class="flex">
               <div
                 v-for="tab in ['all', 'active', 'pending', 'rejected']"
@@ -211,7 +212,7 @@ const filteredCustomers = computed(() => {
                 class="py-3 px-4 focus:outline-none cursor-pointer border-bottom-2 font-medium transition-colors duration-200 capitalize"
                 :class="activeTab === tab ? 'border-primary text-primary' : 'border-transparent text-700 hover:text-900'"
               >
-                {{ tab }}
+                {{ t(`Customer.${tab}`) }}
               </div>
             </div>
           </div>
@@ -220,7 +221,7 @@ const filteredCustomers = computed(() => {
           <div class="p-4">
             <span class="relative p-input-icon-left w-full">
               <span class="absolute top-50 translate-y-50" style="left: 9px"><i class="pi pi-search"></i></span>
-              <input v-model="searchQuery" type="text" class="p-inputtext w-full pl-5" placeholder="Search by name, ID, mobile, CR, or VAT..." />
+              <input v-model="searchQuery" type="text" class="p-inputtext w-full pl-5" :placeholder="`${t('Customer.placeholder')}`" />
             </span>
           </div>
         </div>
@@ -434,25 +435,26 @@ const filteredCustomers = computed(() => {
 
             <Column field="actions" :header="t('labels.actions')">
               <template #body="slotProps">
-                <div class="flex align-items-center gap-2 justify-content-start">
-                  <div @click="handleViewDetails(slotProps.data)" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full">
+                <div class="flex align-items-center gap-3 justify-content-start">
+                  <div @click="handleViewDetails(slotProps.data)" class="p-1.5 text-blue-600 hover:bg-blue-50 cursor-pointer rounded-full">
                     <i class="pi pi-eye"></i>
                   </div>
 
-                  <div @click="handleEditCustomer(slotProps.data)" class="p-1.5 text-gray-600 hover:bg-gray-50 rounded-full">
+                  <div @click="handleEditCustomer(slotProps.data)" class="p-1.5 text-gray-600 hover:bg-gray-50 cursor-pointer rounded-full">
                     <i class="pi pi-pencil"></i>
                   </div>
 
-                  <div v-if="slotProps.data.status === 'draft'" @click="handleSubmitApproval(slotProps.data)" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full">
+                  <!-- v-if="slotProps.data.status === 'draft'" -->
+                  <div v-if="slotProps.data.statusId === 8" @click="handleSubmitApproval(slotProps.data)" class="p-1.5 cursor-pointer text-blue-600 hover:bg-blue-50 rounded-full">
                     <i class="pi pi-send"></i>
                   </div>
 
-                  <template v-if="slotProps.data.approvalStatus === 'pending'">
-                    <div @click="handleApprove(slotProps.data)" class="p-1.5 text-green-600 hover:bg-green-50 rounded-full">
+                  <template v-if="slotProps.data.statusId === 6">
+                    <div @click="handleApprove(slotProps.data)" class="p-1.5 cursor-pointer text-green-600 hover:bg-green-50 rounded-full">
                       <i class="pi pi-check-circle"></i>
                     </div>
 
-                    <div @click="handleReject(slotProps.data)" class="p-1.5 text-red-600 hover:bg-red-50 rounded-full">
+                    <div @click="handleReject(slotProps.data)" class="p-1.5 cursor-pointer text-red-600 hover:bg-red-50 rounded-full">
                       <i class="pi pi-times-circle"></i>
                     </div>
                   </template>
