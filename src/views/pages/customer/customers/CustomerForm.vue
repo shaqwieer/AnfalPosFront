@@ -66,10 +66,10 @@ const formData = ref({
 
 // Left column tabs
 const leftTabs = [
-  { id: 'basic', name: 'Basic Information', icon: 'user' },
-  { id: 'business', name: 'Business Information', icon: 'building' },
-  { id: 'financial', name: 'Financial Information', icon: 'wallet' },
-  { id: 'address', name: 'Address Information', icon: 'map-marker' },
+  { id: 'basic', name: 'Basic_Information', icon: 'user' },
+  { id: 'business', name: 'Business_Information', icon: 'building' },
+  { id: 'financial', name: 'Financial_Information', icon: 'wallet' },
+  { id: 'address', name: 'Address_Information', icon: 'map-marker' },
   { id: 'documents', name: 'Documents', icon: 'folder' },
   { id: 'notes', name: 'Notes', icon: 'file-edit' }
 ];
@@ -292,12 +292,11 @@ watch(leftColumnTab, (newTab) => {
     :maskStyle="{ backgroundColor: 'red' }"
     class="fullscreen-dialog flex justify-content-center bg-black-alpha-50"
     style="width: 100vw; height: 100vh; max-width: 80%; max-height: 80%"
-    header="Customer Details"
+    :header="$t(`Customer.Customer_Details`)"
     @update:visible="$emit('close')"
   >
     <div v-if="show" class="inset-0 flex align-items-center justify-content-center z-5">
       <div class="surface-card border-round-xl w-full max-w-7xl max-h-90vh flex flex-column">
-
         <form @submit.prevent="handleSubmit" class="flex-1 overflow-hidden">
           <!-- Single column layout -->
           <div class="h-full flex flex-column">
@@ -312,7 +311,19 @@ watch(leftColumnTab, (newTab) => {
                 :class="leftColumnTab === tab.id ? 'text-primary border-bottom-2 border-primary' : 'text-600 hover:text-700'"
               >
                 <i class="pi" :class="`pi-${tab.icon}`"></i>
-                <span>{{ tab.name }}</span>
+                <!-- <span>{{ tab.name }}</span> -->
+
+                <span> {{ $t(`Customer.${tab.name}`) }}</span>
+
+                <!-- <span> {{ $t('Customer.Basic_Information') }}</span>
+                <span> {{ $t('Customer.Business_Information') }}</span>
+
+                <span> {{ $t('Customer.Financial_Information') }}</span>
+                <span> {{ $t(`Customer.Address_Information`) }}</span>
+
+                <span> {{ $t(`Customer.Documents`) }}</span>
+                <span> {{ $t(`Customer.Notes`) }}</span> -->
+
                 <div v-if="leftColumnTab === tab.id" class="absolute bottom-0 left-0 right-0 h-2px bg-primary"></div>
               </div>
             </div>
@@ -322,15 +333,15 @@ watch(leftColumnTab, (newTab) => {
               <!-- Basic Information -->
               <div v-show="leftColumnTab === 'basic'" class="flex flex-column gap-4">
                 <div>
-                  <label class="block text-sm font-medium text-700 mb-1">Customer Name</label>
+                  <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Customer_Name`) }}</label>
                   <input v-model="formData.name" type="text" required :disabled="readOnly" class="w-full p-inputtext" />
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-700 mb-1">Mobile Number</label>
+                  <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Mobile_Number`) }}</label>
                   <input v-model="formData.mobile" type="tel" required :disabled="readOnly" class="w-full p-inputtext" />
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-700 mb-1">Email</label>
+                  <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Email`) }}</label>
                   <input v-model="formData.email" type="email" :disabled="readOnly" class="w-full p-inputtext" />
                 </div>
               </div>
@@ -338,27 +349,27 @@ watch(leftColumnTab, (newTab) => {
               <!-- Business Information -->
               <div v-show="leftColumnTab === 'business'" class="flex flex-column gap-4">
                 <div>
-                  <label class="block text-sm font-medium text-700 mb-1">CR Number</label>
+                  <label class="block text-sm font-medium text-700 mb-1">CR </label>
                   <input v-model="formData.cr" type="text" :disabled="readOnly" class="w-full p-inputtext" />
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-700 mb-1">VAT Number</label>
+                  <label class="block text-sm font-medium text-700 mb-1">VAT </label>
                   <input v-model="formData.vat" type="text" :disabled="readOnly" class="w-full p-inputtext" />
                 </div>
               </div>
 
               <!-- Financial Information -->
-              <div v-show="leftColumnTab === 'financial'" class="flex flex-column gap-6">
-                <h3 class="text-lg font-medium text-900">Financial Information</h3>
+              <div v-show="leftColumnTab === 'financial'" class="flex flex-column gap-4 mt-6">
+                <h3 class="text-lg font-medium text-900">{{ $t(`Customer.Financial_Information`) }}</h3>
 
                 <!-- Credit and Payment Terms -->
                 <div class="grid">
                   <div class="col-12 md:col-6">
-                    <label class="block text-sm font-medium text-700 mb-1">Credit Limit (SAR)</label>
+                    <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Credit_Limit`) }} (SAR)</label>
                     <input v-model="formData.creditLimit" type="number" min="0" step="1000" required :disabled="readOnly" class="w-full p-inputtext" />
                   </div>
                   <div class="col-12 md:col-6">
-                    <label class="block text-sm font-medium text-700 mb-1">Payment Terms</label>
+                    <label class="block text-sm font-medium text-700 mb-1"> {{ $t(`Customer.Payment_Terms`) }} </label>
                     <select v-model="formData.paymentTerms" required :disabled="readOnly" class="w-full p-inputtext">
                       <option v-for="term in paymentTermsOptions" :key="term.value" :value="term.value">
                         {{ term.label }}
@@ -369,14 +380,14 @@ watch(leftColumnTab, (newTab) => {
 
                 <!-- Bank Information -->
                 <div class="surface-100 p-4 border-round-lg flex flex-column gap-4">
-                  <h4 class="font-medium text-900">Bank Information</h4>
+                  <h4 class="font-medium text-900">{{ $t(`Customer.Bank_Information`) }}</h4>
                   <div class="grid">
                     <div class="col-12 md:col-6">
-                      <label class="block text-sm font-medium text-700 mb-1">Bank Name</label>
+                      <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Bank_Name`) }} </label>
                       <input v-model="formData.bankName" type="text" :disabled="readOnly" class="w-full p-inputtext" />
                     </div>
                     <div class="col-12 md:col-6">
-                      <label class="block text-sm font-medium text-700 mb-1">Account Number</label>
+                      <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Account_Number`) }}</label>
                       <input v-model="formData.bankAccount" type="text" :disabled="readOnly" class="w-full p-inputtext" />
                     </div>
                     <div class="col-12 md:col-6">
@@ -392,8 +403,8 @@ watch(leftColumnTab, (newTab) => {
 
                 <!-- Financial Notes -->
                 <div>
-                  <label class="block text-sm font-medium text-700 mb-1">Financial Notes</label>
-                  <textarea v-model="formData.financialNotes" rows="3" :disabled="readOnly" class="w-full p-inputtextarea" placeholder="Add any financial notes or special payment arrangements..."></textarea>
+                  <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.FinancialNotes`) }}</label>
+                  <textarea v-model="formData.financialNotes" rows="3" :disabled="readOnly" class="w-full p-inputtextarea" :placeholder="$t(`Customer.Add_any_financial_notes_or_special_payment_arrangements`)"></textarea>
                 </div>
               </div>
 
@@ -420,11 +431,11 @@ watch(leftColumnTab, (newTab) => {
                 <!-- Location Info -->
                 <div class="grid">
                   <div class="col-12 md:col-6">
-                    <label class="block text-sm font-medium text-700 mb-1">Latitude</label>
+                    <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Latitude`) }}</label>
                     <input v-model="formData.location.lat" type="number" step="0.000001" class="w-full p-inputtext" readonly />
                   </div>
                   <div class="col-12 md:col-6">
-                    <label class="block text-sm font-medium text-700 mb-1">Longitude</label>
+                    <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Longitude`) }}</label>
                     <input v-model="formData.location.lng" type="number" step="0.000001" class="w-full p-inputtext" readonly />
                   </div>
                 </div>
@@ -432,27 +443,27 @@ watch(leftColumnTab, (newTab) => {
                 <!-- Address Fields -->
                 <div class="grid">
                   <div class="col-12 md:col-6">
-                    <label class="block text-sm font-medium text-700 mb-1">Building Number</label>
+                    <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Building_Number`) }}</label>
                     <input v-model="formData.buildingNumber" type="text" :disabled="readOnly" class="w-full p-inputtext" />
                   </div>
                   <div class="col-12 md:col-6">
-                    <label class="block text-sm font-medium text-700 mb-1">Street Name</label>
+                    <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Street_Name`) }}</label>
                     <input v-model="formData.streetName" type="text" :disabled="readOnly" class="w-full p-inputtext" />
                   </div>
                   <div class="col-12 md:col-6">
-                    <label class="block text-sm font-medium text-700 mb-1">District</label>
+                    <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.District`) }}</label>
                     <input v-model="formData.district" type="text" :disabled="readOnly" class="w-full p-inputtext" />
                   </div>
                   <div class="col-12 md:col-6">
-                    <label class="block text-sm font-medium text-700 mb-1">City</label>
+                    <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.City`) }}</label>
                     <input v-model="formData.city" type="text" :disabled="readOnly" class="w-full p-inputtext" />
                   </div>
                   <div class="col-12 md:col-6">
-                    <label class="block text-sm font-medium text-700 mb-1">Postal Code</label>
+                    <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Postal_Code`) }}</label>
                     <input v-model="formData.postalCode" type="text" :disabled="readOnly" class="w-full p-inputtext" />
                   </div>
                   <div class="col-12 md:col-6">
-                    <label class="block text-sm font-medium text-700 mb-1">Additional Number</label>
+                    <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Additional_Number`) }}</label>
                     <input v-model="formData.additionalNumber" type="text" :disabled="readOnly" class="w-full p-inputtext" />
                   </div>
                 </div>
@@ -461,7 +472,7 @@ watch(leftColumnTab, (newTab) => {
                 <div v-if="!readOnly" class="flex justify-content-end">
                   <button type="button" @click="getCurrentLocation" class="p-button p-button-primary">
                     <i class="pi pi-map-marker mr-2"></i>
-                    Get Current Location
+                    {{ $t(`Customer.Get_Current_Location`) }}
                   </button>
                 </div>
               </div>
@@ -473,8 +484,8 @@ watch(leftColumnTab, (newTab) => {
 
               <!-- Notes -->
               <div v-show="leftColumnTab === 'notes'" class="flex flex-column gap-4">
-                <h3 class="text-lg font-medium text-900">Additional Notes</h3>
-                <textarea v-model="formData.notes" rows="4" :disabled="readOnly" class="w-full p-inputtextarea" placeholder="Add any additional notes..."></textarea>
+                <h3 class="text-lg font-medium text-900">{{ $t(`Customer.Additional_Notes`) }}</h3>
+                <textarea v-model="formData.notes" rows="4" :disabled="readOnly" class="w-full p-inputtextarea" :placeholder="$t(`Customer.Add_any_additional_notes`)"></textarea>
               </div>
             </div>
           </div>
@@ -482,10 +493,10 @@ watch(leftColumnTab, (newTab) => {
           <!-- Form Actions -->
           <div class="p-4 border-top-1 bg-white surface-border flex justify-content-end gap-2">
             <button type="button" @click="$emit('close')" class="p-button p-button-outlined">
-              {{ readOnly ? 'Close' : 'Cancel' }}
+              {{ readOnly ? `${$t('Customer.Close')}` : `${$t('Customer.Cancel')}` }}
             </button>
             <button v-if="!readOnly" type="submit" class="p-button p-button-primary">
-              {{ customer ? 'Update Customer' : 'Create Customer' }}
+              {{ customer ? `${$t('Customer.Update_Customer')}` : `${$t('Customer.Create_Customer')}` }}
             </button>
           </div>
         </form>
