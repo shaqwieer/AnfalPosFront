@@ -143,7 +143,7 @@ const router = createRouter({
                     meta: {
                         breadcrumb: ['E-Commerce Dashboard']
                     },
-                    component: () => import('@/views/dashboards/Ecommerce.vue')
+                    component: () => import('@/views/dashboards/VANDashboard.vue')
                 },
                 {
                     path: '/dashboard-banking',
