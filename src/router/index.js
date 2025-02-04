@@ -599,30 +599,30 @@ const router = createRouter({
     }
 });
 
-// router.beforeEach(async (to, from, next) => {
-//     console.log(`From: ${from.path}, To: ${to.path}`);
-//     const mainStore = useMainStore();
-//     const token = sessionStorage.getItem('Token') || localStorage.getItem('token');
+router.beforeEach(async (to, from, next) => {
+    console.log(`From: ${from.path}, To: ${to.path}`);
+    const mainStore = useMainStore();
+    const token = sessionStorage.getItem('Token') || localStorage.getItem('token');
 
-//     if (token && mainStore.pageTree.length == 0) {
-//         await mainStore.getMenu();
-//     }
-//     const hasBranchIdKey = token ? mainStore.hasBranchIdKey(token) : false;
-//     console.log(hasBranchIdKey);
-//     const isAllowed = mainStore.accessAllowed(to.path);
-//     console.log(`Navigating to: ${to.path}, Allowed: ${isAllowed}`);
+    if (token && mainStore.pageTree.length == 0) {
+        await mainStore.getMenu();
+    }
+    const hasBranchIdKey = token ? mainStore.hasBranchIdKey(token) : false;
+    console.log(hasBranchIdKey);
+    const isAllowed = mainStore.accessAllowed(to.path);
+    console.log(`Navigating to: ${to.path}, Allowed: ${isAllowed}`);
 
-//     if (!token && to.name !== 'login') {
-//         next({ name: 'login' });
-//     } else if (token && to.name === 'login') {
-//         next({ name: 'e-commerce' });
-//     } else if (token && !isAllowed) {
-//         next({ name: 'notfound' });
-//     } else if (token && !hasBranchIdKey && to.name !== 'available-branches') {
-//         next({ name: 'available-branches' });
-//     } else {
-//         next();
-//     }
-// });
+    if (!token && to.name !== 'login') {
+        next({ name: 'login' });
+    } else if (token && to.name === 'login') {
+        next({ name: 'e-commerce' });
+    } else if (token && !isAllowed) {
+        next({ name: 'notfound' });
+    } else if (token && !hasBranchIdKey && to.name !== 'available-branches') {
+        next({ name: 'available-branches' });
+    } else {
+        next();
+    }
+});
 
 export default router;
