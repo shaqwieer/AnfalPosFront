@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, nextTick } from 'vue';
-import CustomerAttachments from './CustomerAttachments.vue';
+//import CustomerAttachments from './CustomerAttachments.vue';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import CustomerAttachmentsNew from './CustomerAttachmentsNew.vue';
 
 const props = defineProps<{
   show: boolean;
   customer?: any; // For edit mode
   readOnly?: boolean; // For view mode
+  action?: string;
 }>();
 
 const emit = defineEmits(['close', 'submit']);
@@ -27,6 +29,7 @@ const mapZoom = ref(12);
 // Form data with all fields
 const formData = ref({
   // Basic Information
+  id: props.customer?.id || '',
   name: props.customer?.name || '',
   type: props.customer?.type || 'business',
   mobile: props.customer?.mobile || '',
@@ -52,17 +55,20 @@ const formData = ref({
   city: props.customer?.city || '',
   postalCode: props.customer?.postalCode || '',
   additionalNumber: props.customer?.additionalNumber || '',
-
+  latitude: props.customer?.latitude || 24.7136,
+  altitude: props.customer?.altitude || 46.6753,
   // Location
   location: {
-    lat: props.customer?.location?.lat || 24.7136,
-    lng: props.customer?.location?.lng || 46.6753,
+    lat: props.customer?.latitude || 24.7136,
+    lng: props.customer?.altitude || 46.6753,
     address: props.customer?.location?.address || ''
   },
 
   // Attachments
-  attachments: props.customer?.attachments || []
+  attachments: props.customer?.attachments || [],
+  notes: props.customer?.notes || ''
 });
+const attachments = ref(props.customer?.attachments || []);
 
 // Left column tabs
 const leftTabs = [
@@ -261,6 +267,7 @@ const getCurrentLocation = async () => {
 
 const handleSubmit = () => {
   if (props.readOnly) return;
+  formData.value.attachments = attachments.value;
   emit('submit', formData.value);
 };
 
@@ -301,32 +308,6 @@ watch(leftColumnTab, (newTab) => {
           <!-- Single column layout -->
           <div class="h-full flex flex-column">
             <!-- Tabs -->
-            <div class="flex justify-content-between border-bottom-1 surface-border overflow-x-auto">
-              <div
-                v-for="tab in leftTabs"
-                :key="tab.id"
-                type="button"
-                @click="leftColumnTab = tab.id"
-                class="py-2 flex align-items-center gap-2 py-3 cursor-pointer relative whitespace-nowrap"
-                :class="leftColumnTab === tab.id ? 'text-primary border-bottom-2 border-primary' : 'text-600 hover:text-700'"
-              >
-                <i class="pi" :class="`pi-${tab.icon}`"></i>
-                <!-- <span>{{ tab.name }}</span> -->
-
-                <span> {{ $t(`Customer.${tab.name}`) }}</span>
-
-                <!-- <span> {{ $t('Customer.Basic_Information') }}</span>
-                <span> {{ $t('Customer.Business_Information') }}</span>
-
-                <span> {{ $t('Customer.Financial_Information') }}</span>
-                <span> {{ $t(`Customer.Address_Information`) }}</span>
-
-                <span> {{ $t(`Customer.Documents`) }}</span>
-                <span> {{ $t(`Customer.Notes`) }}</span> -->
-
-                <div v-if="leftColumnTab === tab.id" class="absolute bottom-0 left-0 right-0 h-2px bg-primary"></div>
-              </div>
-            </div>
 
             <!-- Tab Content - Scrollable -->
             <div class="flex-1 overflow-y-auto p-6">
@@ -409,7 +390,7 @@ watch(leftColumnTab, (newTab) => {
               </div>
 
               <!-- Address Information -->
-              <div v-show="leftColumnTab === 'address'" class="flex flex-column gap-6">
+              <div  class="flex flex-column gap-6">
                 <!-- Map View -->
                 <div class="h-300px border-round-lg border-1 surface-border overflow-hidden relative">
                   <div ref="mapRef" class="w-full h-full"></div>
@@ -422,12 +403,10 @@ watch(leftColumnTab, (newTab) => {
                     </div>
                   </div>
                 </div>
-
                 <!-- Location Error -->
                 <div v-if="locationError" class="text-red-600 text-sm">
                   {{ locationError }}
                 </div>
-
                 <!-- Location Info -->
                 <div class="grid">
                   <div class="col-12 md:col-6">
@@ -478,8 +457,8 @@ watch(leftColumnTab, (newTab) => {
               </div>
 
               <!-- Documents -->
-              <div v-show="leftColumnTab === 'documents'">
-                <CustomerAttachments :customer-id="customer?.id || 'new'" :read-only="readOnly" @update="handleAttachmentsUpdate" />
+              <div >
+                <CustomerAttachmentsNew :customer-id="customer?.id || 'new'" :read-only="readOnly" v-model="attachments" />
               </div>
 
               <!-- Notes -->

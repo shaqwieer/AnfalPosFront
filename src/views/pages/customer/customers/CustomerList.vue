@@ -2,13 +2,10 @@
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import CustomerCard from './CustomerCard.vue';
-import EditCustomerDialog from './EditCustomerDialog.vue';
 
 const router = useRouter();
 const props = defineProps<{
   customers: any[];
-  activeTab: string;
-  searchQuery: string;
 }>();
 
 const CustomerStatus = {
@@ -22,67 +19,9 @@ const emit = defineEmits(['view-details', 'submit-approval', 'edit-customer', 'a
 const showEditDialog = ref(false);
 const selectedCustomer = ref(null);
 
-const rowsPerPage = ref(10);
-const currentPage = ref(0);
-
-const paginatedCustomers = computed(() => {
-  if (!props.customers || !Array.isArray(props.customers)) {
-    return []; // إذا كان customers غير معرف أو ليس مصفوفة، أعد مصفوفة فارغة
-  }
-
-  const start = currentPage.value * rowsPerPage.value;
-  const end = start + rowsPerPage.value;
-  return props.customers.slice(start, end);
-});
-
-// تحديث الصفحة عند تغيير `Paginator`
-const onPageChange = (event: { page: number }) => {
-  currentPage.value = event.page ?? 0;
-};
-
-// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-const filteredCustomers = computed(() => {
-  // return props.customers.filter((customer) => {
-  //   const matchesTab =
-  //     props.activeTab === 'all' || (props.activeTab === 'approved' && customer.statusName === 'Approved') || (props.activeTab === 'pending' && customer.statusName === 'Pending') || (props.activeTab === 'rejected' && customer.statusName === 'Rejected');
-
-  //   const matchesSearch =
-  //     !props.searchQuery ||
-  //     customer.name.toLowerCase().includes(props.searchQuery.toLowerCase()) ||
-  //     customer.id.toString().toLowerCase().includes(props.searchQuery.toLowerCase()) ||
-  //     customer.primaryPhone.includes(props.searchQuery) ||
-  //     customer.crNumber?.includes(props.searchQuery);
-
-  //   return matchesTab && matchesSearch;
-  // });
-
-  const filtered = props.customers.filter((customer) => {
-    const matchesTab =
-      props.activeTab === 'all' ||
-      (props.activeTab === 'active' && customer.statusId === CustomerStatus.Approved) ||
-      (props.activeTab === 'pending' && customer.statusId === CustomerStatus.Pending) ||
-      (props.activeTab === 'rejected' && customer.statusId === CustomerStatus.Rejected);
-
-    const matchesSearch =
-      !props.searchQuery ||
-      customer.name.toLowerCase().includes(props.searchQuery.toLowerCase()) ||
-      customer.id.toString().toLowerCase().includes(props.searchQuery.toLowerCase()) ||
-      customer.primaryPhone.includes(props.searchQuery) ||
-      customer.crNumber?.includes(props.searchQuery);
-
-    return matchesTab && matchesSearch;
-  });
-
-  // بعد الفلترة، قم بتطبيق التصفح (pagination)
-  const start = currentPage.value * rowsPerPage.value;
-  const end = start + rowsPerPage.value;
-  return filtered.slice(start, end);
-});
 
 const handleEditCustomer = (customer: any) => {
-  selectedCustomer.value = customer;
-  showEditDialog.value = true;
+  emit('edit-customer', customer);
 };
 
 const handleSaveCustomer = (updatedCustomer: any) => {
@@ -114,7 +53,7 @@ const handleReject = (customer: any) => {
 <template>
   <div class="flex flex-column gap-4">
     <CustomerCard
-      v-for="customer in filteredCustomers"
+      v-for="customer in customers"
       :key="customer.id"
       :customer="customer"
       @view-details="$emit('view-details', customer)"
@@ -132,9 +71,8 @@ const handleReject = (customer: any) => {
       </template>
     </CustomerCard>
 
-    <Paginator :rows="rowsPerPage" :totalRecords="props.customers.length" @page="onPageChange" />
 
     <!-- Edit Customer Dialog -->
-    <EditCustomerDialog v-if="showEditDialog" :show="showEditDialog" :customer="selectedCustomer" @close="showEditDialog = false" @save="handleSaveCustomer" />
+    <!-- <EditCustomerDialog v-if="showEditDialog" :show="showEditDialog" :customer="selectedCustomer" @close="showEditDialog = false" @save="handleSaveCustomer" /> -->
   </div>
 </template>
