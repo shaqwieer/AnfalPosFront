@@ -1,52 +1,58 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useVanStore } from '@/stores/vanStore.js';
-import { useCustomerStore } from '@/stores/customerStore.js';
+//import { useVanStore } from '@/stores/vanStore.js';
+import { useCustomerStore } from '../../../stores/customerStore';
 
 import CustomerList from './customers/CustomerList.vue';
 import CustomerForm from './customers/CustomerForm.vue';
-import CustomerDetails from './customers/CustomerDetails.vue';
-import EditCustomerDialog from './customers/EditCustomerDialog.vue';
 import { vanCustomers } from './customers/VANCustomerSampleData';
 
-const vanStore = useVanStore();
+//const vanStore = useVanStore();
 const customerStore = useCustomerStore();
 
 const activeTab = ref('active');
 const searchQuery = ref('');
 const showNewCustomerForm = ref(false);
 const selectedCustomer = ref(null);
-const showDetails = ref(false);
 const showEditDialog = ref(false);
 // const viewMode = ref<'cards' | 'list'>('cards');
 const viewMode = ref<'cards' | 'list'>('cards');
 
 onMounted(async () => {
-  await customerStore.GetCustomerBasedOnBranchType()
+  await Promise.all([customerStore.GetCustomerBasedOnBranchType()]);
 })
 // Initialize customers with sample data
 const customers = computed(()=>customerStore.customers);
 
 
 const handleSubmitCustomer = (customer: any) => {
-  // Add the new customer to the list
-  customers.value = [...customers.value, customer];
 
+  if(selectType.value === 'edit'){
+    customerStore.UpdateCustomerBasedOnBranchType(customer);
+  }
+  else
+  {
+    customerStore.CreateCustomerBasedOnBranchType(customer);
+    customerStore.customers.push(customer);
+  }
   // Close the form
   showNewCustomerForm.value = false;
-
+  selectType.value = ''
   // Switch to pending tab since new customers start as pending
   activeTab.value = 'pending';
 };
 
+const selectType = ref('')
 const handleViewDetails = (customer: any) => {
+  selectType.value = 'view'
   selectedCustomer.value = customer;
-  showDetails.value = true;
+  showNewCustomerForm.value = true;
 };
 
 const handleEditCustomer = (customer: any) => {
+    selectType.value = 'edit'
   selectedCustomer.value = customer;
-  showEditDialog.value = true;
+  showNewCustomerForm.value = true;
 };
 
 const handleSaveCustomer = (updatedCustomer: any) => {
@@ -65,7 +71,7 @@ const handleSubmitApproval = (customer: any) => {
       ...customer,
       status: 'pending',
       approvalStatus: 'pending',
-      submittedBy: vanStore.vanInfo.driver,
+      //submittedBy: vanStore.vanInfo.driver,
       submittedDate: new Date().toISOString().split('T')[0]
     };
   }
@@ -78,7 +84,7 @@ const handleApprove = (customer: any) => {
       ...customer,
       status: 'active',
       approvalStatus: 'approved',
-      approvedBy: vanStore.vanInfo.driver,
+      //approvedBy: vanStore.vanInfo.driver,
       approvedDate: new Date().toISOString().split('T')[0]
     };
   }
@@ -91,7 +97,7 @@ const handleReject = (customer: any) => {
       ...customer,
       status: 'rejected',
       approvalStatus: 'rejected',
-      approvedBy: vanStore.vanInfo.driver,
+      //approvedBy: vanStore.vanInfo.driver,
       approvedDate: new Date().toISOString().split('T')[0]
     };
   }
@@ -112,6 +118,42 @@ const containerClass = computed(() => ({
   ltr: !mainStore.isRTL
 }));
 const { t, locale } = useI18n();
+
+
+const rowsPerPage = ref(10);
+const currentPage = ref(0);
+
+
+
+// تحديث الصفحة عند تغيير `Paginator`
+const onPageChange = (event: { page: number }) => {
+  currentPage.value = event.page ?? 0;
+};
+
+
+const paginatedCustomers = computed(() => {
+  if (!customers.value || !Array.isArray(customers.value)) {
+    return []; // إذا كان customers غير معرف أو ليس مصفوفة، أعد مصفوفة فارغة
+  }
+  const start = currentPage.value * rowsPerPage.value;
+  const end = start + rowsPerPage.value;
+  return customers.value.slice(start, end);
+});
+
+const filteredCustomers = computed(() => {
+  return paginatedCustomers.value.filter((customer) => {
+    const matchesTab = activeTab.value === 'all' || (activeTab.value === 'active' && customer.statusName === 'Approved') || (activeTab.value === 'pending' && customer.statusName === 'Pending')|| (activeTab.value === 'rejected' && customer.statusName === 'Rejected');
+
+    const matchesSearch =
+      !searchQuery.value ||
+      customer.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      customer.id.toString().toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      customer.primaryPhone.includes(searchQuery.value) ||
+      customer.crNumber?.includes(searchQuery.value);
+
+    return matchesTab && matchesSearch;
+  });
+});
 </script>
 
 <template>
@@ -180,122 +222,14 @@ const { t, locale } = useI18n();
     <div class="flex-1 overflow-hidden">
       <div class="h-full overflow-y-auto px-6 pb-6">
         <div class="max-w-7xl mx-auto">
-          <!-- List View -->
-          <!-- <div v-if="viewMode === 'list'" class="surface-card border-round-lg shadow-2 border-1 surface-border overflow-hidden">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Business Info</th>
-                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Credit Limit</th>
-                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Balance</th>
-                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Actions</th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
-                <tr v-for="customer in customers" :key="customer.id" class="hover:bg-gray-50 transition-colors">
-                  <td class="px-6 py-4">
-                    <div class="font-medium text-gray-900">
-                      {{ customer.name }}
-                    </div>
-                    <div class="text-sm text-gray-500">{{ customer.id }}</div>
-                  </td>
-                  <td class="px-6 py-4">
-                    <div class="text-sm">{{ customer.mobile }}</div>
-                    <div class="text-sm text-gray-500">
-                      {{ customer.email }}
-                    </div>
-                  </td>
-                  <td class="px-6 py-4">
-                    <div class="text-sm">CR: {{ customer.cr }}</div>
-                    <div class="text-sm">VAT: {{ customer.vat }}</div>
-                  </td>
-                  <td class="px-6 py-4 text-right">
-                    <div class="text-sm font-medium">
-                      {{
-                        new Intl.NumberFormat('en-US', {
-                          style: 'currency',
-                          currency: 'SAR'
-                        }).format(customer.creditLimit)
-                      }}
-                    </div>
-                  </td>
-                  <td class="px-6 py-4 text-right">
-                    <div class="text-sm font-medium">
-                      {{
-                        new Intl.NumberFormat('en-US', {
-                          style: 'currency',
-                          currency: 'SAR'
-                        }).format(customer.balance)
-                      }}
-                    </div>
-                  </td>
-                  <td class="px-6 py-4">
-                    <div class="flex flex-column align-items-center space-y-1">
-                      <span
-                        class="px-2 py-1 text-xs rounded-full"
-                        :class="{
-                          'bg-green-100 text-green-800': customer.status === 'active',
-                          'bg-yellow-100 text-yellow-800': customer.status === 'pending',
-                          'bg-red-100 text-red-800': customer.status === 'rejected'
-                        }"
-                      >
-                        {{ customer.status }}
-                      </span>
-                      <span
-                        class="px-2 py-1 text-xs rounded-full"
-                        :class="{
-                          'bg-green-100 text-green-800': customer.approvalStatus === 'approved',
-                          'bg-yellow-100 text-yellow-800': customer.approvalStatus === 'pending',
-                          'bg-red-100 text-red-800': customer.approvalStatus === 'rejected'
-                        }"
-                      >
-                        {{ customer.approvalStatus }}
-                      </span>
-                    </div>
-                  </td>
-                  <td class="px-6 py-4">
-                    <div class="flex align-items-center justify-content-center space-x-2">
-                      <button @click="handleViewDetails(customer)" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full">
-                        <i class="pi pi-eye"></i>
-                      </button>
-                      <button @click="handleEditCustomer(customer)" class="p-1.5 text-gray-600 hover:bg-gray-50 rounded-full">
-                        <i class="pi pi-pencil"></i>
-                      </button>
-                      <button v-if="customer.status === 'draft'" @click="handleSubmitApproval(customer)" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-full">
-                        <i class="pi pi-send"></i>
-                      </button>
-                      <template v-if="customer.approvalStatus === 'pending'">
-                        <button @click="handleApprove(customer)" class="p-1.5 text-green-600 hover:bg-green-50 rounded-full">
-                          <i class="pi pi-check-circle"></i>
-                        </button>
-                        <button @click="handleReject(customer)" class="p-1.5 text-red-600 hover:bg-red-50 rounded-full">
-                          <i class="pi pi-times-circle"></i>
-                        </button>
-                      </template>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div> -->
-
-          <!-- ----------------------------------------------------------- -->
 
           <DataTable
             class="surface-card border-round-lg mb-4 shadow-1 border-1 surface-border"
             v-if="viewMode === 'list'"
-            :value="customers"
+            :value="filteredCustomers"
             dataKey="id"
-            :paginator="customers.length > 10 ? true : false"
             :rows="10"
             :globalFilterFields="['name', 'id']"
-            :paginatorTemplate="
-              mainStore.isRTL ? 'RowsPerPageDropdown NextPageLink LastPageLink  PageLinks FirstPageLink PrevPageLink  CurrentPageReport ' : 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
-            "
-            :rowsPerPageOptions="[5, 10, 25]"
             :currentPageReportTemplate="''"
           >
             <template #empty>
@@ -410,9 +344,7 @@ const { t, locale } = useI18n();
           <!-- Card View -->
           <div v-else>
             <CustomerList
-              :customers="customers"
-              :active-tab="activeTab"
-              :search-query="searchQuery"
+              :customers="filteredCustomers"
               @view-details="handleViewDetails"
               @edit-customer="handleEditCustomer"
               @submit-approval="handleSubmitApproval"
@@ -420,6 +352,7 @@ const { t, locale } = useI18n();
               @reject="handleReject"
             />
           </div>
+          <Paginator :rows="rowsPerPage" :totalRecords="customers.length" @page="onPageChange" />
 
           <!-- ----------------------------------------------------------- -->
         </div>
@@ -427,11 +360,7 @@ const { t, locale } = useI18n();
     </div>
 
     <!-- Dialogs -->
-    <CustomerForm v-if="showNewCustomerForm" :show="showNewCustomerForm" @close="showNewCustomerForm = false" @submit="handleSubmitCustomer" />
-
-    <CustomerDetails v-if="showDetails" :show="showDetails" :customer="selectedCustomer" @close="showDetails = false" />
-
-    <EditCustomerDialog v-if="showEditDialog" :show="showEditDialog" :customer="selectedCustomer" @close="showEditDialog = false" @save="handleSaveCustomer" />
+    <CustomerForm v-if="showNewCustomerForm" :show="showNewCustomerForm" :action="selectType" :readOnly="selectType=='view'" :customer="selectedCustomer" @close="showNewCustomerForm = false" @submit="handleSubmitCustomer" />
   </div>
 </template>
 

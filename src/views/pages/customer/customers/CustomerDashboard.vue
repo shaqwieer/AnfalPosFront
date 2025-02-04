@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useVanStore } from '../../../stores/vanStore'
+import { useVanStore } from '../../../../stores/vanStore'
 import { useRouter } from 'vue-router'
 
 const props = defineProps<{
