@@ -1,49 +1,49 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import KPICards from './components/KPICards.vue'
-import VisitsDetails from './components/details/VisitsDetails.vue'
-import SalesDetails from './components/details/SalesDetails.vue'
-import CollectionsDetails from './components/details/CollectionsDetails.vue'
-import SessionsDetails from './components/details/SessionsDetails.vue'
-import OverdueDetails from './components/details/OverdueDetails.vue'
-import StockDetails from './components/details/StockDetails.vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import KPICards from './components/KPICards.vue';
+import VisitsDetails from './components/details/VisitsDetails.vue';
+import SalesDetails from './components/details/SalesDetails.vue';
+import CollectionsDetails from './components/details/CollectionsDetails.vue';
+import SessionsDetails from './components/details/SessionsDetails.vue';
+import OverdueDetails from './components/details/OverdueDetails.vue';
+import StockDetails from './components/details/StockDetails.vue';
 
 // Add new ref for filter values
 const filterValues = ref({
   salesReps: ['all'],
   dateFrom: '',
   dateTo: ''
-})
+});
 
 // Change selectedSalesReps to use a regular array initial value
-const selectedSalesReps = ref<string[]>(['all'])
-const dateFrom = ref('')
-const dateTo = ref('')
+const selectedSalesReps = ref<string[]>(['all']);
+const dateFrom = ref('');
+const dateTo = ref('');
 
 // Add new ref for dropdown state
-const isDropdownOpen = ref(false)
+const isDropdownOpen = ref(false);
 
 // Function to toggle dropdown
 const toggleDropdown = () => {
-  isDropdownOpen.value = !isDropdownOpen.value
-}
+  isDropdownOpen.value = !isDropdownOpen.value;
+};
 
 // Function to close dropdown when clicking outside
 const closeDropdown = (event: Event) => {
-  const target = event.target as HTMLElement
+  const target = event.target as HTMLElement;
   if (!target.closest('.sales-rep-dropdown')) {
-    isDropdownOpen.value = false
+    isDropdownOpen.value = false;
   }
-}
+};
 
 // Add click outside listener
 onMounted(() => {
-  document.addEventListener('click', closeDropdown)
-})
+  document.addEventListener('click', closeDropdown);
+});
 
 onUnmounted(() => {
-  document.removeEventListener('click', closeDropdown)
-})
+  document.removeEventListener('click', closeDropdown);
+});
 
 // Available sales reps
 const availableSalesReps = [
@@ -52,48 +52,52 @@ const availableSalesReps = [
   { id: 'rep2', name: 'Abdullah Al-Qahtani' },
   { id: 'rep3', name: 'Khalid Al-Otaibi' },
   { id: 'rep4', name: 'Fahad Al-Harbi' }
-]
+];
 
 // Watch for 'all' selection - FIXED to prevent recursion
-watch(selectedSalesReps, (newValue) => {
-  if (newValue.includes('all') && newValue.length > 1) {
-    // If 'all' is selected along with other options, only keep 'all'
-    selectedSalesReps.value = ['all']
-  } else if (newValue.length === 0) {
-    // If nothing is selected, default to 'all'
-    selectedSalesReps.value = ['all']
-  } else if (!newValue.includes('all') && newValue.length === availableSalesReps.length - 1) {
-    // If all individual reps are selected, switch to 'all'
-    selectedSalesReps.value = ['all']
-  }
-}, { deep: true })
+watch(
+  selectedSalesReps,
+  (newValue) => {
+    if (newValue.includes('all') && newValue.length > 1) {
+      // If 'all' is selected along with other options, only keep 'all'
+      selectedSalesReps.value = ['all'];
+    } else if (newValue.length === 0) {
+      // If nothing is selected, default to 'all'
+      selectedSalesReps.value = ['all'];
+    } else if (!newValue.includes('all') && newValue.length === availableSalesReps.length - 1) {
+      // If all individual reps are selected, switch to 'all'
+      selectedSalesReps.value = ['all'];
+    }
+  },
+  { deep: true }
+);
 
 // Handle individual selection
 const handleSalesRepSelection = (repId: string) => {
   if (repId === 'all') {
-    selectedSalesReps.value = ['all']
+    selectedSalesReps.value = ['all'];
   } else {
     // Remove 'all' if it's currently selected
     if (selectedSalesReps.value.includes('all')) {
-      selectedSalesReps.value = [repId]
+      selectedSalesReps.value = [repId];
     } else {
       // Toggle the selection of the individual rep
-      const index = selectedSalesReps.value.indexOf(repId)
+      const index = selectedSalesReps.value.indexOf(repId);
       if (index === -1) {
-        selectedSalesReps.value.push(repId)
+        selectedSalesReps.value.push(repId);
       } else {
-        selectedSalesReps.value.splice(index, 1)
+        selectedSalesReps.value.splice(index, 1);
       }
     }
   }
-}
+};
 
 // Add function to handle search
 const handleSearch = () => {
-  selectedSalesReps.value = [...filterValues.value.salesReps]
-  dateFrom.value = filterValues.value.dateFrom
-  dateTo.value = filterValues.value.dateTo
-}
+  selectedSalesReps.value = [...filterValues.value.salesReps];
+  dateFrom.value = filterValues.value.dateFrom;
+  dateTo.value = filterValues.value.dateTo;
+};
 
 // Sample data for yesterday
 const yesterdayData = ref({
@@ -105,7 +109,7 @@ const yesterdayData = ref({
     bank: 2000
   },
   openSessions: 5000
-})
+});
 
 // Sample data for today
 const todayData = ref({
@@ -139,7 +143,7 @@ const todayData = ref({
     days60: 80000,
     days90plus: 50000
   }
-})
+});
 
 // Sample sales reps data with 10 reps
 const salesReps = ref([
@@ -152,9 +156,9 @@ const salesReps = ref([
     sales: 25000,
     collections: 22000,
     openSessions: 3000
-  },
+  }
   // ... other sales reps data
-])
+]);
 
 // Card details data
 const cardDetails = ref({
@@ -366,61 +370,60 @@ const cardDetails = ref({
       ]
     }
   }
-})
+});
 
 // Selected card and view mode state
-const selectedCard = ref<string | null>(null)
-const viewMode = ref<'chart' | 'table'>('chart')
+const selectedCard = ref<string | null>(null);
+const viewMode = ref<'chart' | 'table'>('chart');
 
 // Handle card selection
 const handleCardSelect = (cardType: string | null) => {
-  selectedCard.value = cardType
-}
+  selectedCard.value = cardType;
+};
 
 // Toggle view mode
 const toggleViewMode = () => {
-  viewMode.value = viewMode.value === 'chart' ? 'table' : 'chart'
-}
+  viewMode.value = viewMode.value === 'chart' ? 'table' : 'chart';
+};
 
 // Update filteredData to use selectedSalesReps array
 const filteredData = computed(() => {
-  let data = { ...todayData.value }
-  
+  let data = { ...todayData.value };
+
   // Filter by sales reps if not "all" selected
   if (!selectedSalesReps.value.includes('all')) {
     // Apply sales rep filtering logic here
     // This is a placeholder for actual filtering logic
   }
-  
+
   // Filter by date range
   if (dateFrom.value && dateTo.value) {
     // Apply date range filtering logic here
     // This is a placeholder for actual filtering logic
   }
-  
-  return data
-})
+
+  return data;
+});
 
 // Initialize with current date range
 const initializeDateRange = () => {
-  const today = new Date()
-  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
-  
-  filterValues.value.dateFrom = firstDayOfMonth.toISOString().split('T')[0]
-  filterValues.value.dateTo = today.toISOString().split('T')[0]
-  
+  const today = new Date();
+  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+  filterValues.value.dateFrom = firstDayOfMonth.toISOString().split('T')[0];
+  filterValues.value.dateTo = today.toISOString().split('T')[0];
+
   // Initialize actual filter values
-  dateFrom.value = filterValues.value.dateFrom
-  dateTo.value = filterValues.value.dateTo
-}
+  dateFrom.value = filterValues.value.dateFrom;
+  dateTo.value = filterValues.value.dateTo;
+};
 
 // Initialize date range on component mount
-initializeDateRange()
+initializeDateRange();
 </script>
 
-
 <template>
-  <div class="p-6">
+  <div class="">
     <div class="max-w-7xl mx-auto">
       <!-- Header with Filters -->
       <div class="mb-6">
@@ -430,35 +433,27 @@ initializeDateRange()
             {{ new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}
           </div>
         </div>
-        
+
         <!-- Filters -->
-        <div class="surface-card border-round p-4 border-1">
+        <div class="surface-card border-round p-4 border-1 border-gray-200">
           <div class="grid">
             <!-- Sales Rep Multi-select Dropdown -->
             <div class="col-12 md:col-4 sales-rep-dropdown">
               <label class="block text-sm font-medium text-700 mb-1">Sales Representatives</label>
               <div class="relative">
-                <button @click.stop="toggleDropdown"
-                        class="w-full surface-card border-1 border-round px-4 py-2 text-left flex align-items-center justify-content-between">
+                <button @click.stop="toggleDropdown" class="w-full h-3rem border-1 border-gray-200 surface-card border-1 border-round px-4 py-2 text-left flex align-items-center justify-content-between">
                   <span class="text-overflow-ellipsis">
-                    {{ filterValues.salesReps.includes('all') ? 'All Sales Reps' : 
-                       filterValues.salesReps.length + ' Selected' }}
+                    {{ filterValues.salesReps.includes('all') ? 'All Sales Reps' : filterValues.salesReps.length + ' Selected' }}
                   </span>
                   <i :class="['pi', isDropdownOpen ? 'pi-chevron-up' : 'pi-chevron-down', 'text-500']"></i>
                 </button>
-                
+
                 <!-- Dropdown Menu -->
-                <div v-if="isDropdownOpen"
-                     class="absolute w-full mt-1 surface-card border-1 border-round shadow-2">
+                <div v-if="isDropdownOpen" class="border-1 border-gray-200 absolute w-full mt-1 surface-card border-1 border-round shadow-2">
                   <div class="py-1 overflow-auto" style="max-height: 15rem">
-                    <label v-for="rep in availableSalesReps"
-                           :key="rep.id"
-                           class="flex align-items-center px-4 py-2 hover:surface-hover cursor-pointer">
+                    <label v-for="rep in availableSalesReps" :key="rep.id" class="flex align-items-center px-4 py-2 hover:surface-hover cursor-pointer">
                       <div class="p-checkbox p-component">
-                        <input type="checkbox"
-                               :checked="filterValues.salesReps.includes(rep.id)"
-                               @change="handleSalesRepSelection(rep.id)"
-                               class="p-checkbox-box">
+                        <input type="checkbox" :checked="filterValues.salesReps.includes(rep.id)" @change="handleSalesRepSelection(rep.id)" class="p-checkbox-box" />
                       </div>
                       <span class="ml-3 text-700">{{ rep.name }}</span>
                     </label>
@@ -470,23 +465,17 @@ initializeDateRange()
             <!-- Date Range -->
             <div class="col-12 md:col-4">
               <label class="block text-sm font-medium text-700 mb-1">From Date</label>
-              <input type="date"
-                     v-model="filterValues.dateFrom"
-                     class="w-full border-1 border-round">
+              <input type="date" v-model="filterValues.dateFrom" class="w-full border-none" />
             </div>
             <div class="col-12 md:col-4">
               <label class="block text-sm font-medium text-700 mb-1">To Date</label>
-              <input type="date"
-                     v-model="filterValues.dateTo"
-                     :min="filterValues.dateFrom"
-                     class="w-full border-1 border-round">
+              <input type="date" v-model="filterValues.dateTo" :min="filterValues.dateFrom" class="w-full border-none" />
             </div>
           </div>
-          
+
           <!-- Search Button -->
           <div class="mt-4 flex justify-content-end">
-            <button @click="handleSearch"
-                    class="p-button p-component px-4 py-2 bg-primary text-white border-round flex align-items-center gap-2">
+            <button @click="handleSearch" class="p-button p-component px-4 py-2 bg-primary text-white border-round flex align-items-center gap-2">
               <i class="pi pi-search"></i>
               <span>Search</span>
             </button>
@@ -495,53 +484,41 @@ initializeDateRange()
       </div>
 
       <!-- KPI Cards -->
-      <KPICards 
-        :yesterday-data="yesterdayData"
-        :today-data="filteredData"
-        :selected-card="selectedCard"
-        @select-card="handleCardSelect"
-        class="mb-6"
-      />
+      <KPICards :yesterday-data="yesterdayData" :today-data="filteredData" :selected-card="selectedCard" @select-card="handleCardSelect" class="mb-6" />
 
       <!-- Details Section -->
-      <div v-if="selectedCard" class="surface-card border-round-xl border-1 p-6">
+      <div v-if="selectedCard" class="surface-card border-round-xl border-1 p-4 border-gray-200">
         <div class="flex align-items-center justify-content-between mb-6">
           <h2 class="text-lg font-medium">{{ selectedCard.charAt(0).toUpperCase() + selectedCard.slice(1) }} Details</h2>
           <div class="flex align-items-center gap-2">
-            <button @click="toggleViewMode"
-                    class="p-2 border-round hover:surface-hover">
-              <i :class="['pi', viewMode === 'chart' ? 'pi-table' : 'pi-chart-bar']"></i>
-            </button>
-            <button @click="selectedCard = null"
-                    class="p-2 border-round hover:surface-hover">
-              <i class="pi pi-times"></i>
-            </button>
+            <div @click="toggleViewMode" class="p-2 cursor-pointer border-round hover:surface-hover">
+              <font-awesome-icon :icon="['fas', viewMode === 'chart' ? 'table' : 'chart-simple']" class="text-xl" />
+            </div>
+            <div @click="selectedCard = null" class="p-2 flex justify-content-center align-items-center cursor-pointer border-round hover:surface-hover">
+              <i class="pi pi-times text-xl"></i>
+            </div>
           </div>
         </div>
 
         <!-- Dynamic Details Component -->
-        <VisitsDetails v-if="selectedCard === 'visits' && cardDetails.visits"
-                      :data="cardDetails.visits"
-                      :view-mode="viewMode" />
-        <SalesDetails v-if="selectedCard === 'sales' && cardDetails.sales"
-                     :data="cardDetails.sales"
-                     :view-mode="viewMode" />
-        <CollectionsDetails v-if="selectedCard === 'collections'"
-                       :data="cardDetails.collections"
-                       :view-mode="viewMode" />
-        <SessionsDetails v-if="selectedCard === 'sessions'"
-                    :data="cardDetails.sessions"
-                    :view-mode="viewMode" />
-        <OverdueDetails v-if="selectedCard === 'overdue'"
-                   :data="cardDetails.overdue"
-                   :view-mode="viewMode" />
-        <StockDetails v-if="selectedCard === 'stock'"
-                  :data="cardDetails.stock"
-                  :view-mode="viewMode" />
+        <VisitsDetails v-if="selectedCard === 'visits' && cardDetails.visits" :data="cardDetails.visits" :view-mode="viewMode" class="" />
+        <SalesDetails v-if="selectedCard === 'sales' && cardDetails.sales" :data="cardDetails.sales" :view-mode="viewMode" />
+        <CollectionsDetails v-if="selectedCard === 'collections'" :data="cardDetails.collections" :view-mode="viewMode" />
+        <SessionsDetails v-if="selectedCard === 'sessions'" :data="cardDetails.sessions" :view-mode="viewMode" />
+        <OverdueDetails v-if="selectedCard === 'overdue'" :data="cardDetails.overdue" :view-mode="viewMode" />
+        <StockDetails v-if="selectedCard === 'stock'" :data="cardDetails.stock" :view-mode="viewMode" />
       </div>
     </div>
   </div>
 </template>
+
+<style>
+.grid {
+  margin-right: -0.5rem;
+  margin-left: -0.5rem;
+  margin-top: -0.5rem;
+}
+</style>
 
 <style scoped>
 /* PrimeFlex overrides */
@@ -563,7 +540,7 @@ initializeDateRange()
 }
 
 /* Date input styles */
-input[type="date"] {
+input[type='date'] {
   min-height: 42px;
   padding: 0.5rem;
 }
