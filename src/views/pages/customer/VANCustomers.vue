@@ -29,7 +29,6 @@ const handleSubmitCustomer = (customer: any) => {
     customerStore.EditCustomerBasedOnBranchType(customer);
   } else {
     customerStore.CreateCustomerBasedOnBranchType(customer);
-    customerStore.customers.push(customer);
   }
   // Close the form
   showNewCustomerForm.value = false;
