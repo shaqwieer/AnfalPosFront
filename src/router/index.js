@@ -529,6 +529,11 @@ const router = createRouter({
                     path: '/pages/help',
                     name: 'help',
                     component: () => import('@/views/pages/Help.vue')
+                },
+                {
+                    path: '/salesrep-target',
+                    name: 'target',
+                    component: () => import('@/views/pages/targets/repTargets.vue')
                 }
             ]
         },
