@@ -206,7 +206,7 @@ const getStockLevel = (quantity: number, minStock: number, maxStock: number) => 
           </template>
 
           <template #body="slotProps">
-            <div class="flex flex-column align-items-start text-md text-right">
+            <div class="flex flex-column align-items-start text-md">
               {{ slotProps.data.name }}
             </div>
           </template>
@@ -233,7 +233,7 @@ const getStockLevel = (quantity: number, minStock: number, maxStock: number) => 
           </template>
 
           <template #body="slotProps">
-            <div class="flex flex-column align-items-center text-md text-right">
+            <div class="flex flex-column align-items-center text-md">
               <div class="w-full bg-gray-200 border-round-2xl" style="height: 8px">
                 <div
                   style="height: 8px"
@@ -267,7 +267,7 @@ const getStockLevel = (quantity: number, minStock: number, maxStock: number) => 
           </template>
 
           <template #body="slotProps">
-            <div class="flex flex-column align-items-center text-md text-right">{{ slotProps.data.minStock }} / {{ slotProps.data.maxStock }}</div>
+            <div class="flex flex-column align-items-center text-md">{{ slotProps.data.minStock }} / {{ slotProps.data.maxStock }}</div>
           </template>
         </Column>
 
@@ -279,7 +279,7 @@ const getStockLevel = (quantity: number, minStock: number, maxStock: number) => 
           </template>
 
           <template #body="slotProps">
-            <div class="flex flex-column align-items-center text-sm text-right">
+            <div class="flex flex-column align-items-center text-sm">
               <span class="px-2 py-1 text-xs border-round-3xl" :class="getStatusColor(slotProps.data.status)">
                 {{ slotProps.data.status.toUpperCase() }}
               </span>

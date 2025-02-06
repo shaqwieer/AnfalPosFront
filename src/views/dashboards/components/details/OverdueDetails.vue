@@ -246,7 +246,7 @@ const getAgingColor = (category: string) => {
           </template>
 
           <template #body="slotProps">
-            <div class="flex flex-column align-items-start text-md text-right">
+            <div class="flex flex-column align-items-start text-md">
               {{ slotProps.data.customer }}
             </div>
           </template>
@@ -265,7 +265,7 @@ const getAgingColor = (category: string) => {
             </div>
           </template>
           <template #body="slotProps">
-            <div class="flex flex-column align-items-start text-md text-right">
+            <div class="flex flex-column align-items-start text-md">
               {{ slotProps.data.invoice }}
             </div>
           </template>
@@ -284,7 +284,7 @@ const getAgingColor = (category: string) => {
             </div>
           </template>
           <template #body="slotProps">
-            <div class="flex flex-column align-items-center text-md text-right">
+            <div class="flex flex-column align-items-center text-md">
               {{ slotProps.data.date }}
             </div>
           </template>
@@ -297,7 +297,7 @@ const getAgingColor = (category: string) => {
             </div>
           </template>
           <template #body="slotProps">
-            <div class="flex flex-column align-items-center font-semibold text-md text-right">
+            <div class="flex flex-column align-items-center font-semibold text-md">
               {{ slotProps.data.amount }}
             </div>
           </template>
@@ -316,7 +316,7 @@ const getAgingColor = (category: string) => {
             </div>
           </template>
           <template #body="slotProps">
-            <div class="flex flex-column align-items-center text-md text-right">
+            <div class="flex flex-column align-items-center text-md">
               {{ slotProps.data.days }}
             </div>
           </template>
@@ -329,7 +329,7 @@ const getAgingColor = (category: string) => {
             </div>
           </template>
           <template #body="slotProps">
-            <div class="flex flex-column align-items-center text-md text-right">
+            <div class="flex flex-column align-items-center text-md">
               <span class="px-2 py-1 text-xs border-round-xl" :class="getAgingColor(slotProps.data.category)"> {{ slotProps.data.category }} days </span>
             </div>
           </template>
