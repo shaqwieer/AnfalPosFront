@@ -313,7 +313,7 @@ const filteredCustomers = computed(() => {
           <div v-else>
             <CustomerList :customers="paginatedCustomers" @view-details="handleViewDetails" @edit-customer="handleEditCustomer" @submit-approval="handleSubmitApproval" @approve="handleApprove" @reject="handleReject" />
           </div>
-          <Paginator :rows="rowsPerPage" :totalRecords="customers.length" @page="onPageChange" />
+          <Paginator :rows="rowsPerPage" :totalRecords="filteredCustomers.length" @page="onPageChange" />
 
           <!-- ----------------------------------------------------------- -->
         </div>
