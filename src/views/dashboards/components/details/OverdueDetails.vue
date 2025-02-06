@@ -210,7 +210,7 @@ const getAgingColor = (category: string) => {
 
     <!-- Chart View -->
 
-    <div v-if="viewMode === 'chartx'" class="bg-white border-gray-200 border-round-xl shadow-sm border-1 p-4">
+    <div v-if="viewMode === 'chart'" class="bg-white border-gray-200 border-round-xl shadow-sm border-1 p-4">
       <div style="height: 400px">
         <Bar :data="chartData" :options="chartOptions" />
       </div>
@@ -218,49 +218,6 @@ const getAgingColor = (category: string) => {
 
     <!-- Table View -->
     <div v-else class="bg-white border-1 border-gray-200 border-round shadow-sm border overflow-hidden">
-      <!-- <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sales Rep</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Invoice</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
-              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Days</th>
-              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Aging</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200">
-            <tr v-for="item in overdueData" :key="item.invoice">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.salesRep }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.customer }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.invoice }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(item.date) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">
-                {{ formatPrice(item.amount) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-center">{{ item.days }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-center">
-                <span class="px-2 py-1 text-xs rounded-full" :class="getAgingColor(item.category)"> {{ item.category }} days </span>
-              </td>
-            </tr>
-          </tbody>
-          <tfoot class="bg-gray-50">
-            <tr>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Total ({{ summary.totalSalesReps }} Sales Reps)</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ summary.totalCustomers }} Customers</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ summary.totalInvoices }} Invoices</td>
-              <td class="px-6 py-4"></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">
-                {{ formatPrice(summary.totalOverdue) }}
-              </td>
-              <td colspan="2"></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div> -->
-
       <DataTable :value="overdueData" :paginator="overdueData.length > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" class="">
         <template #empty>
           <div class="flex justify-content-center align-items-center font-bold text-lg">No Data Available</div>
@@ -281,7 +238,6 @@ const getAgingColor = (category: string) => {
           </template>
         </Column>
 
-        <!-- Cash Column -->
         <Column field="customer">
           <template #header="slotProps">
             <div class="w-full">
@@ -290,19 +246,18 @@ const getAgingColor = (category: string) => {
           </template>
 
           <template #body="slotProps">
-            <div class="flex flex-column align-items-start text-md  text-right">
+            <div class="flex flex-column align-items-start text-md text-right">
               {{ slotProps.data.customer }}
             </div>
           </template>
 
           <template #footer="slotProps">
             <div class="flex flex-column align-items-start">
-              <div class="font-semibold text-md ">{{ summary.totalCustomers }} Customers</div>
+              <div class="font-semibold text-md">{{ summary.totalCustomers }} Customers</div>
             </div>
           </template>
         </Column>
 
-        <!-- Card Column -->
         <Column field="invoice">
           <template #header="slotProps">
             <div class="w-full">
@@ -310,7 +265,7 @@ const getAgingColor = (category: string) => {
             </div>
           </template>
           <template #body="slotProps">
-            <div class="flex flex-column align-items-start text-md  text-right">
+            <div class="flex flex-column align-items-start text-md text-right">
               {{ slotProps.data.invoice }}
             </div>
           </template>
@@ -322,7 +277,6 @@ const getAgingColor = (category: string) => {
           </template>
         </Column>
 
-        <!-- Bank Column -->
         <Column field="date">
           <template #header="slotProps">
             <div class="w-full">
@@ -330,7 +284,7 @@ const getAgingColor = (category: string) => {
             </div>
           </template>
           <template #body="slotProps">
-            <div class="flex flex-column align-items-center text-md text-right ">
+            <div class="flex flex-column align-items-center text-md text-right">
               {{ slotProps.data.date }}
             </div>
           </template>
@@ -362,7 +316,7 @@ const getAgingColor = (category: string) => {
             </div>
           </template>
           <template #body="slotProps">
-            <div class="flex flex-column align-items-center  text-md text-right">
+            <div class="flex flex-column align-items-center text-md text-right">
               {{ slotProps.data.days }}
             </div>
           </template>
@@ -375,8 +329,8 @@ const getAgingColor = (category: string) => {
             </div>
           </template>
           <template #body="slotProps">
-            <div class="flex flex-column align-items-center  text-md text-right">
-              <span class="px-2 py-1 text-xs  border-round-xl" :class="getAgingColor(slotProps.data.category)"> {{ slotProps.data.category }} days </span>
+            <div class="flex flex-column align-items-center text-md text-right">
+              <span class="px-2 py-1 text-xs border-round-xl" :class="getAgingColor(slotProps.data.category)"> {{ slotProps.data.category }} days </span>
             </div>
           </template>
         </Column>
