@@ -488,8 +488,8 @@ initializeDateRange();
 
       <!-- Details Section -->
       <div v-if="selectedCard" class="surface-card border-round-xl border-1 p-4 border-gray-200">
-        <div class="flex align-items-center justify-content-between mb-6">
-          <h2 class="text-lg font-medium">{{ selectedCard.charAt(0).toUpperCase() + selectedCard.slice(1) }} Details</h2>
+        <div class="flex align-items-center justify-content-between mb-5 mt-3">
+          <h2 class="text-2xl m-0 font-medium">{{ selectedCard.charAt(0).toUpperCase() + selectedCard.slice(1) }} Details</h2>
           <div class="flex align-items-center gap-2">
             <div @click="toggleViewMode" class="p-2 cursor-pointer border-round hover:surface-hover">
               <font-awesome-icon :icon="['fas', viewMode === 'chart' ? 'table' : 'chart-simple']" class="text-xl" />
