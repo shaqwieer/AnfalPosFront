@@ -86,15 +86,9 @@ const toggleView = () => {
 };
 
 import { useI18n } from 'vue-i18n';
-import apiClientx from '../../../api/apiClient';
 import { useMainStore } from '../../../stores/mainStore';
 
 const mainStore = useMainStore();
-const rtl = computed(() => mainStore.isRTL);
-const containerClass = computed(() => ({
-  rtl: mainStore.isRTL,
-  ltr: !mainStore.isRTL
-}));
 const { t, locale } = useI18n();
 
 const rowsPerPage = ref(10);

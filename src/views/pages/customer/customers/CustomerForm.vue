@@ -32,7 +32,7 @@ const formData = ref({
   id: props.customer?.id || '',
   name: props.customer?.name || '',
   type: props.customer?.type || 'business',
-  mobile: props.customer?.mobile || '',
+  mobile: props.customer?.primaryPhone || '',
   email: props.customer?.email || '',
 
   // Business Information
@@ -390,7 +390,7 @@ watch(leftColumnTab, (newTab) => {
               </div>
 
               <!-- Address Information -->
-              <div  class="flex flex-column gap-6">
+              <div class="flex flex-column gap-6">
                 <!-- Map View -->
                 <div class="h-300px border-round-lg border-1 surface-border overflow-hidden relative">
                   <div ref="mapRef" class="w-full h-full"></div>
@@ -457,7 +457,7 @@ watch(leftColumnTab, (newTab) => {
               </div>
 
               <!-- Documents -->
-              <div >
+              <div>
                 <CustomerAttachmentsNew :customer-id="customer?.id || 'new'" :read-only="readOnly" v-model="attachments" />
               </div>
 

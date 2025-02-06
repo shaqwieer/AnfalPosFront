@@ -60,9 +60,8 @@ export const useCustomerStore = defineStore({
           formData.append(`CustomerAttachments[${index}].attachmentTypeId`, file.id);
           formData.append(`CustomerAttachments[${index}].attachmentTypeData`, file.file);
         });
-        const response = await apiClient.post('/Customers/CreateCustomerBasedOnBranchType', { params: formData });
-        //this.customers = response.data.data;
-        console.log(response);
+        const response = await apiClient.post('/Customers/CreateCustomerBasedOnBranchType', formData);
+        this.customer.push(response.data.data);
       } catch (err) {
         this.error = handleError(err, this.loading);
       }
@@ -100,9 +99,9 @@ export const useCustomerStore = defineStore({
           formData.append(`CustomerAttachments[${index}].attachmentTypeId`, file.id);
           formData.append(`CustomerAttachments[${index}].attachmentTypeData`, file.file);
         });
-        const response = await apiClient.put('/Customers/UpdateCustomerBasedOnBranchType', { params: formData });
-        //this.customers = response.data.data;
-        console.log(response);
+        const response = await apiClient.put('/Customers/UpdateCustomerBasedOnBranchType', formData);
+        const index = this.customers.findIndex((c) => c.id === customer.id);
+        this.customers[index] = response.data.data;
       } catch (err) {
         this.error = handleError(err, this.loading);
       }
@@ -113,7 +112,7 @@ export const useCustomerStore = defineStore({
           customerId: customer.id,
           approve: true
         };
-        await apiClient.put('/Customers/MarkAsApprovedOrRejected', { params: formData });
+        await apiClient.put('/Customers/MarkAsApprovedOrRejected', formData);
         customer.status = 'active';
         customer.approvalStatus = 'approved';
         customer.approvedDate = new Date().toISOString().split('T')[0];
@@ -127,7 +126,7 @@ export const useCustomerStore = defineStore({
           customerId: customer.id,
           approve: false
         };
-        await apiClient.put('/Customers/MarkAsApprovedOrRejected', { params: formData });
+        await apiClient.put('/Customers/MarkAsApprovedOrRejected', formData);
         customer.status = 'rejected';
         customer.approvalStatus = 'rejected';
         customer.approvedDate = new Date().toISOString().split('T')[0];
