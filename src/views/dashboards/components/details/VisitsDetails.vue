@@ -119,7 +119,7 @@ const getStatusColor = (rate: number) => {
 
     <!-- Chart View -->
     <!-- 'chart' -->
-    <div v-if="viewMode === 'chartxx'" class="bg-white border-1 border-gray-200 border-round shadow-sm round shadow-sm border p-4">
+    <div v-if="viewMode === 'chart'" class="bg-white border-1 border-gray-200 border-round shadow-sm round shadow-sm border p-4">
       <div style="height: 400px">
         <Bar :data="chartData" :options="chartOptions" />
       </div>

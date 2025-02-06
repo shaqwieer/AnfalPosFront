@@ -51,7 +51,7 @@ const handleCardClick = (cardType: string) => {
             <span class="font-medium text-blue-600">{{ todayData.productiveVisits }}</span>
           </div>
         </div>
-        <div class="mt-2 pt-2 border-top-1">
+        <div class="mt-2 pt-2 border-top-1 border-gray-200">
           <div class="text-sm text-500">Productivity Rate: {{ Math.round((todayData.productiveVisits / todayData.completedVisits) * 100) }}%</div>
         </div>
       </div>
