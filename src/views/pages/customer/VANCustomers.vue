@@ -25,31 +25,28 @@ onMounted(async () => {
 const customers = computed(() => customerStore.customers);
 
 const handleSubmitCustomer = (customer: any) => {
-
-  if(selectType.value === 'edit'){
-    customerStore.UpdateCustomerBasedOnBranchType(customer);
-  }
-  else
-  {
+  if (selectType.value === 'edit') {
+    customerStore.EditCustomerBasedOnBranchType(customer);
+  } else {
     customerStore.CreateCustomerBasedOnBranchType(customer);
     customerStore.customers.push(customer);
   }
   // Close the form
   showNewCustomerForm.value = false;
-  selectType.value = ''
+  selectType.value = '';
   // Switch to pending tab since new customers start as pending
   activeTab.value = 'pending';
 };
 
-const selectType = ref('')
+const selectType = ref('');
 const handleViewDetails = (customer: any) => {
-  selectType.value = 'view'
+  selectType.value = 'view';
   selectedCustomer.value = customer;
   showNewCustomerForm.value = true;
 };
 
 const handleEditCustomer = (customer: any) => {
-    selectType.value = 'edit'
+  selectType.value = 'edit';
   selectedCustomer.value = customer;
   showNewCustomerForm.value = true;
 };
@@ -118,30 +115,27 @@ const containerClass = computed(() => ({
 }));
 const { t, locale } = useI18n();
 
-
 const rowsPerPage = ref(10);
 const currentPage = ref(0);
-
-
 
 // تحديث الصفحة عند تغيير `Paginator`
 const onPageChange = (event: { page: number }) => {
   currentPage.value = event.page ?? 0;
 };
 
-
 const paginatedCustomers = computed(() => {
-  if (!customers.value || !Array.isArray(customers.value)) {
+  if (!filteredCustomers.value || !Array.isArray(filteredCustomers.value)) {
     return []; // إذا كان customers غير معرف أو ليس مصفوفة، أعد مصفوفة فارغة
   }
   const start = currentPage.value * rowsPerPage.value;
   const end = start + rowsPerPage.value;
-  return customers.value.slice(start, end);
+  return filteredCustomers.value.slice(start, end);
 });
 
 const filteredCustomers = computed(() => {
-  return paginatedCustomers.value.filter((customer) => {
-    const matchesTab = activeTab.value === 'all' || (activeTab.value === 'active' && customer.statusName === 'Approved') || (activeTab.value === 'pending' && customer.statusName === 'Pending')|| (activeTab.value === 'rejected' && customer.statusName === 'Rejected');
+  return customers.value.filter((customer) => {
+    const matchesTab =
+      activeTab.value === 'all' || (activeTab.value === 'active' && customer.statusName === 'Approved') || (activeTab.value === 'pending' && customer.statusName === 'Pending') || (activeTab.value === 'rejected' && customer.statusName === 'Rejected');
 
     const matchesSearch =
       !searchQuery.value ||
@@ -225,15 +219,7 @@ const filteredCustomers = computed(() => {
     <div class="flex-1 overflow-hidden">
       <div class="h-full overflow-y-auto px-6 pb-6">
         <div class="max-w-7xl mx-auto">
-          <DataTable
-            class="surface-card border-round-lg mb-4 shadow-1 border-1 surface-border"
-            v-if="viewMode === 'list'"
-            :value="filteredCustomers"
-            dataKey="id"
-            :rows="10"
-            :globalFilterFields="['name', 'id']"
-            :currentPageReportTemplate="''"
-          >
+          <DataTable class="surface-card border-round-lg mb-4 shadow-1 border-1 surface-border" v-if="viewMode === 'list'" :value="paginatedCustomers" dataKey="id" :rows="10" :globalFilterFields="['name', 'id']" :currentPageReportTemplate="''">
             <template #empty>
               <div class="flex justify-content-center align-items-center font-bold text-lg">
                 {{ t(`Customer.empty`) }}
@@ -307,9 +293,9 @@ const filteredCustomers = computed(() => {
                   <span
                     class="px-2 py-0 text-xs border-round-lg"
                     :class="{
-                      'bg-green-100 text-green-800  border-round-lg': slotProps.data.statusId === CustomerStatus.Approved,
-                      'bg-yellow-100 text-yellow-800  border-round-lg': slotProps.data.statusId === CustomerStatus.Pending,
-                      'bg-red-100 text-red-800  border-round-lg': slotProps.data.statusId === CustomerStatus.Rejected
+                      'bg-green-100 text-green-800  border-round-lg': slotProps.data.statusId === 'Approved',
+                      'bg-yellow-100 text-yellow-800  border-round-lg': slotProps.data.statusId === 'Pending',
+                      'bg-red-100 text-red-800  border-round-lg': slotProps.data.statusId === 'Rejected'
                     }"
                   >
                     {{ slotProps.data.statusName }}
@@ -350,14 +336,7 @@ const filteredCustomers = computed(() => {
 
           <!-- Card View -->
           <div v-else>
-            <CustomerList
-              :customers="filteredCustomers"
-              @view-details="handleViewDetails"
-              @edit-customer="handleEditCustomer"
-              @submit-approval="handleSubmitApproval"
-              @approve="handleApprove"
-              @reject="handleReject"
-            />
+            <CustomerList :customers="paginatedCustomers" @view-details="handleViewDetails" @edit-customer="handleEditCustomer" @submit-approval="handleSubmitApproval" @approve="handleApprove" @reject="handleReject" />
           </div>
           <Paginator :rows="rowsPerPage" :totalRecords="customers.length" @page="onPageChange" />
 
@@ -367,7 +346,7 @@ const filteredCustomers = computed(() => {
     </div>
 
     <!-- Dialogs -->
-    <CustomerForm v-if="showNewCustomerForm" :show="showNewCustomerForm" :action="selectType" :readOnly="selectType=='view'" :customer="selectedCustomer" @close="showNewCustomerForm = false" @submit="handleSubmitCustomer" />
+    <CustomerForm v-if="showNewCustomerForm" :show="showNewCustomerForm" :action="selectType" :readOnly="selectType == 'view'" :customer="selectedCustomer" @close="showNewCustomerForm = false" @submit="handleSubmitCustomer" />
   </div>
 </template>
 
