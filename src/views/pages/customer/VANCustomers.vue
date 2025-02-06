@@ -74,29 +74,11 @@ const handleSubmitApproval = (customer: any) => {
 };
 
 const handleApprove = (customer: any) => {
-  const index = customers.value.findIndex((c) => c.id === customer.id);
-  if (index !== -1) {
-    customers.value[index] = {
-      ...customer,
-      status: 'active',
-      approvalStatus: 'approved',
-      //approvedBy: vanStore.vanInfo.driver,
-      approvedDate: new Date().toISOString().split('T')[0]
-    };
-  }
+  customerStore.ApproveCustomer(customer);
 };
 
 const handleReject = (customer: any) => {
-  const index = customers.value.findIndex((c) => c.id === customer.id);
-  if (index !== -1) {
-    customers.value[index] = {
-      ...customer,
-      status: 'rejected',
-      approvalStatus: 'rejected',
-      //approvedBy: vanStore.vanInfo.driver,
-      approvedDate: new Date().toISOString().split('T')[0]
-    };
-  }
+  customerStore.RejectCustomer(customer);
 };
 
 const toggleView = () => {
