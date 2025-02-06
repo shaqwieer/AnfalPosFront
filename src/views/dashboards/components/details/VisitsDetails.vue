@@ -83,7 +83,7 @@ const getStatusColor = (rate: number) => {
     <!-- Summary Cards -->
     <div class="grid mb-6">
       <div class="col-12 p-2 md:col-6 lg:col-3">
-        <div class="border-1 border-round shadow-sm border-1 border-gray-200 p-4">
+        <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
           <div class="text-sm text-gray-500">Total Planned</div>
           <div class="text-2xl font-bold text-gray-900">
             {{ data.summary.totalPlanned }}
@@ -92,7 +92,7 @@ const getStatusColor = (rate: number) => {
       </div>
 
       <div class="col-12 p-2 md:col-6 lg:col-3">
-        <div class="border-1 border-round shadow-sm border-1 border-gray-200 p-4">
+        <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
           <div class="text-sm text-gray-500">Total Completed</div>
           <div class="text-2xl font-bold text-green-600">
             {{ data.summary.totalCompleted }}
@@ -101,7 +101,7 @@ const getStatusColor = (rate: number) => {
       </div>
 
       <div class="col-12 p-2 md:col-6 lg:col-3">
-        <div class="border-1 border-round shadow-sm border-1 border-gray-200 p-4">
+        <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
           <div class="text-sm text-gray-500">Total Productive</div>
           <div class="text-2xl font-bold text-blue-600">
             {{ data.summary.totalProductive }}
@@ -110,7 +110,7 @@ const getStatusColor = (rate: number) => {
       </div>
 
       <div class="col-12 p-2 md:col-6 lg:col-3">
-        <div class="border-1 border-round shadow-sm border-1 border-gray-200 p-4">
+        <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
           <div class="text-sm text-gray-500">Average Completion Rate</div>
           <div class="text-2xl font-bold text-purple-600">{{ ((data.summary.totalCompleted / data.summary.totalPlanned) * 100).toFixed(1) }}%</div>
         </div>
@@ -119,7 +119,7 @@ const getStatusColor = (rate: number) => {
 
     <!-- Chart View -->
     <!-- 'chart' -->
-    <div v-if="viewMode === 'chart'" class="bg-white border-1 border-gray-200 border-round shadow-sm round shadow-sm border p-4">
+    <div v-if="viewMode === 'chart'" class="bg-white border-1 border-gray-200 border-round-lg shadow-sm  shadow-sm border p-4">
       <div style="height: 400px">
         <Bar :data="chartData" :options="chartOptions" />
       </div>

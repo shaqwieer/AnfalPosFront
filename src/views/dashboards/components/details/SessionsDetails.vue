@@ -119,7 +119,7 @@ const getStatusColor = (status: string) => {
         <div class="bg-white rounded-lg shadow-sm border p-0">
           <div class="grid mb-6">
             <div class="col-12 p-2 md:col-6 lg:col-3">
-              <div class="border-1 border-round shadow-sm border-1 border-gray-200 p-4">
+              <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
                 <div class="text-sm text-gray-500">Open Sessions</div>
                 <div class="text-2xl font-bold text-red-600">
                   {{ summary.totalOpen }}
@@ -128,7 +128,7 @@ const getStatusColor = (status: string) => {
             </div>
 
             <div class="col-12 p-2 md:col-6 lg:col-3">
-              <div class="border-1 border-round shadow-sm border-1 border-gray-200 p-4">
+              <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
                 <div class="text-sm text-gray-500">Pending Sessions</div>
                 <div class="text-2xl font-bold text-orange-600">
                   {{ summary.totalPending }}
@@ -137,7 +137,7 @@ const getStatusColor = (status: string) => {
             </div>
 
             <div class="col-12 p-2 md:col-6 lg:col-3">
-              <div class="border-1 border-round shadow-sm border-1 border-gray-200 p-4">
+              <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
                 <div class="text-sm text-gray-500">Total Amount</div>
                 <div class="text-2xl font-bold text-gray-900">
                   {{ formatPrice(summary.totalAmount) }}
@@ -146,7 +146,7 @@ const getStatusColor = (status: string) => {
             </div>
 
             <div class="col-12 p-2 md:col-6 lg:col-3">
-              <div class="border-1 border-round shadow-sm border-1 border-gray-200 p-4">
+              <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
                 <div class="text-sm text-gray-500">Old Sessions (>1 day)</div>
                 <div class="text-2xl font-bold text-red-600">
                   {{ summary.oldSessions }}
@@ -159,14 +159,14 @@ const getStatusColor = (status: string) => {
     </div>
 
     <!-- Chart View -->
-    <div v-if="viewMode === 'chart'" class="bg-white border-gray-200 border-round shadow-sm border-1 p-4">
+    <div v-if="viewMode === 'chart'" class="bg-white border-gray-200 border-round-lg shadow-sm border-1 p-4">
       <div style="height: 400px">
         <Bar :data="chartData" :options="chartOptions" />
       </div>
     </div>
 
     <!-- Table View -->
-    <div v-else class="bg-white border-1 border-gray-200 border-round shadow-sm border overflow-hidden">
+    <div v-else class="bg-white border-1 border-gray-200 border-round-lg shadow-sm border overflow-hidden">
       <DataTable :value="sessionsData" :paginator="sessionsData.length > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" class="">
         <template #empty>
           <div class="flex justify-content-center align-items-center font-bold text-lg">No Data Available</div>

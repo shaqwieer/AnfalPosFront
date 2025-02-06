@@ -102,28 +102,28 @@ const getGrowthIcon = (growth: number) => {
 
     <div class="grid mb-6">
       <div class="col-12 p-2 md:col-6 lg:col-3">
-        <div class="border-1 border-round shadow-sm border-1 border-gray-200 p-4">
+        <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
           <div class="text-sm text-gray-500">Total Sales</div>
           <div class="text-2xl font-bold text-gray-900">{{ formatPrice(data.summary.totalSales) }}</div>
         </div>
       </div>
 
       <div class="col-12 p-2 md:col-6 lg:col-3">
-        <div class="border-1 border-round shadow-sm border-1 border-gray-200 p-4">
+        <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
           <div class="text-sm text-gray-500">Total Orders</div>
           <div class="text-2xl font-bold text-blue-600">{{ data.summary.totalOrders }}</div>
         </div>
       </div>
 
       <div class="col-12 p-2 md:col-6 lg:col-3">
-        <div class="border-1 border-round shadow-sm border-1 border-gray-200 p-4">
+        <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
           <div class="text-sm text-gray-500">Avg Order Value</div>
           <div class="text-2xl font-bold text-green-600">{{ formatPrice(data.summary.avgOrderValue) }}</div>
         </div>
       </div>
 
       <div class="col-12 p-2 md:col-6 lg:col-3">
-        <div class="border-1 border-round shadow-sm border-1 border-gray-200 p-4">
+        <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
           <div class="text-sm text-gray-500">Target Achievement</div>
           <div class="text-2xl font-bold text-purple-600">{{ data.summary.targetAchievement }}%</div>
         </div>
@@ -132,13 +132,13 @@ const getGrowthIcon = (growth: number) => {
 
     <!-- View Selector -->
     <div class="mb-6">
-      <div class="inline-flex border-round border-1 gap-2 border-gray-200 p-1 bg-gray-50">
+      <div class="inline-flex border-round-lg border-1 gap-2 border-gray-200 p-1 bg-gray-50">
         <div
           v-for="view in ['product', 'category', 'hourly']"
           :key="view"
           @click="selectedView = view"
           style="height: 36px"
-          class="flex justify-content-center align-items-center w-8rem border-round cursor-pointer border-gray-200 text-sm font-bold transition-colors"
+          class="flex justify-content-center align-items-center w-8rem border-round-lg cursor-pointer border-gray-200 text-sm font-bold transition-colors"
           :class="selectedView === view ? 'bg-white text-blue-600 border-1 shadow-1' : 'text-gray-600 hover:text-gray-900'"
         >
           By {{ view.charAt(0).toUpperCase() + view.slice(1) }}
@@ -147,14 +147,14 @@ const getGrowthIcon = (growth: number) => {
     </div>
 
     <!-- Chart View -->
-    <div v-if="viewMode === 'chart' && chartData" class="bg-white border-gray-200 border-round shadow-sm border-1 p-6">
+    <div v-if="viewMode === 'chart' && chartData" class="bg-white border-gray-200 border-round-lg shadow-sm border-1 p-6">
       <div style="height: 400px" class="">
         <Bar :data="chartData" :options="chartOptions" />
       </div>
     </div>
 
     <!-- Table View -->
-    <div v-else class="bg-white border-1 border-gray-200 border-round shadow-sm border overflow-hidden">
+    <div v-else class="bg-white border-1 border-gray-200 border-round-lg shadow-sm border overflow-hidden">
       <DataTable :value="data.salesReps" :paginator="data.salesReps.lenth > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" :currentPageReportTemplate="''">
         <template #empty>
           <div class="flex justify-content-center align-items-center font-bold text-lg">test</div>
@@ -220,7 +220,7 @@ const getGrowthIcon = (growth: number) => {
 
           <template #body="slotProps">
             <div class="flex flex-row justify-content-center align-items-center">
-              <span class="text-sm px-2 py-1 border-round-2xl bg-yellow-100 text-xs text-yellow-800">{{ slotProps.data.achievement }}%</span>
+              <span class="text-sm px-2 py-1 border-round-lg bg-yellow-100 text-xs text-yellow-800">{{ slotProps.data.achievement }}%</span>
             </div>
           </template>
         </Column>

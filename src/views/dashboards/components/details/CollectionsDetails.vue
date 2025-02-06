@@ -120,7 +120,7 @@ const summary = computed(() => ({
         <div class="bg-white rounded-lg shadow-sm border p-0">
           <div class="grid mb-6">
             <div class="col-12 p-2 md:col-6 lg:col-3">
-              <div class="border-1 border-round shadow-sm border-1 border-gray-200 p-4">
+              <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
                 <div class="text-sm text-gray-500">Total Cash</div>
                 <div class="text-2xl font-bold text-green-600">
                   {{ formatPrice(summary.totalCash) }}
@@ -129,7 +129,7 @@ const summary = computed(() => ({
             </div>
 
             <div class="col-12 p-2 md:col-6 lg:col-3">
-              <div class="border-1 border-round shadow-sm border-1 border-gray-200 p-4">
+              <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
                 <div class="text-sm text-gray-500">Total Card</div>
                 <div class="text-2xl font-bold text-blue-600">
                   {{ formatPrice(summary.totalCard) }}
@@ -138,7 +138,7 @@ const summary = computed(() => ({
             </div>
 
             <div class="col-12 p-2 md:col-6 lg:col-3">
-              <div class="border-1 border-round shadow-sm border-1 border-gray-200 p-4">
+              <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
                 <div class="text-sm text-gray-500">Total Bank</div>
                 <div class="text-2xl font-bold text-purple-600">
                   {{ formatPrice(summary.totalBank) }}
@@ -147,7 +147,7 @@ const summary = computed(() => ({
             </div>
 
             <div class="col-12 p-2 md:col-6 lg:col-3">
-              <div class="border-1 border-round shadow-sm border-1 border-gray-200 p-4">
+              <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
                 <div class="text-sm text-gray-500">Grand Total</div>
                 <div class="text-2xl font-bold text-gray-900">
                   {{ formatPrice(summary.grandTotal) }}
@@ -160,14 +160,14 @@ const summary = computed(() => ({
     </div>
 
     <!-- Chart View -->
-    <div v-if="viewMode === 'chart'" class="bg-white border-gray-200 border-round shadow-sm border-1 p-4">
+    <div v-if="viewMode === 'chart'" class="bg-white border-gray-200 border-round-lg shadow-sm border-1 p-4">
       <div style="height: 400px">
         <Bar :data="chartData" :options="chartOptions" />
       </div>
     </div>
 
     <!-- Table View -->
-    <div v-else class="bg-white border-1 border-gray-200 border-round shadow-sm border overflow-hidden">
+    <div v-else class="bg-white border-1 border-gray-200 border-round-lg shadow-sm border overflow-hidden">
       <DataTable :value="collectionsData" :paginator="collectionsData.length > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" class="">
         <template #empty>
           <div class="flex justify-content-center align-items-center font-bold text-lg">No Data Available</div>

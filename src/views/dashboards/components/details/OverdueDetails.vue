@@ -170,10 +170,10 @@ const getAgingColor = (category: string) => {
 
     <div class="p-grid p-dir-col p-md-dir-row p-align-start p-justify-between">
       <div class="p-col-12">
-        <div class="bg-white border-round-xl shadow-sm border p-0">
+        <div class="bg-white border-round-lg shadow-sm border p-0">
           <div class="grid mb-6">
             <div class="col-12 p-2 md:col-6 lg:col-3">
-              <div class="border-1 border-round-xl shadow-sm border-1 border-gray-200 p-4">
+              <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
                 <div class="text-sm text-gray-500">30-60 Days</div>
                 <div class="text-2xl font-bold text-yellow-600">{{ formatPrice(summary.total30_60) }}</div>
                 <div class="text-sm text-gray-500">{{ overdueData.filter((i) => i.category === '30-60').length }} invoices</div>
@@ -181,7 +181,7 @@ const getAgingColor = (category: string) => {
             </div>
 
             <div class="col-12 p-2 md:col-6 lg:col-3">
-              <div class="border-1 border-round-xl shadow-sm border-1 border-gray-200 p-4">
+              <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
                 <div class="text-sm text-gray-500">60-90 Days</div>
                 <div class="text-2xl font-bold text-orange-600">{{ formatPrice(summary.total60_90) }}</div>
                 <div class="text-sm text-gray-500">{{ overdueData.filter((i) => i.category === '60-90').length }} invoices</div>
@@ -189,7 +189,7 @@ const getAgingColor = (category: string) => {
             </div>
 
             <div class="col-12 p-2 md:col-6 lg:col-3">
-              <div class="border-1 border-round-xl shadow-sm border-1 border-gray-200 p-4">
+              <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
                 <div class="text-sm text-gray-500">90+ Days</div>
                 <div class="text-2xl font-bold text-red-600">{{ formatPrice(summary.total90Plus) }}</div>
                 <div class="text-sm text-gray-500">{{ overdueData.filter((i) => i.category === '90+').length }} invoices</div>
@@ -197,7 +197,7 @@ const getAgingColor = (category: string) => {
             </div>
 
             <div class="col-12 p-2 md:col-6 lg:col-3">
-              <div class="border-1 border-round-xl shadow-sm border-1 border-gray-200 p-4">
+              <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
                 <div class="text-sm text-gray-500">Total Overdue</div>
                 <div class="text-2xl font-bold text-gray-900">{{ formatPrice(summary.totalOverdue) }}</div>
                 <div class="text-sm text-gray-500">{{ summary.totalInvoices }} invoices</div>
@@ -210,14 +210,14 @@ const getAgingColor = (category: string) => {
 
     <!-- Chart View -->
 
-    <div v-if="viewMode === 'chart'" class="bg-white border-gray-200 border-round-xl shadow-sm border-1 p-4">
+    <div v-if="viewMode === 'chart'" class="bg-white border-gray-200 border-round-lg shadow-sm border-1 p-4">
       <div style="height: 400px">
         <Bar :data="chartData" :options="chartOptions" />
       </div>
     </div>
 
     <!-- Table View -->
-    <div v-else class="bg-white border-1 border-gray-200 border-round shadow-sm border overflow-hidden">
+    <div v-else class="bg-white border-1 border-gray-200 border-round-lg shadow-sm border overflow-hidden">
       <DataTable :value="overdueData" :paginator="overdueData.length > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" class="">
         <template #empty>
           <div class="flex justify-content-center align-items-center font-bold text-lg">No Data Available</div>
