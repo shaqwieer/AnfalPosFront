@@ -469,5 +469,37 @@
     "CashEnd ": "مبلغ الانتهاء",
     "OpeningClosing": "الفتح والاغلاق"
   },
-  "Dashboard": "لوحة التحكم"
+  "Dashboard": "لوحة التحكم",
+  "dashboard": {
+    "VANSalesDashboard": "لوحة معلومات مبيعات VAN",
+    "Search": "بحث",
+    "Sales_Representatives": "مندوبي المبيعات",
+    "ToDate": "الي تاريخ",
+    "FromDate": "من تاريخ",
+    "Visits": "الزيارات",
+    "Today_Performance": "أداء اليوم",
+    "Planned": "المخطط",
+    "Completed": "مكتمل",
+    "Productive": "منتج",
+    "Productivity_Rate": "معدل الإنتاجية",
+    "Sales": "مبيعات",
+    "Daily_Revenue": "الإيرادات اليومية",
+    "Target": "هدف",
+    "Actual": "فِعلي",
+    "of_target": "من الهدف",
+    "Collections": "مجموعات",
+    "Payment_Methods": "أموال غير مخصصة",
+    "Cash": "نقدي",
+    "VISA": "فيزا",
+    "Bank": "بنك",
+    "OpenSessions": "جلسات مفتوحة",
+    "Rep": "مندوب",
+    "Overdue": "تأخر",
+    "AgingBuckets": "الشيخوخة",
+    "StockinVans": "مخزون في الشاحنات",
+    "InventoryStatus": "حالة المخزون",
+    "VANs": "شاحنات",
+    "Items": "عنصر",
+    "AllSalesReps": "جميع مندوبي المبيعات"
+  }
 }
