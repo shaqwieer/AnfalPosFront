@@ -1,29 +1,14 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { Bar } from 'vue-chartjs'
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-} from 'chart.js'
+import { ref, computed } from 'vue';
+import { Bar } from 'vue-chartjs';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-)
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const props = defineProps<{
-  data: any
-  viewMode: 'chart' | 'table'
-}>()
+  data: any;
+  viewMode: 'chart' | 'table';
+}>();
 
 // Sample overdue data
 const overdueData = ref([
@@ -72,43 +57,43 @@ const overdueData = ref([
     days: 100,
     category: '90+'
   }
-])
+]);
 
 // Chart data
 const chartData = computed(() => {
-  const salesRepData = {}
-  overdueData.value.forEach(item => {
+  const salesRepData = {};
+  overdueData.value.forEach((item) => {
     if (!salesRepData[item.salesRep]) {
       salesRepData[item.salesRep] = {
         '30-60': 0,
         '60-90': 0,
         '90+': 0
-      }
+      };
     }
-    salesRepData[item.salesRep][item.category] += item.amount
-  })
+    salesRepData[item.salesRep][item.category] += item.amount;
+  });
 
   return {
     labels: Object.keys(salesRepData),
     datasets: [
       {
         label: '30-60 Days',
-        data: Object.values(salesRepData).map(data => data['30-60']),
+        data: Object.values(salesRepData).map((data) => data['30-60']),
         backgroundColor: '#f59e0b'
       },
       {
         label: '60-90 Days',
-        data: Object.values(salesRepData).map(data => data['60-90']),
+        data: Object.values(salesRepData).map((data) => data['60-90']),
         backgroundColor: '#f97316'
       },
       {
         label: '90+ Days',
-        data: Object.values(salesRepData).map(data => data['90+']),
+        data: Object.values(salesRepData).map((data) => data['90+']),
         backgroundColor: '#ef4444'
       }
     ]
-  }
-})
+  };
+});
 
 const chartOptions = {
   responsive: true,
@@ -131,7 +116,7 @@ const chartOptions = {
       beginAtZero: true
     }
   }
-}
+};
 
 const formatPrice = (price: number): string => {
   return price.toLocaleString('en-US', {
@@ -139,26 +124,20 @@ const formatPrice = (price: number): string => {
     currency: 'SAR',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
-  })
-}
+  });
+};
 
 const formatDate = (date: string): string => {
-  return new Date(date).toLocaleDateString()
-}
+  return new Date(date).toLocaleDateString();
+};
 
 // Summary calculations
 const summary = computed(() => {
-  const total30_60 = overdueData.value
-    .filter(item => item.category === '30-60')
-    .reduce((sum, item) => sum + item.amount, 0)
-  
-  const total60_90 = overdueData.value
-    .filter(item => item.category === '60-90')
-    .reduce((sum, item) => sum + item.amount, 0)
-  
-  const total90Plus = overdueData.value
-    .filter(item => item.category === '90+')
-    .reduce((sum, item) => sum + item.amount, 0)
+  const total30_60 = overdueData.value.filter((item) => item.category === '30-60').reduce((sum, item) => sum + item.amount, 0);
+
+  const total60_90 = overdueData.value.filter((item) => item.category === '60-90').reduce((sum, item) => sum + item.amount, 0);
+
+  const total90Plus = overdueData.value.filter((item) => item.category === '90+').reduce((sum, item) => sum + item.amount, 0);
 
   return {
     total30_60,
@@ -166,107 +145,196 @@ const summary = computed(() => {
     total90Plus,
     totalOverdue: total30_60 + total60_90 + total90Plus,
     totalInvoices: overdueData.value.length,
-    totalCustomers: new Set(overdueData.value.map(item => item.customer)).size,
-    totalSalesReps: new Set(overdueData.value.map(item => item.salesRep)).size
-  }
-})
+    totalCustomers: new Set(overdueData.value.map((item) => item.customer)).size,
+    totalSalesReps: new Set(overdueData.value.map((item) => item.salesRep)).size
+  };
+});
 
 const getAgingColor = (category: string) => {
   switch (category) {
-    case '30-60': return 'bg-yellow-100 text-yellow-800'
-    case '60-90': return 'bg-orange-100 text-orange-800'
-    case '90+': return 'bg-red-100 text-red-800'
-    default: return 'bg-gray-100 text-gray-800'
+    case '30-60':
+      return 'bg-yellow-100 text-yellow-800';
+    case '60-90':
+      return 'bg-orange-100 text-orange-800';
+    case '90+':
+      return 'bg-red-100 text-red-800';
+    default:
+      return 'bg-gray-100 text-gray-800';
   }
-}
+};
 </script>
 
 <template>
   <div>
     <!-- Summary Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-      <div class="bg-white rounded-lg shadow-sm border p-4">
-        <div class="text-sm text-gray-500">30-60 Days</div>
-        <div class="text-2xl font-bold text-yellow-600">{{ formatPrice(summary.total30_60) }}</div>
-        <div class="text-sm text-gray-500">{{ overdueData.filter(i => i.category === '30-60').length }} invoices</div>
-      </div>
-      <div class="bg-white rounded-lg shadow-sm border p-4">
-        <div class="text-sm text-gray-500">60-90 Days</div>
-        <div class="text-2xl font-bold text-orange-600">{{ formatPrice(summary.total60_90) }}</div>
-        <div class="text-sm text-gray-500">{{ overdueData.filter(i => i.category === '60-90').length }} invoices</div>
-      </div>
-      <div class="bg-white rounded-lg shadow-sm border p-4">
-        <div class="text-sm text-gray-500">90+ Days</div>
-        <div class="text-2xl font-bold text-red-600">{{ formatPrice(summary.total90Plus) }}</div>
-        <div class="text-sm text-gray-500">{{ overdueData.filter(i => i.category === '90+').length }} invoices</div>
-      </div>
-      <div class="bg-white rounded-lg shadow-sm border p-4">
-        <div class="text-sm text-gray-500">Total Overdue</div>
-        <div class="text-2xl font-bold text-gray-900">{{ formatPrice(summary.totalOverdue) }}</div>
-        <div class="text-sm text-gray-500">{{ summary.totalInvoices }} invoices</div>
+
+    <div class="p-grid p-dir-col p-md-dir-row p-align-start p-justify-between">
+      <div class="p-col-12">
+        <div class="bg-white border-round-lg shadow-sm border p-0">
+          <div class="grid mb-6">
+            <div class="col-12 p-2 md:col-6 lg:col-3">
+              <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
+                <div class="text-sm text-gray-500">30-60 Days</div>
+                <div class="text-2xl font-bold text-yellow-600">{{ formatPrice(summary.total30_60) }}</div>
+                <div class="text-sm text-gray-500">{{ overdueData.filter((i) => i.category === '30-60').length }} invoices</div>
+              </div>
+            </div>
+
+            <div class="col-12 p-2 md:col-6 lg:col-3">
+              <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
+                <div class="text-sm text-gray-500">60-90 Days</div>
+                <div class="text-2xl font-bold text-orange-600">{{ formatPrice(summary.total60_90) }}</div>
+                <div class="text-sm text-gray-500">{{ overdueData.filter((i) => i.category === '60-90').length }} invoices</div>
+              </div>
+            </div>
+
+            <div class="col-12 p-2 md:col-6 lg:col-3">
+              <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
+                <div class="text-sm text-gray-500">90+ Days</div>
+                <div class="text-2xl font-bold text-red-600">{{ formatPrice(summary.total90Plus) }}</div>
+                <div class="text-sm text-gray-500">{{ overdueData.filter((i) => i.category === '90+').length }} invoices</div>
+              </div>
+            </div>
+
+            <div class="col-12 p-2 md:col-6 lg:col-3">
+              <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
+                <div class="text-sm text-gray-500">Total Overdue</div>
+                <div class="text-2xl font-bold text-gray-900">{{ formatPrice(summary.totalOverdue) }}</div>
+                <div class="text-sm text-gray-500">{{ summary.totalInvoices }} invoices</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Chart View -->
-    <div v-if="viewMode === 'chart'" class="bg-white rounded-lg shadow-sm border p-6">
-      <div class="h-[400px]">
+
+    <div v-if="viewMode === 'chart'" class="bg-white border-gray-200 border-round-lg shadow-sm border-1 p-4">
+      <div style="height: 400px">
         <Bar :data="chartData" :options="chartOptions" />
       </div>
     </div>
 
     <!-- Table View -->
-    <div v-else class="bg-white rounded-lg shadow-sm border overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sales Rep</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Invoice</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Amount</th>
-              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Days</th>
-              <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Aging</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200">
-            <tr v-for="item in overdueData" :key="item.invoice">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.salesRep }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.customer }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.invoice }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(item.date) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">
-                {{ formatPrice(item.amount) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-center">{{ item.days }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-center">
-                <span class="px-2 py-1 text-xs rounded-full"
-                      :class="getAgingColor(item.category)">
-                  {{ item.category }} days
-                </span>
-              </td>
-            </tr>
-          </tbody>
-          <tfoot class="bg-gray-50">
-            <tr>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                Total ({{ summary.totalSalesReps }} Sales Reps)
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ summary.totalCustomers }} Customers
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ summary.totalInvoices }} Invoices
-              </td>
-              <td class="px-6 py-4"></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">
-                {{ formatPrice(summary.totalOverdue) }}
-              </td>
-              <td colspan="2"></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
+    <div v-else class="bg-white border-1 border-gray-200 border-round-lg shadow-sm border overflow-hidden">
+      <DataTable :value="overdueData" :paginator="overdueData.length > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" class="">
+        <template #empty>
+          <div class="flex justify-content-center align-items-center font-bold text-lg">No Data Available</div>
+        </template>
+
+        <!-- Sales Rep Column -->
+        <Column field="salesRep" header="Sales Rep">
+          <template #body="slotProps">
+            <div class="flex flex-column align-items-start">
+              <div class="font-semibold text-md">{{ slotProps.data.salesRep }}</div>
+            </div>
+          </template>
+
+          <template #footer="slotProps">
+            <div class="flex flex-column align-items-start">
+              <div class="font-semibold text-md">Total ({{ summary.totalSalesReps }} Sales Reps)</div>
+            </div>
+          </template>
+        </Column>
+
+        <Column field="customer">
+          <template #header="slotProps">
+            <div class="w-full">
+              <span class="text-md flex justify-content-start font-normal">customer</span>
+            </div>
+          </template>
+
+          <template #body="slotProps">
+            <div class="flex flex-column align-items-start text-md">
+              {{ slotProps.data.customer }}
+            </div>
+          </template>
+
+          <template #footer="slotProps">
+            <div class="flex flex-column align-items-start">
+              <div class="font-semibold text-md">{{ summary.totalCustomers }} Customers</div>
+            </div>
+          </template>
+        </Column>
+
+        <Column field="invoice">
+          <template #header="slotProps">
+            <div class="w-full">
+              <span class="text-md flex justify-content-start font-normal">invoice</span>
+            </div>
+          </template>
+          <template #body="slotProps">
+            <div class="flex flex-column align-items-start text-md">
+              {{ slotProps.data.invoice }}
+            </div>
+          </template>
+
+          <template #footer="slotProps">
+            <div class="flex flex-column align-items-start">
+              <div class="font-semibold text-md">{{ summary.totalInvoices }} invoices</div>
+            </div>
+          </template>
+        </Column>
+
+        <Column field="date">
+          <template #header="slotProps">
+            <div class="w-full">
+              <span class="text-md flex justify-content-center font-normal">date</span>
+            </div>
+          </template>
+          <template #body="slotProps">
+            <div class="flex flex-column align-items-center text-md">
+              {{ slotProps.data.date }}
+            </div>
+          </template>
+        </Column>
+
+        <Column field="amount">
+          <template #header="slotProps">
+            <div class="w-full">
+              <span class="text-md flex justify-content-center font-normal">Amount</span>
+            </div>
+          </template>
+          <template #body="slotProps">
+            <div class="flex flex-column align-items-center font-semibold text-md">
+              {{ slotProps.data.amount }}
+            </div>
+          </template>
+
+          <template #footer="slotProps">
+            <div class="flex flex-column align-items-center">
+              <div class="font-semibold text-md">{{ formatPrice(summary.totalOverdue) }}</div>
+            </div>
+          </template>
+        </Column>
+
+        <Column field="days">
+          <template #header="slotProps">
+            <div class="w-full">
+              <span class="text-md flex justify-content-center font-normal">Days</span>
+            </div>
+          </template>
+          <template #body="slotProps">
+            <div class="flex flex-column align-items-center text-md">
+              {{ slotProps.data.days }}
+            </div>
+          </template>
+        </Column>
+
+        <Column>
+          <template #header="slotProps">
+            <div class="w-full">
+              <span class="text-md flex justify-content-center font-normal">Aging</span>
+            </div>
+          </template>
+          <template #body="slotProps">
+            <div class="flex flex-column align-items-center text-md">
+              <span class="px-2 py-1 text-xs border-round-xl" :class="getAgingColor(slotProps.data.category)"> {{ slotProps.data.category }} days </span>
+            </div>
+          </template>
+        </Column>
+      </DataTable>
     </div>
   </div>
 </template>

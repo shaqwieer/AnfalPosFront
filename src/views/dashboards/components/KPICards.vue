@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed } from 'vue';
 
 const props = defineProps<{
-  yesterdayData: any
-  todayData: any
-  selectedCard: string | null
-}>()
+  yesterdayData: any;
+  todayData: any;
+  selectedCard: string | null;
+}>();
 
-const emit = defineEmits(['select-card'])
+const emit = defineEmits(['select-card']);
 
 const formatPrice = (price: number): string => {
   return price.toLocaleString('en-US', {
@@ -15,28 +15,25 @@ const formatPrice = (price: number): string => {
     currency: 'SAR',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
-  })
-}
+  });
+};
 
 const handleCardClick = (cardType: string) => {
-  emit('select-card', props.selectedCard === cardType ? null : cardType)
-}
+  emit('select-card', props.selectedCard === cardType ? null : cardType);
+};
 </script>
-
 
 <template>
   <div class="grid">
-    <div class="col-12 md:col-6 lg:col-4 xl:col-2">
+    <div style="height: 255px;" class="col-12  md:col-6 lg:col-4 xl:col-2">
       <!-- Visits Card -->
-      <div class="surface-card border-round-xl border-1 p-6 cursor-pointer transition-all transition-duration-200 hover:shadow-2"
-           :class="{'border-primary border-2': selectedCard === 'visits'}"
-           @click="handleCardClick('visits')">
+      <div class="h-full surface-card border-round-xl border-1 border-gray-200  border-gray-200 p-4 cursor-pointer transition-all transition-duration-200 hover:shadow-2" :class="{ 'border-primary border-2': selectedCard === 'visits' }" @click="handleCardClick('visits')">
         <div class="flex align-items-center gap-3 mb-4">
           <div class="w-3rem h-3rem border-round-lg bg-blue-50 flex align-items-center justify-content-center">
             <i class="pi pi-shopping-bag text-blue-500 text-xl"></i>
           </div>
           <div>
-            <h3 class="font-medium text-900 m-0">Visits</h3>
+            <h3 class="text-base text-900 m-0 text-900 m-0">Visits</h3>
             <p class="text-sm text-500 m-0">Today's Performance</p>
           </div>
         </div>
@@ -54,25 +51,21 @@ const handleCardClick = (cardType: string) => {
             <span class="font-medium text-blue-600">{{ todayData.productiveVisits }}</span>
           </div>
         </div>
-        <div class="mt-2 pt-2 border-top-1">
-          <div class="text-sm text-500">
-            Productivity Rate: {{ Math.round((todayData.productiveVisits / todayData.completedVisits) * 100) }}%
-          </div>
+        <div class="mt-2 pt-2 border-top-1 border-gray-200">
+          <div class="text-sm text-500">Productivity Rate: {{ Math.round((todayData.productiveVisits / todayData.completedVisits) * 100) }}%</div>
         </div>
       </div>
     </div>
 
-    <div class="col-12 md:col-6 lg:col-4 xl:col-2">
+    <div style="height: 255px;" class="col-12 md:col-6 lg:col-4 xl:col-2">
       <!-- Sales Card -->
-      <div class="surface-card border-round-xl border-1 p-6 cursor-pointer transition-all transition-duration-200 hover:shadow-2"
-           :class="{'border-primary border-2': selectedCard === 'sales'}"
-           @click="handleCardClick('sales')">
+      <div class="h-full surface-card border-round-xl border-1 border-gray-200  p-4 cursor-pointer transition-all transition-duration-200 hover:shadow-2" :class="{ 'border-primary border-2': selectedCard === 'sales' }" @click="handleCardClick('sales')">
         <div class="flex align-items-center gap-3 mb-4">
           <div class="w-3rem h-3rem border-round-lg bg-green-50 flex align-items-center justify-content-center">
             <i class="pi pi-money-bill text-green-500 text-xl"></i>
           </div>
           <div>
-            <h3 class="font-medium text-900 m-0">Sales</h3>
+            <h3 class="text-base  m-0">Sales</h3>
             <p class="text-sm text-500 m-0">Daily Revenue</p>
           </div>
         </div>
@@ -85,29 +78,23 @@ const handleCardClick = (cardType: string) => {
             <span class="text-sm text-500">Actual</span>
             <span class="font-medium text-green-600">{{ formatPrice(todayData.sales) }}</span>
           </div>
-          <div class="surface-200 border-round-full w-full h-2">
-            <div class="bg-green-500 h-2 border-round-full"
-                 :style="{ width: `${Math.min((todayData.sales / (todayData.sales * 1.2)) * 100, 100)}%` }">
-            </div>
+          <div class="surface-200 border-round w-full" style="height: 8px">
+            <div class="bg-green-500 h-2 border-round" style="height: 8px" :style="{ width: `${Math.min((todayData.sales / (todayData.sales * 1.2)) * 100, 100)}%` }"></div>
           </div>
-          <div class="text-sm text-500 text-right">
-            {{ Math.round((todayData.sales / (todayData.sales * 1.2)) * 100) }}% of target
-          </div>
+          <div class="text-sm text-500 text-right">{{ Math.round((todayData.sales / (todayData.sales * 1.2)) * 100) }}% of target</div>
         </div>
       </div>
     </div>
 
-    <div class="col-12 md:col-6 lg:col-4 xl:col-2">
+    <div style="height: 255px;" class="col-12 md:col-6 lg:col-4 xl:col-2">
       <!-- Collections Card -->
-      <div class="surface-card border-round-xl border-1 p-6 cursor-pointer transition-all transition-duration-200 hover:shadow-2"
-           :class="{'border-primary border-2': selectedCard === 'collections'}"
-           @click="handleCardClick('collections')">
+      <div class="h-full surface-card border-round-xl border-1 border-gray-200  p-4 cursor-pointer transition-all transition-duration-200 hover:shadow-2" :class="{ 'border-primary border-2': selectedCard === 'collections' }" @click="handleCardClick('collections')">
         <div class="flex align-items-center gap-3 mb-4">
           <div class="w-3rem h-3rem border-round-lg bg-purple-50 flex align-items-center justify-content-center">
             <i class="pi pi-wallet text-purple-500 text-xl"></i>
           </div>
           <div>
-            <h3 class="font-medium text-900 m-0">Collections</h3>
+            <h3 class="text-base  text-900 m-0">Collections</h3>
             <p class="text-sm text-500 m-0">Payment Methods</p>
           </div>
         </div>
@@ -128,17 +115,15 @@ const handleCardClick = (cardType: string) => {
       </div>
     </div>
 
-    <div class="col-12 md:col-6 lg:col-4 xl:col-2">
+    <div style="height: 255px;" class="col-12 md:col-6 lg:col-4 xl:col-2">
       <!-- Open Sessions Card -->
-      <div class="surface-card border-round-xl border-1 p-6 cursor-pointer transition-all transition-duration-200 hover:shadow-2"
-           :class="{'border-primary border-2': selectedCard === 'sessions'}"
-           @click="handleCardClick('sessions')">
+      <div class="h-full surface-card border-round-xl border-1 border-gray-200  p-4 cursor-pointer transition-all transition-duration-200 hover:shadow-2" :class="{ 'border-primary border-2': selectedCard === 'sessions' }" @click="handleCardClick('sessions')">
         <div class="flex align-items-center gap-3 mb-4">
           <div class="w-3rem h-3rem border-round-lg bg-orange-50 flex align-items-center justify-content-center">
             <i class="pi pi-building text-orange-500 text-xl"></i>
           </div>
           <div>
-            <h3 class="font-medium text-900 m-0">Open Sessions</h3>
+            <h3 class="text-base text-900 m-0">Open Sessions</h3>
             <p class="text-sm text-500 m-0">Undeposited Cash</p>
           </div>
         </div>
@@ -147,17 +132,15 @@ const handleCardClick = (cardType: string) => {
       </div>
     </div>
 
-    <div class="col-12 md:col-6 lg:col-4 xl:col-2">
+    <div style="height: 255px;" class="col-12 md:col-6 lg:col-4 xl:col-2">
       <!-- Overdue Card -->
-      <div class="surface-card border-round-xl border-1 p-6 cursor-pointer transition-all transition-duration-200 hover:shadow-2"
-           :class="{'border-primary border-2': selectedCard === 'overdue'}"
-           @click="handleCardClick('overdue')">
+      <div class="h-full surface-card border-round-xl border-1 border-gray-200  p-4 cursor-pointer transition-all transition-duration-200 hover:shadow-2" :class="{ 'border-primary border-2': selectedCard === 'overdue' }" @click="handleCardClick('overdue')">
         <div class="flex align-items-center gap-3 mb-4">
           <div class="w-3rem h-3rem border-round-lg bg-red-50 flex align-items-center justify-content-center">
             <i class="pi pi-exclamation-triangle text-red-500 text-xl"></i>
           </div>
           <div>
-            <h3 class="font-medium text-900 m-0">Overdue</h3>
+            <h3 class="text-base text-900 m-0">Overdue</h3>
             <p class="text-sm text-500 m-0">Aging Buckets</p>
           </div>
         </div>
@@ -166,17 +149,15 @@ const handleCardClick = (cardType: string) => {
       </div>
     </div>
 
-    <div class="col-12 md:col-6 lg:col-4 xl:col-2">
+    <div style="height: 255px;" class="col-12 md:col-6 lg:col-4 xl:col-2">
       <!-- Stock in Vans Card -->
-      <div class="surface-card border-round-xl border-1 p-6 cursor-pointer transition-all transition-duration-200 hover:shadow-2"
-           :class="{'border-primary border-2': selectedCard === 'stock'}"
-           @click="handleCardClick('stock')">
+      <div class="h-full surface-card border-round-xl border-1 border-gray-200  p-4 cursor-pointer transition-all transition-duration-200 hover:shadow-2" :class="{ 'border-primary border-2': selectedCard === 'stock' }" @click="handleCardClick('stock')">
         <div class="flex align-items-center gap-3 mb-4">
           <div class="w-3rem h-3rem border-round-lg bg-blue-50 flex align-items-center justify-content-center">
             <i class="pi pi-truck text-blue-500 text-xl"></i>
           </div>
           <div>
-            <h3 class="font-medium text-900 m-0">Stock in Vans</h3>
+            <h3 class="text-base text-900 m-0">Stock in Vans</h3>
             <p class="text-sm text-500 m-0">Inventory Status</p>
           </div>
         </div>
