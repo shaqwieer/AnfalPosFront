@@ -29,7 +29,6 @@ const handleSubmitCustomer = (customer: any) => {
     customerStore.EditCustomerBasedOnBranchType(customer);
   } else {
     customerStore.CreateCustomerBasedOnBranchType(customer);
-    customerStore.customers.push(customer);
   }
   // Close the form
   showNewCustomerForm.value = false;
@@ -86,15 +85,9 @@ const toggleView = () => {
 };
 
 import { useI18n } from 'vue-i18n';
-import apiClientx from '../../../api/apiClient';
 import { useMainStore } from '../../../stores/mainStore';
 
 const mainStore = useMainStore();
-const rtl = computed(() => mainStore.isRTL);
-const containerClass = computed(() => ({
-  rtl: mainStore.isRTL,
-  ltr: !mainStore.isRTL
-}));
 const { t, locale } = useI18n();
 
 const rowsPerPage = ref(10);
@@ -320,7 +313,7 @@ const filteredCustomers = computed(() => {
           <div v-else>
             <CustomerList :customers="paginatedCustomers" @view-details="handleViewDetails" @edit-customer="handleEditCustomer" @submit-approval="handleSubmitApproval" @approve="handleApprove" @reject="handleReject" />
           </div>
-          <Paginator :rows="rowsPerPage" :totalRecords="customers.length" @page="onPageChange" />
+          <Paginator :rows="rowsPerPage" :totalRecords="filteredCustomers.length" @page="onPageChange" />
 
           <!-- ----------------------------------------------------------- -->
         </div>

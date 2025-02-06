@@ -32,21 +32,21 @@ const formData = ref({
   id: props.customer?.id || '',
   name: props.customer?.name || '',
   type: props.customer?.type || 'business',
-  mobile: props.customer?.mobile || '',
+  mobile: props.customer?.primaryPhone || '',
   email: props.customer?.email || '',
 
   // Business Information
-  cr: props.customer?.cr || '',
-  vat: props.customer?.vat || '',
+  cr: props.customer?.crNumber || '',
+  vat: props.customer?.vatNumber || '',
 
   // Financial Information
   creditLimit: props.customer?.creditLimit || 0,
   paymentTerms: props.customer?.paymentTerms || '75',
   bankName: props.customer?.bankName || '',
-  bankAccount: props.customer?.bankAccount || '',
+  bankAccount: props.customer?.accountNumber || '',
   iban: props.customer?.iban || '',
   swiftCode: props.customer?.swiftCode || '',
-  financialNotes: props.customer?.financialNotes || '',
+  financialNotes: props.customer?.financeNotes || '',
 
   // Address Information
   buildingNumber: props.customer?.buildingNumber || '',
@@ -66,7 +66,7 @@ const formData = ref({
 
   // Attachments
   attachments: props.customer?.attachments || [],
-  notes: props.customer?.notes || ''
+  notes: props.customer?.additionalNotes || ''
 });
 const attachments = ref(props.customer?.attachments || []);
 
@@ -390,7 +390,7 @@ watch(leftColumnTab, (newTab) => {
               </div>
 
               <!-- Address Information -->
-              <div  class="flex flex-column gap-6">
+              <div class="flex flex-column gap-6">
                 <!-- Map View -->
                 <div class="h-300px border-round-lg border-1 surface-border overflow-hidden relative">
                   <div ref="mapRef" class="w-full h-full"></div>
@@ -457,7 +457,7 @@ watch(leftColumnTab, (newTab) => {
               </div>
 
               <!-- Documents -->
-              <div >
+              <div>
                 <CustomerAttachmentsNew :customer-id="customer?.id || 'new'" :read-only="readOnly" v-model="attachments" />
               </div>
 
