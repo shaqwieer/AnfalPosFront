@@ -32,7 +32,7 @@ watch(
     <nav class="layout-breadcrumb">
         <ol>
             <template v-for="(breadcrumbRoute, i) in breadcrumbRoutes" :key="breadcrumbRoute">
-                <li>{{ breadcrumbRoute }}</li>
+                <li class="w-max">{{ breadcrumbRoute }}</li>
                 <li v-if="i !== breadcrumbRoutes.length - 1" class="layout-breadcrumb-chevron">/</li>
             </template>
         </ol>

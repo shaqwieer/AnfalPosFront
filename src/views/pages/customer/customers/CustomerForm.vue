@@ -485,10 +485,9 @@ watch(leftColumnTab, (newTab) => {
 </template>
 
 <style>
-/* .p-dialog-content {
-  display: flex;
-  justify-content: center;
-} */
+.p-dialog-mask {
+  background: #5b5b5b3b !important;
+}
 </style>
 
 <style scoped>
