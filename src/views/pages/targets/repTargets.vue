@@ -147,6 +147,21 @@ const handleSalesRepSelection = (repId) => {
     filterValues.salesReps = [repId]; // اختيار عنصر واحد فقط
   }
 };
+
+import { useSalesGoalsStore } from '../../../stores/TargetsStore';
+
+const salesGoalsStore = useSalesGoalsStore();
+
+const businessEntityId = ref(1);
+const year = ref(new Date().getFullYear());
+const test = ref();
+const fetchData = async () => {
+  await salesGoalsStore.fetchSalesGoals();
+  console.log(salesGoalsStore.salesGoals);
+  test.value = salesGoalsStore.salesGoals;
+};
+
+fetchData();
 </script>
 
 <template>
@@ -164,6 +179,8 @@ const handleSalesRepSelection = (repId) => {
         </div>
       </div>
 
+      {{ test }}
+
       <!-- Main Content -->
       <div v-if="selectedRep" class="surface-card border-round-xl border-1 surface-border p-4">
         <!-- Rep Header -->
@@ -173,8 +190,9 @@ const handleSalesRepSelection = (repId) => {
             <!-- Credit Limit Info -->
             <div class="flex align-items-center gap-6">
               <div class="text-sm">
-                <span class="text-500">Credit Limit:</span>
-                <span class="ml-1 font-bold">{{ formatPrice(selectedRep.creditLimit) }}</span>
+                <span class="text-500">Credit Limit:</span>xxxxx
+                <span class="ml-1 font-bold">{{ formatPrice(test == undefined ? '0' : test[0].creditLimit) }}</span>
+                
               </div>
               <div class="text-sm">
                 <span class="text-500">Current Balance:</span>
@@ -225,44 +243,52 @@ const handleSalesRepSelection = (repId) => {
         <!-- View Mode -->
 
         <div v-if="!isEditing" class="overflow-x-auto mt-4 border-round-lg border-1 border-gray-200">
-          <DataTable :value="months" :paginator="months.length > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" class="">
+          <DataTable :value="test" :rows="10" :rowsPerPageOptions="[5, 10, 25]" class="">
             <template #empty>
               <div class="flex justify-content-center align-items-center font-bold text-lg">No Data Available</div>
             </template>
 
-            <Column field="" header="#">
+            <Column field="businessEntityName" header="name">
               <template #body="slotProps">
                 <div class="flex flex-column align-items-start">
                   <div class="text-md">
-                    {{ slotProps.index + 1 }}
+                    {{ slotProps.data.businessEntityName }}
                   </div>
-                </div>
-              </template>
-
-              <template #footer="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md text-green-600"></div>
                 </div>
               </template>
             </Column>
 
-            <Column header="Month" field="month">
+            <Column header="period" field="period">
               <template #body="slotProps">
                 <div class="flex flex-column align-items-start">
                   <div class="text-md">
-                    {{ slotProps.data }}
+                    {{ slotProps.data.period }}
                   </div>
-                </div>
-              </template>
-
-              <template #footer="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md text-green-600">Total</div>
                 </div>
               </template>
             </Column>
 
-            <Column header="Sales Target" field="month">
+            <Column header="collectionTarget" field="collection Target">
+              <template #body="slotProps">
+                <div class="flex flex-column align-items-start">
+                  <div class="text-md">
+                    {{ formatPrice(slotProps.data.collectionTarget) }}
+                  </div>
+                </div>
+              </template>
+            </Column>
+
+            <Column header="salesTarget" field="sales Target">
+              <template #body="slotProps">
+                <div class="flex flex-column align-items-start">
+                  <div class="text-md">
+                    {{ formatPrice(slotProps.data.salesTarget) }}
+                  </div>
+                </div>
+              </template>
+            </Column>
+
+            <!-- <Column header="Sales Target" field="month">
               <template #body="slotProps">
                 <div class="flex flex-column align-items-start">
                   <div class="text-md">
@@ -296,7 +322,7 @@ const handleSalesRepSelection = (repId) => {
                   </div>
                 </div>
               </template>
-            </Column>
+            </Column> -->
           </DataTable>
         </div>
 
@@ -441,7 +467,7 @@ const handleSalesRepSelection = (repId) => {
 
           <!-- Action Buttons -->
           <div class="flex justify-content-end gap-3">
-            <div @click="cancelEdit" class=" cursor-pointer px-4 py-2 border-1 surface-border border-round-lg hover:surface-100 transition-colors">Cancel</div>
+            <div @click="cancelEdit" class="cursor-pointer px-4 py-2 border-1 surface-border border-round-lg hover:surface-100 transition-colors">Cancel</div>
             <div @click="saveChanges" class="cursor-pointer px-4 py-2 bg-blue-600 text-white border-round-lg hover:bg-blue-700 transition-colors">Save Changes</div>
           </div>
         </div>
