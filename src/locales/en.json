@@ -477,5 +477,37 @@
     "discrepancyAmount": "Sales",
     "OpeningClosing": "Opening/Closing"
   },
-  "Dashboard": "Dashboard"
+  "Dashboard": "Dashboard",
+  "dashboard": {
+    "VANSalesDashboard": "VAN Sales Dashboard",
+    "Search": "Search",
+    "Sales_Representatives": "Sales Representatives",
+    "ToDate": "To Date",
+    "FromDate": "From Date",
+    "Visits": "Visits",
+    "Today_Performance": "Today's Performance",
+    "Planned": "Planned",
+    "Completed": "Completed",
+    "Productive": "Productive",
+    "Productivity_Rate": "Productivity Rate",
+    "Sales": "Sales",
+    "Daily_Revenue": "Daily Revenue",
+    "Target": "Target",
+    "Actual": "Actual",
+    "of_target": "of target",
+    "Collections": "Collections",
+    "Cash": "Cash",
+    "VISA": "VISA",
+    "Bank": "Bank",
+    "OpenSessions": "Open Sessions",
+    "Payment_Methods": "Undeposited Cash",
+    "Rep": "Rep",
+    "Overdue": "Overdue",
+    "AgingBuckets": "Aging Buckets",
+    "StockinVans": "Stock in Vans",
+    "InventoryStatus": "Inventory Status",
+    "VANs": "VANs",
+    "Items": "Items",
+    "AllSalesReps": "All Sales Reps"
+  }
 }

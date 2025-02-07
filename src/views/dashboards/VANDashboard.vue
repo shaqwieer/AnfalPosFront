@@ -8,6 +8,11 @@ import SessionsDetails from './components/details/SessionsDetails.vue';
 import OverdueDetails from './components/details/OverdueDetails.vue';
 import StockDetails from './components/details/StockDetails.vue';
 
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
+const totalSalesReps = ref(0);
+
 // Add new ref for filter values
 const filterValues = ref({
   salesReps: ['all'],
@@ -47,7 +52,7 @@ onUnmounted(() => {
 
 // Available sales reps
 const availableSalesReps = [
-  { id: 'all', name: 'All Sales Reps' },
+  { id: 'all', name: `${t('dashboard.AllSalesReps')}` },
   { id: 'rep1', name: 'Mohammed Al-Malki' },
   { id: 'rep2', name: 'Abdullah Al-Qahtani' },
   { id: 'rep3', name: 'Khalid Al-Otaibi' },
@@ -420,6 +425,13 @@ const initializeDateRange = () => {
 
 // Initialize date range on component mount
 initializeDateRange();
+
+const Rtl = localStorage.getItem('Rtl');
+
+const DetailsSectionTitle = computed(() => {
+  // return `${Rtl.value ?  : (selectedCard.value.charAt(0).toUpperCase() + selectedCard.value.slice(1) )}${} 'Details'`;
+  return 'test  ';
+});
 </script>
 
 <template>
@@ -428,7 +440,7 @@ initializeDateRange();
       <!-- Header with Filters -->
       <div class="mb-6">
         <div class="flex align-items-center justify-content-between mb-4">
-          <h1 class="text-2xl font-bold text-900">VAN Sales Dashboard</h1>
+          <h1 class="text-2xl font-bold text-900">{{ t('dashboard.VANSalesDashboard') }}</h1>
           <div class="text-sm text-500">
             {{ new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}
           </div>
@@ -439,11 +451,11 @@ initializeDateRange();
           <div class="grid">
             <!-- Sales Rep Multi-select Dropdown -->
             <div class="col-12 md:col-4 sales-rep-dropdown">
-              <label class="block text-sm font-medium text-700 mb-1">Sales Representatives</label>
+              <label class="block text-md font-medium text-700 mb-1">{{ t('dashboard.Sales_Representatives') }}</label>
               <div class="relative">
                 <button @click.stop="toggleDropdown" class="w-full h-3rem border-1 border-gray-200 surface-card border-1 border-round px-4 py-2 text-left flex align-items-center justify-content-between">
                   <span class="text-overflow-ellipsis">
-                    {{ filterValues.salesReps.includes('all') ? 'All Sales Reps' : filterValues.salesReps.length + ' Selected' }}
+                    {{ filterValues.salesReps.includes('all') ? `${t('dashboard.AllSalesReps')}` : filterValues.salesReps.length + ' Selected' }}
                   </span>
                   <i :class="['pi', isDropdownOpen ? 'pi-chevron-up' : 'pi-chevron-down', 'text-500']"></i>
                 </button>
@@ -464,11 +476,11 @@ initializeDateRange();
 
             <!-- Date Range -->
             <div class="col-12 md:col-4">
-              <label class="block text-sm font-medium text-700 mb-1">From Date</label>
+              <label class="block text-md font-medium text-700 mb-1"> {{ t('dashboard.FromDate') }}</label>
               <input type="date" v-model="filterValues.dateFrom" class="w-full border-none" />
             </div>
             <div class="col-12 md:col-4">
-              <label class="block text-sm font-medium text-700 mb-1">To Date</label>
+              <label class="block text-md font-medium text-700 mb-1">{{ t('dashboard.ToDate') }}</label>
               <input type="date" v-model="filterValues.dateTo" :min="filterValues.dateFrom" class="w-full border-none" />
             </div>
           </div>
@@ -477,19 +489,20 @@ initializeDateRange();
           <div class="mt-4 flex justify-content-end">
             <button @click="handleSearch" class="p-button p-component px-4 py-2 bg-primary text-white border-round flex align-items-center gap-2">
               <i class="pi pi-search"></i>
-              <span>Search</span>
+              <span>{{ t('dashboard.Search') }}</span>
             </button>
           </div>
         </div>
       </div>
 
       <!-- KPI Cards -->
-      <KPICards :yesterday-data="yesterdayData" :today-data="filteredData" :selected-card="selectedCard" @select-card="handleCardSelect" class="mb-6" />
+      <KPICards :yesterday-data="yesterdayData" :today-data="filteredData" :selected-card="selectedCard" v-model="totalSalesReps" @select-card="handleCardSelect" class="mb-6" />
 
       <!-- Details Section -->
       <div v-if="selectedCard" class="surface-card border-round-xl border-1 p-4 border-gray-200">
         <div class="flex align-items-center justify-content-between mb-5 mt-3">
           <h2 class="text-2xl m-0 font-medium">{{ selectedCard.charAt(0).toUpperCase() + selectedCard.slice(1) }} Details</h2>
+
           <div class="flex align-items-center gap-2">
             <div @click="toggleViewMode" class="p-2 cursor-pointer border-round hover:surface-hover">
               <font-awesome-icon :icon="['fas', viewMode === 'chart' ? 'table' : 'chart-simple']" class="text-xl" />
@@ -505,7 +518,7 @@ initializeDateRange();
         <SalesDetails v-if="selectedCard === 'sales' && cardDetails.sales" :data="cardDetails.sales" :view-mode="viewMode" />
         <CollectionsDetails v-if="selectedCard === 'collections'" :data="cardDetails.collections" :view-mode="viewMode" />
         <SessionsDetails v-if="selectedCard === 'sessions'" :data="cardDetails.sessions" :view-mode="viewMode" />
-        <OverdueDetails v-if="selectedCard === 'overdue'" :data="cardDetails.overdue" :view-mode="viewMode" />
+        <OverdueDetails v-if="selectedCard === 'overdue'" :data="cardDetails.overdue" :view-mode="viewMode" v-model="totalSalesReps" />
         <StockDetails v-if="selectedCard === 'stock'" :data="cardDetails.stock" :view-mode="viewMode" />
       </div>
     </div>
