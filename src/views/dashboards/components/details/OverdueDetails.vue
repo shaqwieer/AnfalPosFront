@@ -3,6 +3,9 @@ import { ref, computed } from 'vue';
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const props = defineProps<{
@@ -77,17 +80,17 @@ const chartData = computed(() => {
     labels: Object.keys(salesRepData),
     datasets: [
       {
-        label: '30-60 Days',
+        label: t('dashboard.30-60Days'),
         data: Object.values(salesRepData).map((data) => data['30-60']),
         backgroundColor: '#f59e0b'
       },
       {
-        label: '60-90 Days',
+        label: t('dashboard.60-90Days'),
         data: Object.values(salesRepData).map((data) => data['60-90']),
         backgroundColor: '#f97316'
       },
       {
-        label: '90+ Days',
+        label: t('dashboard.90Days'),
         data: Object.values(salesRepData).map((data) => data['90+']),
         backgroundColor: '#ef4444'
       }
@@ -104,7 +107,7 @@ const chartOptions = {
     },
     title: {
       display: true,
-      text: 'Overdue Analysis by Sales Rep'
+      text: t('dashboard.OverdueAnalysisbySalesRep')
     }
   },
   scales: {
@@ -118,8 +121,9 @@ const chartOptions = {
   }
 };
 
+const Rtl = localStorage.getItem('Rtl') === 'true';
 const formatPrice = (price: number): string => {
-  return price.toLocaleString('en-US', {
+  return price.toLocaleString(Rtl ? 'ar-SA' : 'en-US', {
     style: 'currency',
     currency: 'SAR',
     minimumFractionDigits: 2,
@@ -153,7 +157,6 @@ const summary = computed(() => {
 // const totalSalesReps = defineModel();
 // totalSalesReps.value = overdueData.value.length;
 
-
 const getAgingColor = (category: string) => {
   switch (category) {
     case '30-60':
@@ -178,33 +181,33 @@ const getAgingColor = (category: string) => {
           <div class="grid mb-6">
             <div class="col-12 p-2 md:col-6 lg:col-3">
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-                <div class="text-sm text-gray-500">30-60 Days</div>
+                <div class="text-sm text-gray-500">{{ t('dashboard.30-60Days') }}</div>
                 <div class="text-2xl font-bold text-yellow-600">{{ formatPrice(summary.total30_60) }}</div>
-                <div class="text-sm text-gray-500">{{ overdueData.filter((i) => i.category === '30-60').length }} invoices</div>
+                <div class="text-sm text-gray-500">{{ overdueData.filter((i) => i.category === '30-60').length }} {{ t('dashboard.invoices') }}</div>
               </div>
             </div>
 
             <div class="col-12 p-2 md:col-6 lg:col-3">
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-                <div class="text-sm text-gray-500">60-90 Days</div>
+                <div class="text-sm text-gray-500">{{ t('dashboard.60-90Days') }}</div>
                 <div class="text-2xl font-bold text-orange-600">{{ formatPrice(summary.total60_90) }}</div>
-                <div class="text-sm text-gray-500">{{ overdueData.filter((i) => i.category === '60-90').length }} invoices</div>
+                <div class="text-sm text-gray-500">{{ overdueData.filter((i) => i.category === '60-90').length }} {{ t('dashboard.invoices') }}</div>
               </div>
             </div>
 
             <div class="col-12 p-2 md:col-6 lg:col-3">
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-                <div class="text-sm text-gray-500">90+ Days</div>
+                <div class="text-sm text-gray-500">{{ t('dashboard.90Days') }}</div>
                 <div class="text-2xl font-bold text-red-600">{{ formatPrice(summary.total90Plus) }}</div>
-                <div class="text-sm text-gray-500">{{ overdueData.filter((i) => i.category === '90+').length }} invoices</div>
+                <div class="text-sm text-gray-500">{{ overdueData.filter((i) => i.category === '90+').length }} {{ t('dashboard.invoices') }}</div>
               </div>
             </div>
 
             <div class="col-12 p-2 md:col-6 lg:col-3">
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-                <div class="text-sm text-gray-500">Total Overdue</div>
+                <div class="text-sm text-gray-500">{{ t('dashboard.TotalOverdue') }}</div>
                 <div class="text-2xl font-bold text-gray-900">{{ formatPrice(summary.totalOverdue) }}</div>
-                <div class="text-sm text-gray-500">{{ summary.totalInvoices }} invoices</div>
+                <div class="text-sm text-gray-500">{{ summary.totalInvoices }} {{ t('dashboard.invoices') }}</div>
               </div>
             </div>
           </div>
@@ -228,7 +231,7 @@ const getAgingColor = (category: string) => {
         </template>
 
         <!-- Sales Rep Column -->
-        <Column field="salesRep" header="Sales Rep">
+        <Column field="salesRep" :header="t('dashboard.SalesRep')">
           <template #body="slotProps">
             <div class="flex flex-column align-items-start">
               <div class="font-semibold text-md">{{ slotProps.data.salesRep }}</div>
@@ -237,7 +240,7 @@ const getAgingColor = (category: string) => {
 
           <template #footer="slotProps">
             <div class="flex flex-column align-items-start">
-              <div class="font-semibold text-md">Total ({{ summary.totalSalesReps }} Sales Reps)</div>
+              <div class="font-semibold text-md">{{ t('dashboard.Total') }} ({{ summary.totalSalesReps }} {{ t('dashboard.SalesReps') }} )</div>
             </div>
           </template>
         </Column>
@@ -245,7 +248,7 @@ const getAgingColor = (category: string) => {
         <Column field="customer">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-start font-normal">customer</span>
+              <span class="text-md flex justify-content-start font-normal"> {{ t('dashboard.customer') }} </span>
             </div>
           </template>
 
@@ -257,7 +260,7 @@ const getAgingColor = (category: string) => {
 
           <template #footer="slotProps">
             <div class="flex flex-column align-items-start">
-              <div class="font-semibold text-md">{{ summary.totalCustomers }} Customers</div>
+              <div class="font-semibold text-md">{{ summary.totalCustomers }} {{ t('dashboard.Customers') }}</div>
             </div>
           </template>
         </Column>
@@ -265,7 +268,7 @@ const getAgingColor = (category: string) => {
         <Column field="invoice">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-start font-normal">invoice</span>
+              <span class="text-md flex justify-content-start font-normal"> {{ t('dashboard.invoice') }}</span>
             </div>
           </template>
           <template #body="slotProps">
@@ -276,7 +279,7 @@ const getAgingColor = (category: string) => {
 
           <template #footer="slotProps">
             <div class="flex flex-column align-items-start">
-              <div class="font-semibold text-md">{{ summary.totalInvoices }} invoices</div>
+              <div class="font-semibold text-md">{{ summary.totalInvoices }} {{ t('dashboard.invoices') }}</div>
             </div>
           </template>
         </Column>
@@ -284,7 +287,7 @@ const getAgingColor = (category: string) => {
         <Column field="date">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">date</span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.date') }}</span>
             </div>
           </template>
           <template #body="slotProps">
@@ -297,7 +300,7 @@ const getAgingColor = (category: string) => {
         <Column field="amount">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">Amount</span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Amount') }}</span>
             </div>
           </template>
           <template #body="slotProps">
@@ -316,7 +319,7 @@ const getAgingColor = (category: string) => {
         <Column field="days">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">Days</span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Days') }}</span>
             </div>
           </template>
           <template #body="slotProps">
@@ -329,12 +332,12 @@ const getAgingColor = (category: string) => {
         <Column>
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">Aging</span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Aging') }}</span>
             </div>
           </template>
           <template #body="slotProps">
             <div class="flex flex-column align-items-center text-md">
-              <span class="px-2 py-1 text-xs border-round-xl" :class="getAgingColor(slotProps.data.category)"> {{ slotProps.data.category }} days </span>
+              <span class="px-2 py-1 text-xs border-round-xl" :class="getAgingColor(slotProps.data.category)"> {{ slotProps.data.category }} {{ t('dashboard.Days') }} </span>
             </div>
           </template>
         </Column>

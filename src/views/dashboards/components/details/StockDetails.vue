@@ -3,6 +3,9 @@ import { ref, computed } from 'vue';
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const props = defineProps<{
@@ -68,7 +71,7 @@ const summary = computed(() => {
 
 // Chart data
 const chartData = computed(() => ({
-  labels: ['Critical', 'Warning', 'Normal'],
+  labels: [t('dashboard.Critical'), t('dashboard.Warning'), t('dashboard.Normal')],
   datasets: [
     {
       data: [summary.value.criticalItems, summary.value.warningItems, summary.value.normalItems],
@@ -86,7 +89,7 @@ const chartOptions = {
     },
     title: {
       display: true,
-      text: `Stock Status - ${stockData.value.salesRep}`
+      text: `${t('dashboard.StockStatus')} - ${stockData.value.salesRep}`
     }
   },
   scales: {
@@ -131,7 +134,7 @@ const getStockLevel = (quantity: number, minStock: number, maxStock: number) => 
           <div class="grid mb-6">
             <div class="col-12 p-2 md:col-6 lg:col-3">
               <div class="border-1 border-round-lg h-full shadow-sm border-1 border-gray-200 p-4">
-                <div class="text-sm text-gray-500">Open Sessions</div>
+                <div class="text-sm text-gray-500">{{ t('dashboard.OpenSessions') }}</div>
                 <div class="text-2xl font-bold text-gray-900">
                   {{ summary.totalItems }}
                 </div>
@@ -140,7 +143,7 @@ const getStockLevel = (quantity: number, minStock: number, maxStock: number) => 
 
             <div class="col-12 p-2 md:col-6 lg:col-3">
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-                <div class="text-sm text-gray-500">Critical Stock</div>
+                <div class="text-sm text-gray-500">{{ t('dashboard.CriticalStock') }}</div>
                 <div class="text-2xl font-bold text-red-600">{{ summary.criticalItems }}</div>
                 <div class="text-sm text-gray-500">{{ summary.criticalPercentage.toFixed(1) }}%</div>
               </div>
@@ -148,7 +151,7 @@ const getStockLevel = (quantity: number, minStock: number, maxStock: number) => 
 
             <div class="col-12 p-2 md:col-6 lg:col-3">
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-                <div class="text-sm text-gray-500">Warning Stock</div>
+                <div class="text-sm text-gray-500">{{ t('dashboard.WarningStock') }}</div>
                 <div class="text-2xl font-bold text-yellow-600">{{ summary.warningItems }}</div>
                 <div class="text-sm text-gray-500">{{ summary.warningPercentage.toFixed(1) }}%</div>
               </div>
@@ -156,7 +159,7 @@ const getStockLevel = (quantity: number, minStock: number, maxStock: number) => 
 
             <div class="col-12 p-2 md:col-6 lg:col-3">
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-                <div class="text-sm text-gray-500">Normal Stock</div>
+                <div class="text-sm text-gray-500">{{ t('dashboard.NormalStock') }}</div>
                 <div class="text-2xl font-bold text-green-600">{{ summary.normalItems }}</div>
                 <div class="text-sm text-gray-500">{{ summary.normalPercentage.toFixed(1) }}%</div>
               </div>
@@ -181,13 +184,13 @@ const getStockLevel = (quantity: number, minStock: number, maxStock: number) => 
 
       <DataTable :value="stockData.inventory" :paginator="stockData.inventory.length > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" class="">
         <template #empty>
-          <div class="flex justify-content-center align-items-center font-bold text-lg">No Data Available</div>
+          <div class="flex justify-content-center align-items-center font-bold text-lg">{{ t('dashboard.empty') }}</div>
         </template>
 
         <Column field="code">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-start font-normal">CODE</span>
+              <span class="text-md flex justify-content-start font-normal"> {{ t('dashboard.CODE') }}</span>
             </div>
           </template>
 
@@ -201,7 +204,7 @@ const getStockLevel = (quantity: number, minStock: number, maxStock: number) => 
         <Column field="name">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-start font-normal">Product</span>
+              <span class="text-md flex justify-content-start font-normal"> {{ t('dashboard.Product') }}</span>
             </div>
           </template>
 
@@ -215,7 +218,7 @@ const getStockLevel = (quantity: number, minStock: number, maxStock: number) => 
         <Column field="category">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-start font-normal">category</span>
+              <span class="text-md flex justify-content-start font-normal">{{ t('dashboard.Category') }}</span>
             </div>
           </template>
           <template #body="slotProps">
@@ -228,7 +231,7 @@ const getStockLevel = (quantity: number, minStock: number, maxStock: number) => 
         <Column field="maxStock">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">Stock Level</span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.StockLevel') }}</span>
             </div>
           </template>
 
@@ -249,7 +252,7 @@ const getStockLevel = (quantity: number, minStock: number, maxStock: number) => 
         <Column field="quantity">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">quantity</span>
+              <span class="text-md flex justify-content-center font-normal">{{ t('dashboard.quantity') }}</span>
             </div>
           </template>
           <template #body="slotProps">
@@ -262,7 +265,7 @@ const getStockLevel = (quantity: number, minStock: number, maxStock: number) => 
         <Column field="maxStock">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">Min/Max </span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Min/Max') }}</span>
             </div>
           </template>
 
@@ -274,14 +277,14 @@ const getStockLevel = (quantity: number, minStock: number, maxStock: number) => 
         <Column field="status">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">Status</span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Status') }}</span>
             </div>
           </template>
 
           <template #body="slotProps">
             <div class="flex flex-column align-items-center text-sm">
               <span class="px-2 py-1 text-xs border-round-3xl" :class="getStatusColor(slotProps.data.status)">
-                {{ slotProps.data.status.toUpperCase() }}
+                {{ t(`dashboard.${slotProps.data.status.charAt(0).toUpperCase() + slotProps.data.status.slice(1)}`) }}
               </span>
             </div>
           </template>

@@ -3,6 +3,9 @@ import { ref, computed } from 'vue';
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const props = defineProps<{
@@ -54,17 +57,17 @@ const chartData = computed(() => ({
   labels: collectionsData.value.map((item) => item.salesRep),
   datasets: [
     {
-      label: 'Cash',
+      label: t('dashboard.Cash'),
       data: collectionsData.value.map((item) => item.cash),
       backgroundColor: '#22c55e'
     },
     {
-      label: 'Card',
+      label: t('dashboard.Card'),
       data: collectionsData.value.map((item) => item.card),
       backgroundColor: '#3b82f6'
     },
     {
-      label: 'Bank',
+      label: t('dashboard.Bank'),
       data: collectionsData.value.map((item) => item.bank),
       backgroundColor: '#8b5cf6'
     }
@@ -80,7 +83,7 @@ const chartOptions = {
     },
     title: {
       display: true,
-      text: 'Collections by Payment Method'
+      text: t('dashboard.CollectionsbyPaymentMethod')
     }
   },
   scales: {
@@ -94,8 +97,9 @@ const chartOptions = {
   }
 };
 
+const Rtl = localStorage.getItem('Rtl') === 'true';
 const formatPrice = (price: number): string => {
-  return price.toLocaleString('en-US', {
+  return price.toLocaleString(Rtl ? 'ar-SA' : 'en-US', {
     style: 'currency',
     currency: 'SAR',
     minimumFractionDigits: 2,
@@ -115,13 +119,13 @@ const summary = computed(() => ({
 <template>
   <div>
     <!-- Summary Card -->
-    <div class="p-grid p-dir-col p-md-dir-row p-align-start p-justify-between ">
+    <div class="p-grid p-dir-col p-md-dir-row p-align-start p-justify-between">
       <div class="p-col-12">
         <div class="bg-white rounded-lg shadow-sm border p-0">
           <div class="grid mb-6">
             <div class="col-12 p-2 md:col-6 lg:col-3">
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-                <div class="text-sm text-gray-500">Total Cash</div>
+                <div class="text-sm text-gray-500">{{ t('dashboard.TotalCash') }}</div>
                 <div class="text-2xl font-bold text-green-600">
                   {{ formatPrice(summary.totalCash) }}
                 </div>
@@ -130,7 +134,7 @@ const summary = computed(() => ({
 
             <div class="col-12 p-2 md:col-6 lg:col-3">
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-                <div class="text-sm text-gray-500">Total Card</div>
+                <div class="text-sm text-gray-500">{{ t('dashboard.TotalCard') }}</div>
                 <div class="text-2xl font-bold text-blue-600">
                   {{ formatPrice(summary.totalCard) }}
                 </div>
@@ -139,7 +143,7 @@ const summary = computed(() => ({
 
             <div class="col-12 p-2 md:col-6 lg:col-3">
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-                <div class="text-sm text-gray-500">Total Bank</div>
+                <div class="text-sm text-gray-500">{{ t('dashboard.TotalBank') }}</div>
                 <div class="text-2xl font-bold text-purple-600">
                   {{ formatPrice(summary.totalBank) }}
                 </div>
@@ -148,7 +152,7 @@ const summary = computed(() => ({
 
             <div class="col-12 p-2 md:col-6 lg:col-3">
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-                <div class="text-sm text-gray-500">Grand Total</div>
+                <div class="text-sm text-gray-500">{{ t('dashboard.GrandTotal') }}</div>
                 <div class="text-2xl font-bold text-gray-900">
                   {{ formatPrice(summary.grandTotal) }}
                 </div>
@@ -170,11 +174,11 @@ const summary = computed(() => ({
     <div v-else class="bg-white border-1 border-gray-200 border-round-lg shadow-sm border overflow-hidden">
       <DataTable :value="collectionsData" :paginator="collectionsData.length > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" class="">
         <template #empty>
-          <div class="flex justify-content-center align-items-center font-bold text-lg">No Data Available</div>
+          <div class="flex justify-content-center align-items-center font-bold text-lg">{{ t('dashboard.empty') }}</div>
         </template>
 
         <!-- Sales Rep Column -->
-        <Column field="salesRep" header="Sales Rep">
+        <Column field="salesRep" :header="t('dashboard.SalesRep')">
           <template #body="slotProps">
             <div class="flex flex-column align-items-start">
               <div class="font-semibold text-md">{{ slotProps.data.salesRep }}</div>
@@ -183,7 +187,7 @@ const summary = computed(() => ({
 
           <template #footer="slotProps">
             <div class="flex flex-column align-items-start">
-              <div class="font-semibold text-md">Total</div>
+              <div class="font-semibold text-md">{{ t('dashboard.Total') }}</div>
             </div>
           </template>
         </Column>
@@ -192,7 +196,7 @@ const summary = computed(() => ({
         <Column field="cash">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">Cash</span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Cash') }}</span>
             </div>
           </template>
 
@@ -215,7 +219,7 @@ const summary = computed(() => ({
         <Column field="card">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">Card</span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Card') }}</span>
             </div>
           </template>
           <template #body="slotProps">
@@ -237,7 +241,7 @@ const summary = computed(() => ({
         <Column field="bank">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">Bank</span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Bank') }}</span>
             </div>
           </template>
           <template #body="slotProps">
@@ -257,7 +261,7 @@ const summary = computed(() => ({
         <Column field="total">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">Total</span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Total') }}</span>
             </div>
           </template>
           <template #body="slotProps">

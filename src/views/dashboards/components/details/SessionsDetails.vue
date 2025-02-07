@@ -6,7 +6,6 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 
-
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const props = defineProps<{
@@ -69,7 +68,7 @@ const chartOptions = {
     },
     title: {
       display: true,
-      text: 'Open Sessions by Sales Rep'
+      text: t('dashboard.OpenSessionsbySalesRep')
     }
   },
   scales: {
@@ -79,8 +78,9 @@ const chartOptions = {
   }
 };
 
+const Rtl = localStorage.getItem('Rtl') === 'true';
 const formatPrice = (price: number): string => {
-  return price.toLocaleString('en-US', {
+  return price.toLocaleString(Rtl ? 'ar-SA' : 'en-US', {
     style: 'currency',
     currency: 'SAR',
     minimumFractionDigits: 2,
@@ -124,7 +124,7 @@ const getStatusColor = (status: string) => {
           <div class="grid mb-6">
             <div class="col-12 p-2 md:col-6 lg:col-3">
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-                <div class="text-sm text-gray-500">Open Sessions</div>
+                <div class="text-sm text-gray-500">{{ t('dashboard.OpenSessions') }}</div>
                 <div class="text-2xl font-bold text-red-600">
                   {{ summary.totalOpen }}
                 </div>
@@ -133,7 +133,7 @@ const getStatusColor = (status: string) => {
 
             <div class="col-12 p-2 md:col-6 lg:col-3">
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-                <div class="text-sm text-gray-500">Pending Sessions</div>
+                <div class="text-sm text-gray-500">{{ t('dashboard.PendingSessions') }}</div>
                 <div class="text-2xl font-bold text-orange-600">
                   {{ summary.totalPending }}
                 </div>
@@ -142,7 +142,7 @@ const getStatusColor = (status: string) => {
 
             <div class="col-12 p-2 md:col-6 lg:col-3">
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-                <div class="text-sm text-gray-500">Total Amount</div>
+                <div class="text-sm text-gray-500">{{ t('dashboard.TotalAmount') }}</div>
                 <div class="text-2xl font-bold text-gray-900">
                   {{ formatPrice(summary.totalAmount) }}
                 </div>
@@ -151,7 +151,7 @@ const getStatusColor = (status: string) => {
 
             <div class="col-12 p-2 md:col-6 lg:col-3">
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-                <div class="text-sm text-gray-500">Old Sessions (>1 day)</div>
+                <div class="text-sm text-gray-500">{{ t('dashboard.OldSessions') }}</div>
                 <div class="text-2xl font-bold text-red-600">
                   {{ summary.oldSessions }}
                 </div>
@@ -173,11 +173,11 @@ const getStatusColor = (status: string) => {
     <div v-else class="bg-white border-1 border-gray-200 border-round-lg shadow-sm border overflow-hidden">
       <DataTable :value="sessionsData" :paginator="sessionsData.length > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" class="">
         <template #empty>
-          <div class="flex justify-content-center align-items-center font-bold text-lg">No Data Available {{ t('dashboard.empty') }}</div>
+          <div class="flex justify-content-center align-items-center font-bold text-lg">{{ t('dashboard.empty') }}</div>
         </template>
 
         <!-- Sales Rep Column -->
-        <Column field="salesRep" header="Sales Rep">
+        <Column field="salesRep" :header="t('dashboard.SalesRep')">
           <template #body="slotProps">
             <div class="flex flex-column align-items-start">
               <div class="font-semibold text-md">{{ slotProps.data.salesRep }}</div>
@@ -189,7 +189,7 @@ const getStatusColor = (status: string) => {
         <Column field="sessionDate">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">Session Date</span>
+              <span class="text-md flex justify-content-center font-normal">{{ t('dashboard.SessionDate') }}</span>
             </div>
           </template>
 
@@ -204,7 +204,7 @@ const getStatusColor = (status: string) => {
         <Column field="cashAmount">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">Cash Amount</span>
+              <span class="text-md flex justify-content-center font-normal">{{ t('dashboard.CashAmount') }}</span>
             </div>
           </template>
           <template #body="slotProps">
@@ -218,13 +218,13 @@ const getStatusColor = (status: string) => {
         <Column field="status">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">Status</span>
+              <span class="text-md flex justify-content-center font-normal">{{ t('dashboard.Status') }}</span>
             </div>
           </template>
           <template #body="slotProps">
             <div class="flex flex-column align-items-center">
               <span :class="getStatusColor(slotProps.data.status)" class="text-xs text-center border-round-3xl px-2 py-1 flex justify-content-center align-content-center">
-                {{ formatPrice(slotProps.data.status.toUpperCase()) }}
+                {{ t(`dashboard.${slotProps.data.status}`).toUpperCase() }}
               </span>
             </div>
           </template>
@@ -234,7 +234,7 @@ const getStatusColor = (status: string) => {
         <Column field="sessionDate">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">Warning</span>
+              <span class="text-md flex justify-content-center font-normal">{{ t('dashboard.Warning') }}</span>
             </div>
           </template>
 
