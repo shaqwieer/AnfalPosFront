@@ -9,8 +9,8 @@ const props = defineProps<{
 
 const emit = defineEmits(['select-card']);
 
-const Rtl = localStorage.getItem('Rtl');
 
+const Rtl = localStorage.getItem('Rtl') === 'true';
 const formatPrice = (price: number): string => {
   return price.toLocaleString(Rtl ? 'ar-SA' : 'en-US', {
     style: 'currency',
@@ -172,7 +172,7 @@ const totalSalesReps = defineModel();
           </div>
         </div>
         <div class="text-2xl font-bold text-900">{{ totalSalesReps ? totalSalesReps : 5 }} {{ t('dashboard.Rep') }}</div>
-        <div class="text-md text-500">50 Cst. SAR 5,000.00</div>
+        <div class="text-lg text-500">50 {{ t('dashboard.Cst') }}. {{ formatPrice(5000) }}</div>
       </div>
     </div>
 

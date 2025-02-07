@@ -100,19 +100,8 @@ const updateMonthlyTarget = (type, monthIndex, value) => {
   }
 };
 
-// Add new ref for dropdown state
-const isDropdownOpen = ref(false);
 
-// Function to toggle dropdown
-const toggleDropdown = () => {
-  isDropdownOpen.value = !isDropdownOpen.value;
-};
 
-const filterValues = ref({
-  salesReps: ['all'],
-  dateFrom: '',
-  dateTo: ''
-});
 
 const selectedSalesReps = ref<string[]>(['all']);
 
@@ -142,12 +131,6 @@ watch(
   { deep: true }
 );
 
-const handleSalesRepSelection = (repId) => {
-  if (!filterValues.salesReps.includes(repId)) {
-    filterValues.salesReps = [repId]; // اختيار عنصر واحد فقط
-  }
-};
-
 import { useSalesGoalsStore } from '../../../stores/TargetsStore';
 
 const salesGoalsStore = useSalesGoalsStore();
@@ -160,8 +143,6 @@ const fetchData = async () => {
   console.log(salesGoalsStore.salesGoals);
   test.value = salesGoalsStore.salesGoals;
 };
-
-fetchData();
 </script>
 
 <template>
@@ -179,8 +160,6 @@ fetchData();
         </div>
       </div>
 
-      {{ test }}
-
       <!-- Main Content -->
       <div v-if="selectedRep" class="surface-card border-round-xl border-1 surface-border p-4">
         <!-- Rep Header -->
@@ -190,9 +169,8 @@ fetchData();
             <!-- Credit Limit Info -->
             <div class="flex align-items-center gap-6">
               <div class="text-sm">
-                <span class="text-500">Credit Limit:</span>xxxxx
-                <span class="ml-1 font-bold">{{ formatPrice(test == undefined ? '0' : test[0].creditLimit) }}</span>
-                
+                <span class="text-500">Credit Limit:</span>
+                <span class="ml-1 font-bold">{{ formatPrice(selectedRep.creditLimit) }}</span>
               </div>
               <div class="text-sm">
                 <span class="text-500">Current Balance:</span>
@@ -243,52 +221,44 @@ fetchData();
         <!-- View Mode -->
 
         <div v-if="!isEditing" class="overflow-x-auto mt-4 border-round-lg border-1 border-gray-200">
-          <DataTable :value="test" :rows="10" :rowsPerPageOptions="[5, 10, 25]" class="">
+          <DataTable :value="months" :paginator="months.length > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" class="">
             <template #empty>
               <div class="flex justify-content-center align-items-center font-bold text-lg">No Data Available</div>
             </template>
 
-            <Column field="businessEntityName" header="name">
+            <Column field="" header="#">
               <template #body="slotProps">
                 <div class="flex flex-column align-items-start">
                   <div class="text-md">
-                    {{ slotProps.data.businessEntityName }}
+                    {{ slotProps.index + 1 }}
                   </div>
+                </div>
+              </template>
+
+              <template #footer="slotProps">
+                <div class="flex flex-column align-items-start">
+                  <div class="text-md text-green-600"></div>
                 </div>
               </template>
             </Column>
 
-            <Column header="period" field="period">
+            <Column header="Month" field="month">
               <template #body="slotProps">
                 <div class="flex flex-column align-items-start">
                   <div class="text-md">
-                    {{ slotProps.data.period }}
+                    {{ slotProps.data }}
                   </div>
+                </div>
+              </template>
+
+              <template #footer="slotProps">
+                <div class="flex flex-column align-items-start">
+                  <div class="text-md text-green-600">Total</div>
                 </div>
               </template>
             </Column>
 
-            <Column header="collectionTarget" field="collection Target">
-              <template #body="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md">
-                    {{ formatPrice(slotProps.data.collectionTarget) }}
-                  </div>
-                </div>
-              </template>
-            </Column>
-
-            <Column header="salesTarget" field="sales Target">
-              <template #body="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md">
-                    {{ formatPrice(slotProps.data.salesTarget) }}
-                  </div>
-                </div>
-              </template>
-            </Column>
-
-            <!-- <Column header="Sales Target" field="month">
+            <Column header="Sales Target" field="month">
               <template #body="slotProps">
                 <div class="flex flex-column align-items-start">
                   <div class="text-md">
@@ -322,7 +292,7 @@ fetchData();
                   </div>
                 </div>
               </template>
-            </Column> -->
+            </Column>
           </DataTable>
         </div>
 

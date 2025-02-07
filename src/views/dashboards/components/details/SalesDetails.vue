@@ -6,6 +6,9 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
 const props = defineProps<{
   data: any;
   viewMode: 'chart' | 'table';
@@ -64,7 +67,7 @@ const chartOptions = {
     },
     title: {
       display: true,
-      text: 'Sales Analysis'
+      text: t('dashboard.SalesAnalysis')
     }
   },
   scales: {
@@ -74,8 +77,9 @@ const chartOptions = {
   }
 };
 
+const Rtl = localStorage.getItem('Rtl') === 'true';
 const formatPrice = (price: number): string => {
-  return price.toLocaleString('en-US', {
+  return price.toLocaleString(Rtl ? 'ar-SA' : 'en-US', {
     style: 'currency',
     currency: 'SAR',
     minimumFractionDigits: 2,
@@ -103,28 +107,28 @@ const getGrowthIcon = (growth: number) => {
     <div class="grid mb-6">
       <div class="col-12 p-2 md:col-6 lg:col-3">
         <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-          <div class="text-sm text-gray-500">Total Sales</div>
+          <div class="text-sm text-gray-500">{{ t('dashboard.TotalSales') }}</div>
           <div class="text-2xl font-bold text-gray-900">{{ formatPrice(data.summary.totalSales) }}</div>
         </div>
       </div>
 
       <div class="col-12 p-2 md:col-6 lg:col-3">
         <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-          <div class="text-sm text-gray-500">Total Orders</div>
+          <div class="text-sm text-gray-500">{{ t('dashboard.TotalOrders') }}</div>
           <div class="text-2xl font-bold text-blue-600">{{ data.summary.totalOrders }}</div>
         </div>
       </div>
 
       <div class="col-12 p-2 md:col-6 lg:col-3">
         <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-          <div class="text-sm text-gray-500">Avg Order Value</div>
+          <div class="text-sm text-gray-500">{{ t('dashboard.AvgOrderValue') }}</div>
           <div class="text-2xl font-bold text-green-600">{{ formatPrice(data.summary.avgOrderValue) }}</div>
         </div>
       </div>
 
       <div class="col-12 p-2 md:col-6 lg:col-3">
         <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-          <div class="text-sm text-gray-500">Target Achievement</div>
+          <div class="text-sm text-gray-500">{{ t('dashboard.TargetAchievement') }}</div>
           <div class="text-2xl font-bold text-purple-600">{{ data.summary.targetAchievement }}%</div>
         </div>
       </div>
@@ -141,7 +145,7 @@ const getGrowthIcon = (growth: number) => {
           class="flex justify-content-center align-items-center w-8rem border-round-lg cursor-pointer border-gray-200 text-sm font-bold transition-colors"
           :class="selectedView === view ? 'bg-white text-blue-600 border-1 shadow-1' : 'text-gray-600 hover:text-gray-900'"
         >
-          By {{ view.charAt(0).toUpperCase() + view.slice(1) }}
+          {{ t(`dashboard.${view}`) }}
         </div>
       </div>
     </div>
@@ -157,14 +161,14 @@ const getGrowthIcon = (growth: number) => {
     <div v-else class="bg-white border-1 border-gray-200 border-round-lg shadow-sm border overflow-hidden">
       <DataTable :value="data.salesReps" :paginator="data.salesReps.lenth > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" :currentPageReportTemplate="''">
         <template #empty>
-          <div class="flex justify-content-center align-items-center font-bold text-lg">test</div>
+          <div class="flex justify-content-center align-items-center font-bold text-lg">{{ t('dashboard.empty') }}</div>
         </template>
 
-        <Column field="name" header="Sales Rep" class="font-normal">
+        <Column field="name" :header="t('dashboard.SalesRep')" class="font-normal">
           <template #body="slotProps">
             <div class="flex flex-column align-items-start">
               <div class="font-semibold text-md">{{ slotProps.data.name }}</div>
-              <div class="text-sm text-gray-500">Top Product: {{ slotProps.data.topProducts[0].name }}</div>
+              <div class="text-sm text-gray-500">{{ t('dashboard.TopProduct') }}: {{ slotProps.data.topProducts[0].name }}</div>
             </div>
           </template>
         </Column>
@@ -172,7 +176,7 @@ const getGrowthIcon = (growth: number) => {
         <Column field="orders" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">Orders</span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Orders') }}</span>
             </div>
           </template>
 
@@ -186,7 +190,7 @@ const getGrowthIcon = (growth: number) => {
         <Column field="totalSales" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">Total Sales </span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.TotalSales') }}</span>
             </div>
           </template>
 
@@ -200,7 +204,7 @@ const getGrowthIcon = (growth: number) => {
         <Column field="target" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">Target</span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Target') }}</span>
             </div>
           </template>
 
@@ -214,7 +218,7 @@ const getGrowthIcon = (growth: number) => {
         <Column field="achievement" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">Achievement</span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Achievement') }}</span>
             </div>
           </template>
 
@@ -228,7 +232,7 @@ const getGrowthIcon = (growth: number) => {
         <Column field="avgOrderValue" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">Avg Order Value </span>
+              <span class="text-md flex justify-content-center font-normal">{{ t('dashboard.AvgOrderValue') }}</span>
             </div>
           </template>
 

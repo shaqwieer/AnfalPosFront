@@ -3,6 +3,9 @@ import { computed } from 'vue';
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const props = defineProps<{
@@ -15,19 +18,19 @@ const chartData = computed(() => ({
   labels: props.data.salesReps.map((rep: any) => rep.name),
   datasets: [
     {
-      label: 'Planned Visits',
+      label: t('dashboard.PlannedVisits'),
       data: props.data.salesReps.map((rep: any) => rep.planned),
       backgroundColor: '#94a3b8',
       stack: 'Stack 0'
     },
     {
-      label: 'Completed Visits',
+      label: t('dashboard.CompletedVisits'),
       data: props.data.salesReps.map((rep: any) => rep.completed),
       backgroundColor: '#22c55e',
       stack: 'Stack 1'
     },
     {
-      label: 'Productive Visits',
+      label: t('dashboard.ProductiveVisits'),
       data: props.data.salesReps.map((rep: any) => rep.productive),
       backgroundColor: '#3b82f6',
       stack: 'Stack 1'
@@ -44,7 +47,7 @@ const chartOptions = {
     },
     title: {
       display: true,
-      text: 'Sales Rep Visit Performance'
+      text: t('dashboard.SalesRepVisitPerformance')
     }
   },
   scales: {
@@ -84,7 +87,7 @@ const getStatusColor = (rate: number) => {
     <div class="grid mb-6">
       <div class="col-12 p-2 md:col-6 lg:col-3">
         <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-          <div class="text-sm text-gray-500">Total Planned</div>
+          <div class="text-sm text-gray-500">{{ t('dashboard.TotalPlanned') }}</div>
           <div class="text-2xl font-bold text-gray-900">
             {{ data.summary.totalPlanned }}
           </div>
@@ -93,7 +96,7 @@ const getStatusColor = (rate: number) => {
 
       <div class="col-12 p-2 md:col-6 lg:col-3">
         <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-          <div class="text-sm text-gray-500">Total Completed</div>
+          <div class="text-sm text-gray-500">{{ t('dashboard.TotalCompleted') }}</div>
           <div class="text-2xl font-bold text-green-600">
             {{ data.summary.totalCompleted }}
           </div>
@@ -102,7 +105,7 @@ const getStatusColor = (rate: number) => {
 
       <div class="col-12 p-2 md:col-6 lg:col-3">
         <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-          <div class="text-sm text-gray-500">Total Productive</div>
+          <div class="text-sm text-gray-500">{{ t('dashboard.TotalProductive') }}</div>
           <div class="text-2xl font-bold text-blue-600">
             {{ data.summary.totalProductive }}
           </div>
@@ -111,7 +114,7 @@ const getStatusColor = (rate: number) => {
 
       <div class="col-12 p-2 md:col-6 lg:col-3">
         <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-          <div class="text-sm text-gray-500">Average Completion Rate</div>
+          <div class="text-sm text-gray-500">{{ t('dashboard.AverageCompletionRate') }}</div>
           <div class="text-2xl font-bold text-purple-600">{{ ((data.summary.totalCompleted / data.summary.totalPlanned) * 100).toFixed(1) }}%</div>
         </div>
       </div>
@@ -119,7 +122,7 @@ const getStatusColor = (rate: number) => {
 
     <!-- Chart View -->
     <!-- 'chart' -->
-    <div v-if="viewMode === 'chart'" class="bg-white border-1 border-gray-200 border-round-lg shadow-sm  shadow-sm border p-4">
+    <div v-if="viewMode === 'chart'" class="bg-white border-1 border-gray-200 border-round-lg shadow-sm shadow-sm border p-4">
       <div style="height: 400px">
         <Bar :data="chartData" :options="chartOptions" />
       </div>
@@ -130,10 +133,10 @@ const getStatusColor = (rate: number) => {
     <div v-else class="card bg-white p-0 round shadow-none border">
       <DataTable :value="transactionData" :paginator="transactionData.lenth > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" :currentPageReportTemplate="''">
         <template #empty>
-          <div class="flex justify-content-center align-items-center font-bold text-lg">test</div>
+          <div class="flex justify-content-center align-items-center font-bold text-lg">{{ t('dashboard.empty') }}</div>
         </template>
 
-        <Column field="name" header="Sales Rep" class="font-normal">
+        <Column field="name" :header="t('dashboard.SalesRep')" class="font-normal">
           <template #body="slotProps">
             <div class="flex flex-row align-items-center">
               <span class="font-semibold text-md">{{ slotProps.data.name }}</span>
@@ -144,7 +147,7 @@ const getStatusColor = (rate: number) => {
         <Column field="planned" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-               <span class=" text-md flex justify-content-center font-normal">Planned</span>
+              <span class="text-md flex justify-content-center font-normal">{{ t('dashboard.Planned') }}</span>
             </div>
           </template>
 
@@ -158,7 +161,7 @@ const getStatusColor = (rate: number) => {
         <Column field="completed" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-               <span class=" text-md flex justify-content-center font-normal">Completed</span>
+              <span class="text-md flex justify-content-center font-normal">{{ t('dashboard.Completed') }}</span>
             </div>
           </template>
 
@@ -172,7 +175,7 @@ const getStatusColor = (rate: number) => {
         <Column field="productive" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-               <span class=" text-md flex justify-content-center font-normal">Productive</span>
+              <span class="text-md flex justify-content-center font-normal">{{ t('dashboard.Productive') }}</span>
             </div>
           </template>
 
@@ -186,7 +189,7 @@ const getStatusColor = (rate: number) => {
         <Column field="sales" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-               <span class=" text-md flex justify-content-center font-normal">Sales</span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Sales') }}</span>
             </div>
           </template>
 
@@ -200,7 +203,7 @@ const getStatusColor = (rate: number) => {
         <Column field="returns" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-               <span class=" text-md flex justify-content-center font-normal">Return</span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Return') }}</span>
             </div>
           </template>
 
@@ -214,7 +217,7 @@ const getStatusColor = (rate: number) => {
         <Column field="collections" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-               <span class=" text-md flex justify-content-center font-normal">Collection</span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Collection') }}</span>
             </div>
           </template>
 

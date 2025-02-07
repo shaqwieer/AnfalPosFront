@@ -3,6 +3,10 @@ import { ref, computed } from 'vue';
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+
+
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const props = defineProps<{
@@ -169,7 +173,7 @@ const getStatusColor = (status: string) => {
     <div v-else class="bg-white border-1 border-gray-200 border-round-lg shadow-sm border overflow-hidden">
       <DataTable :value="sessionsData" :paginator="sessionsData.length > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" class="">
         <template #empty>
-          <div class="flex justify-content-center align-items-center font-bold text-lg">No Data Available</div>
+          <div class="flex justify-content-center align-items-center font-bold text-lg">No Data Available {{ t('dashboard.empty') }}</div>
         </template>
 
         <!-- Sales Rep Column -->

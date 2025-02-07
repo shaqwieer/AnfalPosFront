@@ -15,11 +15,11 @@ export const useSalesGoalsStore = defineStore({
 
       try {
         const response = await apiClient.post('/SalesGoals/GetSalesGoalsBasedOnBranch', {}, {
-          headers: { 'Content-Type': 'application/json' } // ✅ تأكيد إرسال JSON فارغ
+          headers: { 'Content-Type': 'application/json' }
         });
 
         if (response.data && response.data.data) {
-          this.salesGoals = response.data.data; // ✅ حفظ البيانات في الحالة
+          this.salesGoals = response.data.data;
         } else {
           throw new Error('Invalid response structure');
         }
