@@ -7,7 +7,7 @@ import SessionDetailsDialog from './SessionDetailsDialog.vue';
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 // Filter states
-const selectedSalesReps = ref(['all']);
+const selectedSalesReps = ref([]);
 const dateFrom = ref('');
 const dateTo = ref('');
 const selectedStatus = ref('all');
@@ -18,7 +18,7 @@ const viewMode = ref<'table' | 'chart'>('table');
 
 // Available sales reps
 const salesReps = [
-  { id: 'all', name: 'All Sales Reps' },
+  // { id: 'all', name: 'All Sales Reps' },
   { id: 'rep1', name: 'Mohammed Al-Malki' },
   { id: 'rep2', name: 'Abdullah Al-Qahtani' },
   { id: 'rep3', name: 'Khalid Al-Otaibi' },
@@ -260,19 +260,19 @@ const getStatusColor = (status: string) => {
 };
 
 // Watch for 'all' selection
-watch(
-  selectedSalesReps,
-  (newValue) => {
-    if (newValue.includes('all') && newValue.length > 1) {
-      selectedSalesReps.value = ['all'];
-    } else if (newValue.length === 0) {
-      selectedSalesReps.value = ['all'];
-    } else if (!newValue.includes('all') && newValue.length === salesReps.length - 1) {
-      selectedSalesReps.value = ['all'];
-    }
-  },
-  { deep: true }
-);
+// watch(
+//   selectedSalesReps,
+//   (newValue) => {
+//     if (newValue.includes('all') && newValue.length > 1) {
+//       selectedSalesReps.value = ['all'];
+//     } else if (newValue.length === 0) {
+//       selectedSalesReps.value = ['all'];
+//     } else if (!newValue.includes('all') && newValue.length === salesReps.length - 1) {
+//       selectedSalesReps.value = ['all'];
+//     }
+//   },
+//   { deep: true }
+// );
 
 // Handle individual selection
 const handleSalesRepSelection = (repId: string) => {
@@ -309,64 +309,42 @@ initializeDateRange();
   <div class="p-6">
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
-      <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center justify-between mb-4">
         <h1 class="text-2xl font-bold text-gray-900">Session Management</h1>
       </div>
 
       <!-- Filters -->
-      <div class="bg-white rounded-lg shadow-sm border p-4 mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="bg-white border-round-lg shadow-1 border p-4 mb-4 flex w-full align-items-center justify-content-center">
+        <div class="flex flex-row justify-content-between align-items-center w-3/4 gap-4">
           <!-- Sales Rep Multi-select Dropdown -->
           <div class="relative">
             <label class="block text-sm font-medium text-gray-700 mb-1">Sales Representatives</label>
-            <div class="relative">
-              <button @click="toggleDropdown" class="w-full bg-white border rounded-lg px-4 py-2 text-left flex items-center justify-between">
-                <span class="truncate">
-                  {{ selectedSalesReps.includes('all') ? 'All Sales Reps' : selectedSalesReps.length + ' Selected' }}
-                </span>
-                <span class="material-icons text-gray-400 text-xl">
-                  {{ isDropdownOpen ? 'expand_less' : 'expand_more' }}
-                </span>
-              </button>
 
-              <!-- Dropdown Menu -->
-              <div v-if="isDropdownOpen" class="absolute z-10 w-full mt-1 bg-white border rounded-lg shadow-lg">
-                <div class="py-1 max-h-60 overflow-auto">
-                  <label v-for="rep in salesReps" :key="rep.id" class="flex items-center px-4 py-2 hover:bg-gray-50 cursor-pointer">
-                    <input type="checkbox" :checked="selectedSalesReps.includes(rep.id)" @change="handleSalesRepSelection(rep.id)" class="h-4 w-4 text-blue-600 rounded border-gray-300" />
-                    <span class="ml-3 text-gray-700">{{ rep.name }}</span>
-                  </label>
-                </div>
-              </div>
-            </div>
+            <MultiSelect v-model="selectedSalesReps" :options="salesReps" filter optionLabel="name" placeholder="Select Sales Reps" :maxSelectedLabels="3" class="w-full md:w-20rem" />
           </div>
 
           <!-- Date Range -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">From Date</label>
-            <input type="date" v-model="dateFrom" class="w-full rounded-lg border-gray-300" />
+            <Calendar v-model="dateFrom" showIcon iconDisplay="input" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">To Date</label>
-            <input type="date" v-model="dateTo" :min="dateFrom" class="w-full rounded-lg border-gray-300" />
+            <Calendar v-model="dateTo" showIcon iconDisplay="input" />
           </div>
 
           <!-- Status Filter -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-            <select v-model="selectedStatus" class="w-full rounded-lg border-gray-300">
-              <option v-for="status in statusOptions" :key="status.id" :value="status.id">
-                {{ status.name }}
-              </option>
-            </select>
+            <Dropdown v-model="selectedStatus" :options="statusOptions" optionLabel="name" placeholder="Select a Status" class="w-full md:w-14rem" />
           </div>
         </div>
       </div>
 
       <!-- Summary Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+      <div class="flex gap-4 mb-4">
         <!-- Open Sessions -->
-        <div class="bg-white border-round-lg shadow-sm border-1 p-4">
+        <div class="bg-white border-round-lg shadow-1 border-gray-200 border-1 p-4 w-3">
           <div class="text-sm text-gray-500">Open Sessions</div>
           <div class="text-2xl font-bold text-red-600">
             {{ filteredSessions.filter((s) => s.status === 'OPEN').length }}
@@ -374,7 +352,7 @@ initializeDateRange();
         </div>
 
         <!-- Pending Sessions -->
-        <div class="bg-white border-round-lg shadow-sm border-1 p-4">
+        <div class="bg-white border-round-lg shadow-1 border-gray-200 border-1 p-4 w-3">
           <div class="text-sm text-gray-500">Pending Sessions</div>
           <div class="text-2xl font-bold text-yellow-600">
             {{ filteredSessions.filter((s) => s.status === 'PENDING').length }}
@@ -382,7 +360,7 @@ initializeDateRange();
         </div>
 
         <!-- Total Amount -->
-        <div class="bg-white border-round-lg shadow-sm border-1 p-4">
+        <div class="bg-white border-round-lg shadow-1 border-gray-200 border-1 p-4 w-3">
           <div class="text-sm text-gray-500">Total Amount</div>
           <div class="text-2xl font-bold text-gray-900">
             {{ formatPrice(filteredSessions.reduce((sum, session) => sum + session.cashAmount, 0)) }}
@@ -390,7 +368,7 @@ initializeDateRange();
         </div>
 
         <!-- Old Sessions -->
-        <div class="bg-white border-round-lg shadow-sm border-1 p-4">
+        <div class="bg-white border-round-lg shadow-1 border-gray-200 border-1 p-4 w-3">
           <div class="text-sm text-gray-500">Old Sessions (>1 day)</div>
           <div class="text-2xl font-bold text-red-600">
             {{
@@ -407,28 +385,24 @@ initializeDateRange();
       </div>
 
       <!-- Sessions View -->
-      <div class="bg-white rounded-lg shadow-sm border overflow-hidden">
+      <div class="bg-white border-round-lg shadow-1 border-1 border-gray-200 overflow-hidden">
         <!-- View Toggle Header -->
-        <div class="p-4 border-b flex items-center justify-between">
-          <h2 class="text-lg font-medium">Sessions</h2>
+        <div class="p-4 border-b flex align-items-center justify-content-between">
+          <span class="text-xl font-medium">Sessions</span>
           <div class="flex items-center space-x-2">
-            <button @click="toggleViewMode" class="p-2 rounded-lg hover:bg-gray-100 transition-colors" :title="viewMode === 'table' ? 'Switch to Chart View' : 'Switch to Table View'">
-              <span class="material-icons">
-                {{ viewMode === 'table' ? 'bar_chart' : 'table_rows' }}
-              </span>
-            </button>
+            <Button @click="toggleViewMode" class="p-1 rounded-lg hover:bg-gray-100 transition-colors" size="large" text :icon="viewMode === 'chart' ? 'pi pi-table' : 'pi pi-chart-bar'"> </Button>
           </div>
         </div>
 
         <!-- Chart View -->
         <div v-if="viewMode === 'chart'" class="p-6">
-          <div class="h-[400px]">
+          <div class="h-30rem">
             <Bar :data="chartData" :options="chartOptions" />
           </div>
         </div>
 
         <!-- Table View -->
-        <div v-else class="overflow-x-auto">
+        <!-- <div v-else class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
@@ -466,8 +440,88 @@ initializeDateRange();
                 </td>
               </tr>
             </tbody>
-          </table>
-        </div>
+          </table> -->
+        <DataTable class="surface-card border-round-lg mb-4 shadow-1 border-1 surface-border" v-else :value="filteredSessions" dataKey="id" :rows="10" :globalFilterFields="['name', 'id']" :currentPageReportTemplate="''">
+          <template #empty>
+            <div class="flex justify-content-center align-items-center font-bold text-lg">
+              {{ 'No Sessions Found' }}
+            </div></template
+          >
+
+          <Column field="salesRep" class="" :sortable="true">
+            <template #header>
+              <span class="text-lg font-bold"> {{ 'Sales Rep' }} </span>
+            </template>
+
+            <template #body="slotProps">
+              <div class="font-semibold text-lg">{{ slotProps.data.salesRep }}</div>
+            </template>
+          </Column>
+
+          <Column field="sessionDate" class="">
+            <template #header>
+              <span class="text-lg font-bold"> {{ 'Session Date' }} </span>
+            </template>
+            <template #body="slotProps">
+              <span class="text-md">{{ slotProps.data.sessionDate }}</span>
+            </template>
+          </Column>
+
+          <Column field="cashAmount" :header="'Cash Amount'" class="">
+            <template #body="slotProps">
+              <div class="text-md">{{ slotProps.data.cashAmount }}</div>
+            </template>
+          </Column>
+
+          <Column field="Credit Limit" :header="'Status'" class="" :sortable="true">
+            <template #body="slotProps">
+              <span class="px-2 py-1 text-xs border-round-3xl" :class="getStatusColor(slotProps.data.status)">
+                {{ slotProps.data.status === 'IN_APPROVAL' ? 'In Approval' : slotProps.data.status === 'OPEN' ? 'Open' : slotProps.data.status === 'PENDING' ? 'Pending' : slotProps.data.status }}
+              </span>
+            </template>
+          </Column>
+
+          <Column field="hasWarning" :header="'Warning'" class="">
+            <template #body="slotProps">
+              <span v-if="slotProps.data.hasWarning" class="material-icons text-red-500" title="Session requires attention"> warning </span>
+            </template>
+          </Column>
+
+          <Column field="statusName" :header="'Status'" class="">
+            <template #body="slotProps">
+              <Button @click="viewSessionDetails(slotProps.data)" class="p-2 hover:bg-gray-100 rounded-full" size="large" text icon="pi pi-eye" title="View Details"> </Button>
+            </template>
+          </Column>
+
+          <!-- <Column field="actions" :header="t('labels.actions')">
+              <template #body="slotProps">
+                <div class="flex align-items-center gap-3 justify-content-start">
+                  <div @click="handleViewDetails(slotProps.data)" class="p-1.5 text-blue-600 hover:bg-blue-50 cursor-pointer rounded-full">
+                    <i class="pi pi-eye"></i>
+                  </div>
+
+                  <div @click="handleEditCustomer(slotProps.data)" class="p-1.5 text-gray-600 hover:bg-gray-50 cursor-pointer rounded-full">
+                    <i class="pi pi-pencil"></i>
+                  </div>
+
+                  v-if="slotProps.data.status === 'draft'"
+                  <div v-if="slotProps.data.statusId === 8" @click="handleSubmitApproval(slotProps.data)" class="p-1.5 cursor-pointer text-blue-600 hover:bg-blue-50 rounded-full">
+                    <i class="pi pi-send"></i>
+                  </div>
+
+                  <template v-if="slotProps.data.statusId === 6">
+                    <div @click="handleApprove(slotProps.data)" class="p-1.5 cursor-pointer text-green-600 hover:bg-green-50 rounded-full">
+                      <i class="pi pi-check-circle"></i>
+                    </div>
+
+                    <div @click="handleReject(slotProps.data)" class="p-1.5 cursor-pointer text-red-600 hover:bg-red-50 rounded-full">
+                      <i class="pi pi-times-circle"></i>
+                    </div>
+                  </template>
+                </div>
+              </template>
+            </Column> -->
+        </DataTable>
       </div>
 
       <!-- Session Details Dialog -->
