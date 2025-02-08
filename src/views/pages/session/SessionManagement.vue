@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import SessionDetailsDialog from './SessionDetailsDialog.vue';
-
+import { useSessionStore } from '../../../stores/sessionStore';
+import { on } from 'events';
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 // Filter states
@@ -13,9 +14,9 @@ const dateTo = ref('');
 const selectedStatus = ref('all');
 const isDropdownOpen = ref(false);
 const showDetailsDialog = ref(false);
-const selectedSession = ref(null);
+const selectedSession = ref();
 const viewMode = ref<'table' | 'chart'>('table');
-
+const sessionStore = useSessionStore();
 // Available sales reps
 const salesReps = [
   // { id: 'all', name: 'All Sales Reps' },
@@ -160,7 +161,7 @@ const sessions = ref([
 
 // Filtered sessions
 const filteredSessions = computed(() => {
-  return sessions.value;
+  return sessionStore.sessions;
   // .filter((session) => {
   //     const matchesSalesRep =
   //         selectedSalesReps.value.includes("all") ||
@@ -248,7 +249,7 @@ const formatPrice = (price: number): string => {
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case 'OPEN':
+    case 'Opened':
       return 'bg-red-100 text-red-800';
     case 'PENDING':
       return 'bg-yellow-100 text-yellow-800';
@@ -258,41 +259,6 @@ const getStatusColor = (status: string) => {
       return 'bg-gray-100 text-gray-800';
   }
 };
-
-// Watch for 'all' selection
-// watch(
-//   selectedSalesReps,
-//   (newValue) => {
-//     if (newValue.includes('all') && newValue.length > 1) {
-//       selectedSalesReps.value = ['all'];
-//     } else if (newValue.length === 0) {
-//       selectedSalesReps.value = ['all'];
-//     } else if (!newValue.includes('all') && newValue.length === salesReps.length - 1) {
-//       selectedSalesReps.value = ['all'];
-//     }
-//   },
-//   { deep: true }
-// );
-
-// Handle individual selection
-const handleSalesRepSelection = (repId: string) => {
-  if (repId === 'all') {
-    selectedSalesReps.value = ['all'];
-  } else {
-    if (selectedSalesReps.value.includes('all')) {
-      selectedSalesReps.value = [repId];
-    } else {
-      const index = selectedSalesReps.value.indexOf(repId);
-      if (index === -1) {
-        selectedSalesReps.value.push(repId);
-      } else {
-        selectedSalesReps.value.splice(index, 1);
-      }
-    }
-  }
-};
-
-// Initialize with current date range
 const initializeDateRange = () => {
   const today = new Date();
   const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -300,9 +266,12 @@ const initializeDateRange = () => {
   dateFrom.value = firstDayOfMonth.toISOString().split('T')[0];
   dateTo.value = today.toISOString().split('T')[0];
 };
-
+const applyFilters = () => {};
 // Initialize date range on component mount
 initializeDateRange();
+onMounted(async () => {
+  sessionStore.GetSessions();
+});
 </script>
 
 <template>
@@ -320,7 +289,7 @@ initializeDateRange();
           <div class="relative">
             <label class="block text-sm font-medium text-gray-700 mb-1">Sales Representatives</label>
 
-            <MultiSelect v-model="selectedSalesReps" :options="salesReps" filter optionLabel="name" placeholder="Select Sales Reps" :maxSelectedLabels="3" class="w-full md:w-20rem" />
+            <MultiSelect v-model="selectedSalesReps" :options="sessionStore.sessionData.sales" filter optionLabel="name" placeholder="Select Sales Reps" :maxSelectedLabels="3" class="w-full md:w-20rem" />
           </div>
 
           <!-- Date Range -->
@@ -338,6 +307,9 @@ initializeDateRange();
             <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
             <Dropdown v-model="selectedStatus" :options="statusOptions" optionLabel="name" placeholder="Select a Status" class="w-full md:w-14rem" />
           </div>
+          <div class="align-self-end p-1">
+            <Button size="small" icon="pi pi-filter" label="Filter" class="p-button-outlined" @click="applyFilters" />
+          </div>
         </div>
       </div>
 
@@ -347,7 +319,7 @@ initializeDateRange();
         <div class="bg-white border-round-lg shadow-1 border-gray-200 border-1 p-4 w-3">
           <div class="text-sm text-gray-500">Open Sessions</div>
           <div class="text-2xl font-bold text-red-600">
-            {{ filteredSessions.filter((s) => s.status === 'OPEN').length }}
+            {{ sessionStore.sessionData?.openSession }}
           </div>
         </div>
 
@@ -355,31 +327,21 @@ initializeDateRange();
         <div class="bg-white border-round-lg shadow-1 border-gray-200 border-1 p-4 w-3">
           <div class="text-sm text-gray-500">Pending Sessions</div>
           <div class="text-2xl font-bold text-yellow-600">
-            {{ filteredSessions.filter((s) => s.status === 'PENDING').length }}
+            {{ sessionStore.sessionData?.pendingSession }}
           </div>
         </div>
 
         <!-- Total Amount -->
         <div class="bg-white border-round-lg shadow-1 border-gray-200 border-1 p-4 w-3">
           <div class="text-sm text-gray-500">Total Amount</div>
-          <div class="text-2xl font-bold text-gray-900">
-            {{ formatPrice(filteredSessions.reduce((sum, session) => sum + session.cashAmount, 0)) }}
-          </div>
+          <div class="text-2xl font-bold text-gray-900">SAR {{ sessionStore.sessionData?.totalAmount }}</div>
         </div>
 
         <!-- Old Sessions -->
         <div class="bg-white border-round-lg shadow-1 border-gray-200 border-1 p-4 w-3">
           <div class="text-sm text-gray-500">Old Sessions (>1 day)</div>
           <div class="text-2xl font-bold text-red-600">
-            {{
-              filteredSessions.filter((s) => {
-                const sessionDate = new Date(s.sessionDate);
-                const today = new Date();
-                const diffTime = Math.abs(today.getTime() - sessionDate.getTime());
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                return diffDays > 1;
-              }).length
-            }}
+            {{ sessionStore.sessionData?.oldSession }}
           </div>
         </div>
       </div>
@@ -401,46 +363,6 @@ initializeDateRange();
           </div>
         </div>
 
-        <!-- Table View -->
-        <!-- <div v-else class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sales Rep</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Session Date</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Cash Amount</th>
-                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Warning</th>
-                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-              <tr v-for="session in filteredSessions" :key="session.id">
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ session.salesRep }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ session.sessionDate }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">
-                  {{ formatPrice(session.cashAmount) }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-center">
-                  <span class="px-2 py-1 text-xs rounded-full" :class="getStatusColor(session.status)">
-                    {{ session.status === 'IN_APPROVAL' ? 'In Approval' : session.status === 'OPEN' ? 'Open' : session.status === 'PENDING' ? 'Pending' : session.status }}
-                  </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-center">
-                  <span v-if="session.hasWarning" class="material-icons text-red-500" title="Session requires attention"> warning </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-center">
-                  <button @click="viewSessionDetails(session)" class="p-2 hover:bg-gray-100 rounded-full" title="View Details">
-                    <span class="material-icons text-blue-600">visibility</span>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table> -->
         <DataTable class="surface-card border-round-lg mb-4 shadow-1 border-1 surface-border" v-else :value="filteredSessions" dataKey="id" :rows="10" :globalFilterFields="['name', 'id']" :currentPageReportTemplate="''">
           <template #empty>
             <div class="flex justify-content-center align-items-center font-bold text-lg">
@@ -454,16 +376,16 @@ initializeDateRange();
             </template>
 
             <template #body="slotProps">
-              <div class="font-semibold text-lg">{{ slotProps.data.salesRep }}</div>
+              <div class="font-semibold text-lg">{{ slotProps.data.saleName }}</div>
             </template>
           </Column>
 
-          <Column field="sessionDate" class="">
+          <Column field="sessionStartDate" class="">
             <template #header>
               <span class="text-lg font-bold"> {{ 'Session Date' }} </span>
             </template>
             <template #body="slotProps">
-              <span class="text-md">{{ slotProps.data.sessionDate }}</span>
+              <span class="text-md">{{ slotProps.data.sessionStartDate }}</span>
             </template>
           </Column>
 
@@ -475,15 +397,15 @@ initializeDateRange();
 
           <Column field="Credit Limit" :header="'Status'" class="" :sortable="true">
             <template #body="slotProps">
-              <span class="px-2 py-1 text-xs border-round-3xl" :class="getStatusColor(slotProps.data.status)">
-                {{ slotProps.data.status === 'IN_APPROVAL' ? 'In Approval' : slotProps.data.status === 'OPEN' ? 'Open' : slotProps.data.status === 'PENDING' ? 'Pending' : slotProps.data.status }}
+              <span class="px-2 py-1 text-xs border-round-3xl" :class="getStatusColor(slotProps.data.statusName)">
+                {{ slotProps.data.statusName === 'IN_APPROVAL' ? 'In Approval' : slotProps.data.statusName === 'Opened' ? 'Open' : slotProps.data.statusName === 'PENDING' ? 'Pending' : slotProps.data.statusName }}
               </span>
             </template>
           </Column>
 
-          <Column field="hasWarning" :header="'Warning'" class="">
+          <Column field="isSessionLate" :header="'Warning'" class="text-center">
             <template #body="slotProps">
-              <span v-if="slotProps.data.hasWarning" class="material-icons text-red-500" title="Session requires attention"> warning </span>
+              <icon v-if="slotProps.data.isSessionLate" class="pi pi-exclamation-triangle text-red-500"></icon>
             </template>
           </Column>
 
@@ -492,40 +414,11 @@ initializeDateRange();
               <Button @click="viewSessionDetails(slotProps.data)" class="p-2 hover:bg-gray-100 rounded-full" size="large" text icon="pi pi-eye" title="View Details"> </Button>
             </template>
           </Column>
-
-          <!-- <Column field="actions" :header="t('labels.actions')">
-              <template #body="slotProps">
-                <div class="flex align-items-center gap-3 justify-content-start">
-                  <div @click="handleViewDetails(slotProps.data)" class="p-1.5 text-blue-600 hover:bg-blue-50 cursor-pointer rounded-full">
-                    <i class="pi pi-eye"></i>
-                  </div>
-
-                  <div @click="handleEditCustomer(slotProps.data)" class="p-1.5 text-gray-600 hover:bg-gray-50 cursor-pointer rounded-full">
-                    <i class="pi pi-pencil"></i>
-                  </div>
-
-                  v-if="slotProps.data.status === 'draft'"
-                  <div v-if="slotProps.data.statusId === 8" @click="handleSubmitApproval(slotProps.data)" class="p-1.5 cursor-pointer text-blue-600 hover:bg-blue-50 rounded-full">
-                    <i class="pi pi-send"></i>
-                  </div>
-
-                  <template v-if="slotProps.data.statusId === 6">
-                    <div @click="handleApprove(slotProps.data)" class="p-1.5 cursor-pointer text-green-600 hover:bg-green-50 rounded-full">
-                      <i class="pi pi-check-circle"></i>
-                    </div>
-
-                    <div @click="handleReject(slotProps.data)" class="p-1.5 cursor-pointer text-red-600 hover:bg-red-50 rounded-full">
-                      <i class="pi pi-times-circle"></i>
-                    </div>
-                  </template>
-                </div>
-              </template>
-            </Column> -->
         </DataTable>
       </div>
 
       <!-- Session Details Dialog -->
-      <SessionDetailsDialog :show="showDetailsDialog" :session="selectedSession" @close="showDetailsDialog = false" />
+      <SessionDetailsDialog v-if="showDetailsDialog" v-model:visible="showDetailsDialog" :session="selectedSession" @close="showDetailsDialog = false" />
     </div>
   </div>
 </template>

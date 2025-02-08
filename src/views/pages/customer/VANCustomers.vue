@@ -330,9 +330,4 @@ const filteredCustomers = computed(() => {
 .translate-y-50 {
   transform: translateY(-50%);
 }
-
-:deep(.p-datatable .p-datatable-thead > tr > th) {
-  /* background-color: red; */
-  /* border-radius: 20px; */
-}
 </style>

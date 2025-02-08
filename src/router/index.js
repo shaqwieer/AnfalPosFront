@@ -39,7 +39,7 @@ const router = createRouter({
           component: () => import('@/views/pages/customer/customers/CustomerDashboard.vue')
         },
         {
-          path: 'Sessions',
+          path: 'Session-analytics',
           name: 'Sessions',
           component: () => import('@/views/pages/session/SessionManagement.vue')
         },

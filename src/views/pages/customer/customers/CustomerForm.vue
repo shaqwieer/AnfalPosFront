@@ -292,16 +292,7 @@ watch(leftColumnTab, (newTab) => {
 </script>
 
 <template>
-  <Dialog
-    v-model:visible="props.show"
-    :dismissableMask="false"
-    :closable="true"
-    :maskStyle="{ backgroundColor: 'red' }"
-    class="fullscreen-dialog flex justify-content-center bg-black-alpha-50"
-    style="width: 100vw; height: 100vh; max-width: 80%; max-height: 80%"
-    :header="$t(`Customer.Customer_Details`)"
-    @update:visible="$emit('close')"
-  >
+  <Dialog v-model:visible="props.show" :closable="true" class="flex justify-content-center" style="width: 100vw; height: 100vh; max-width: 80%; max-height: 80%" :header="$t(`Customer.Customer_Details`)" @update:visible="$emit('close')">
     <div v-if="show" class="inset-0 flex align-items-center justify-content-center z-5">
       <div class="surface-card border-round-xl w-full max-w-7xl max-h-90vh flex flex-column">
         <form @submit.prevent="handleSubmit" class="flex-1 overflow-hidden">
@@ -483,12 +474,6 @@ watch(leftColumnTab, (newTab) => {
     </div>
   </Dialog>
 </template>
-
-<style>
-.p-dialog-mask {
-  background: #5b5b5b3b !important;
-}
-</style>
 
 <style scoped>
 /* Map-specific styles */
