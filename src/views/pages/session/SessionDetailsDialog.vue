@@ -15,10 +15,11 @@ const emit = defineEmits(['close']);
 const sessionStore = useSessionStore();
 const RejectSession = (session) => {
   const payload = {
-    shifSessionId: session.shifSessionId,
+    shiftSessionId: session.sessionId,
     statusId: 6
   };
   sessionStore.ApproveSession(payload);
+  closeDialog();
 };
 const ApproveSession = (session) => {
   const payload = {
