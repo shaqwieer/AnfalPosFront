@@ -9,7 +9,6 @@ const props = defineProps<{
 
 const emit = defineEmits(['select-card']);
 
-
 const Rtl = localStorage.getItem('Rtl') === 'true';
 const formatPrice = (price: number): string => {
   return price.toLocaleString(Rtl ? 'ar-SA' : 'en-US', {
@@ -32,7 +31,7 @@ const totalSalesReps = defineModel();
 
 <template>
   <div class="grid">
-    <div style="height: 255px" class="col-12 md:col-6 lg:col-4 xl:col-2">
+    <div style="height: 255px" class="col-12 md:col-6 lg:col-4 xl:col-2 xl:p-2">
       <!-- Visits Card -->
       <div
         class="h-full surface-card border-round-xl border-1 border-gray-200 border-gray-200 p-4 cursor-pointer transition-all transition-duration-200 hover:shadow-2"
@@ -68,7 +67,7 @@ const totalSalesReps = defineModel();
       </div>
     </div>
 
-    <div style="height: 255px" class="col-12 md:col-6 lg:col-4 xl:col-2">
+    <div style="height: 255px" class="col-12 md:col-6 lg:col-4 xl:col-2 xl:p-2">
       <!-- Sales Card -->
       <div
         class="h-full surface-card border-round-xl border-1 border-gray-200 p-4 cursor-pointer transition-all transition-duration-200 hover:shadow-2"
@@ -101,7 +100,7 @@ const totalSalesReps = defineModel();
       </div>
     </div>
 
-    <div style="height: 255px" class="col-12 md:col-6 lg:col-4 xl:col-2">
+    <div style="height: 255px" class="col-12 md:col-6 lg:col-4 xl:col-2 xl:p-2">
       <!-- Collections Card -->
       <div
         class="h-full surface-card border-round-xl border-1 border-gray-200 p-4 cursor-pointer transition-all transition-duration-200 hover:shadow-2"
@@ -134,7 +133,7 @@ const totalSalesReps = defineModel();
       </div>
     </div>
 
-    <div style="height: 255px" class="col-12 md:col-6 lg:col-4 xl:col-2">
+    <div style="height: 255px" class="col-12 md:col-6 lg:col-4 xl:col-2 xl:p-2">
       <!-- Open Sessions Card -->
       <div
         class="h-full surface-card border-round-xl border-1 border-gray-200 p-4 cursor-pointer transition-all transition-duration-200 hover:shadow-2"
@@ -155,7 +154,7 @@ const totalSalesReps = defineModel();
       </div>
     </div>
 
-    <div style="height: 255px" class="col-12 md:col-6 lg:col-4 xl:col-2">
+    <div style="height: 255px" class="col-12 md:col-6 lg:col-4 xl:col-2 xl:p-2">
       <!-- Overdue Card -->
       <div
         class="h-full surface-card border-round-xl border-1 border-gray-200 p-4 cursor-pointer transition-all transition-duration-200 hover:shadow-2"
@@ -176,7 +175,7 @@ const totalSalesReps = defineModel();
       </div>
     </div>
 
-    <div style="height: 255px" class="col-12 md:col-6 lg:col-4 xl:col-2">
+    <div style="height: 255px" class="col-12 md:col-6 lg:col-4 xl:col-2 xl:p-2">
       <!-- Stock in Vans Card -->
       <div
         class="h-full surface-card border-round-xl border-1 border-gray-200 p-4 cursor-pointer transition-all transition-duration-200 hover:shadow-2"

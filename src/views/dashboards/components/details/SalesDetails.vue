@@ -106,7 +106,7 @@ const getGrowthIcon = (growth: number) => {
 
     <div class="grid mb-6">
       <div class="col-12 p-2 md:col-6 lg:col-3">
-        <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
+        <div class="border-1 border-round-lg shadow-sm shadow-1 border-1 border-gray-200 p-4">
           <div class="text-sm text-gray-500">{{ t('dashboard.TotalSales') }}</div>
           <div class="text-2xl font-bold text-gray-900">{{ formatPrice(data.summary.totalSales) }}</div>
         </div>

@@ -58,17 +58,11 @@ const { t, locale } = useI18n();
 <template>
   <div class="surface-card border-round-lg shadow-2 border-1 surface-border hover:border-primary transition-colors duration-200">
     <div class="p-4">
-      <!-- <div @click="test" style="width: 200px; height: 20px; background: red;"></div> -->
-
       <!-- Customer Header -->
       <div class="flex align-items-start justify-content-between mb-4">
         <div>
           <div class="flex align-items-center gap-2">
             <span class="font-medium text-900">{{ customer.name }}</span>
-            <!-- <span class="px-2 py-1 text-xs border-round-lg" :class="getStatusColor(customer.statusId)">
-              {{ customer.statusId === CustomerStatus.Approved ? 'Approved' : customer.statusId === CustomerStatus.Pending ? 'Pending' : 'Rejected' }}
-            </span> -->
-
             <span class="px-2 py-0 text-xs border-round-lg" :class="getApprovalStatusColor(customer.statusId)">
               {{ customer.statusName }}
             </span>
