@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
@@ -6,6 +6,9 @@ import SessionDetailsDialog from './SessionDetailsDialog.vue';
 import { useSessionStore } from '../../../stores/sessionStore';
 import Dropdown from 'primevue/dropdown';
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
 
 // Filter states
 const selectedSalesReps = ref(null);
@@ -15,7 +18,8 @@ const selectedStatus = ref('4');
 const isDropdownOpen = ref(false);
 const showDetailsDialog = ref(false);
 const selectedSession = ref();
-const viewMode = (ref < 'table') | ('chart' > 'table');
+// const viewMode = (ref < 'table') | ('chart' > 'table');
+const viewMode = ref('table');
 const sessionStore = useSessionStore();
 // Available sales reps
 const salesReps = [
@@ -29,11 +33,11 @@ const salesReps = [
 
 // Status options
 const statusOptions = [
-  { label: 'All', value: '8' },
-  { label: 'Pending', value: '6' },
-  { label: 'Closed', value: '5' },
-  { label: 'Open', value: '4' },
-  { label: 'Approved', value: '7' }
+  { label: `${t('All')}`, value: '8' },
+  { label: `${t('Pending')}`, value: '6' },
+  { label: `${t('Closed')}`, value: '5' },
+  { label: `${t('Open')}`, value: '4' },
+  { label: `${t('Approved')}`, value: '7' }
 ];
 
 // Updated sample sessions data with more realistic information
@@ -239,8 +243,9 @@ const viewSessionDetails = (session) => {
   showDetailsDialog.value = true;
 };
 
-const formatPrice = (price) => {
-  return price.toLocaleString('en-US', {
+const Rtl = localStorage.getItem('Rtl') === 'true';
+const formatPrice = (price: number | undefined | null): string => {
+  return price.toLocaleString(Rtl ? 'ar-SA' : 'en-US', {
     style: 'currency',
     currency: 'SAR',
     minimumFractionDigits: 2,
@@ -308,162 +313,186 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="p-6">
+  <div class="lg:p-6">
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
-      <div class="flex items-center justify-between mb-4">
-        <h1 class="text-2xl font-bold text-gray-900">Session Management</h1>
+      <div class="flex items-center justify-between mb-4 p-2">
+        <h1 class="text-2xl font-bold text-gray-900">{{ t('Session.SessionManagement') }}</h1>
       </div>
 
       <!-- Filters -->
-      <div class="bg-white row-gap-3 border-round-lg shadow-1 border p-4 mb-4 grid gap-0 w-full align-items-end justify-content-between">
-        <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
-          <div class="h-full surface-card cursor-pointer">
-            <div class="relative">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Sales Representatives</label>
-              <Dropdown v-model="selectedSalesReps" :options="sessionStore.sessionData.sales" filter optionLabel="name" optionValue="id" placeholder="Select Sales Reps" :maxSelectedLabels="3" class="w-full h-44px" />
+      <div class="p-2">
+        <div class="bg-white row-gap-3 border-round-lg shadow-1 border p-4 mb-4 grid gap-0 w-full align-items-end justify-content-between">
+          <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
+            <div class="h-full surface-card cursor-pointer">
+              <div class="relative">
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('Session.SalesRepresentatives') }}</label>
+                <Dropdown v-model="selectedSalesReps" :options="sessionStore.sessionData.sales" filter optionLabel="name" optionValue="id" placeholder="Select Sales Reps" :maxSelectedLabels="3" class="w-full h-44px" />
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
-          <div class="h-full surface-card cursor-pointer transition-all transition-duration-200">
-            <div class="w-full">
-              <label class="block text-sm font-medium text-gray-700 mb-1">From Date</label>
-              <Calendar v-model="dateFrom" showIcon iconDisplay="input" class="w-full h-44px" />
+          <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
+            <div class="h-full surface-card cursor-pointer transition-all transition-duration-200">
+              <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('Session.FromDate') }}</label>
+                <Calendar v-model="dateFrom" showIcon iconDisplay="input" class="w-full h-44px" />
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
-          <div class="h-full surface-card cursor-pointer transition-all transition-duration-200">
-            <div class="w-full">
-              <label class="block text-sm font-medium text-gray-700 mb-1">To Date</label>
-              <Calendar v-model="dateTo" showIcon iconDisplay="input" class="w-full h-44px" />
+          <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
+            <div class="h-full surface-card cursor-pointer">
+              <div class="w-full">
+                <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('Session.ToDate') }}</label>
+                <Calendar v-model="dateTo" showIcon iconDisplay="input" class="w-full h-44px" />
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="col-12 sm:col-6 lg:col-3 xl:col-2 p-0 sm:px-2 xl:p-2">
-          <div class="h-full surface-card cursor-pointer">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-              <Dropdown v-model="selectedStatus" :options="statusOptions" optionLabel="label" optionValue="value" placeholder="Select a Status" class="w-full h-44px" />
+          <div class="col-12 sm:col-6 lg:col-3 xl:col-2 p-0 sm:px-2 xl:p-2">
+            <div class="h-full surface-card cursor-pointer">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"> {{ t('Session.Status') }}</label>
+                <Dropdown v-model="selectedStatus" :options="statusOptions" optionLabel="label" optionValue="value" placeholder="Select a Status" class="w-full h-44px flex" />
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="col-12 xl:col-1 p-0 sm:px-2 xl:p-2">
-          <div class="w-full xl:w-fit surface-card cursor-pointer">
-            <div class="align-self-end w-full xl:w-fit">
-              <Button size="small" icon="pi pi-filter" label="Filter" class="p-button-outlined w-full xl:w-fit h-42px" @click="applyFilters" />
+          <div class="col-12 xl:col-1 p-0 sm:px-2 xl:p-2">
+            <div class="w-full xl:w-fit surface-card cursor-pointer">
+              <div class="align-self-end w-full xl:w-fit">
+                <Button size="small" icon="pi pi-filter" :label="t('Filter')" class="p-button-outlined w-full xl:w-fit h-44px" @click="applyFilters" />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Summary Cards -->
-      <div class="flex gap-4 mb-4">
+      <div class="grid mb-4 p-2 sm:p-0 row-gap-2">
         <!-- Open Sessions -->
-        <div class="bg-white border-round-lg shadow-1 border-gray-200 border-1 p-4 w-3">
-          <div class="text-sm text-gray-500">Open Sessions</div>
-          <div class="text-2xl font-bold text-red-600">
-            {{ sessionStore.sessionData?.openSession }}
+        <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
+          <div class="bg-white border-round-lg shadow-1 border-gray-200 border-1 p-4 h-full surface-card">
+            <div class="text-sm text-gray-500">{{ t('Session.OpenSessions') }}</div>
+            <div class="text-2xl font-bold text-red-600">
+              {{ sessionStore.sessionData?.openSession }}
+            </div>
           </div>
         </div>
 
         <!-- Pending Sessions -->
-        <div class="bg-white border-round-lg shadow-1 border-gray-200 border-1 p-4 w-3">
-          <div class="text-sm text-gray-500">Pending Sessions</div>
-          <div class="text-2xl font-bold text-yellow-600">
-            {{ sessionStore.sessionData?.pendingSession }}
+        <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
+          <div class="bg-white border-round-lg shadow-1 border-gray-200 border-1 p-4 h-full surface-card">
+            <div class="text-sm text-gray-500">{{ t('Session.PendingSessions') }}</div>
+            <div class="text-2xl font-bold text-yellow-600">
+              {{ sessionStore.sessionData?.pendingSession }}
+            </div>
           </div>
         </div>
 
         <!-- Total Amount -->
-        <div class="bg-white border-round-lg shadow-1 border-gray-200 border-1 p-4 w-3">
-          <div class="text-sm text-gray-500">Total Amount</div>
-          <div class="text-2xl font-bold text-gray-900">SAR {{ sessionStore.sessionData?.totalAmount }}</div>
+        <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
+          <div class="bg-white border-round-lg shadow-1 border-gray-200 border-1 p-4 h-full surface-card">
+            <div class="text-sm text-gray-500">{{ t('Session.TotalAmount') }}</div>
+            <div class="text-2xl font-bold text-gray-900">{{ formatPrice(Number(sessionStore.sessionData?.totalAmount)) }}</div>
+          </div>
         </div>
 
         <!-- Old Sessions -->
-        <div class="bg-white border-round-lg shadow-1 border-gray-200 border-1 p-4 w-3">
-          <div class="text-sm text-gray-500">Old Sessions (>1 day)</div>
-          <div class="text-2xl font-bold text-red-600">
-            {{ sessionStore.sessionData?.oldSession }}
+        <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
+          <div class="bg-white border-round-lg shadow-1 border-gray-200 border-1 p-4 h-full surface-card">
+            <div class="text-sm text-gray-500">{{ t('Session.OldSessions') }}</div>
+            <div class="text-2xl font-bold text-red-600">
+              {{ sessionStore.sessionData?.oldSession }}
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Sessions View -->
-      <div class="bg-white border-round-lg shadow-1 border-1 border-gray-200 overflow-hidden">
-        <!-- View Toggle Header -->
-        <div class="p-4 border-b flex align-items-center justify-content-between">
-          <span class="text-xl font-medium">Sessions</span>
-          <div class="flex items-center space-x-2">
-            <Button @click="toggleViewMode" class="p-1 rounded-lg hover:bg-gray-100 transition-colors" size="large" text :icon="viewMode === 'chart' ? 'pi pi-table' : 'pi pi-chart-bar'"> </Button>
+      <div class="p-2">
+        <div class="bg-white border-round-lg shadow-1 border-1 border-gray-200 overflow-hidden">
+          <!-- View Toggle Header -->
+          <div class="p-4 border-b flex align-items-center justify-content-between">
+            <span class="text-xl font-medium"> {{ t('Sessions') }}</span>
+            <div class="flex items-center space-x-2">
+              <Button @click="toggleViewMode" class="p-1 rounded-lg hover:bg-gray-100 transition-colors" size="large" text :icon="viewMode === 'chart' ? 'pi pi-table' : 'pi pi-chart-bar'"> </Button>
+            </div>
           </div>
-        </div>
 
-        <!-- Chart View -->
-        <div v-if="viewMode === 'chart'" class="p-6">
-          <div class="h-30rem">
-            <Bar :data="chartData" :options="chartOptions" />
+          <!-- Chart View -->
+          <div v-if="viewMode === 'chart'" class="p-6">
+            <div class="h-30rem">
+              <Bar :data="chartData" :options="chartOptions" />
+            </div>
           </div>
-        </div>
 
-        <DataTable class="surface-card border-round-lg mb-4 shadow-1 border-1 surface-border" v-else :value="filteredSessions" dataKey="id" :rows="10" :globalFilterFields="['name', 'id']" :currentPageReportTemplate="''">
-          <template #empty>
-            <div class="flex justify-content-center align-items-center font-bold text-lg">
-              {{ 'No Sessions Found' }}
-            </div></template
+          <DataTable
+            class="surface-card border-round-lg shadow-1 border-1 surface-border"
+            v-else
+            :value="filteredSessions"
+            :paginator="true"
+            :rows="10"
+            :rowsPerPageOptions="[5, 10, 25]"
+            dataKey="id"
+            :globalFilterFields="['name', 'id']"
+            :currentPageReportTemplate="''"
           >
+            <template #empty>
+              <div class="flex justify-content-center align-items-center font-bold text-lg">
+                {{ t('Session.empty') }}
+              </div>
+            </template>
+            <Column field="salesRep" class="" :sortable="true">
+              <template #header>
+                <span class="text-lg font-bold"> {{ t('Session.SalesRep') }}</span>
+              </template>
 
-          <Column field="salesRep" class="" :sortable="true">
-            <template #header>
-              <span class="text-lg font-bold"> {{ 'Sales Rep' }} </span>
-            </template>
+              <template #body="slotProps">
+                <div class="font-semibold flex text-lg">{{ slotProps.data.saleName }}</div>
+              </template>
+            </Column>
+            <Column field="sessionStartDate" class="">
+              <template #header>
+                <span class="text-lg font-bold"> {{ t('Session.SessionDate') }} </span>
+              </template>
+              <template #body="slotProps">
+                <span class="text-md flex">{{ slotProps.data.sessionStartDate }}</span>
+              </template>
+            </Column>
+            <Column field="cashAmount" class="">
+              <template #header>
+                <span class="text-lg flex font-bold"> {{ t('Session.CashAmount') }} </span>
+              </template>
 
-            <template #body="slotProps">
-              <div class="font-semibold text-lg">{{ slotProps.data.saleName }}</div>
-            </template>
-          </Column>
+              <template #body="slotProps">
+                <div class="text-md flex">{{ slotProps.data.allAmount }}</div>
+              </template>
+            </Column>
+            <Column field="Credit Limit" class="" :sortable="true">
+              <template #header>
+                <span class="text-lg flex font-bold"> {{ t('Status') }} </span>
+              </template>
 
-          <Column field="sessionStartDate" class="">
-            <template #header>
-              <span class="text-lg font-bold"> {{ 'Session Date' }} </span>
-            </template>
-            <template #body="slotProps">
-              <span class="text-md">{{ slotProps.data.sessionStartDate }}</span>
-            </template>
-          </Column>
-
-          <Column field="cashAmount" :header="'Cash Amount'" class="">
-            <template #body="slotProps">
-              <div class="text-md">{{ slotProps.data.allAmount }}</div>
-            </template>
-          </Column>
-
-          <Column field="Credit Limit" :header="'Status'" class="" :sortable="true">
-            <template #body="slotProps">
-              <span class="px-2 py-1 text-xs border-round-3xl" :class="getStatusColor(slotProps.data.statusId)">
-                {{ slotProps.data.statusName }}
-              </span>
-            </template>
-          </Column>
-
-          <Column field="isSessionLate" :header="'Warning'" class="text-center">
-            <template #body="slotProps">
-              <icon v-if="slotProps.data.isSessionLate" class="pi pi-exclamation-triangle text-red-500"></icon>
-            </template>
-          </Column>
-
-          <Column field="statusName" :header="'Status'" class="">
-            <template #body="slotProps">
-              <Button @click="viewSessionDetails(slotProps.data)" class="p-2 hover:bg-gray-100 rounded-full" size="large" text icon="pi pi-eye" title="View Details"> </Button>
-            </template>
-          </Column>
-        </DataTable>
+              <template #body="slotProps">
+                <span class="px-2 py-1 flex w-fit text-xs border-round-3xl" :class="getStatusColor(slotProps.data.statusId)">
+                  {{ slotProps.data.statusName }}
+                </span>
+              </template>
+            </Column>
+            <Column field="isSessionLate" :header="t('Warning')" class="text-center">
+              <template #body="slotProps">
+                <icon v-if="slotProps.data.isSessionLate" class="pi flex pi-exclamation-triangle text-red-500"></icon>
+              </template>
+            </Column>
+            <Column field="statusName" :header="t('Status')" class="">
+              <template #body="slotProps">
+                <Button @click="viewSessionDetails(slotProps.data)" class="p-2 hover:bg-gray-100 rounded-full" size="large" text icon="pi pi-eye" title="View Details"> </Button>
+              </template>
+            </Column>
+          </DataTable>
+        </div>
       </div>
 
       <!-- Session Details Dialog -->
@@ -475,9 +504,6 @@ onMounted(async () => {
 <style scoped>
 .h-44px {
   height: 44px !important;
-}
-.h-42px {
-  height: 42px !important;
 }
 /* Custom scrollbar styles */
 .overflow-x-auto {
