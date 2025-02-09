@@ -9,6 +9,9 @@ const salesGoalsStore = useSalesGoalsStore();
 
 const selectedYear = ref(new Date().getFullYear());
 const selectedRepId = ref(); // Default to first rep
+const creditLimit = ref(0);
+const availableCredit = ref(0);
+const currentBalance = ref(0);
 const isEditing = ref(false);
 const editingData = ref(null);
 
@@ -18,18 +21,18 @@ const years = computed(() => {
 });
 
 const months = ref([
-  { name: 'January' },
-  { name: 'February' },
-  { name: 'March' },
-  { name: 'April' },
-  { name: 'May' },
-  { name: 'June' },
-  { name: 'July' },
-  { name: 'August' },
-  { name: 'September' },
-  { name: 'October' },
-  { name: 'November' },
-  { name: 'December' }
+  { name: 'January', id: 1 },
+  { name: 'February', id: 2 },
+  { name: 'March', id: 3 },
+  { name: 'April', id: 4 },
+  { name: 'May', id: 5 },
+  { name: 'June', id: 6 },
+  { name: 'July', id: 7 },
+  { name: 'August', id: 8 },
+  { name: 'September', id: 9 },  
+  { name: 'October', id: 10 },
+  { name: 'November', id: 11 },
+  { name: 'December', id: 12 }
 ]);
 // Get selected rep data
 const selectedRep = ref(null);
@@ -58,7 +61,7 @@ const formatPrice = (price) => {
 
 const startEdit = () => {
   editingData.value = {
-    creditLimit: selectedRep.value.creditLimit,
+    creditLimit: creditLimit.value,
     targets: {
       sales: [...selectedRep.value.targets.sales],
       collections: [...selectedRep.value.targets.collections]
@@ -105,6 +108,9 @@ const test = ref();
 const fetchData = async () => {
   await salesGoalsStore.fetchSalesGoals({ businessEntityId: selectedRepId.value, year: selectedYear.value });
   selectedRep.value = salesGoalsStore.salesGoals.filter((rep) => rep.businessEntityId == selectedRepId.value);
+  creditLimit.value = salesGoalsStore.creditLimit;
+  availableCredit.value = salesGoalsStore.availableCredit;
+  currentBalance.value = salesGoalsStore.currentBalance;
 };
 watch(
   [selectedRepId, selectedYear],
@@ -143,11 +149,11 @@ onMounted(() => {
             <div class="flex align-items-center gap-6">
               <div class="text-sm">
                 <span class="text-500">Credit Limit:</span>
-                <span class="ml-1 font-bold">{{ selectedRep[0]?.creditLimit }}</span>
+                <span class="ml-1 font-bold">{{ creditLimit }}</span>
               </div>
               <div class="text-sm">
                 <span class="text-500">Current Balance:</span>
-                <span class="ml-1 font-bold">{{ selectedRep[0]?.currentBalance }}</span>
+                <span class="ml-1 font-bold">{{ currentBalance }}</span>
               </div>
               <div class="text-sm flex align-items-center gap-2">
                 <span class="text-500">Remaining:</span>
@@ -159,7 +165,7 @@ onMounted(() => {
                     'text-green-600': creditStatus.status === 'normal'
                   }"
                 >
-                  {{ selectedRep[0]?.availableCredit }}
+                  {{ availableCredit }}
                 </span>
                 <span
                   v-if="creditStatus.status !== 'normal'"
@@ -300,7 +306,7 @@ onMounted(() => {
             <Column header="Sales Target" field="month">
               <template #body="slotProps">
                 <div class="flex flex-column align-items-start">
-                  <div class="text-md">{{ selectedRep.find((item) => item.period.includes(slotProps.data.name))?.salesTarget }}</div>
+                  <div class="text-md">{{ selectedRep.find((item) => item.month === slotProps.data.id)?.salesTarget }}</div>
                 </div>
               </template>
 
@@ -320,7 +326,7 @@ onMounted(() => {
               <template #body="slotProps">
                 <div class="flex flex-column align-items-start">
                   <div class="text-md">
-                    {{ selectedRep.find((item) => item.period.includes(slotProps.data.name))?.collectionTarget }}
+                    {{ selectedRep.find((item) => item.month === slotProps.data.id)?.collectionTarget }}
                   </div>
                 </div>
               </template>

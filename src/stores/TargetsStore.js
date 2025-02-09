@@ -7,7 +7,10 @@ export const useSalesGoalsStore = defineStore({
     salesGoals: [],
     salesReps: [],
     loading: false,
-    error: null
+    error: null,
+    creditLimit: 0,
+    availableCredit: 0,
+    currentBalance: 0
   }),
   actions: {
     async fetchSalesGoals(payload) {
@@ -15,12 +18,16 @@ export const useSalesGoalsStore = defineStore({
       this.error = null;
 
       try {
-        const response = await apiClient.post('/SalesGoals/GetSalesGoalsBasedOnBranch', payload, {
+        const response = await apiClient.post('/SalesGoals/GetSalesRepGoals', payload, {
           headers: { 'Content-Type': 'application/json' }
         });
 
         if (response.data && response.data.data) {
-          this.salesGoals = response.data.data;
+          let data = response.data.data;
+          this.salesGoals = data.salesGoals;
+          this.creditLimit = data.creditLimit;
+          this.availableCredit = data.availableCredit;
+          this.currentBalance = data.currentBalance;
         } else {
           throw new Error('Invalid response structure');
         }
