@@ -316,34 +316,48 @@ onMounted(async () => {
       </div>
 
       <!-- Filters -->
-      <div class="bg-white border-round-lg shadow-1 border p-4 mb-4 flex w-full align-items-center justify-content-center">
-        <div class="flex flex-row flex-wrap justify-content-between align-items-center w-3/4 gap-4">
-          <!-- Sales Rep Multi-select Dropdown -->
-          <div class="flex flex-column xl:flex-row-reverse gap-4 justify-content-end">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">From Date</label>
-              <Calendar v-model="dateFrom" showIcon iconDisplay="input" />
-            </div>
+      <div class="bg-white row-gap-3 border-round-lg shadow-1 border p-4 mb-4 grid gap-0 w-full align-items-end justify-content-between">
+        <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
+          <div class="h-full surface-card cursor-pointer">
             <div class="relative">
               <label class="block text-sm font-medium text-gray-700 mb-1">Sales Representatives</label>
-              <Dropdown v-model="selectedSalesReps" :options="sessionStore.sessionData.sales" filter optionLabel="name" optionValue="id" placeholder="Select Sales Reps" :maxSelectedLabels="3" class="w-full md:w-20rem" />
+              <Dropdown v-model="selectedSalesReps" :options="sessionStore.sessionData.sales" filter optionLabel="name" optionValue="id" placeholder="Select Sales Reps" :maxSelectedLabels="3" class="w-full h-44px" />
             </div>
-            <!-- Date Range -->
           </div>
-          <div class="flex flex-column xl:flex-row gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">To Date</label>
-              <Calendar v-model="dateTo" showIcon iconDisplay="input" />
+        </div>
+
+        <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
+          <div class="h-full surface-card cursor-pointer transition-all transition-duration-200">
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-1">From Date</label>
+              <Calendar v-model="dateFrom" showIcon iconDisplay="input" class="w-full h-44px" />
             </div>
-            <!-- Status Filter -->
+          </div>
+        </div>
+
+        <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
+          <div class="h-full surface-card cursor-pointer transition-all transition-duration-200">
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-1">To Date</label>
+              <Calendar v-model="dateTo" showIcon iconDisplay="input" class="w-full h-44px" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 sm:col-6 lg:col-3 xl:col-2 p-0 sm:px-2 xl:p-2">
+          <div class="h-full surface-card cursor-pointer">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-              <Dropdown v-model="selectedStatus" :options="statusOptions" optionLabel="label" optionValue="value" placeholder="Select a Status" class="w-full md:w-14rem" />
+              <Dropdown v-model="selectedStatus" :options="statusOptions" optionLabel="label" optionValue="value" placeholder="Select a Status" class="w-full h-44px" />
             </div>
           </div>
+        </div>
 
-          <div class="align-self-end p-1">
-            <Button size="small" icon="pi pi-filter" label="Filter" class="p-button-outlined" @click="applyFilters" />
+        <div class="col-12 xl:col-1 p-0 sm:px-2 xl:p-2">
+          <div class="w-full xl:w-fit surface-card cursor-pointer">
+            <div class="align-self-end w-full xl:w-fit">
+              <Button size="small" icon="pi pi-filter" label="Filter" class="p-button-outlined w-full xl:w-fit h-42px" @click="applyFilters" />
+            </div>
           </div>
         </div>
       </div>
@@ -459,6 +473,12 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.h-44px {
+  height: 44px !important;
+}
+.h-42px {
+  height: 42px !important;
+}
 /* Custom scrollbar styles */
 .overflow-x-auto {
   scrollbar-width: thin;
@@ -501,6 +521,12 @@ input[type='date'] {
 /* Dialog animation */
 .fixed {
   animation: fadeIn 0.2s ease-out;
+}
+
+.grid {
+  margin-right: 0rem;
+  margin-left: 0rem;
+  margin-top: 0rem;
 }
 
 @keyframes fadeIn {
