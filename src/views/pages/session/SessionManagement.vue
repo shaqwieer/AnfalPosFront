@@ -29,6 +29,7 @@ const salesReps = [
 
 // Status options
 const statusOptions = [
+  { label: 'All', value: '8' },
   { label: 'Pending', value: '6' },
   { label: 'Closed', value: '5' },
   { label: 'Open', value: '4' },
@@ -259,19 +260,31 @@ const getStatusColor = (status) => {
       return 'bg-gray-100 text-gray-800';
   }
 };
+// const initializeDateRange = () => {
+//   const today = new Date();
+//   const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+//   dateFrom.value = firstDayOfMonth.toISOString().split('T')[0];
+//   dateTo.value = today.toISOString().split('T')[0];
+// };
+
 const initializeDateRange = () => {
-  const today = new Date();
+  var today = new Date();
+
+  let nextday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 2);
+
   const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
   dateFrom.value = firstDayOfMonth.toISOString().split('T')[0];
-  dateTo.value = today.toISOString().split('T')[0];
+  dateTo.value = nextday.toISOString().split('T')[0];
 };
+
 const applyFilters = () => {};
 // Initialize date range on component mount
 initializeDateRange();
 const getSessions = async () => {
   const formData = new FormData();
-  formData.append('StatusId', selectedStatus.value);
+  formData.append('StatusId', selectedStatus.value == '8' ? '' : selectedStatus.value);
   formData.append('SalesRepId', selectedSalesReps.value);
   formData.append('StartDate', new Date(dateFrom.value).toDateString());
   formData.append('EndDate', new Date(dateTo.value).toDateString());
