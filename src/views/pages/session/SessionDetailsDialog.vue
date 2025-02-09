@@ -22,10 +22,11 @@ const RejectSession = (session) => {
 };
 const ApproveSession = (session) => {
   const payload = {
-    shifSessionId: session.shifSessionId,
+    shiftSessionId: session.sessionId,
     statusId: 7
   };
   sessionStore.ApproveSession(payload);
+  closeDialog();
 };
 const closeDialog = () => {
   emit('close');
@@ -107,8 +108,8 @@ const closeDialog = () => {
 
         <!-- Action Buttons -->
         <div class="flex justify-content-end gap-3">
-          <Button v-if="session.statusName === 'IN_APPROVAL'" class="px-4 py-2 bg-red-600 text-white border-0 hover:bg-red-700" @click="RejectSession(session)">Reject</Button>
-          <Button v-if="session.statusName === 'IN_APPROVAL'" class="px-4 py-2 bg-green-600 text-white border-0 hover:bg-green-700" @click="ApproveSession(session)">Approve</Button>
+          <Button v-if="session.statusName === 'Closed'" class="px-4 py-2 bg-red-600 text-white border-0 hover:bg-red-700" @click="RejectSession(session)">Reject</Button>
+          <Button v-if="session.statusName === 'Closed'" class="px-4 py-2 bg-green-600 text-white border-0 hover:bg-green-700" @click="ApproveSession(session)">Approve</Button>
         </div>
       </div>
 

@@ -33,7 +33,7 @@ const statusOptions = [
   { label: 'Pending', value: '6' },
   { label: 'Closed', value: '5' },
   { label: 'Open', value: '4' },
-  { label: 'Completed', value: '7' }
+  { label: 'Approved', value: '7' }
 ];
 
 // Updated sample sessions data with more realistic information
@@ -256,6 +256,8 @@ const getStatusColor = (status) => {
       return 'bg-yellow-100 text-yellow-800';
     case 6:
       return 'bg-blue-100 text-blue-800';
+    case 7:
+      return 'bg-green-100 text-green-800';
     default:
       return 'bg-gray-100 text-gray-800';
   }
