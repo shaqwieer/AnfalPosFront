@@ -8,14 +8,15 @@ export const useSessionStore = defineStore({
   state: () => ({
     sessions: <any[]>[],
     sessionData: <any>{},
+    salesReps: [],
     attachmentTypes: <any[]>[],
     loading: useLoadingStore(),
     error: ''
   }),
   actions: {
-    async GetSessions() {
+    async GetSessions(payload) {
       try {
-        const response = await apiClient.get('/ShiftSessions/GetSessionsManagment');
+        const response = await apiClient.post('/ShiftSessions/GetSessionsManagment', payload);
         console.log(response);
 
         this.sessionData = response.data.data;
@@ -31,108 +32,10 @@ export const useSessionStore = defineStore({
         this.error = handleError(err, this.loading);
       }
     },
-    async CreateCustomerBasedOnBranchType(customer: any) {
+    async GetSalesReps() {
       try {
-        console.log(customer);
-        debugger;
-        const formData = new FormData();
-        formData.append('Name', customer.name);
-        formData.append('PrimaryPhone', customer.mobile);
-        formData.append('Email', customer.email);
-        formData.append('CrNumber', customer.cr);
-        formData.append('VatNumber', customer.vat);
-        formData.append('Industry', '');
-        formData.append('CreditLimit', customer.creditLimit);
-        formData.append('PaymentTerm', customer.paymentTerm);
-        formData.append('Latitude', customer.location.lat);
-        formData.append('Altitude', customer.location.lng);
-        formData.append('BuildingNumber', customer.buildingNumber);
-        formData.append('StreetName', customer.streetName);
-        formData.append('District', customer.district);
-        formData.append('City', customer.city);
-        formData.append('PostalCode', customer.postalCode);
-        formData.append('AdditionalNumber', customer.additionalNumber);
-        formData.append('BankName', customer.bankName);
-        formData.append('AccountNumber', customer.bankAccount);
-        formData.append('Iban', customer.iban);
-        formData.append('SwiftCode', customer.swiftCode);
-        formData.append('FinanceNotes', customer.financialNotes);
-        formData.append('IsBusinessPartner', 'true');
-        formData.append('AdditionalNotes', customer.notes);
-        customer.attachments.forEach((file, index) => {
-          formData.append(`CustomerAttachments[${index}].attachmentTypeId`, file.id);
-          formData.append(`CustomerAttachments[${index}].attachmentTypeData`, file.file);
-        });
-        const response = await apiClient.post('/Customers/CreateCustomerBasedOnBranchType', formData);
-        this.customer.push(response.data.data);
-      } catch (err) {
-        this.error = handleError(err, this.loading);
-      }
-    },
-    async EditCustomerBasedOnBranchType(customer: any) {
-      try {
-        console.log(customer);
-        debugger;
-        const formData = new FormData();
-        formData.append('Id', customer.id);
-        formData.append('Name', customer.name);
-        formData.append('PrimaryPhone', customer.mobile);
-        formData.append('Email', customer.email);
-        formData.append('CrNumber', customer.cr);
-        formData.append('VatNumber', customer.vat);
-        formData.append('Industry', '');
-        formData.append('CreditLimit', customer.creditLimit);
-        formData.append('PaymentTerm', customer.paymentTerm);
-        formData.append('Latitude', customer.location.lat);
-        formData.append('Altitude', customer.location.lng);
-        formData.append('BuildingNumber', customer.buildingNumber);
-        formData.append('StreetName', customer.streetName);
-        formData.append('District', customer.district);
-        formData.append('City', customer.city);
-        formData.append('PostalCode', customer.postalCode);
-        formData.append('AdditionalNumber', customer.additionalNumber);
-        formData.append('BankName', customer.bankName);
-        formData.append('AccountNumber', customer.bankAccount);
-        formData.append('Iban', customer.iban);
-        formData.append('SwiftCode', customer.swiftCode);
-        formData.append('FinanceNotes', customer.financialNotes);
-        formData.append('IsBusinessPartner', 'true');
-        formData.append('AdditionalNotes', customer.notes);
-        customer.attachments.forEach((file, index) => {
-          formData.append(`CustomerAttachments[${index}].attachmentTypeId`, file.id);
-          formData.append(`CustomerAttachments[${index}].attachmentTypeData`, file.file);
-        });
-        const response = await apiClient.put('/Customers/UpdateCustomerBasedOnBranchType', formData);
-        const index = this.customers.findIndex((c) => c.id === customer.id);
-        this.customers[index] = response.data.data;
-      } catch (err) {
-        this.error = handleError(err, this.loading);
-      }
-    },
-    async ApproveCustomer(customer: any) {
-      try {
-        const formData = {
-          customerId: customer.id,
-          approve: true
-        };
-        await apiClient.put('/Customers/MarkAsApprovedOrRejected', formData);
-        customer.status = 'active';
-        customer.approvalStatus = 'approved';
-        customer.approvedDate = new Date().toISOString().split('T')[0];
-      } catch (err) {
-        this.error = handleError(err, this.loading);
-      }
-    },
-    async RejectCustomer(customer: any) {
-      try {
-        const formData = {
-          customerId: customer.id,
-          approve: false
-        };
-        await apiClient.put('/Customers/MarkAsApprovedOrRejected', formData);
-        customer.status = 'rejected';
-        customer.approvalStatus = 'rejected';
-        customer.approvedDate = new Date().toISOString().split('T')[0];
+        const response = await apiClient.get('/BusinessEntities/GetUserVanSaleInBranch');
+        this.salesReps = response.data.data;
       } catch (err) {
         this.error = handleError(err, this.loading);
       }

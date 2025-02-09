@@ -1,37 +1,14 @@
-<script setup lang="ts">
-import { ref, computed, watch } from 'vue';
-
+<script setup>
+import { ref, computed, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
-
 import Dropdown from 'primevue/dropdown';
-
+import { useSalesGoalsStore } from '../../../stores/TargetsStore';
+const salesGoalsStore = useSalesGoalsStore();
 // Sample sales reps data with current balance
-const salesReps = ref([
-  {
-    id: 'rep1',
-    name: 'Mohammed Al-Malki',
-    creditLimit: 500000,
-    currentBalance: 450000,
-    targets: {
-      sales: Array(12).fill(200000),
-      collections: Array(12).fill(180000)
-    }
-  },
-  {
-    id: 'rep2',
-    name: 'Abdullah Al-Qahtani',
-    creditLimit: 400000,
-    currentBalance: 250000,
-    targets: {
-      sales: Array(12).fill(150000),
-      collections: Array(12).fill(135000)
-    }
-  }
-]);
 
 const selectedYear = ref(new Date().getFullYear());
-const selectedRepId = ref(salesReps.value[0].id); // Default to first rep
+const selectedRepId = ref(); // Default to first rep
 const isEditing = ref(false);
 const editingData = ref(null);
 
@@ -40,15 +17,26 @@ const years = computed(() => {
   return [currentYear - 1, currentYear, currentYear + 1];
 });
 
-const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
+const months = ref([
+  { name: 'January' },
+  { name: 'February' },
+  { name: 'March' },
+  { name: 'April' },
+  { name: 'May' },
+  { name: 'June' },
+  { name: 'July' },
+  { name: 'August' },
+  { name: 'September' },
+  { name: 'October' },
+  { name: 'November' },
+  { name: 'December' }
+]);
 // Get selected rep data
-const selectedRep = computed(() => salesReps.value.find((rep) => rep.id === selectedRepId.value));
+const selectedRep = ref(null);
 
 // Calculate credit status
 const creditStatus = computed(() => {
   if (!selectedRep.value) return null;
-
   const remaining = selectedRep.value.creditLimit - selectedRep.value.currentBalance;
   const usagePercentage = (selectedRep.value.currentBalance / selectedRep.value.creditLimit) * 100;
 
@@ -100,10 +88,7 @@ const updateMonthlyTarget = (type, monthIndex, value) => {
   }
 };
 
-
-
-
-const selectedSalesReps = ref<string[]>(['all']);
+const selectedSalesReps = ref(['all']);
 
 const availableSalesReps = [
   { id: 'all', name: `${t('dashboard.AllSalesReps')}` },
@@ -114,35 +99,26 @@ const availableSalesReps = [
 ];
 
 // Watch for 'all' selection - FIXED to prevent recursion
-watch(
-  selectedSalesReps,
-  (newValue) => {
-    if (newValue.includes('all') && newValue.length > 1) {
-      // If 'all' is selected along with other options, only keep 'all'
-      selectedSalesReps.value = ['all'];
-    } else if (newValue.length === 0) {
-      // If nothing is selected, default to 'all'
-      selectedSalesReps.value = ['all'];
-    } else if (!newValue.includes('all') && newValue.length === salesReps.length - 1) {
-      // If all individual reps are selected, switch to 'all'
-      selectedSalesReps.value = ['all'];
-    }
-  },
-  { deep: true }
-);
-
-import { useSalesGoalsStore } from '../../../stores/TargetsStore';
-
-const salesGoalsStore = useSalesGoalsStore();
-
 const businessEntityId = ref(1);
 const year = ref(new Date().getFullYear());
 const test = ref();
 const fetchData = async () => {
-  await salesGoalsStore.fetchSalesGoals();
-  console.log(salesGoalsStore.salesGoals);
-  test.value = salesGoalsStore.salesGoals;
+  await salesGoalsStore.fetchSalesGoals({ businessEntityId: selectedRepId.value, year: selectedYear.value });
+  selectedRep.value = salesGoalsStore.salesGoals.filter((rep) => rep.businessEntityId == selectedRepId.value);
 };
+watch(
+  [selectedRepId, selectedYear],
+  () => {
+    fetchData();
+  },
+  { deep: true }
+);
+onMounted(() => {
+  salesGoalsStore.GetSalesReps().then(() => {
+    selectedRepId.value = salesGoalsStore.salesReps[0].id;
+    fetchData();
+  });
+});
 </script>
 
 <template>
@@ -153,8 +129,7 @@ const fetchData = async () => {
         <h1 class="text-2xl font-bold text-900">Sales Rep Targets</h1>
         <div class="flex align-items-center gap-4">
           <!-- Sales Rep Selection -->
-          <Dropdown v-model="selectedRepId" :options="salesReps" optionLabel="name" optionValue="id" placeholder="Select a Sales Rep" class="w-full md:w-14rem" />
-
+          <Dropdown v-model="selectedRepId" :options="salesGoalsStore.salesReps" optionLabel="name" optionValue="id" placeholder="Select a Sales Rep" class="w-full md:w-14rem" />
           <!-- Year Selection -->
           <Dropdown v-model="selectedYear" :options="years" placeholder="Select a Year" class="w-full md:w-14rem" />
         </div>
@@ -162,19 +137,17 @@ const fetchData = async () => {
 
       <!-- Main Content -->
       <div v-if="selectedRep" class="surface-card border-round-xl border-1 surface-border p-4">
-        <!-- Rep Header -->
         <div class="flex align-items-center justify-content-between">
           <div class="flex flex-column gap-2">
-            <h3 class="text-lg font-semibold text-900">{{ selectedRep.name }}</h3>
-            <!-- Credit Limit Info -->
+            <h3 class="text-lg font-semibold text-900">{{ salesGoalsStore.salesReps.find((rep) => rep.id === selectedRepId)?.name }}</h3>
             <div class="flex align-items-center gap-6">
               <div class="text-sm">
                 <span class="text-500">Credit Limit:</span>
-                <span class="ml-1 font-bold">{{ formatPrice(selectedRep.creditLimit) }}</span>
+                <span class="ml-1 font-bold">{{ selectedRep[0]?.creditLimit }}</span>
               </div>
               <div class="text-sm">
                 <span class="text-500">Current Balance:</span>
-                <span class="ml-1 font-bold">{{ formatPrice(selectedRep.currentBalance) }}</span>
+                <span class="ml-1 font-bold">{{ selectedRep[0]?.currentBalance }}</span>
               </div>
               <div class="text-sm flex align-items-center gap-2">
                 <span class="text-500">Remaining:</span>
@@ -186,9 +159,8 @@ const fetchData = async () => {
                     'text-green-600': creditStatus.status === 'normal'
                   }"
                 >
-                  {{ formatPrice(creditStatus.remaining) }}
+                  {{ selectedRep[0]?.availableCredit }}
                 </span>
-                <!-- Warning Icon -->
                 <span
                   v-if="creditStatus.status !== 'normal'"
                   class="material-icons text-lg"
@@ -221,7 +193,7 @@ const fetchData = async () => {
         <!-- View Mode -->
 
         <div v-if="!isEditing" class="overflow-x-auto mt-4 border-round-lg border-1 border-gray-200">
-          <DataTable :value="months" :paginator="months.length > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" class="">
+          <!-- <DataTable :value="months" :paginator="months.length > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" class="">
             <template #empty>
               <div class="flex justify-content-center align-items-center font-bold text-lg">No Data Available</div>
             </template>
@@ -262,7 +234,7 @@ const fetchData = async () => {
               <template #body="slotProps">
                 <div class="flex flex-column align-items-start">
                   <div class="text-md">
-                    {{ formatPrice(selectedRep.targets.sales[slotProps.index]) }}
+                    {{ selectedRep.targets.sales[slotProps.index] }}
                   </div>
                 </div>
               </template>
@@ -270,7 +242,7 @@ const fetchData = async () => {
               <template #footer="slotProps">
                 <div class="flex flex-column align-items-start">
                   <div class="text-md text-green-600">
-                    {{ formatPrice(selectedRep.targets.sales.reduce((a, b) => a + b, 0)) }}
+                    {{ selectedRep.targets.sales.reduce((a, b) => a + b, 0) }}
                   </div>
                 </div>
               </template>
@@ -280,7 +252,7 @@ const fetchData = async () => {
               <template #body="slotProps">
                 <div class="flex flex-column align-items-start">
                   <div class="text-md">
-                    {{ formatPrice(selectedRep.targets.collections[slotProps.index]) }}
+                    {{ selectedRep.targets.collections[slotProps.index] }}
                   </div>
                 </div>
               </template>
@@ -288,7 +260,79 @@ const fetchData = async () => {
               <template #footer="slotProps">
                 <div class="flex flex-column align-items-start">
                   <div class="text-md text-green-600">
-                    {{ formatPrice(selectedRep.targets.collections.reduce((a, b) => a + b, 0)) }}
+                    {{ selectedRep.targets.collections.reduce((a, b) => a + b, 0) }}
+                  </div>
+                </div>
+              </template>
+            </Column>
+          </DataTable> -->
+          <DataTable :value="months">
+            <Column field="" header="#">
+              <template #body="slotProps">
+                <div class="flex flex-column align-items-start">
+                  <div class="text-md">
+                    {{ slotProps.index + 1 }}
+                  </div>
+                </div>
+              </template>
+
+              <template #footer="slotProps">
+                <div class="flex flex-column align-items-start">
+                  <div class="text-md text-green-600"></div>
+                </div>
+              </template>
+            </Column>
+            <Column header="Month" field="month">
+              <template #body="slotProps">
+                <div class="flex flex-column align-items-start">
+                  <div class="text-md">
+                    {{ slotProps.data.name }}
+                  </div>
+                </div>
+              </template>
+
+              <template #footer="slotProps">
+                <div class="flex flex-column align-items-start">
+                  <div class="text-md text-green-600">Total</div>
+                </div>
+              </template>
+            </Column>
+            <Column header="Sales Target" field="month">
+              <template #body="slotProps">
+                <div class="flex flex-column align-items-start">
+                  <div class="text-md">{{ selectedRep.find((item) => item.period.includes(slotProps.data.name))?.salesTarget }}</div>
+                </div>
+              </template>
+
+              <template #footer="slotProps">
+                <div class="flex flex-column align-items-start">
+                  <div class="text-md text-green-600">
+                    {{
+                      selectedRep.reduce((a, b) => {
+                        return a + b.salesTarget;
+                      }, 0)
+                    }}
+                  </div>
+                </div>
+              </template>
+            </Column>
+            <Column header="Collection Target" field="month">
+              <template #body="slotProps">
+                <div class="flex flex-column align-items-start">
+                  <div class="text-md">
+                    {{ selectedRep.find((item) => item.period.includes(slotProps.data.name))?.collectionTarget }}
+                  </div>
+                </div>
+              </template>
+
+              <template #footer="slotProps">
+                <div class="flex flex-column align-items-start">
+                  <div class="text-md text-green-600">
+                    {{
+                      selectedRep.reduce((a, b) => {
+                        return a + b.collectionTarget;
+                      }, 0)
+                    }}
                   </div>
                 </div>
               </template>
@@ -345,10 +389,10 @@ const fetchData = async () => {
                   <td class="px-6 py-4"></td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-900">Total</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-900">
-                    {{ formatPrice(editingData.targets.sales.reduce((a, b) => a + b, 0)) }}
+                    {{ editingData.targets.sales.reduce((a, b) => a + b, 0)) }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-900">
-                    {{ formatPrice(editingData.targets.collections.reduce((a, b) => a + b, 0)) }}
+                    {{ editingData.targets.collections.reduce((a, b) => a + b, 0)) }}
                   </td>
                 </tr>
               </tfoot>
@@ -407,7 +451,7 @@ const fetchData = async () => {
               <template #footer="slotProps">
                 <div class="flex flex-column align-items-start">
                   <div class="text-md text-green-600">
-                    {{ formatPrice(selectedRep.targets.sales.reduce((a, b) => a + b, 0)) }}
+                    {{ selectedRep.targets.sales.reduce((a, b) => a + b, 0) }}
                   </div>
                 </div>
               </template>
@@ -428,7 +472,7 @@ const fetchData = async () => {
               <template #footer="slotProps">
                 <div class="flex flex-column align-items-start">
                   <div class="text-md text-green-600">
-                    {{ formatPrice(selectedRep.targets.collections.reduce((a, b) => a + b, 0)) }}
+                    {{ selectedRep.targets.collections.reduce((a, b) => a + b, 0) }}
                   </div>
                 </div>
               </template>

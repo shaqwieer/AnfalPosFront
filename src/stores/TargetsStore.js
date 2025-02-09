@@ -5,16 +5,17 @@ export const useSalesGoalsStore = defineStore({
   id: 'salesGoals',
   state: () => ({
     salesGoals: [],
+    salesReps: [],
     loading: false,
     error: null
   }),
   actions: {
-    async fetchSalesGoals() {
+    async fetchSalesGoals(payload) {
       this.loading = true;
       this.error = null;
 
       try {
-        const response = await apiClient.post('/SalesGoals/GetSalesGoalsBasedOnBranch', {}, {
+        const response = await apiClient.post('/SalesGoals/GetSalesGoalsBasedOnBranch', payload, {
           headers: { 'Content-Type': 'application/json' }
         });
 
@@ -28,6 +29,14 @@ export const useSalesGoalsStore = defineStore({
         console.error('Error fetching sales goals:', err);
       } finally {
         this.loading = false;
+      }
+    },
+    async GetSalesReps() {
+      try {
+        const response = await apiClient.get('/BusinessEntities/GetUserVanSaleInBranch');
+        this.salesReps = response.data.data;
+      } catch (err) {
+        this.error = handleError(err, this.loading);
       }
     }
   }

@@ -1,21 +1,21 @@
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+<script setup>
+import { ref, computed, onMounted, watch } from 'vue';
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import SessionDetailsDialog from './SessionDetailsDialog.vue';
 import { useSessionStore } from '../../../stores/sessionStore';
-import { on } from 'events';
+import Dropdown from 'primevue/dropdown';
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 // Filter states
-const selectedSalesReps = ref([]);
+const selectedSalesReps = ref(null);
 const dateFrom = ref('');
 const dateTo = ref('');
-const selectedStatus = ref('all');
+const selectedStatus = ref('4');
 const isDropdownOpen = ref(false);
 const showDetailsDialog = ref(false);
 const selectedSession = ref();
-const viewMode = ref<'table' | 'chart'>('table');
+const viewMode = (ref < 'table') | ('chart' > 'table');
 const sessionStore = useSessionStore();
 // Available sales reps
 const salesReps = [
@@ -29,10 +29,10 @@ const salesReps = [
 
 // Status options
 const statusOptions = [
-  { id: 'all', name: 'All Status' },
-  { id: 'OPEN', name: 'Open' },
-  { id: 'PENDING', name: 'Pending' },
-  { id: 'IN_APPROVAL', name: 'In Approval' }
+  { label: 'Pending', value: '6' },
+  { label: 'Closed', value: '5' },
+  { label: 'Open', value: '4' },
+  { label: 'Completed', value: '7' }
 ];
 
 // Updated sample sessions data with more realistic information
@@ -233,12 +233,12 @@ const toggleViewMode = () => {
 };
 
 // View session details
-const viewSessionDetails = (session: any) => {
+const viewSessionDetails = (session) => {
   selectedSession.value = session;
   showDetailsDialog.value = true;
 };
 
-const formatPrice = (price: number): string => {
+const formatPrice = (price) => {
   return price.toLocaleString('en-US', {
     style: 'currency',
     currency: 'SAR',
@@ -247,13 +247,13 @@ const formatPrice = (price: number): string => {
   });
 };
 
-const getStatusColor = (status: string) => {
+const getStatusColor = (status) => {
   switch (status) {
-    case 'Opened':
+    case 4:
       return 'bg-red-100 text-red-800';
-    case 'PENDING':
+    case 5:
       return 'bg-yellow-100 text-yellow-800';
-    case 'IN_APPROVAL':
+    case 6:
       return 'bg-blue-100 text-blue-800';
     default:
       return 'bg-gray-100 text-gray-800';
@@ -269,8 +269,26 @@ const initializeDateRange = () => {
 const applyFilters = () => {};
 // Initialize date range on component mount
 initializeDateRange();
+const getSessions = async () => {
+  const formData = new FormData();
+  formData.append('StatusId', selectedStatus.value);
+  formData.append('SalesRepId', selectedSalesReps.value);
+  formData.append('StartDate', new Date(dateFrom.value).toDateString());
+  formData.append('EndDate', new Date(dateTo.value).toDateString());
+  await sessionStore.GetSessions(formData);
+};
+watch(
+  [selectedStatus, selectedSalesReps, dateFrom, dateTo],
+  () => {
+    getSessions();
+  },
+  { deep: true }
+);
 onMounted(async () => {
-  sessionStore.GetSessions();
+  sessionStore.GetSalesReps().then(() => {
+    selectedSalesReps.value = sessionStore.salesReps[0].id;
+    getSessions();
+  });
 });
 </script>
 
@@ -284,29 +302,31 @@ onMounted(async () => {
 
       <!-- Filters -->
       <div class="bg-white border-round-lg shadow-1 border p-4 mb-4 flex w-full align-items-center justify-content-center">
-        <div class="flex flex-row justify-content-between align-items-center w-3/4 gap-4">
+        <div class="flex flex-row flex-wrap justify-content-between align-items-center w-3/4 gap-4">
           <!-- Sales Rep Multi-select Dropdown -->
-          <div class="relative">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Sales Representatives</label>
-
-            <MultiSelect v-model="selectedSalesReps" :options="sessionStore.sessionData.sales" filter optionLabel="name" placeholder="Select Sales Reps" :maxSelectedLabels="3" class="w-full md:w-20rem" />
+          <div class="flex flex-column xl:flex-row-reverse gap-4 justify-content-end">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">From Date</label>
+              <Calendar v-model="dateFrom" showIcon iconDisplay="input" />
+            </div>
+            <div class="relative">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Sales Representatives</label>
+              <Dropdown v-model="selectedSalesReps" :options="sessionStore.sessionData.sales" filter optionLabel="name" optionValue="id" placeholder="Select Sales Reps" :maxSelectedLabels="3" class="w-full md:w-20rem" />
+            </div>
+            <!-- Date Range -->
+          </div>
+          <div class="flex flex-column xl:flex-row gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">To Date</label>
+              <Calendar v-model="dateTo" showIcon iconDisplay="input" />
+            </div>
+            <!-- Status Filter -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <Dropdown v-model="selectedStatus" :options="statusOptions" optionLabel="label" optionValue="value" placeholder="Select a Status" class="w-full md:w-14rem" />
+            </div>
           </div>
 
-          <!-- Date Range -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">From Date</label>
-            <Calendar v-model="dateFrom" showIcon iconDisplay="input" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">To Date</label>
-            <Calendar v-model="dateTo" showIcon iconDisplay="input" />
-          </div>
-
-          <!-- Status Filter -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-            <Dropdown v-model="selectedStatus" :options="statusOptions" optionLabel="name" placeholder="Select a Status" class="w-full md:w-14rem" />
-          </div>
           <div class="align-self-end p-1">
             <Button size="small" icon="pi pi-filter" label="Filter" class="p-button-outlined" @click="applyFilters" />
           </div>
@@ -391,14 +411,14 @@ onMounted(async () => {
 
           <Column field="cashAmount" :header="'Cash Amount'" class="">
             <template #body="slotProps">
-              <div class="text-md">{{ slotProps.data.cashAmount }}</div>
+              <div class="text-md">{{ slotProps.data.allAmount }}</div>
             </template>
           </Column>
 
           <Column field="Credit Limit" :header="'Status'" class="" :sortable="true">
             <template #body="slotProps">
-              <span class="px-2 py-1 text-xs border-round-3xl" :class="getStatusColor(slotProps.data.statusName)">
-                {{ slotProps.data.statusName === 'IN_APPROVAL' ? 'In Approval' : slotProps.data.statusName === 'Opened' ? 'Open' : slotProps.data.statusName === 'PENDING' ? 'Pending' : slotProps.data.statusName }}
+              <span class="px-2 py-1 text-xs border-round-3xl" :class="getStatusColor(slotProps.data.statusId)">
+                {{ slotProps.data.statusName }}
               </span>
             </template>
           </Column>

@@ -16,14 +16,14 @@ const sessionStore = useSessionStore();
 const RejectSession = (session) => {
   const payload = {
     shifSessionId: session.shifSessionId,
-    statusId: 5
+    statusId: 6
   };
   sessionStore.ApproveSession(payload);
 };
 const ApproveSession = (session) => {
   const payload = {
     shifSessionId: session.shifSessionId,
-    statusId: 2
+    statusId: 7
   };
   sessionStore.ApproveSession(payload);
 };
