@@ -4,7 +4,7 @@ export function handleError(err, loading, defaultErrorMessage = 'An unexpected e
     if (err.response) {
         switch (err.response.status) {
             case 400:
-                errorMessage = 'Bad request. Please check your input.';
+                errorMessage = err.response.data?.message ||'Bad request. Please check your input.';
                 break;
             case 401:
                 errorMessage = 'Unauthorized access. Please log in again.';
