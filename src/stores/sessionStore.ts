@@ -28,6 +28,7 @@ export const useSessionStore = defineStore({
     async ApproveSession(payload: any) {
       try {
         const response = await apiClient.post('/ShiftSessions/ApproveShiftSession', payload);
+        this.sessions.find((session: any) => session.id === payload.shiftSessionId).statusId = payload.statusId;
       } catch (err) {
         this.error = handleError(err, this.loading);
       }
