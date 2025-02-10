@@ -78,11 +78,21 @@ const validateCredit = () => {
   return true;
 };
 
+const isAtLeastOneTargetHasValue = () => {
+  return selectedRep.value.some(t => t.salesTarget > 0 || t.collectionTarget > 0);
+};
+
 const saveChanges = async () => {
-  alert('saveChanges');
+  
   try {
     if (!validateCredit()) {
       return; // Stop if validation fails
+    }
+
+    const atLeastOneTargetHasValue = isAtLeastOneTargetHasValue();
+    if (!atLeastOneTargetHasValue) {
+      errorMessage.value = 'Cannot save: At least one of Collection Target or Sales Target must have a value';
+      return;
     }
 
     // Format data according to backend DTO structure
