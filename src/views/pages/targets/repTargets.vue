@@ -4,16 +4,19 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 import Dropdown from 'primevue/dropdown';
 import { useSalesGoalsStore } from '../../../stores/TargetsStore';
+import apiClient from '@/api/apiClient';
+import { useMainStore } from '@/stores/mainStore';
+const mainStore = useMainStore();
 const salesGoalsStore = useSalesGoalsStore();
-// Sample sales reps data with current balance
 
 const selectedYear = ref(new Date().getFullYear());
-const selectedRepId = ref(); // Default to first rep
+const selectedRepId = ref();
 const creditLimit = ref(0);
 const availableCredit = ref(0);
 const currentBalance = ref(0);
 const isEditing = ref(false);
 const editingData = ref(null);
+const errorMessage = ref('');
 
 const years = computed(() => {
   const currentYear = new Date().getFullYear();
@@ -34,14 +37,14 @@ const months = ref([
   { name: 'November', id: 11 },
   { name: 'December', id: 12 }
 ]);
-// Get selected rep data
-const selectedRep = ref(null);
 
-// Calculate credit status
+const selectedRep = ref(null);
+const editedTargets = ref(null);
+
 const creditStatus = computed(() => {
   if (!selectedRep.value) return null;
-  const remaining = selectedRep.value.creditLimit - selectedRep.value.currentBalance;
-  const usagePercentage = (selectedRep.value.currentBalance / selectedRep.value.creditLimit) * 100;
+  const remaining = creditLimit.value - currentBalance.value;
+  const usagePercentage = (currentBalance.value / creditLimit.value) * 100;
 
   return {
     remaining,
@@ -60,51 +63,84 @@ const formatPrice = (price) => {
 };
 
 const startEdit = () => {
-  editingData.value = {
-    creditLimit: creditLimit.value,
-    targets: {
-      sales: [...selectedRep.value.targets.sales],
-      collections: [...selectedRep.value.targets.collections]
-    }
-  };
   isEditing.value = true;
+  editedTargets.value = JSON.parse(JSON.stringify(selectedRep.value));
+  errorMessage.value = ''; // Clear any previous error messages
 };
 
-const saveChanges = () => {
-  if (selectedRep.value && editingData.value) {
-    selectedRep.value.creditLimit = editingData.value.creditLimit;
-    selectedRep.value.targets.sales = [...editingData.value.targets.sales];
-    selectedRep.value.targets.collections = [...editingData.value.targets.collections];
+const validateCredit = () => {
+  const remaining = creditLimit.value - currentBalance.value;
+  if (remaining < 0) {
+    errorMessage.value = 'Cannot save: Credit limit would result in negative remaining credit';
+    return false;
   }
-  isEditing.value = false;
-  editingData.value = null;
+  errorMessage.value = '';
+  return true;
+};
+
+const saveChanges = async () => {
+  alert('saveChanges');
+  try {
+    if (!validateCredit()) {
+      return; // Stop if validation fails
+    }
+
+    // Format data according to backend DTO structure
+    const formData = {
+      businessEntityId: selectedRepId.value,
+      creditLimit: parseFloat(creditLimit.value),
+      salesGoalsMonthly: months.value.map(month => ({
+        id: selectedRep.value.find(t => t.month === month.id)?.id || 0,
+        month: month.id,
+        year: selectedYear.value,
+        salesTarget: parseFloat(selectedRep.value.find(t => t.month === month.id)?.salesTarget || 0),
+        collectionTarget: parseFloat(selectedRep.value.find(t => t.month === month.id)?.collectionTarget || 0)
+      }))
+    };
+
+    try {
+        const response = await apiClient.post('/SalesGoals/UpdateSalesGoalMonthlyData', formData);
+        mainStore.loading.setNotificationInfo('success', response.data.message);
+        isEditing.value = false;
+          editedTargets.value = null;
+          errorMessage.value = '';
+          await fetchData(); // Refresh data after save
+
+      } catch (err) {
+        this.error = handleError(err, this.loading);
+      }
+ 
+  } catch (error) {
+    console.error('Failed to save changes:', error);
+    errorMessage.value = 'Failed to save changes. Please try again.';
+  }
 };
 
 const cancelEdit = () => {
   isEditing.value = false;
-  editingData.value = null;
+  editedTargets.value = null;
+  errorMessage.value = '';
 };
 
-const updateMonthlyTarget = (type, monthIndex, value) => {
-  if (editingData.value) {
-    editingData.value.targets[type][monthIndex] = parseFloat(value) || 0;
+const updateTarget = (monthId, field, value) => {
+  const target = selectedRep.value.find(t => t.month === monthId);
+  if (target) {
+    target[field] = parseFloat(value) || 0;
+  } else {
+    // Create new target if it doesn't exist
+    selectedRep.value.push({
+      id: 0,
+      month: monthId,
+      year: selectedYear.value,
+      salesTarget: field === 'salesTarget' ? parseFloat(value) || 0 : 0,
+      collectionTarget: field === 'collectionTarget' ? parseFloat(value) || 0 : 0
+    });
   }
 };
 
-const selectedSalesReps = ref(['all']);
-
-const availableSalesReps = [
-  { id: 'all', name: `${t('dashboard.AllSalesReps')}` },
-  { id: 'rep1', name: 'Mohammed Al-Malki' },
-  { id: 'rep2', name: 'Abdullah Al-Qahtani' },
-  { id: 'rep3', name: 'Khalid Al-Otaibi' },
-  { id: 'rep4', name: 'Fahad Al-Harbi' }
-];
-
-// Watch for 'all' selection - FIXED to prevent recursion
 const businessEntityId = ref(1);
 const year = ref(new Date().getFullYear());
-const test = ref();
+
 const fetchData = async () => {
   await salesGoalsStore.fetchSalesGoals({ businessEntityId: selectedRepId.value, year: selectedYear.value });
   selectedRep.value = salesGoalsStore.salesGoals.filter((rep) => rep.businessEntityId == selectedRepId.value);
@@ -112,6 +148,7 @@ const fetchData = async () => {
   availableCredit.value = salesGoalsStore.availableCredit;
   currentBalance.value = salesGoalsStore.currentBalance;
 };
+
 watch(
   [selectedRepId, selectedYear],
   () => {
@@ -119,6 +156,7 @@ watch(
   },
   { deep: true }
 );
+
 onMounted(() => {
   salesGoalsStore.GetSalesReps().then(() => {
     selectedRepId.value = salesGoalsStore.salesReps[0].id;
@@ -134,11 +172,14 @@ onMounted(() => {
       <div class="flex align-items-center justify-content-between mb-6">
         <h1 class="text-2xl font-bold text-900">Sales Rep Targets</h1>
         <div class="flex align-items-center gap-4">
-          <!-- Sales Rep Selection -->
           <Dropdown v-model="selectedRepId" :options="salesGoalsStore.salesReps" optionLabel="name" optionValue="id" placeholder="Select a Sales Rep" class="w-full md:w-14rem" />
-          <!-- Year Selection -->
           <Dropdown v-model="selectedYear" :options="years" placeholder="Select a Year" class="w-full md:w-14rem" />
         </div>
+      </div>
+
+      <!-- Error Message -->
+      <div v-if="errorMessage" class="mb-4 p-3 bg-red-100 text-red-700 border-round-lg">
+        {{ errorMessage }}
       </div>
 
       <!-- Main Content -->
@@ -149,11 +190,23 @@ onMounted(() => {
             <div class="flex align-items-center gap-6">
               <div class="text-sm">
                 <span class="text-500">Credit Limit:</span>
-                <span class="ml-1 font-bold">{{ creditLimit }}</span>
+                <span class="ml-1 font-bold">
+                  <input 
+                    v-if="isEditing" 
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    v-model="creditLimit"
+                    @input="validateCredit"
+                    class="w-32 p-2 border-round-lg border-1 surface-border"
+                    :class="{ 'border-red-500': errorMessage }"
+                  />
+                  <span v-else>{{ formatPrice(creditLimit) }}</span>
+                </span>
               </div>
               <div class="text-sm">
                 <span class="text-500">Current Balance:</span>
-                <span class="ml-1 font-bold">{{ currentBalance }}</span>
+                <span class="ml-1 font-bold">{{ formatPrice(currentBalance) }}</span>
               </div>
               <div class="text-sm flex align-items-center gap-2">
                 <span class="text-500">Remaining:</span>
@@ -165,21 +218,10 @@ onMounted(() => {
                     'text-green-600': creditStatus.status === 'normal'
                   }"
                 >
-                  {{ availableCredit }}
-                </span>
-                <span
-                  v-if="creditStatus.status !== 'normal'"
-                  class="material-icons text-lg"
-                  :class="{
-                    'text-red-500': creditStatus.status === 'critical',
-                    'text-yellow-500': creditStatus.status === 'warning'
-                  }"
-                >
-                  <font-awesome-icon :icon="['fas', `${creditStatus.status === 'critical' ? 'circle-exclamation' : ''}`]" />
+                  {{ formatPrice(creditStatus.remaining) }}
                 </span>
               </div>
             </div>
-            <!-- Credit Usage Progress Bar -->
             <div style="height: 6px" class="w-full surface-200 border-round-full border-round-3xl mt-1">
               <div
                 style="height: 6px"
@@ -193,303 +235,76 @@ onMounted(() => {
               ></div>
             </div>
           </div>
-          <div v-if="!isEditing" @click="startEdit" class="px-4 py-2 bg-blue-600 cursor-pointer text-white border-round-lg hover:bg-blue-700 transition-colors">Edit Targets</div>
+          <button 
+            @click="isEditing ? saveChanges() : startEdit()" 
+            class="px-4 py-2 bg-blue-600 cursor-pointer text-white border-round-lg hover:bg-blue-700 transition-colors"
+           
+          >
+            {{ isEditing ? 'Save Targets' : 'Edit Targets' }}
+          </button>
         </div>
 
-        <!-- View Mode -->
-
-        <div v-if="!isEditing" class="overflow-x-auto mt-4 border-round-lg border-1 border-gray-200">
-          <!-- <DataTable :value="months" :paginator="months.length > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" class="">
-            <template #empty>
-              <div class="flex justify-content-center align-items-center font-bold text-lg">No Data Available</div>
-            </template>
-
-            <Column field="" header="#">
-              <template #body="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md">
-                    {{ slotProps.index + 1 }}
-                  </div>
-                </div>
-              </template>
-
-              <template #footer="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md text-green-600"></div>
-                </div>
-              </template>
-            </Column>
-
-            <Column header="Month" field="month">
-              <template #body="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md">
-                    {{ slotProps.data }}
-                  </div>
-                </div>
-              </template>
-
-              <template #footer="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md text-green-600">Total</div>
-                </div>
-              </template>
-            </Column>
-
-            <Column header="Sales Target" field="month">
-              <template #body="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md">
-                    {{ selectedRep.targets.sales[slotProps.index] }}
-                  </div>
-                </div>
-              </template>
-
-              <template #footer="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md text-green-600">
-                    {{ selectedRep.targets.sales.reduce((a, b) => a + b, 0) }}
-                  </div>
-                </div>
-              </template>
-            </Column>
-
-            <Column header="Collection Target" field="month">
-              <template #body="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md">
-                    {{ selectedRep.targets.collections[slotProps.index] }}
-                  </div>
-                </div>
-              </template>
-
-              <template #footer="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md text-green-600">
-                    {{ selectedRep.targets.collections.reduce((a, b) => a + b, 0) }}
-                  </div>
-                </div>
-              </template>
-            </Column>
-          </DataTable> -->
+        <div class="overflow-x-auto mt-4 border-round-lg border-1 border-gray-200">
           <DataTable :value="months">
             <Column field="" header="#">
               <template #body="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md">
-                    {{ slotProps.index + 1 }}
-                  </div>
-                </div>
-              </template>
-
-              <template #footer="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md text-green-600"></div>
-                </div>
+                {{ slotProps.index + 1 }}
               </template>
             </Column>
-            <Column header="Month" field="month">
+            
+            <Column header="Month" field="name" />
+            
+            <Column header="Sales Target">
               <template #body="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md">
-                    {{ slotProps.data.name }}
-                  </div>
-                </div>
+                <template v-if="isEditing">
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    :value="selectedRep.find(t => t.month === slotProps.data.id)?.salesTarget"
+                    @input="updateTarget(slotProps.data.id, 'salesTarget', $event.target.value)"
+                    class="w-full p-2 border-round-lg border-1 surface-border"
+                  />
+                </template>
+                <template v-else>
+                  {{ formatPrice(selectedRep.find(t => t.month === slotProps.data.id)?.salesTarget || 0) }}
+                </template>
               </template>
-
-              <template #footer="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md text-green-600">Total</div>
-                </div>
+              <template #footer>
+                <strong>{{ formatPrice(selectedRep.reduce((sum, item) => sum + (item.salesTarget || 0), 0)) }}</strong>
               </template>
             </Column>
-            <Column header="Sales Target" field="month">
+            
+            <Column header="Collection Target">
               <template #body="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md">{{ selectedRep.find((item) => item.month === slotProps.data.id)?.salesTarget }}</div>
-                </div>
+                <template v-if="isEditing">
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    :value="selectedRep.find(t => t.month === slotProps.data.id)?.collectionTarget"
+                    @input="updateTarget(slotProps.data.id, 'collectionTarget', $event.target.value)"
+                    class="w-full p-2 border-round-lg border-1 surface-border"
+                  />
+                </template>
+                <template v-else>
+                  {{ formatPrice(selectedRep.find(t => t.month === slotProps.data.id)?.collectionTarget || 0) }}
+                </template>
               </template>
-
-              <template #footer="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md text-green-600">
-                    {{
-                      selectedRep.reduce((a, b) => {
-                        return a + b.salesTarget;
-                      }, 0)
-                    }}
-                  </div>
-                </div>
-              </template>
-            </Column>
-            <Column header="Collection Target" field="month">
-              <template #body="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md">
-                    {{ selectedRep.find((item) => item.month === slotProps.data.id)?.collectionTarget }}
-                  </div>
-                </div>
-              </template>
-
-              <template #footer="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md text-green-600">
-                    {{
-                      selectedRep.reduce((a, b) => {
-                        return a + b.collectionTarget;
-                      }, 0)
-                    }}
-                  </div>
-                </div>
+              <template #footer>
+                <strong>{{ formatPrice(selectedRep.reduce((sum, item) => sum + (item.collectionTarget || 0), 0)) }}</strong>
               </template>
             </Column>
           </DataTable>
         </div>
 
-        <!-- Edit Mode -->
-        <div v-else class="flex flex-column gap-6 mt-4">
-          <!-- Credit Limit Input -->
-          <div>
-            <label class="block text-sm font-bold text-700 mb-1">Credit Limit</label>
-            <div class="relative border-round-lg">
-              <span style="transform: translateY(50%); bottom: 50%; left: 9px" class="absolute text-500">SAR</span>
-              <input type="number" v-model="editingData.creditLimit" style="height: 42px" class="pl-6 pr-4 py-2 w-full outline-none border-round-lg border-1 surface-border focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-            </div>
-          </div>
-
-          <!-- Monthly Targets Edit -->
-          <!-- <div class="overflow-x-auto">
-            <table class="w-full">
-              <thead class="surface-100">
-                <tr>
-                  <th class="px-6 py-3 text-center text-xs font-medium text-500 uppercase">#</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-500 uppercase">Month</th>
-                  <th class="px-6 py-3 text-right text-xs font-medium text-500 uppercase">Sales Target</th>
-                  <th class="px-6 py-3 text-right text-xs font-medium text-500 uppercase">Collection Target</th>
-                </tr>
-              </thead>
-              <tbody class="surface-card">
-                <tr v-for="(month, index) in months" :key="month" class="border-b-1 surface-border">
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-500">{{ index + 1 }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-900">{{ month }}</td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <input
-                      type="number"
-                      :value="editingData.targets.sales[index]"
-                      @input="updateMonthlyTarget('sales', index, $event.target.value)"
-                      class="w-full text-right border-round-lg border-1 surface-border focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <input
-                      type="number"
-                      :value="editingData.targets.collections[index]"
-                      @input="updateMonthlyTarget('collections', index, $event.target.value)"
-                      class="w-full text-right border-round-lg border-1 surface-border focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
-                  </td>
-                </tr>
-              </tbody>
-              <tfoot class="surface-100">
-                <tr>
-                  <td class="px-6 py-4"></td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-900">Total</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-900">
-                    {{ editingData.targets.sales.reduce((a, b) => a + b, 0)) }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-900">
-                    {{ editingData.targets.collections.reduce((a, b) => a + b, 0)) }}
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
-          </div> -->
-
-          <DataTable :value="months" :paginator="months.length > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" class="">
-            <template #empty>
-              <div class="flex justify-content-center align-items-center font-bold text-lg">No Data Available</div>
-            </template>
-
-            <Column field="" header="#">
-              <template #body="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md">
-                    {{ slotProps.index + 1 }}
-                  </div>
-                </div>
-              </template>
-
-              <template #footer="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md text-green-600"></div>
-                </div>
-              </template>
-            </Column>
-
-            <Column header="Month" field="month">
-              <template #body="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md">
-                    {{ slotProps.data }}
-                  </div>
-                </div>
-              </template>
-
-              <template #footer="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md text-green-600">Total</div>
-                </div>
-              </template>
-            </Column>
-
-            <Column header="Sales Target" field="month">
-              <template #body="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <input
-                    type="number"
-                    v-model="selectedRep.targets.sales[slotProps.index]"
-                    @input="updateMonthlyTarget('sales', slotProps.index, selectedRep.targets.sales[slotProps.index])"
-                    class="p-2 w-full outline-none border-0 h-full text-right border-round-lg border-1 surface-border focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-              </template>
-
-              <template #footer="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md text-green-600">
-                    {{ selectedRep.targets.sales.reduce((a, b) => a + b, 0) }}
-                  </div>
-                </div>
-              </template>
-            </Column>
-
-            <Column header="Collection Target" field="month">
-              <template #body="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <input
-                    type="number"
-                    v-model="selectedRep.targets.collections[slotProps.index]"
-                    @input="updateMonthlyTarget('collections', slotProps.index, selectedRep.targets.sales[slotProps.index])"
-                    class="p-2 w-full outline-none text-right border-round-lg border-1 surface-border focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </template>
-
-              <template #footer="slotProps">
-                <div class="flex flex-column align-items-start">
-                  <div class="text-md text-green-600">
-                    {{ selectedRep.targets.collections.reduce((a, b) => a + b, 0) }}
-                  </div>
-                </div>
-              </template>
-            </Column>
-          </DataTable>
-
-          <!-- Action Buttons -->
-          <div class="flex justify-content-end gap-3">
-            <div @click="cancelEdit" class="cursor-pointer px-4 py-2 border-1 surface-border border-round-lg hover:surface-100 transition-colors">Cancel</div>
-            <div @click="saveChanges" class="cursor-pointer px-4 py-2 bg-blue-600 text-white border-round-lg hover:bg-blue-700 transition-colors">Save Changes</div>
-          </div>
+        <div v-if="isEditing" class="flex justify-content-end gap-3 mt-4">
+          <button 
+            @click="cancelEdit" 
+            class="px-4 py-2 border-1 surface-border border-round-lg hover:surface-100 transition-colors"
+          >
+            Cancel
+          </button>
         </div>
       </div>
     </div>
@@ -497,7 +312,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-/* Custom number input styles */
 input[type='number'] {
   -moz-appearance: textfield;
 }
