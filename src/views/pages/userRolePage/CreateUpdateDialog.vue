@@ -54,8 +54,8 @@ const togglePasswordConfirmVisibility = () => {
 const passwordConfirmFieldType = computed(() => (isPasswordConfirmVisible.value ? 'text' : 'password'));
 
 const typeSchema = yup.object({
-    firstName: yup.string().min(6, t('CreateUpdateUsersRoles.nameMinError')).required(t('CreateUpdateUsersRoles.requiredError')),
-    lastName: yup.string().min(6, t('CreateUpdateUsersRoles.nameMinError')).required(t('CreateUpdateUsersRoles.requiredError')),
+    firstName: yup.string().min(2, t('CreateUpdateUsersRoles.nameMinError')).required(t('CreateUpdateUsersRoles.requiredError')),
+    lastName: yup.string().min(2, t('CreateUpdateUsersRoles.nameMinError')).required(t('CreateUpdateUsersRoles.requiredError')),
     email: yup
         .string()
         .min(6, t('CreateUpdateUsersRoles.userNameMinError'))
@@ -184,7 +184,7 @@ getBranchs();
 </script>
 
 <template>
-    <Dialog :breakpoints="{ '640px': '40rem' }" :header="t('CreateUpdateUsersRoles.header')" :class="containerClass" :style="{ width: '50rem' }" :modal="true" :closable="false">
+    <Dialog :breakpoints="{ '640px': '45rem' }" :header="t('CreateUpdateUsersRoles.header')" :class="containerClass" :style="{ width: '70rem' }" :modal="true" :closable="false">
         <div class="flex flex-column gap-3 p-4">
             <div class="flex gap-2 border-1 p-4 border-round-lg overflow-scroll scroll-container">
                 <div class="field flex flex-column w-4">
@@ -202,7 +202,7 @@ getBranchs();
                     >
                         <template #option="slotProps">
                             <div class="flex align-items-center mx-auto gap-3">
-                                <div>{{ slotProps.option }}</div>
+                                <div>{{ slotProps.option.name }}</div>
                             </div>
                         </template>
                     </Dropdown>
@@ -254,7 +254,7 @@ getBranchs();
                     <small v-if="errors.organization" class="text-red-600">{{ errors.organization }}</small>
                 </div>
 
-                <div class="field flex flex-column w-4">
+                <!-- <div class="field flex flex-column w-4">
                     <label for="organization" class="mb-3 required">{{ $t('CreateUpdateUsersRoles.branchs') }}</label>
                     <Dropdown v-model="branchs" v-bind="branchsAttrs" :virtualScrollerOptions="{ itemSize: 38 }" :options="branchs" filter :loading="false" optionLabel="name" :placeholder="t('CreateUpdateUsersRoles.branchs')" class="w-full">
                         <template #option="slotProps">
@@ -264,7 +264,7 @@ getBranchs();
                         </template>
                     </Dropdown>
                     <small v-if="errors.organization" class="text-red-600">{{ errors.branchs }}</small>
-                </div>
+                </div> -->
             </div>
 
             <div class="flex gap-2 border-1 p-4 border-round-lg">
