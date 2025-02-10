@@ -194,7 +194,7 @@ onMounted(() => {
 
       <!-- Main Content -->
       <div v-if="selectedRep" class="surface-card border-round-xl border-1 surface-border p-4">
-        <div class="flex align-items-center justify-content-between">
+        <div class="flex align-items-center justify-content-between"> 
           <div class="flex flex-column gap-2">
             <h3 class="text-lg font-semibold text-900">{{ salesGoalsStore.salesReps.find((rep) => rep.id === selectedRepId)?.name }}</h3>
             <div class="flex align-items-center gap-6">
@@ -241,18 +241,28 @@ onMounted(() => {
                   'bg-yellow-500': creditStatus.status === 'warning',
                   'bg-green-500': creditStatus.status === 'normal'
                 }"
-                :style="{ width: `${creditStatus.usagePercentage}%` }"
+                :style="{ width: `${Math.min(creditStatus.usagePercentage, 100)}%` }"
               ></div>
             </div>
           </div>
+          <div  class="flex justify-content-end gap-3 mt-4">
+          <button v-if="isEditing"
+            @click="cancelEdit" 
+            class="p-button p-button-warning"
+          >
+            Cancel
+          </button>
           <button 
             @click="isEditing ? saveChanges() : startEdit()" 
-            class="px-4 py-2 bg-blue-600 cursor-pointer text-white border-round-lg hover:bg-blue-700 transition-colors"
+            class="p-button p-button-primary"
            
           >
             {{ isEditing ? 'Save Targets' : 'Edit Targets' }}
           </button>
         </div>
+        </div>
+
+        
 
         <div class="overflow-x-auto mt-4 border-round-lg border-1 border-gray-200">
           <DataTable :value="months">
@@ -308,14 +318,7 @@ onMounted(() => {
           </DataTable>
         </div>
 
-        <div v-if="isEditing" class="flex justify-content-end gap-3 mt-4">
-          <button 
-            @click="cancelEdit" 
-            class="px-4 py-2 border-1 surface-border border-round-lg hover:surface-100 transition-colors"
-          >
-            Cancel
-          </button>
-        </div>
+    
       </div>
     </div>
   </div>
