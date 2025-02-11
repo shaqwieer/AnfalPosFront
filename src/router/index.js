@@ -41,6 +41,9 @@ const router = createRouter({
         {
           path: 'Session-analytics',
           name: 'Sessions',
+          meta: {
+            breadcrumb: ['Session Managment']
+          },
           component: () => import('@/views/pages/session/SessionManagement.vue')
         },
         {

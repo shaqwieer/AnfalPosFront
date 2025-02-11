@@ -139,7 +139,7 @@
     "updateButton": "تحديث",
     "cancelButton": "إلغاء",
     "requiredError": "هذا الحقل مطلوب",
-    "nameMinError": "يجب أن يحتوي الاسم على الأقل 6 أحرف",
+    "nameMinError": "يجب أن يحتوي الاسم على الأقل 2\\ أحرف",
     "userNameMinError": "يجب أن يحتوي اسم المستخدم على الأقل 6 أحرف",
     "passwordNotMatch": "كلمة المرور وتأكيد كلمة المرور غير متطابقتين",
     "emailInvalidError": "يجب أن يكون على شكل البريد الالكترونى",

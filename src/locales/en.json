@@ -139,7 +139,7 @@
     "updateButton": "Update",
     "cancelButton": "Cancel",
     "requiredError": "This field is required",
-    "nameMinError": "Name must be at least 6 characters",
+    "nameMinError": "Name must be at least 2 characters",
     "userNameMinError": "User name must be at least 6 characters",
     "passwordNotMatch": "Password and Confirm Password do not match",
     "emailInvalidError": "It Must Be Email",
