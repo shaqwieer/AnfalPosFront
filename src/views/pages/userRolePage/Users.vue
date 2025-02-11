@@ -28,6 +28,7 @@ const updateAddDialogVisible = ref(false);
 const updateData = ref({});
 const isAddFlag = ref(true);
 const toggleCreateEditDialog = (addFlag, data, close) => {
+    debugger;
     if (!addFlag && !close) {
         updateData.value = data;
         isAddFlag.value = false;
