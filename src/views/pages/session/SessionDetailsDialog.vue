@@ -40,7 +40,7 @@ const closeDialog = () => {
 
 <template>
   <Dialog
-    :header="t('Session.Details') + ' ' + session.saleId"
+    :header="t('Session.Details') + ' #' + session.sessionId + ' - ' + session.saleName + (session.isSessionLate ? '(Late Session)' : '')"
     :pt="{
       root: 'border-none',
       mask: {
@@ -65,7 +65,6 @@ const closeDialog = () => {
             <p class="font-medium">{{ session.sessionEndDate }}</p>
           </div>
         </div>
-
         <!-- Payment Methods -->
         <div class="grid grid-cols-3 gap-2 mb-4">
           <div>
@@ -122,8 +121,8 @@ const closeDialog = () => {
 
         <!-- Action Buttons -->
         <div class="flex justify-content-end gap-3">
-          <Button v-if="session.statusName === 'Closed'" class="px-4 py-2 bg-red-600 text-white border-0 hover:bg-red-700" @click="RejectSession(session)">{{ t('Session.Reject') }}</Button>
-          <Button v-if="session.statusName === 'Closed'" class="px-4 py-2 bg-green-600 text-white border-0 hover:bg-green-700" @click="ApproveSession(session)">{{ t('Session.Approve') }}</Button>
+          <Button v-if="session.statusId === 4" class="px-4 py-2 bg-red-600 text-white border-0 hover:bg-red-700" @click="RejectSession(session)">{{ t('Session.Reject') }}</Button>
+          <Button v-if="session.statusId === 4" class="px-4 py-2 bg-green-600 text-white border-0 hover:bg-green-700" @click="ApproveSession(session)">{{ t('Session.Approve') }}</Button>
         </div>
       </div>
 
