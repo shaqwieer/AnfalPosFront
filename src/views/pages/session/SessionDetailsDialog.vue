@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import InputText from 'primevue/inputtext';
 import { useSessionStore } from '../../../stores/sessionStore';
 
 import { useI18n } from 'vue-i18n';
+import { ref, computed, onMounted } from 'vue';
 const { t } = useI18n();
 
 const props = defineProps({
@@ -17,6 +17,7 @@ const props = defineProps({
 const emit = defineEmits(['close']);
 
 const sessionStore = useSessionStore();
+const selectedDocument = ref('');
 const RejectSession = (session) => {
   const payload = {
     shiftSessionId: session.sessionId,
@@ -36,104 +37,175 @@ const ApproveSession = (session) => {
 const closeDialog = () => {
   emit('close');
 };
+const Rtl = localStorage.getItem('Rtl') === 'true';
+const formatPrice = (price: number | undefined | null): string => {
+  return (
+    price?.toLocaleString(Rtl ? 'ar-SA' : 'en-US', {
+      style: 'currency',
+      currency: 'SAR',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) || '0.00'
+  );
+};
+const sessionData = computed(() => sessionStore.selectedSession);
+onMounted(() => {
+  sessionStore.GetSessionDetails(props.session.sessionId);
+});
 </script>
 
 <template>
-  <Dialog
-    :header="t('Session.Details') + ' #' + session.sessionId + ' - ' + session.saleName + (session.isSessionLate ? '(Late Session)' : '')"
-    :pt="{
-      root: 'border-none',
-      mask: {
-        style: 'background: #5b5b5b3b'
-      }
-    }"
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-  >
-    <div class="bg-white rounded-xl w-full max-w-5xl max-h-[90vh] flex">
-      <!-- Left Side - Session Details -->
-      <div class="flex-1 p-3 border-right-1 border-gray-300 overflow-y-auto">
-        <!-- Header -->
-
-        <!-- Session Info -->
-        <div class="grid grid-cols-2 gap-6 mb-6">
-          <div>
-            <p class="text-sm text-gray-500">{{ t('Session.Start') }}</p>
-            <p class="font-medium">{{ session.sessionStartDate }}</p>
+  <Dialog modal style="min-width: 70vw" :header="t('Session.Details') + ' #' + session.sessionId + ' - ' + session.saleName + (session.isSessionLate ? '(Late Session)' : '')">
+    <div class="flex">
+      <div class="flex flex-column gap-3 w-full">
+        <span class="font-light text-gray-400">{{ session.sessionStartDate + ' - ' + session.sessionEndDate }}</span>
+        <div class="flex flex-column w-full gap-2 p-3 bg-gray-100 border-round-md">
+          <span class="font-bold text-lg">Cash Transactions</span>
+          <div class="flex flex-row justify-content-between w-full">
+            <span class="font-medium">Cash Carried Forward</span>
+            <span>{{ formatPrice(sessionData.cashCarriedForward) }}</span>
           </div>
-          <div>
-            <p class="text-sm text-gray-500">{{ t('Session.Close') }}</p>
-            <p class="font-medium">{{ session.sessionEndDate }}</p>
+          <div class="flex flex-row justify-content-between w-full">
+            <span class="font-medium">Cash Recieved</span>
+            <span>{{ formatPrice(sessionData.cashReceived) }}</span>
           </div>
-        </div>
-        <!-- Payment Methods -->
-        <div class="grid grid-cols-3 gap-2 mb-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"> {{ t('Session.Cash') }}</label>
-            <inputText type="number" v-model="session.cash" class="w-full rounded-lg border-gray-300" :disabled="session.statusName === 'IN_APPROVAL'" />
+          <div class="flex flex-row justify-content-between w-full">
+            <span class="font-medium">Total Cash</span>
+            <span>{{ formatPrice(sessionData.cashCarriedForward + sessionData.cashReceived) }}</span>
           </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"> {{ t('Session.Card') }}</label>
-            <inputText type="number" v-model="session.card" class="w-full rounded-lg border-gray-300" :disabled="session.statusName === 'IN_APPROVAL'" />
+          <hr />
+          <div class="flex flex-row justify-content-between w-full">
+            <span class="font-medium">Expenses</span>
+            <span>{{ formatPrice(sessionData.expenses) }}</span>
           </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"> {{ t('Session.Bank') }}</label>
-            <inputText type="number" v-model="session.bank" class="w-full rounded-lg border-gray-300" :disabled="session.statusName === 'IN_APPROVAL'" />
+          <div class="flex flex-row justify-content-between w-full text-red-500">
+            <span class="font-medium">Customer Incentive</span>
+            <span>{{ '-' + formatPrice(sessionData.customerIncentive) }}</span>
           </div>
-        </div>
-
-        <!-- Deposit Info -->
-        <div class="grid grid-cols-2 gap-4 mb-2">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"> {{ t('Session.DepositAmount') }}</label>
-            <inputText type="number" v-model="session.depositAmount" class="w-full rounded-lg border-gray-300" :disabled="session.statusName === 'IN_APPROVAL'" />
+          <div class="flex flex-row justify-content-between w-full text-red-500">
+            <span class="font-medium">Remaining Cash</span>
+            <span>{{ '-' + formatPrice(sessionData.cashCarriedForward + sessionData.cashReceived - sessionData.expenses - sessionData.customerIncentive) }}</span>
           </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1"> {{ t('Session.Discrepancy') }}</label>
-            <inputText type="number" v-model="session.discrepancy" class="w-full rounded-lg border-gray-300" :disabled="session.statusName === 'IN_APPROVAL'" />
+          <div class="flex flex-row justify-content-between w-full">
+            <span class="font-medium">Deposit Amount</span>
+            <span>{{ formatPrice(sessionData.depositAmount) }}</span>
+          </div>
+          <div class="flex flex-row justify-content-between w-full">
+            <span class="font-medium">Discrepancy</span>
+            <span>{{ formatPrice(sessionData.cashCarriedForward + sessionData.cashReceived - sessionData.expenses - sessionData.customerIncentive - sessionData.depositAmount) }}</span>
           </div>
         </div>
-
-        <!-- Notes -->
-        <div class="mb-2">
-          <label class="block text-sm font-medium text-gray-700 mb-1"> {{ t('Session.Notes') }}</label>
-          <Textarea v-model="session.notes" rows="3" class="w-full rounded-lg border-gray-300 resize-none" :disabled="session.statusName === 'IN_APPROVAL'"> </Textarea>
+        <div class="flex flex-row gap-3 w-full">
+          <div class="flex flex-column w-full p-3 bg-gray-100 border-round-md">
+            <span class="font-semibold"> Card Payments </span>
+            <span class="text-black font-bold text-2xl"> {{ formatPrice(sessionData.cardPayment) }}</span>
+          </div>
+          <div class="flex flex-column w-full p-3 bg-gray-100 border-round-md">
+            <span class="font-semibold"> Bank Transfers </span>
+            <span class="text-black font-bold text-2xl"> {{ formatPrice(sessionData.bankTransfers) }}</span>
+          </div>
         </div>
-
-        <!-- Attachments -->
-        <div class="mb-2">
-          <label class="block text-sm font-medium text-gray-700 mb-1"> {{ t('Session.Attachments') }}</label>
-          <div class="border-1 border-gray-300 border-round-lg p-4">
-            <div v-if="session?.details?.attachments.length" class="flex flex-column gap-2">
-              <div v-for="attachment in session.details.attachments" :key="attachment" class="flex align-items-center justify-content-between p-2 bg-gray-50 border-round-md">
-                <span class="text-sm">{{ attachment }}</span>
-                <Button text size="large" icon="pi pi-download"> </Button>
+        <div class="flex flex-column w-full p-3 bg-gray-100 border-round-md">
+          <span class="font-semibold"> Session Total </span>
+          <span class="text-black font-bold text-2xl"> {{ formatPrice(session.sessionTotal) }}</span>
+        </div>
+        <div class="flex flex-column gap-1 w-full p-3 border-1 border-gray-300 border-round-md">
+          <span class="font-semibold text-lg">Deposit Attachments</span>
+          <DataTable
+            class="surface-card border-round-lg shadow-1 border-1 surface-border"
+            :value="sessionData.shiftCashDeposits"
+            :paginator="true"
+            :rows="5"
+            :rowsPerPageOptions="[5, 10, 25]"
+            dataKey="id"
+            :globalFilterFields="['name', 'id']"
+            :currentPageReportTemplate="''"
+          >
+            <template #empty>
+              <div class="flex justify-content-center align-items-center font-bold text-lg">
+                {{ 'No Deposits' }}
               </div>
-            </div>
-            <div v-else class="text-sm text-gray-500 text-center py-2">{{ t('Session.Noattachments') }}</div>
-          </div>
+            </template>
+            <Column field="depositNo" header="Deposit No." class="" :sortable="true">
+              <template #body="slotProps">
+                <div class="flex text-lg">{{ slotProps.data.depositNo }}</div>
+              </template>
+            </Column>
+            <Column field="createdAt" header="Date" class="" :sortable="true">
+              <template #body="slotProps">
+                <div class="flex text-lg">{{ new Date(slotProps.data.createdAt).toLocaleDateString('en-GB') }}</div>
+              </template>
+            </Column>
+            <Column field="depositAmount" header="Amount" class="" :sortable="true">
+              <template #body="slotProps">
+                <div class="flex text-lg">{{ formatPrice(slotProps.data.depositAmount) }}</div>
+              </template>
+            </Column>
+            <Column field="attachmentUrl" header="Attachment" class="w-1rem" :sortable="true">
+              <template #body="slotProps">
+                <div class="flex align-items-center justify-content-center">
+                  <div @click="selectedDocument = slotProps.data.attachmentUrl" class="cursor-pointer border-circle border-1 surface-border flex align-items-center justify-content-center w-3rem h-3rem hover:bg-gray-100">
+                    <i class="pi pi-file"></i>
+                  </div>
+                </div>
+              </template>
+            </Column>
+          </DataTable>
         </div>
-
-        <!-- Deposit Number -->
-        <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('Session.DepositNo') }}</label>
-          <InputText type="text" v-model="session.depositRefCode" class="w-full rounded-lg border-gray-300" :disabled="session.statusName === 'IN_APPROVAL'" />
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="flex justify-content-end gap-3">
-          <Button v-if="session.statusId === 4" class="px-4 py-2 bg-red-600 text-white border-0 hover:bg-red-700" @click="RejectSession(session)">{{ t('Session.Reject') }}</Button>
-          <Button v-if="session.statusId === 4" class="px-4 py-2 bg-green-600 text-white border-0 hover:bg-green-700" @click="ApproveSession(session)">{{ t('Session.Approve') }}</Button>
+        <div class="flex flex-column gap-1 w-full p-3 border-1 border-gray-300 border-round-md">
+          <span class="font-semibold text-lg">Transactions</span>
+          <DataTable
+            class="surface-card border-round-lg shadow-1 border-1 surface-border"
+            :value="sessionData.transactions"
+            :paginator="true"
+            :rows="5"
+            :rowsPerPageOptions="[5, 10, 25]"
+            dataKey="id"
+            :globalFilterFields="['name', 'id']"
+            :currentPageReportTemplate="''"
+          >
+            <template #empty>
+              <div class="flex justify-content-center align-items-center font-bold text-lg">
+                {{ 'No Transactions' }}
+              </div>
+            </template>
+            <Column field="id" header="Transaction ID" class="" :sortable="true">
+              <template #body="slotProps">
+                <div class="flex text-lg">{{ slotProps.data.id }}</div>
+              </template>
+            </Column>
+            <Column field="createdAt" header="Date" class="" :sortable="true">
+              <template #body="slotProps">
+                <div class="flex text-lg">{{ new Date(slotProps.data.createdAt).toLocaleDateString('en-GB') }}</div>
+              </template>
+            </Column>
+            <Column field="amount" header="Amount" class="" :sortable="true">
+              <template #body="slotProps">
+                <div class="flex text-lg">{{ formatPrice(slotProps.data.amount) }}</div>
+              </template>
+            </Column>
+            <Column field="attachmentUrl" header="Attachment" class="w-1rem" :sortable="true">
+              <template #body="slotProps">
+                <div class="flex align-items-center justify-content-center">
+                  <div
+                    v-if="slotProps.data.attachmentUrl"
+                    @click="selectedDocument = slotProps.data.attachmentUrl"
+                    class="cursor-pointer border-circle border-1 surface-border flex align-items-center justify-content-center w-3rem h-3rem hover:bg-gray-100"
+                  >
+                    <i class="pi pi-file"></i>
+                  </div>
+                  <div v-else class="flex w-11 justify-content-center align-items-center bg-white text-sm text-red-600">No Attachment</div>
+                </div>
+              </template>
+            </Column>
+          </DataTable>
         </div>
       </div>
-
-      <!-- Right Side - PDF/Image Viewer -->
-      <div class="w-6 bg-gray-100 p-6 flex flex-column">
-        <h3 class="text-lg font-medium mb-4">{{ t('Session.AttachmentsPreview') }}</h3>
-        <div class="flex-1 bg-white border-1 border-gray-300 border-round-lg flex align-items-center justify-content-center">
-          <div class="text-center text-gray-500">
-            <i class="pi pi-file text-6xl mb-2"></i>
-            <p>{{ t('Session.Selectanattachmenttopreview') }}</p>
-          </div>
+      <div class="flex flex-column gap-1 w-full px-3">
+        <span class="font-semibold text-2xl">Attachment</span>
+        <iframe v-if="selectedDocument" class="w-full" style="height: 90%" :src="selectedDocument" frameborder="0"></iframe>
+        <div v-else class="flex w-full h-full justify-content-center align-items-center font-bold text-lg bg-gray-100 border-round-md">
+          <div style="height: 95%" class="flex w-11 justify-content-center align-items-center bg-white text-4xl">No Attachment Selected</div>
         </div>
       </div>
     </div>

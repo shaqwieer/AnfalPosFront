@@ -8,6 +8,7 @@ export const useSessionStore = defineStore({
   state: () => ({
     sessions: <any[]>[],
     sessionData: <any>{},
+    selectedSession: <any>{},
     salesReps: [],
     attachmentTypes: <any[]>[],
     loading: useLoadingStore(),
@@ -21,6 +22,14 @@ export const useSessionStore = defineStore({
 
         this.sessionData = response.data.data;
         this.sessions = response.data.data.sessionSales;
+      } catch (err) {
+        this.error = handleError(err, this.loading);
+      }
+    },
+    async GetSessionDetails(payload) {
+      try {
+        const response = await apiClient.get('/ShiftSessions/GetSessionDetailForSpecificSession/' + payload);
+        this.selectedSession = response.data.data;
       } catch (err) {
         this.error = handleError(err, this.loading);
       }
