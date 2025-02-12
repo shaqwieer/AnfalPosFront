@@ -147,9 +147,14 @@ onMounted(() => {
             <Column field="attachmentUrl" header="Attachment" class="w-1rem" :sortable="true">
               <template #body="slotProps">
                 <div class="flex align-items-center justify-content-center">
-                  <div @click="selectedDocument = slotProps.data.attachmentUrl" class="cursor-pointer border-circle border-1 surface-border flex align-items-center justify-content-center w-3rem h-3rem hover:bg-gray-100">
+                  <div
+                    v-if="slotProps.data.attachmentUrl"
+                    @click="selectedDocument = slotProps.data.attachmentUrl"
+                    class="cursor-pointer border-circle border-1 surface-border flex align-items-center justify-content-center w-3rem h-3rem hover:bg-gray-100"
+                  >
                     <i class="pi pi-file"></i>
                   </div>
+                  <div v-else class="flex w-11 justify-content-center align-items-center bg-white text-sm text-red-600">No Attachment</div>
                 </div>
               </template>
             </Column>
@@ -202,6 +207,10 @@ onMounted(() => {
               </template>
             </Column>
           </DataTable>
+        </div>
+        <div class="flex justify-content-end gap-3">
+          <Button v-if="session.statusId === 4" class="px-4 py-2 bg-red-600 text-white border-0 hover:bg-red-700" @click="RejectSession(session)">{{ t('Session.Reject') }}</Button>
+          <Button v-if="session.statusId === 4" class="px-4 py-2 bg-green-600 text-white border-0 hover:bg-green-700" @click="ApproveSession(session)">{{ t('Session.Approve') }}</Button>
         </div>
       </div>
       <div class="flex flex-column gap-1 w-full px-3">

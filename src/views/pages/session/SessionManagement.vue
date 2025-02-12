@@ -99,13 +99,13 @@ const formatPrice = (price: number | undefined | null): string => {
 const getStatusColor = (status) => {
   switch (status) {
     case 4:
-      return 'bg-green-100 text-green-800';
+      return 'bg-blue-100 text-blue-800';
     case 5:
       return 'bg-yellow-100 text-yellow-800';
     case 6:
       return 'bg-blue-100 text-blue-800';
     case 7:
-      return 'bg-blue-100 text-blue-800';
+      return 'bg-green-100 text-green-800';
     default:
       return 'bg-gray-100 text-gray-800';
   }
@@ -208,19 +208,44 @@ onMounted(() => {
       </div>
 
       <!-- Summary Cards -->
-      <div class="grid row-gap-2">
+      <div class="flex flex-row gap-4 p-4">
         <!-- Open Sessions -->
-        <div class="col-12 sm:col-6 lg:col-3 xl:col-3">
-          <div class="bg-green-50 border-round-lg border-green-400 border-1 p-4 h-full">
-            <div class="text-md font-medium text-green-600">{{ t('Session.OpenSessions') }}</div>
-            <div class="text-3xl font-bold text-green-700">
-              {{ sessionStore.sessionData?.openSession }}
+        <div style="width: 20%">
+          <div class="bg-blue-50 border-round-lg shadow-1 border-blue-200 border-1 pl-4 pt-4 pr-3 pb-3 h-full flex flex-row justify-content-between">
+            <div>
+              <div class="text-md font-medium text-blue-500">{{ t('Session.OpenSessions') }}</div>
+              <div class="text-3xl font-bold text-blue-500">
+                {{ sessionStore.sessionData?.openSession }}
+              </div>
+            </div>
+            <div class="flex flex-column w-7 justify-content-end">
+              <div className="flex align-items-center justify-content-between">
+                <div className="flex align-items-center gap-2">
+                  <i class="pi pi-check-circle text-green-600 text-lg" />
+                  <span className="text-green-600 font-semibold text-lg">On Track</span>
+                </div>
+                <span className="font-semibold text-green-600 text-lg">{{ sessionStore.sessionData?.openSession - sessionStore.sessionData?.oldSession }}</span>
+              </div>
+              <div className="flex align-items-center justify-content-between">
+                <div className="flex align-items-center gap-2">
+                  <i class="pi pi-exclamation-circle text-orange-500 text-lg" />
+                  <span className="text-orange-500 text-lg font-semibold">Late</span>
+                </div>
+                <span className="font-semibold text-orange-500 text-lg">{{ sessionStore.sessionData?.oldSession }}</span>
+              </div>
             </div>
           </div>
         </div>
-
+        <div style="width: 20%">
+          <div class="bg-yellow-50 border-round-lg shadow-1 border-yellow-200 border-1 p-4 h-full">
+            <div class="text-md font-medium text-yellow-600">{{ 'Closed Sessions' }}</div>
+            <div class="text-3xl font-bold text-yellow-600">
+              {{ sessionStore.sessionData?.pendingSession }}
+            </div>
+          </div>
+        </div>
         <!-- Pending Sessions -->
-        <div class="col-12 sm:col-6 lg:col-3 xl:col-3">
+        <div style="width: 20%">
           <div class="bg-orange-50 border-round-lg shadow-1 border-orange-200 border-1 p-4 h-full">
             <div class="text-md font-medium text-orange-600">{{ t('Session.PendingSessions') }}</div>
             <div class="text-3xl font-bold text-orange-600">
@@ -229,25 +254,23 @@ onMounted(() => {
           </div>
         </div>
 
-        <!-- Total Amount -->
-        <div class="col-12 sm:col-6 lg:col-3 xl:col-3">
-          <div class="bg-blue-50 border-round-lg shadow-1 border-blue-200 border-1 p-4 h-full">
-            <div class="text-md font-medium text-blue-500">{{ t('Session.TotalAmount') }}</div>
-            <div class="text-3xl font-bold text-blue-500">{{ formatPrice(Number(sessionStore.sessionData?.totalAmount)) }}</div>
-          </div>
-        </div>
-
         <!-- Old Sessions -->
-        <div class="col-12 sm:col-6 lg:col-3 xl:col-3">
-          <div class="bg-red-50 border-round-lg shadow-1 border-red-200 border-1 p-4 h-full">
-            <div class="text-md font-medium text-red-600">{{ t('Session.OldSessions') }}</div>
-            <div class="text-3xl font-bold text-red-600">
+        <div style="width: 20%">
+          <div class="bg-green-50 border-round-lg border-green-400 border-1 p-4 h-full">
+            <div class="text-md font-medium text-green-600">{{ 'Approved Sessions' }}</div>
+            <div class="text-3xl font-bold text-green-700">
               {{ sessionStore.sessionData?.oldSession }}
             </div>
           </div>
         </div>
-      </div>
 
+        <div style="width: 20%">
+          <div class="bg-purple-50 border-round-lg shadow-1 border-purple-200 border-1 p-4 h-full">
+            <div class="text-md font-medium text-purple-500">{{ t('Session.TotalAmount') }}</div>
+            <div class="text-3xl font-bold text-purple-500">{{ formatPrice(Number(sessionStore.sessionData?.totalAmount)) }}</div>
+          </div>
+        </div>
+      </div>
       <!-- Sessions View -->
 
       <div class="bg-white border-round-lg border-1 border-gray-300 overflow-hidden mx-3">
