@@ -54,7 +54,7 @@ const branchSchema = yup.object({
     branchType: yup.mixed().required(t('branchDialog.requiredError')),
     country: yup.mixed().required(t('branchDialog.requiredError')),
 
-    accountantEmail: yup.string().required(t('branchDialog.requiredError')),
+    salesRepCode: yup.string().required(t('branchDialog.requiredError')),
     sapStorageLocation: yup.mixed().nullable(),
     cashCustomer: yup.mixed().nullable(),
     profitCenter: yup.mixed().nullable(),
@@ -69,7 +69,7 @@ const informationInitial = ref({
     address: '',
     primaryPhone: '',
     secondaryPhone: '',
-    accountantEmail: '',
+    salesRepCode: '',
     city: null,
     country: null,
     branchType: null,
@@ -101,7 +101,7 @@ const [city, cityAttrs] = defineField('city');
 const [branchType, branchTypeAttrs] = defineField('branchType');
 const [country, countryAttrs] = defineField('country');
 
-const [accountantEmail, accountantEmailAttrs] = defineField('accountantEmail');
+const [salesRepCode, salesRepCodeAttrs] = defineField('salesRepCode');
 const [sapStorageLocation, sapStorageLocationAttrs] = defineField('sapStorageLocation');
 const [cashCustomer, cashCustomerAttrs] = defineField('cashCustomer');
 const [profitCenter, profitCenterAttrs] = defineField('profitCenter');
@@ -122,7 +122,7 @@ const createData = handleSubmit(async (validatedInfo) => {
             "BankAccountNo": validatedInfo.bankAccountNo || null,
 
             "SecondaryPhone": validatedInfo.secondaryPhone || null,
-            "AccountantEmail": validatedInfo.accountantEmail || null,
+            "SalesRepCode": validatedInfo.salesRepCode || null,
             "CashCustomer": validatedInfo.cashCustomer || null,
             "BranchTypeId": validatedInfo.branchType?.id || 0,
             "CountryId": validatedInfo.country?.id || 0,
@@ -147,7 +147,7 @@ const updateData = handleSubmit(async (validatedInfo) => {
             "BankAccountNo": validatedInfo.bankAccountNo || null,
 
             "SecondaryPhone": validatedInfo.secondaryPhone || null,
-            "AccountantEmail": validatedInfo.accountantEmail || null,
+            "SalesRepCode": validatedInfo.salesRepCode || null,
             "CashCustomer": validatedInfo.cashCustomer || null,
             "BranchTypeId": validatedInfo.branchType?.id || 0,
             "CountryId": validatedInfo.country?.id || 0,
@@ -167,7 +167,7 @@ const setFormValues = () => {
         address: props.selectedData.address,
         primaryPhone: props.selectedData.primaryPhone,
         secondaryPhone: props.selectedData.secondaryPhone,
-        accountantEmail: props.selectedData.accountantEmail,
+        salesRepCode: props.selectedData.salesRepCode,
         sapStorageLocation: null,
         cashCustomer: null,
         profitCenter: null,
@@ -328,9 +328,9 @@ watch(
                         <small v-if="errors.cashCustomer" class="text-red-600">{{ errors.cashCustomer }}</small>
                     </div>
                     <div class="field flex flex-column w-6 p-2">
-                        <label for="accountantEmail" class="required">{{ $t('cityDialog.accountantEmail') }}</label>
-                        <InputText id="accountantEmail" v-model="accountantEmail" v-bind="accountantEmailAttrs" autofocus :invalid="!!errors.accountantEmail" />
-                        <small v-if="errors.accountantEmail" class="text-red-600">{{ errors.accountantEmail }}</small>
+                        <label for="SalesRepCode" class="required">Sales Rep Code</label>
+                        <InputText id="SalesRepCode" v-model="salesRepCode" v-bind="salesRepCodeAttrs" autofocus :invalid="!!errors.salesRepCode" />
+                        <small v-if="errors.salesRepCode" class="text-red-600">{{ errors.salesRepCode }}</small>
                     </div>
                 </div>
             </div>

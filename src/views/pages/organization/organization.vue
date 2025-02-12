@@ -157,7 +157,7 @@ const addData = async (data) => {
         <template #subtitle>
           <div class="flex justify-content-between p-0">
             <span class="text-base text-400 font-semibold">{{ data.organizationTypeName }}</span>
-            <Tag :severity="!data.isDeActivated ? 'success' : 'danger'" :value="!data.isDeActivated ? `${t('organizationActive')}` : `${t('organizationDeactivated')}`"></Tag>
+            <Tag :class="!data.isDeActivated ? 'bg-green-100 text-green-800' : 'danger'" :value="!data.isDeActivated ? `${t('organizationActive')}` : `${t('organizationDeactivated')}`"></Tag>
           </div>
         </template>
         <template #footer>

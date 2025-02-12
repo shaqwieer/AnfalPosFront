@@ -32,7 +32,7 @@ const months = ref([
   { name: 'June', id: 6 },
   { name: 'July', id: 7 },
   { name: 'August', id: 8 },
-  { name: 'September', id: 9 },  
+  { name: 'September', id: 9 },
   { name: 'October', id: 10 },
   { name: 'November', id: 11 },
   { name: 'December', id: 12 }
@@ -176,7 +176,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="p-6">
+  <div class="p-6" @click="testx()">
     <div class="max-w-7xl mx-auto">
       <!-- Header -->
       <div class="flex align-items-center justify-content-between mb-6">
