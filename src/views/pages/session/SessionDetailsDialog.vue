@@ -55,9 +55,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <Dialog modal style="min-width: 70vw" :header="t('Session.Details') + ' #' + session.sessionId + ' - ' + session.saleName + (session.isSessionLate ? '(Late Session)' : '')">
+  <Dialog modal style="min-width: 70vw" :header="t('Session.Details')">
     <div class="flex">
       <div class="flex flex-column gap-3 w-full">
+        <span class="font-bold text-xl"
+          >{{ '#' + session.sessionId + ' - ' + session.saleName }}<span class="text-red-500">{{ session.isSessionLate ? ' (Late Session)' : '' }}</span></span
+        >
         <span class="font-light text-gray-400">{{ session.sessionStartDate + ' - ' + session.sessionEndDate }}</span>
         <div class="flex flex-column w-full gap-2 p-3 bg-gray-100 border-round-md">
           <span class="font-bold text-lg">Cash Transactions</span>
