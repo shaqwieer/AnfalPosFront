@@ -149,16 +149,16 @@ const addData = async (data) => {
           </div>
         </template>
         <template #title>
-          <div class="flex justify-content-between gap-1 align-items-center">
+          <div class="flex justify-content-between gap-1 px-3 align-items-center">
             <span class="text-xl">{{ data.cityName }},{{ data.countryName }}</span>
             <Tag :class="!data.isDeActivated ? 'bg-green-100 text-green-800' : 'danger'" :value="!data.isDeActivated ? 'Active' : 'Inactive'"></Tag>
           </div>
         </template>
         <template #subtitle>
-          <span class="text-base text-500 font-semibold">{{ data.branchTypeName }}</span>
+          <span class="text-base text-500 font-semibold px-3">{{ data.branchTypeName }}</span>
         </template>
         <template #content>
-          <div class="flex flex-column gap-2">
+          <div class="flex flex-column gap-2 px-3">
             <div class="flex gap-2 align-items-center">
               <i class="pi pi-phone mr-2"></i>
               <span>{{ data.primaryPhone }}</span>
@@ -174,8 +174,8 @@ const addData = async (data) => {
           </div>
         </template>
         <template #footer>
-          <div class="flex gap-3">
-            <Button :label="t('organizationUpdateButton')" @click="toggleCreateEditDialog(false, data, false)"  class="w-full h-2rem bg-primary  text-xs xl:text-sm" />
+          <div class="flex gap-3 px-3 pb-3">
+            <Button :label="t('organizationUpdateButton')" @click="toggleCreateEditDialog(false, data, false)" class="w-full h-2rem bg-primary text-xs xl:text-sm" />
             <Button
               :label="data.isDeActivated ? `${t('organizationActiveAction')}` : `${t('organizationDeactivatedAction')}`"
               :severity="data.isDeActivated ? 'success' : 'danger'"
@@ -237,10 +237,11 @@ const addData = async (data) => {
 </template>
 <style scoped>
 :deep(.p-card .p-card-body) {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  padding: 0px;
 }
 
 :deep(.p-card .p-card-content) {
