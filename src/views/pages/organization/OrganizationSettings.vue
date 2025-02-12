@@ -178,7 +178,7 @@ onMounted(async () => {
 <template>
   <div class="flex flex-column gap-4 p-4">
     <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
-      <h3 data-v-2f754343="" class="text-primary-600 text-base font-semibold">Organizational Structure</h3>
+      <h3 data-v-2f754343="" class="text-primary-600 text-base font-semibold">{{ $t('organizationConfig.OrganizationalStructure') }}</h3>
       <div class="flex gap-2 flex-wrap">
         <div class="field flex flex-column w-4">
           <label for="superOrganization" class="required">{{ $t('organizationConfig.superOrganization') }}</label>
@@ -219,7 +219,7 @@ onMounted(async () => {
     </div>
 
     <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
-      <h3 data-v-2f754343="" class="text-primary-600 text-base font-semibold">Sales & Distribution Configuration</h3>
+      <h3 data-v-2f754343="" class="text-primary-600 text-base font-semibold">{{ $t('organizationConfig.SalesDistributionConfiguration') }}</h3>
 
       <div class="flex gap-2 flex-wrap">
         <div class="field flex flex-column w-4">
@@ -243,7 +243,7 @@ onMounted(async () => {
     </div>
 
     <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
-      <h3 data-v-2f754343="" class="text-primary-600 text-base font-semibold">Pricing & Discount Configuration</h3>
+      <h3 data-v-2f754343="" class="text-primary-600 text-base font-semibold">{{ $t('organizationConfig.PricingDiscountConfiguration') }}</h3>
 
       <div class="flex gap-2 flex-wrap">
         <div class="field flex flex-column w-2">
@@ -272,7 +272,7 @@ onMounted(async () => {
     </div>
 
     <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
-      <h3 data-v-2f754343="" class="text-primary-600 text-base font-semibold">Order & Billing Types</h3>
+      <h3 data-v-2f754343="" class="text-primary-600 text-base font-semibold">{{ $t('organizationConfig.OrderBillingTypes') }}</h3>
 
       <div class="flex gap-2 flex-wrap">
         <div class="field flex flex-column w-4">
@@ -296,7 +296,7 @@ onMounted(async () => {
     </div>
 
     <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
-      <h3 data-v-2f754343="" class="text-primary-600 text-base font-semibold">Returns & Refunds</h3>
+      <h3 data-v-2f754343="" class="text-primary-600 text-base font-semibold">{{ $t('organizationConfig.ReturnsRefunds') }}</h3>
 
       <div class="flex gap-2 flex-wrap">
         <div class="field flex flex-column w-2">

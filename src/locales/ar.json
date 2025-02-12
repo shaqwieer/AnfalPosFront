@@ -447,7 +447,12 @@
     "sapCode": "كود SAP",
     "SapOrganization": "مؤسسة SAP",
     "sapPlant": "مصنع SAP",
-    "superOrganization": "المؤسسة العليا"
+    "superOrganization": "المؤسسة العليا",
+    "OrganizationalStructure": "الهيكل التنظيمي",
+    "SalesDistributionConfiguration": "تكوين المبيعات والتوزيع",
+    "PricingDiscountConfiguration": "التسعير",
+    "OrderBillingTypes": "طلب",
+    "ReturnsRefunds": "عودة"
   },
   "availableBranch": {
     "title": "الفروع المتاحة"

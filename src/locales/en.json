@@ -454,7 +454,12 @@
     "sapCode": "Sap Code",
     "SapOrganization": "Sap Organization",
     "sapPlant": "Sap Plant",
-    "superOrganization": "Super Organization"
+    "superOrganization": "Super Organization",
+    "OrganizationalStructure": "Organizational Structure",
+    "SalesDistributionConfiguration": "Sales & Distribution Configuration",
+    "PricingDiscountConfiguration": "Pricing & Discount Configuration",
+    "OrderBillingTypes": "Order & Billing Types",
+    "ReturnsRefunds": "Returns & Refunds"
   },
   "availableBranch": {
     "title": "Available Branches"

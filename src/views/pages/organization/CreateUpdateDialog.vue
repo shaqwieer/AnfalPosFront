@@ -190,7 +190,7 @@ watch(
 </script>
 
 <template>
-  <Dialog style="width: 80rem; max-width: 80%" v-model:visible="visible" :breakpoints="{ '640px': '25rem' }" :header="$t('organizationDialog.header')" :class="containerClass" :modal="true" :closable="false">
+  <Dialog  closable style="width: 80rem; max-width: 80%" v-model:visible="visible" :breakpoints="{ '640px': '25rem' }" :header="$t('organizationDialog.header')" :class="containerClass" :modal="true" :closable="false">
     <TabView>
       <TabPanel :header="$t('organizationDialog.basicDataTab')">
         <div class="flex flex-column gap-4 p-4">
