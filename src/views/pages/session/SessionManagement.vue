@@ -318,9 +318,9 @@ onMounted(() => {
               </span>
             </template>
           </Column>
-          <Column field="isSessionLate" :header="t('Warning')" headerClass="" class="w-8rem">
+          <Column field="isSessionLate" :header="'Late Session'" headerClass="" class="w-12rem">
             <template #body="slotProps">
-              <div class="flex align-items-center justify-content-center text-center min-w-max">
+              <div class="flex align-items-center justify-content-center text-center w-5rem">
                 <i v-if="slotProps.data.isSessionLate" class="pi flex pi-exclamation-triangle text-red-500 text-center" />
               </div>
             </template>
