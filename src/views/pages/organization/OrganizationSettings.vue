@@ -179,41 +179,48 @@ onMounted(async () => {
   <div class="flex flex-column gap-4 p-4">
     <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
       <h3 data-v-2f754343="" class="text-primary-600 text-base font-semibold">{{ $t('organizationConfig.OrganizationalStructure') }}</h3>
-      <div class="flex gap-2 flex-wrap">
-        <div class="field flex flex-column w-4">
-          <label for="superOrganization" class="required">{{ $t('organizationConfig.superOrganization') }}</label>
-          <InputText id="superOrganization" v-model="superOrganization" v-bind="superOrganizationAttrs" autofocus :invalid="!!errors.superOrganization" />
-          <small v-if="errors.superOrganization" class="text-red-600">{{ errors.superOrganization }}</small>
+
+      <div class="flex gap-2 flex-wrap flex-column">
+        <div class="flex gap-2">
+          <div class="field flex flex-column w-6">
+            <label for="superOrganization" class="required">{{ $t('organizationConfig.superOrganization') }}</label>
+            <InputText id="superOrganization" v-model="superOrganization" v-bind="superOrganizationAttrs" autofocus :invalid="!!errors.superOrganization" />
+            <small v-if="errors.superOrganization" class="text-red-600">{{ errors.superOrganization }}</small>
+          </div>
+
+          <div class="field flex flex-column w-6">
+            <label for="sapCode" class="required">{{ $t('organizationConfig.sapCode') }}</label>
+            <InputText id="sapCode" v-model="sapCode" v-bind="sapCodeAttrs" autofocus :invalid="!!errors.sapCode" />
+            <small v-if="errors.sapCode" class="text-red-600">{{ errors.sapCode }}</small>
+          </div>
         </div>
 
-        <div class="field flex flex-column w-4">
-          <label for="sapCode" class="required">{{ $t('organizationConfig.sapCode') }}</label>
-          <InputText id="sapCode" v-model="sapCode" v-bind="sapCodeAttrs" autofocus :invalid="!!errors.sapCode" />
-          <small v-if="errors.sapCode" class="text-red-600">{{ errors.sapCode }}</small>
+        <div class="flex gap-2">
+          <div class="field flex flex-column w-6">
+            <label for="SalesOrganization" class="required">{{ $t('organizationConfig.SalesOrganization') }}</label>
+            <InputText id="SalesOrganization" v-model="SalesOrganization" v-bind="SalesOrganizationAttrs" autofocus :invalid="!!errors.SalesOrganization" />
+            <small v-if="errors.SalesOrganization" class="text-red-600">{{ errors.SalesOrganization }}</small>
+          </div>
+
+          <div class="field flex flex-column w-6">
+            <label for="SapOrganization" class="required">{{ $t('organizationConfig.SapOrganization') }}</label>
+            <InputText id="SapOrganization" v-model="SapOrganization" v-bind="SapOrganizationAttrs" autofocus :invalid="!!errors.SapOrganization" />
+            <small v-if="errors.SapOrganization" class="text-red-600">{{ errors.SapOrganization }}</small>
+          </div>
         </div>
 
-        <div class="field flex flex-column w-4">
-          <label for="SalesOrganization" class="required">{{ $t('organizationConfig.SalesOrganization') }}</label>
-          <InputText id="SalesOrganization" v-model="SalesOrganization" v-bind="SalesOrganizationAttrs" autofocus :invalid="!!errors.SalesOrganization" />
-          <small v-if="errors.SalesOrganization" class="text-red-600">{{ errors.SalesOrganization }}</small>
-        </div>
+        <div class="flex gap-2">
+          <div class="field flex flex-column w-6">
+            <label for="sapPlant" class="required">{{ $t('organizationConfig.sapPlant') }}</label>
+            <InputText id="sapPlant" v-model="sapPlant" v-bind="sapPlantAttrs" autofocus :invalid="!!errors.sapPlant" />
+            <small v-if="errors.sapPlant" class="text-red-600">{{ errors.sapPlant }}</small>
+          </div>
 
-        <div class="field flex flex-column w-4">
-          <label for="SapOrganization" class="required">{{ $t('organizationConfig.SapOrganization') }}</label>
-          <InputText id="SapOrganization" v-model="SapOrganization" v-bind="SapOrganizationAttrs" autofocus :invalid="!!errors.SapOrganization" />
-          <small v-if="errors.SapOrganization" class="text-red-600">{{ errors.SapOrganization }}</small>
-        </div>
-
-        <div class="field flex flex-column w-4">
-          <label for="sapPlant" class="required">{{ $t('organizationConfig.sapPlant') }}</label>
-          <InputText id="sapPlant" v-model="sapPlant" v-bind="sapPlantAttrs" autofocus :invalid="!!errors.sapPlant" />
-          <small v-if="errors.sapPlant" class="text-red-600">{{ errors.sapPlant }}</small>
-        </div>
-
-        <div class="field flex flex-column w-4">
-          <label for="profitCenter" class="required">{{ $t('organizationConfig.profitCenter') }}</label>
-          <InputText id="profitCenter" v-model="profitCenter" v-bind="profitCenterAttrs" autofocus :invalid="!!errors.profitCenter" />
-          <small v-if="errors.profitCenter" class="text-red-600">{{ errors.profitCenter }}</small>
+          <div class="field flex flex-column w-6">
+            <label for="profitCenter" class="required">{{ $t('organizationConfig.profitCenter') }}</label>
+            <InputText id="profitCenter" v-model="profitCenter" v-bind="profitCenterAttrs" autofocus :invalid="!!errors.profitCenter" />
+            <small v-if="errors.profitCenter" class="text-red-600">{{ errors.profitCenter }}</small>
+          </div>
         </div>
       </div>
     </div>
@@ -221,52 +228,56 @@ onMounted(async () => {
     <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
       <h3 data-v-2f754343="" class="text-primary-600 text-base font-semibold">{{ $t('organizationConfig.SalesDistributionConfiguration') }}</h3>
 
-      <div class="flex gap-2 flex-wrap">
-        <div class="field flex flex-column w-4">
-          <label for="OrganizationDivision" class="required">{{ $t('organizationConfig.OrganizationDivision') }}</label>
-          <InputText id="OrganizationDivision" v-model="OrganizationDivision" v-bind="OrganizationDivisionAttrs" autofocus :invalid="!!errors.OrganizationDivision" />
-          <small v-if="errors.OrganizationDivision" class="text-red-600">{{ errors.OrganizationDivision }}</small>
-        </div>
-
-        <div class="field flex flex-column w-4">
-          <label for="DistributionChannel" class="required">{{ $t('organizationConfig.DistributionChannel') }}</label>
-          <InputText id="DistributionChannel" v-model="DistributionChannel" v-bind="DistributionChannelAttrs" autofocus :invalid="!!errors.DistributionChannel" />
-          <small v-if="errors.DistributionChannel" class="text-red-600">{{ errors.DistributionChannel }}</small>
-        </div>
-
-        <div class="field flex flex-column w-4">
-          <label for="IncotermsClassification" class="required">{{ $t('organizationConfig.IncometermsClassification') }}</label>
-          <InputText id="IncotermsClassification" v-model="IncotermsClassification" v-bind="IncotermsClassificationAttrs" autofocus :invalid="!!errors.IncotermsClassification" />
-          <small v-if="errors.IncotermsClassification" class="text-red-600">{{ errors.IncotermsClassification }}</small>
+      <div class="flex gap-2 flex-wrap flex-column">
+        <div class="flex gap-2">
+          <div class="field flex flex-column w-4">
+            <label for="OrganizationDivision" class="required">{{ $t('organizationConfig.OrganizationDivision') }}</label>
+            <InputText id="OrganizationDivision" v-model="OrganizationDivision" v-bind="OrganizationDivisionAttrs" autofocus :invalid="!!errors.OrganizationDivision" />
+            <small v-if="errors.OrganizationDivision" class="text-red-600">{{ errors.OrganizationDivision }}</small>
+          </div>
+          <div class="field flex flex-column w-4">
+            <label for="DistributionChannel" class="required">{{ $t('organizationConfig.DistributionChannel') }}</label>
+            <InputText id="DistributionChannel" v-model="DistributionChannel" v-bind="DistributionChannelAttrs" autofocus :invalid="!!errors.DistributionChannel" />
+            <small v-if="errors.DistributionChannel" class="text-red-600">{{ errors.DistributionChannel }}</small>
+          </div>
+          <div class="field flex flex-column w-4">
+            <label for="IncotermsClassification" class="required">{{ $t('organizationConfig.IncometermsClassification') }}</label>
+            <InputText id="IncotermsClassification" v-model="IncotermsClassification" v-bind="IncotermsClassificationAttrs" autofocus :invalid="!!errors.IncotermsClassification" />
+            <small v-if="errors.IncotermsClassification" class="text-red-600">{{ errors.IncotermsClassification }}</small>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
       <h3 data-v-2f754343="" class="text-primary-600 text-base font-semibold">{{ $t('organizationConfig.PricingDiscountConfiguration') }}</h3>
+      <div class="flex gap-2 flex-wrap flex-column">
+        <div class="flex gap-2">
+          <div class="field flex flex-column w-6">
+            <label for="pricingProcedure" class="required">{{ $t('organizationConfig.pricingProcedure') }}</label>
+            <InputText id="pricingProcedure" v-model="pricingProcedure" v-bind="pricingProcedureAttrs" autofocus :invalid="!!errors.pricingProcedure" />
+            <small v-if="errors.pricingProcedure" class="text-red-600">{{ errors.pricingProcedure }}</small>
+          </div>
 
-      <div class="flex gap-2 flex-wrap">
-        <div class="field flex flex-column w-2">
-          <label for="pricingProcedure" class="required">{{ $t('organizationConfig.pricingProcedure') }}</label>
-          <InputText id="pricingProcedure" v-model="pricingProcedure" v-bind="pricingProcedureAttrs" autofocus :invalid="!!errors.pricingProcedure" />
-          <small v-if="errors.pricingProcedure" class="text-red-600">{{ errors.pricingProcedure }}</small>
-        </div>
-        <div class="field flex flex-column w-2">
-          <label for="basePriceCode" class="required">{{ $t('organizationConfig.basePriceCode') }}</label>
-          <InputText id="basePriceCode" v-model="basePriceCode" v-bind="basePriceCodeAttrs" autofocus :invalid="!!errors.basePriceCode" />
-          <small v-if="errors.basePriceCode" class="text-red-600">{{ errors.basePriceCode }}</small>
-        </div>
-
-        <div class="field flex flex-column w-2">
-          <label for="customerDiscountPercentageCode" class="required">{{ $t('organizationConfig.customerDiscountPercentageCode') }}</label>
-          <InputText id="customerDiscountPercentageCode" v-model="customerDiscountPercentageCode" v-bind="customerDiscountPercentageCodeAttrs" autofocus :invalid="!!errors.customerDiscountPercentageCode" />
-          <small v-if="errors.customerDiscountPercentageCode" class="text-red-600">{{ errors.customerDiscountPercentageCode }}</small>
+          <div class="field flex flex-column w-6">
+            <label for="basePriceCode" class="required">{{ $t('organizationConfig.basePriceCode') }}</label>
+            <InputText id="basePriceCode" v-model="basePriceCode" v-bind="basePriceCodeAttrs" autofocus :invalid="!!errors.basePriceCode" />
+            <small v-if="errors.basePriceCode" class="text-red-600">{{ errors.basePriceCode }}</small>
+          </div>
         </div>
 
-        <div class="field flex flex-column w-2">
-          <label for="customerDiscountFixedCode" class="required">{{ $t('organizationConfig.customerDiscountFixedCode') }}</label>
-          <InputText id="customerDiscountFixedCode" v-model="customerDiscountFixedCode" v-bind="customerDiscountFixedCodeAttrs" autofocus :invalid="!!errors.customerDiscountFixedCode" />
-          <small v-if="errors.customerDiscountFixedCode" class="text-red-600">{{ errors.customerDiscountFixedCode }}</small>
+        <div class="flex gap-2">
+          <div class="field flex flex-column w-6">
+            <label for="customerDiscountPercentageCode" class="required">{{ $t('organizationConfig.customerDiscountPercentageCode') }}</label>
+            <InputText id="customerDiscountPercentageCode" v-model="customerDiscountPercentageCode" v-bind="customerDiscountPercentageCodeAttrs" autofocus :invalid="!!errors.customerDiscountPercentageCode" />
+            <small v-if="errors.customerDiscountPercentageCode" class="text-red-600">{{ errors.customerDiscountPercentageCode }}</small>
+          </div>
+
+          <div class="field flex flex-column w-6">
+            <label for="customerDiscountFixedCode" class="required">{{ $t('organizationConfig.customerDiscountFixedCode') }}</label>
+            <InputText id="customerDiscountFixedCode" v-model="customerDiscountFixedCode" v-bind="customerDiscountFixedCodeAttrs" autofocus :invalid="!!errors.customerDiscountFixedCode" />
+            <small v-if="errors.customerDiscountFixedCode" class="text-red-600">{{ errors.customerDiscountFixedCode }}</small>
+          </div>
         </div>
       </div>
     </div>
@@ -274,23 +285,23 @@ onMounted(async () => {
     <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
       <h3 data-v-2f754343="" class="text-primary-600 text-base font-semibold">{{ $t('organizationConfig.OrderBillingTypes') }}</h3>
 
-      <div class="flex gap-2 flex-wrap">
-        <div class="field flex flex-column w-4">
-          <label for="cashBillingType" class="required">{{ $t('organizationConfig.cashBillingType') }}</label>
-          <InputText id="cashBillingType" v-model="cashBillingType" v-bind="cashBillingTypeAttrs" autofocus :invalid="!!errors.cashBillingType" />
-          <small v-if="errors.cashBillingType" class="text-red-600">{{ errors.cashBillingType }}</small>
-        </div>
-
-        <div class="field flex flex-column w-4">
-          <label for="cashSalesOrderType" class="required">{{ $t('organizationConfig.cashSalesOrderType') }}</label>
-          <InputText id="cashSalesOrderType" v-model="cashSalesOrderType" v-bind="cashSalesOrderTypeAttrs" autofocus :invalid="!!errors.cashSalesOrderType" />
-          <small v-if="errors.cashSalesOrderType" class="text-red-600">{{ errors.cashSalesOrderType }}</small>
-        </div>
-
-        <div class="field flex flex-column w-4">
-          <label for="cashSalesFocItemType" class="required">{{ $t('organizationConfig.cashSalesFocItemType') }}</label>
-          <InputText id="cashSalesFocItemType" v-model="cashSalesFocItemType" v-bind="cashSalesFocItemTypeAttrs" autofocus :invalid="!!errors.cashSalesFocItemType" />
-          <small v-if="errors.cashSalesFocItemType" class="text-red-600">{{ errors.cashSalesFocItemType }}</small>
+      <div class="flex gap-2 flex-wrap flex-column">
+        <div class="flex gap-2">
+          <div class="field flex flex-column w-4">
+            <label for="cashBillingType" class="required">{{ $t('organizationConfig.cashBillingType') }}</label>
+            <InputText id="cashBillingType" v-model="cashBillingType" v-bind="cashBillingTypeAttrs" autofocus :invalid="!!errors.cashBillingType" />
+            <small v-if="errors.cashBillingType" class="text-red-600">{{ errors.cashBillingType }}</small>
+          </div>
+          <div class="field flex flex-column w-4">
+            <label for="cashSalesOrderType" class="required">{{ $t('organizationConfig.cashSalesOrderType') }}</label>
+            <InputText id="cashSalesOrderType" v-model="cashSalesOrderType" v-bind="cashSalesOrderTypeAttrs" autofocus :invalid="!!errors.cashSalesOrderType" />
+            <small v-if="errors.cashSalesOrderType" class="text-red-600">{{ errors.cashSalesOrderType }}</small>
+          </div>
+          <div class="field flex flex-column w-4">
+            <label for="cashSalesFocItemType" class="required">{{ $t('organizationConfig.cashSalesFocItemType') }}</label>
+            <InputText id="cashSalesFocItemType" v-model="cashSalesFocItemType" v-bind="cashSalesFocItemTypeAttrs" autofocus :invalid="!!errors.cashSalesFocItemType" />
+            <small v-if="errors.cashSalesFocItemType" class="text-red-600">{{ errors.cashSalesFocItemType }}</small>
+          </div>
         </div>
       </div>
     </div>
@@ -298,22 +309,24 @@ onMounted(async () => {
     <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
       <h3 data-v-2f754343="" class="text-primary-600 text-base font-semibold">{{ $t('organizationConfig.ReturnsRefunds') }}</h3>
 
-      <div class="flex gap-2 flex-wrap">
-        <div class="field flex flex-column w-2">
-          <label for="customerReturnOrderType" class="required">{{ $t('organizationConfig.customerReturnOrderType') }}</label>
-          <InputText id="customerReturnOrderType" v-model="customerReturnOrderType" v-bind="customerReturnOrderTypeAttrs" autofocus :invalid="!!errors.customerReturnOrderType" />
-          <small v-if="errors.customerReturnOrderType" class="text-red-600">{{ errors.customerReturnOrderType }}</small>
-        </div>
+      <div class="flex gap-2 flex-wrap flex-column">
+        <div class="flex gap-2">
+          <div class="field flex flex-column w-6">
+            <label for="customerReturnOrderType" class="required">{{ $t('organizationConfig.customerReturnOrderType') }}</label>
+            <InputText id="customerReturnOrderType" v-model="customerReturnOrderType" v-bind="customerReturnOrderTypeAttrs" autofocus :invalid="!!errors.customerReturnOrderType" />
+            <small v-if="errors.customerReturnOrderType" class="text-red-600">{{ errors.customerReturnOrderType }}</small>
+          </div>
 
-        <div class="field flex flex-column w-2">
-          <label for="returnBillingType" class="required">{{ $t('organizationConfig.returnBillingType') }}</label>
-          <InputText id="returnBillingType" v-model="returnBillingType" v-bind="returnBillingTypeAttrs" autofocus :invalid="!!errors.returnBillingType" />
-          <small v-if="errors.returnBillingType" class="text-red-600">{{ errors.returnBillingType }}</small>
+          <div class="field flex flex-column w-6">
+            <label for="returnBillingType" class="required">{{ $t('organizationConfig.returnBillingType') }}</label>
+            <InputText id="returnBillingType" v-model="returnBillingType" v-bind="returnBillingTypeAttrs" autofocus :invalid="!!errors.returnBillingType" />
+            <small v-if="errors.returnBillingType" class="text-red-600">{{ errors.returnBillingType }}</small>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="flex justify-content-end gap-3 pt-2">
+    <div class="flex justify-content-end gap-3 pt-2 absolute" style="bottom: 0px; right: 43px; width: 93%; background: white; height: 59px; padding-bottom: 12px; padding-right: 23px">
       <Button
         :label="$t('cityDialog.addButton')"
         v-if="IsAdd"
@@ -352,11 +365,11 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.w-4 {
+/* .w-4 {
   width: 32.3333% !important;
-}
+} */
 
-.w-2 {
+/* .w-2 {
   width: 49.5% !important;
-}
+} */
 </style>

@@ -59,11 +59,7 @@ const branchSchema = yup.object({
   cashCustomer: yup.mixed().nullable(),
   profitCenter: yup.mixed().nullable(),
   cashJournal: yup.mixed().nullable(),
-  bankAccounts: yup.mixed().nullable(),
-
-  bankPosFirst: yup.mixed().nullable(),
-  bankPosSecond: yup.mixed().nullable(),
-  bankPosThird: yup.mixed().nullable()
+  bankAccounts: yup.mixed().nullable()
 });
 
 const informationInitial = ref({
@@ -77,11 +73,12 @@ const informationInitial = ref({
   city: null,
   country: null,
   branchType: null,
-  sapStorageLocation: null,
+  sapStorageLocation: '',
   cashCustomer: null,
   profitCenter: null,
   cashJournal: null,
   bankAccounts: null,
+
   bankPosFirst: null,
   bankPosSecond: null,
   bankPosThird: null
@@ -115,12 +112,11 @@ const [sapStorageLocation, sapStorageLocationAttrs] = defineField('sapStorageLoc
 const [cashCustomer, cashCustomerAttrs] = defineField('cashCustomer');
 const [profitCenter, profitCenterAttrs] = defineField('profitCenter');
 const [cashJournal, cashJournalAttrs] = defineField('cashJournal');
-// const [bankPosFirst, bankPosSecond, bankPosThird, bankAccountsAttrs] = defineField('bankAccounts');
+const [bankAccounts, bankAccountsAttrs] = defineField('bankAccounts');
 
 const [bankPosFirst, bankPosFirstAttrs] = defineField('bankPosFirst');
 const [bankPosSecond, bankPosSecondAttrs] = defineField('bankPosSecond');
 const [bankPosThird, bankPosThirdAttrs] = defineField('bankPosThird');
-const [bankAccounts, bankAccountsAttrs] = defineField('bankAccounts');
 
 const createData = handleSubmit(async (validatedInfo) => {
   const branchDto = {
@@ -131,14 +127,13 @@ const createData = handleSubmit(async (validatedInfo) => {
     primaryPhone: validatedInfo.primaryPhone,
     OrganizationId: validatedInfo.organizationId || 1, // Provide default value if not present
     BankAccountId: validatedInfo.bankAccounts || null,
+    BankName: validatedInfo.bankName || null,
+    BankCode: validatedInfo.bankCode || null,
+    BankAccountNo: validatedInfo.bankAccountNo || null,
 
     bankPosFirst: validatedInfo.bankPosFirst || null,
     bankPosSecond: validatedInfo.bankPosSecond || null,
     bankPosThird: validatedInfo.bankPosThird || null,
-
-    BankName: validatedInfo.bankName || null,
-    BankCode: validatedInfo.bankCode || null,
-    BankAccountNo: validatedInfo.bankAccountNo || null,
 
     SecondaryPhone: validatedInfo.secondaryPhone || null,
     SalesRepCode: validatedInfo.salesRepCode || null,
@@ -161,14 +156,13 @@ const updateData = handleSubmit(async (validatedInfo) => {
     primaryPhone: validatedInfo.primaryPhone,
     OrganizationId: validatedInfo.organizationId || 1, // Provide default value if not present
     BankAccountId: validatedInfo.bankAccounts || null,
+    BankName: validatedInfo.bankName || null,
+    BankCode: validatedInfo.bankCode || null,
+    BankAccountNo: validatedInfo.bankAccountNo || null,
 
     bankPosFirst: validatedInfo.bankPosFirst || null,
     bankPosSecond: validatedInfo.bankPosSecond || null,
     bankPosThird: validatedInfo.bankPosThird || null,
-
-    BankName: validatedInfo.bankName || null,
-    BankCode: validatedInfo.bankCode || null,
-    BankAccountNo: validatedInfo.bankAccountNo || null,
 
     SecondaryPhone: validatedInfo.secondaryPhone || null,
     SalesRepCode: validatedInfo.salesRepCode || null,
@@ -192,19 +186,22 @@ const setFormValues = () => {
     primaryPhone: props.selectedData.primaryPhone,
     secondaryPhone: props.selectedData.secondaryPhone,
     salesRepCode: props.selectedData.salesRepCode,
-    sapStorageLocation: null,
-    cashCustomer: null,
-    profitCenter: null,
+    sapStorageLocation: props.selectedData.sapStorageLocation,
+    cashCustomer: props.selectedData.cashCustomer,
+    profitCenter: props.selectedData.profitCenter,
+    bankAccounts: props.selectedData.bankAccountId,
 
-    bankPosFirst: null,
-    bankPosSecond: null,
-    bankPosThird: null,
+    bankPosFirst: props.selectedData.bankPosFirst,
+    bankPosSecond: props.selectedData.bankPosSecond,
+    bankPosThird: props.selectedData.bankPosThird,
 
-    cashJournal: null,
+    cashJournal: props.selectedData.cashJournal,
     country: countries.find((e) => e.id === props.selectedData.countryId),
     branchType: branchTypes.find((e) => e.id === props.selectedData.branchTypeId),
     city: cities.value.find((e) => e.id === props.selectedData.cityId)
   });
+  console.log('props.selectedData');
+  console.log(props.selectedData);
 };
 watch(
   () => props.load,
@@ -216,8 +213,6 @@ watch(
       cities.value = branchLookups.cities;
       if (props.load === true && props.IsAdd === false && props.selectedData) {
         setFormValues();
-        console.log('props.selectedData');
-        console.log(props.selectedData);
       }
     }
   }
@@ -243,86 +238,33 @@ watch(
         </div>
       </div>
       <div class="flex flex-column w-full gap-2 border-1 p-4 border-round-lg">
-        <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.sapInformation') }}</h3>
+        <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.sapInformation') }} || Sap Information</h3>
         <div class="flex gap-2">
           <div class="field flex flex-column w-4">
             <label for="organizationType" class="mb-3 required">{{ $t('branchDialog.sapStorageLocation') }}</label>
-            <!-- <Dropdown
-              v-model="sapStorageLocation"
-              v-bind="sapStorageLocationAttrs"
-              :virtualScrollerOptions="{ itemSize: 38 }"
-              :options="countries"
-              filter
-              :disabled="true"
-              :loading="false"
-              optionLabel="name"
-              :placeholder="t('branchDialog.sapStorageLocationPlaceholder')"
-              class="w-full"
-            >
-              <template #option="slotProps">
-                <div class="flex align-items-center mx-auto gap-3">
-                  <div>{{ slotProps.option.name }}</div>
-                </div>
-              </template>
-            </Dropdown> -->
 
-            <InputText id="organizationType" v-model="sapStorageLocation" v-bind="sapStorageLocationAttrs" autofocus :invalid="!!errors.sapStorageLocation" />
+            <InputText id="organizationType" v-model="sapStorageLocation" v-bind="sapStorageLocationAttrs" :invalid="!!errors.sapStorageLocation" />
 
             <small v-if="errors.sapStorageLocation" class="text-red-600">{{ errors.sapStorageLocation }}</small>
           </div>
+
           <div class="field flex flex-column w-4">
             <label for="cashJournal" class="mb-3 required">{{ $t('branchDialog.cashJournal') }}</label>
-            <!-- <Dropdown
-              v-model="cashJournal"
-              v-bind="cashJournalAttrs"
-              :virtualScrollerOptions="{ itemSize: 38 }"
-              :options="countries"
-              filter
-              :loading="false"
-              optionLabel="name"
-              disabled
-              :placeholder="t('branchDialog.cashJournalPlaceholder')"
-              class="w-full"
-            >
-              <template #option="slotProps">
-                <div class="flex align-items-center mx-auto gap-3">
-                  <div>{{ slotProps.option.name }}</div>
-                </div>
-              </template>
-            </Dropdown> -->
 
-            <InputText id="cashJournal" v-model="cashJournal" v-bind="cashJournalAttrs" autofocus :invalid="!!errors.cashJournal" />
+            <InputText id="cashJournal" v-model="cashJournal" v-bind="cashJournalAttrs" :invalid="!!errors.cashJournal" />
 
             <small v-if="errors.cashJournal" class="text-red-600">{{ errors.cashJournal }}</small>
           </div>
 
           <div class="field flex flex-column w-4">
             <label for="bankAccounts" class="mb-3 required">{{ $t('branchDialog.bankAccounts') }}</label>
-            <!-- <Dropdown
-              v-model="bankAccounts"
-              disabled
-              v-bind="bankAccountsAttrs"
-              :virtualScrollerOptions="{ itemSize: 38 }"
-              :options="countries"
-              filter
-              :loading="false"
-              optionLabel="name"
-              :placeholder="t('branchDialog.bankAccountsPlaceholder')"
-              class="w-full"
-            >
-              <template #option="slotProps">
-                <div class="flex align-items-center mx-auto gap-3">
-                  <div>{{ slotProps.option.name }}</div>
-                </div>
-              </template>
-            </Dropdown> -->
 
-            <InputText id="bankAccounts" v-model="bankAccounts" v-bind="bankAccountsAttrs" autofocus :invalid="!!errors.bankAccounts" />
-
+            <InputText id="bankAccounts" v-model="bankAccounts" v-bind="bankAccountsAttrs" :invalid="!!errors.bankAccounts" />
 
             <small v-if="errors.bankAccounts" class="text-red-600">{{ errors.bankAccounts }}</small>
           </div>
         </div>
+
         <div class="flex gap-2">
           <div class="field flex flex-column w-4">
             <label for="profitCenter" class="mb-3 required">{{ $t('branchDialog.profitCenter') }}</label>
@@ -345,11 +287,10 @@ watch(
               </template>
             </Dropdown> -->
 
-            <InputText id="profitCenter" v-model="profitCenter" v-bind="profitCenterAttrs" autofocus :invalid="!!errors.profitCenter" />
+            <InputText id="profitCenter" v-model="profitCenter" v-bind="profitCenterAttrs" :invalid="!!errors.profitCenter" />
 
             <small v-if="errors.profitCenter" class="text-red-600">{{ errors.profitCenter }}</small>
           </div>
-
           <div class="field flex flex-column w-4">
             <label for="cashCustomer" class="mb-3 required">{{ $t('branchDialog.cashCustomer') }}</label>
             <!-- <Dropdown
@@ -371,12 +312,12 @@ watch(
               </template>
             </Dropdown> -->
 
-            <InputText id="cashCustomer" v-model="cashCustomer" v-bind="cashCustomerAttrs" autofocus :invalid="!!errors.cashCustomer" />
+            <InputText id="cashCustomer" v-model="cashCustomer" v-bind="cashCustomerAttrs" :invalid="!!errors.cashCustomer" />
 
             <small v-if="errors.cashCustomer" class="text-red-600">{{ errors.cashCustomer }}</small>
           </div>
-          <div class="field flex flex-column w-6 p-2">
-            <label for="SalesRepCode" class="required">Sales Rep Code</label>
+          <div class="field flex flex-column w-4">
+            <label for="SalesRepCode" class="required mb-3">Sales Rep Code</label>
             <InputText id="SalesRepCode" v-model="salesRepCode" v-bind="salesRepCodeAttrs" autofocus :invalid="!!errors.salesRepCode" />
             <small v-if="errors.salesRepCode" class="text-red-600">{{ errors.salesRepCode }}</small>
           </div>
