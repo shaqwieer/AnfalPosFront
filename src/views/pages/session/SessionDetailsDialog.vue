@@ -112,6 +112,7 @@ onMounted(() => {
           <span class="font-semibold"> Session Total </span>
           <span class="text-black font-bold text-2xl"> {{ formatPrice(session.sessionTotal) }}</span>
         </div>
+        x
         <div class="flex flex-column gap-1 w-full p-3 border-1 border-gray-300 border-round-md">
           <span class="font-semibold text-lg">Deposit Attachments</span>
           <DataTable
@@ -160,6 +161,7 @@ onMounted(() => {
             </Column>
           </DataTable>
         </div>
+        x
         <div class="flex flex-column gap-1 w-full p-3 border-1 border-gray-300 border-round-md">
           <span class="font-semibold text-lg">Transactions</span>
           <DataTable
@@ -208,6 +210,7 @@ onMounted(() => {
             </Column>
           </DataTable>
         </div>
+        x
         <div class="flex justify-content-end gap-3">
           <Button v-if="session.statusId === 4" class="px-4 py-2 bg-red-600 text-white border-0 hover:bg-red-700" @click="RejectSession(session)">{{ t('Session.Reject') }}</Button>
           <Button v-if="session.statusId === 4" class="px-4 py-2 bg-green-600 text-white border-0 hover:bg-green-700" @click="ApproveSession(session)">{{ t('Session.Approve') }}</Button>

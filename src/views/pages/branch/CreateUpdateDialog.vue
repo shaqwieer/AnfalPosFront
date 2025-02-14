@@ -257,41 +257,14 @@ watch(
           </div>
 
           <div class="field flex flex-column w-4">
-            <label for="bankAccounts" class="mb-3 required">{{ $t('branchDialog.bankAccounts') }}</label>
-
-            <InputText id="bankAccounts" v-model="bankAccounts" v-bind="bankAccountsAttrs" :invalid="!!errors.bankAccounts" />
-
-            <small v-if="errors.bankAccounts" class="text-red-600">{{ errors.bankAccounts }}</small>
+            <label for="profitCenter" class="mb-3 required">{{ $t('branchDialog.profitCenter') }}</label>
+            <InputText id="profitCenter" v-model="profitCenter" v-bind="profitCenterAttrs" :invalid="!!errors.profitCenter" />
+            <small v-if="errors.profitCenter" class="text-red-600">{{ errors.profitCenter }}</small>
           </div>
         </div>
 
         <div class="flex gap-2">
-          <div class="field flex flex-column w-4">
-            <label for="profitCenter" class="mb-3 required">{{ $t('branchDialog.profitCenter') }}</label>
-            <!-- <Dropdown
-              v-model="profitCenter"
-              disabled
-              v-bind="profitCenterAttrs"
-              :virtualScrollerOptions="{ itemSize: 38 }"
-              :options="countries"
-              filter
-              :loading="false"
-              optionLabel="name"
-              :placeholder="t('branchDialog.profitCenterPlaceholder')"
-              class="w-full"
-            >
-              <template #option="slotProps">
-                <div class="flex align-items-center mx-auto gap-3">
-                  <div>{{ slotProps.option.name }}</div>
-                </div>
-              </template>
-            </Dropdown> -->
-
-            <InputText id="profitCenter" v-model="profitCenter" v-bind="profitCenterAttrs" :invalid="!!errors.profitCenter" />
-
-            <small v-if="errors.profitCenter" class="text-red-600">{{ errors.profitCenter }}</small>
-          </div>
-          <div class="field flex flex-column w-4">
+          <div class="field flex flex-column w-6">
             <label for="cashCustomer" class="mb-3 required">{{ $t('branchDialog.cashCustomer') }}</label>
             <!-- <Dropdown
               v-model="cashCustomer"
@@ -316,7 +289,7 @@ watch(
 
             <small v-if="errors.cashCustomer" class="text-red-600">{{ errors.cashCustomer }}</small>
           </div>
-          <div class="field flex flex-column w-4">
+          <div class="field flex flex-column w-6">
             <label for="SalesRepCode" class="required mb-3">Sales Rep Code</label>
             <InputText id="SalesRepCode" v-model="salesRepCode" v-bind="salesRepCodeAttrs" autofocus :invalid="!!errors.salesRepCode" />
             <small v-if="errors.salesRepCode" class="text-red-600">{{ errors.salesRepCode }}</small>
@@ -328,38 +301,29 @@ watch(
         <h3 class="text-primary-600 text-base font-semibold">Bank Information</h3>
 
         <div class="flex gap-2">
-          <div class="field flex flex-column w-4">
+          <div class="field flex flex-column w-6">
+            <label for="bankAccounts" class="mb-3 required">{{ $t('branchDialog.bankAccounts') }}</label>
+
+            <InputText id="bankAccounts" v-model="bankAccounts" v-bind="bankAccountsAttrs" :invalid="!!errors.bankAccounts" />
+
+            <small v-if="errors.bankAccounts" class="text-red-600">{{ errors.bankAccounts }}</small>
+          </div>
+
+          <div class="field flex flex-column w-6">
             <label for="bankPosFirst" class="mb-3 required">Bank POS1</label>
             <InputText id="bankPosFirst" v-model="bankPosFirst" v-bind="bankPosFirstAttrs" :invalid="!!errors.bankPosFirst" />
             <small v-if="errors.bankPosFirst" class="text-red-600">{{ errors.bankPosFirst }}</small>
           </div>
+        </div>
 
-          <div class="field flex flex-column w-4">
+        <div class="flex gap-2">
+          <div class="field flex flex-column w-6">
             <label for="bankPosSecond" class="mb-3 required">Bank POS2</label>
             <InputText id="bankPosSecond" v-model="bankPosSecond" v-bind="bankPosSecondAttrs" :invalid="!!errors.bankPosSecond" />
             <small v-if="errors.bankPosSecond" class="text-red-600">{{ errors.bankPosSecond }}</small>
           </div>
 
-          <div class="field flex flex-column w-4">
-            <!-- <Dropdown
-              v-model="bankPosThird"
-              disabled
-              v-bind="bankAccountsAttrs"
-              :virtualScrollerOptions="{ itemSize: 38 }"
-              :options="countries"
-              filter
-              :loading="false"
-              optionLabel="name"
-              :placeholder="t('branchDialog.bankAccountsPlaceholder')"
-              class="w-full"
-            >
-              <template #option="slotProps">
-                <div class="flex align-items-center mx-auto gap-3">
-                  <div>{{ slotProps.option.name }}</div>
-                </div>
-              </template>
-            </Dropdown> -->
-
+          <div class="field flex flex-column w-6">
             <label for="bankPosThird" class="mb-3 required">Bank POS3</label>
             <InputText id="bankPosThird" v-model="bankPosThird" v-bind="bankPosThirdAttrs" :invalid="!!errors.bankPosThird" />
             <small v-if="errors.bankPosThird" class="text-red-600">{{ errors.bankPosThird }}</small>
