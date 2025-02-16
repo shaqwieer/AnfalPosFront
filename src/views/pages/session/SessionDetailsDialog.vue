@@ -114,7 +114,7 @@ onMounted(() => {
           </div>
           <div class="flex flex-row justify-content-between w-full font-bold text-red-500">
             <span class="">Customer Incentive</span>
-            <span>{{ '-' + formatPrice(sessionData.customerIncentive) }}</span>
+            <span>{{ formatPrice(sessionData.customerIncentive) }}</span>
           </div>
           <hr />
           <div class="flex flex-row justify-content-between w-full font-bold">
@@ -127,7 +127,7 @@ onMounted(() => {
           </div>
           <div class="flex flex-row justify-content-between w-full p-3 align-items-center bg-blue-100 border-round-lg">
             <span class="font-bold text-xl text-blue-700">Session Total</span>
-            <span class="font-bold text-2xl text-blue-700">{{ formatPrice(session.sessionTotal) }}</span>
+            <span class="font-bold text-2xl text-blue-700">{{ formatPrice(sessionData.sessionTotal) }}</span>
           </div>
         </div>
 
@@ -179,7 +179,7 @@ onMounted(() => {
                   </div>
                   <div v-else class="flex w-11 justify-content-center align-items-center bg-white text-sm text-red-600">No Attachment</div>
                   <div
-                    v-if="sessionData.statusId === 4"
+                    v-if="slotProps.data.statusId === 1"
                     @click="ApproveSessionTransaction(slotProps.data.depositNo, 'Deposits')"
                     class="cursor-pointer text-green-500 border-circle border-1 border-green-200 flex align-items-center justify-content-center w-3rem h-3rem hover:bg-green-100"
                   >
@@ -232,7 +232,7 @@ onMounted(() => {
                   </div>
                   <div v-else class="flex w-11 justify-content-center align-items-center bg-white text-sm text-red-600">No Attachment</div>
                   <div
-                    v-if="sessionData.statusId === 4"
+                    v-if="slotProps.data.statusId === 1"
                     @click="ApproveSessionTransaction(slotProps.data.id, 'Transactions')"
                     class="cursor-pointer text-green-500 border-circle border-1 border-green-200 flex align-items-center justify-content-center w-3rem h-3rem hover:bg-green-100"
                   >
@@ -244,8 +244,8 @@ onMounted(() => {
           </DataTable>
         </div>
         <!-- <div class="flex justify-content-end gap-3">
-          <Button v-if="sessionData.statusId === 4" class="px-4 py-2 bg-red-600 text-white border-0 hover:bg-red-700" @click="RejectSession(sessionData)">{{ t('Session.Reject') }}</Button>
-          <Button v-if="sessionData.statusId === 4" class="px-4 py-2 bg-green-600 text-white border-0 hover:bg-green-700" @click="ApproveSession(sessionData)">{{ t('Session.Approve') }}</Button>
+          <Button v-if="session.statusId === 4" class="px-4 py-2 bg-red-600 text-white border-0 hover:bg-red-700" @click="RejectSession(sessionData)">{{ t('Session.Reject') }}</Button>
+          <Button v-if="session.statusId === 4" class="px-4 py-2 bg-green-600 text-white border-0 hover:bg-green-700" @click="ApproveSession(sessionData)">{{ t('Session.Approve') }}</Button>
         </div> -->
       </div>
       <div class="flex flex-column gap-1 w-full p-3 shadow-1 border-round-xl bg-white">
