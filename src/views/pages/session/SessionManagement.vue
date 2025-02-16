@@ -241,7 +241,7 @@ onMounted(() => {
           <div class="bg-yellow-50 border-round-lg shadow-1 border-yellow-200 border-1 p-4 h-full">
             <div class="text-md font-medium text-yellow-600">{{ 'Closed Sessions' }}</div>
             <div class="text-3xl font-bold text-yellow-600">
-              {{ sessionStore.sessionData?.pendingSession }}
+              {{ sessionStore.sessionData?.closedSession }}
             </div>
           </div>
         </div>
@@ -263,7 +263,7 @@ onMounted(() => {
           <div class="bg-green-50 border-round-lg border-green-400 border-1 p-4 h-full">
             <div class="text-md font-medium text-green-600">{{ 'Approved Sessions' }}</div>
             <div class="text-3xl font-bold text-green-700">
-              {{ sessionStore.sessionData?.oldSession }}
+              {{ sessionStore.sessionData?.approvedSession }}
             </div>
           </div>
         </div>

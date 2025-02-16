@@ -44,6 +44,11 @@ const ApproveSessionTransaction = (transationId, transactionType) => {
   };
   sessionStore.ApproveSessionTransaction(payload);
 };
+const statusOptions = [
+  { label: `${t('Pending')}`, value: '1', color: '#BC4819' },
+  { label: `${t('Approved')}`, value: '2', color: '#3357FF' },
+  { label: 'Reconciled', value: '3', color: '#FA7B00' }
+];
 const closeDialog = () => {
   emit('close');
 };
