@@ -291,6 +291,19 @@ watch(leftColumnTab, (newTab) => {
     });
   }
 });
+
+import { LMap, LTileLayer, LMarker } from '@vue-leaflet/vue-leaflet';
+import 'leaflet/dist/leaflet.css';
+
+const zoom = ref(13);
+const center = ref([formData.value.location.lat, formData.value.location.lng]); // الرياض
+const markerPosition = ref([formData.value.location.lat, formData.value.location.lng]);
+const tileLayerUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+const isLoaded = ref(false);
+
+onMounted(() => {
+  isLoaded.value = true;
+});
 </script>
 
 <template>
@@ -397,9 +410,16 @@ watch(leftColumnTab, (newTab) => {
                   <!-- Address Information -->
                   <div class="flex flex-column gap-6">
                     <!-- Map View -->
-x
+
                     <div class="h-300px border-round-lg border-1 surface-border overflow-hidden relative">
-                      <div ref="mapRef" class="w-full h-full"></div>
+                      <!-- <div ref="mapRef" class="w-full h-full"></div> -->
+                      <div>
+                        <l-map v-if="isLoaded" v-model:zoom="zoom" v-model:center="center" style="height: 400px; width: 100%">
+                          <l-tile-layer :url="tileLayerUrl"></l-tile-layer>
+
+                          <l-marker :lat-lng="markerPosition"></l-marker>
+                        </l-map>
+                      </div>
 
                       <!-- Search Results Dropdown -->
                       <div v-if="!readOnly && searchResults.length > 0" class="absolute top-4rem left-3rem w-20rem surface-card border-round-lg shadow-5 border-1 surface-border z-5 max-h-12rem overflow-y-auto">
@@ -409,12 +429,12 @@ x
                         </div>
                       </div>
                     </div>
-x
+
                     <!-- Location Error -->
                     <div v-if="locationError" class="text-red-600 text-sm">
                       {{ locationError }}
                     </div>
-x
+
                     <!-- Location Info -->
                     <div class="grid">
                       <div class="col-12 md:col-6">
@@ -426,7 +446,7 @@ x
                         <input v-model="formData.location.lng" type="number" step="0.000001" class="w-full p-inputtext" readonly />
                       </div>
                     </div>
-x
+
                     <!-- Address Fields -->
                     <div class="grid">
                       <div class="col-12 md:col-6">
