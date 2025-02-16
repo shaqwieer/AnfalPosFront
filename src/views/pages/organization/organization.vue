@@ -149,28 +149,33 @@ const addData = async (data) => {
     </div>
 
     <div class="col-12 md:col-6 lg:col-4 xl:col-3" v-for="data in paginatedEntities" :key="data.id">
-      <Card style="width: 100%; overflow: hidden; min-width: 200px; max-width: 300px; height: 300px" class="p-4 flex flex-column justify-content-between">
+      <Card style="width: 100%; overflow: hidden; min-width: 200px; max-width: 300px; height: 302px" class="flex justify-content-between flex-column col-12 md:col-6 lg:col-4 xl:col-3 border-round p-0">
         <template #header>
-          <ImageLoader class="w-full h-8rem" alt="Logo" :src="data.logoImageUrl != null ? data.logoImageUrl : placeHolderPhoto" />
+          <ImageLoader style="object-fit: contain" class="w-full h-8rem border-bottom-1 border-gray-300 border-round" alt="Logo" :src="data.logoImageUrl != null ? data.logoImageUrl : placeHolderPhoto" />
         </template>
-        <template #title>{{ data.name }}</template>
+
+        <template #title>
+          <div class="flex justify-content-between gap-1 px-3 align-items-center pt-3">
+            {{ data.name }}
+          </div>
+        </template>
         <template #subtitle>
-          <div class="flex justify-content-between p-0">
+          <div class="flex justify-content-between gap-1 px-3 align-items-center pt-3">
             <span class="text-base text-400 font-semibold">{{ data.organizationTypeName }}</span>
             <Tag :class="!data.isDeActivated ? 'bg-green-100 text-green-800' : 'danger'" :value="!data.isDeActivated ? `${t('organizationActive')}` : `${t('organizationDeactivated')}`"></Tag>
           </div>
         </template>
         <template #footer>
-          <div class="flex gap-1 mt-1 p-0">
+          <div class="flex gap-3 px-3 pb-3 justify-content-between">
             <!-- <Button :label="t('organizationUpdateButton')" @click="toggleCreateEditDialog(false, data, false)" severity="info" class=" h-2rem text-xs xl:text-sm" /> -->
-            <Button :label="t('organizationUpdateButton')" @click="toggleCreateEditDialog(false, data, false)" severity="info" class="p-button p-component w-full px-4 py-2 bg-primary text-white border-round flex align-items-center gap-2" />
+            <Button :label="t('organizationUpdateButton')" @click="toggleCreateEditDialog(false, data, false)" severity="info" class="p-button p-component px-3 py-2 bg-primary text-white border-round flex align-items-center" />
 
             <Button
               :label="data.isDeActivated ? `${t('organizationActiveAction')}` : `${t('organizationDeactivatedAction')}`"
               @click="toggleActivateDeactivateDialog(data.isDeActivated, data.uniqueIdentifier)"
               :severity="data.isDeActivated ? 'success' : 'danger'"
               outlined
-              class="p-button p-component w-full px-1 py-2 border-round flex align-items-center gap-2"
+              class="p-button p-component px-3 py-2 xborder-round flex align-items-center gap-2"
             />
           </div>
         </template>
@@ -182,7 +187,6 @@ const addData = async (data) => {
   </div>
   <!-- Add Dialog -->
   <CreateUpdateDialog
- 
     v-model="updateAddDialogVisible"
     :closeDialog="
       () => {
@@ -233,9 +237,15 @@ const addData = async (data) => {
 .p-card .p-card-body {
   padding: 0 !important;
 }
-
 </style>
 <style scoped>
+:deep(.p-card .p-card-body) {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  padding: 0px;
+}
 :deep(.p-card .p-card-content) {
   padding: 0% !important;
 }

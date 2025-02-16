@@ -208,9 +208,9 @@ onMounted(() => {
       </div>
 
       <!-- Summary Cards -->
-      <div class="flex flex-row gap-4 p-4">
+      <div class="grid mb-6 p-4">
         <!-- Open Sessions -->
-        <div style="width: 20%">
+        <div class="col-12 md:col-12 lg:col-4 xl:col-3 xl:p-2">
           <div class="bg-blue-50 border-round-lg shadow-1 border-blue-200 border-1 pl-4 pt-4 pr-3 pb-3 h-full flex flex-row justify-content-between">
             <div>
               <div class="text-md font-medium text-blue-500">{{ t('Session.OpenSessions') }}</div>
@@ -218,7 +218,7 @@ onMounted(() => {
                 {{ sessionStore.sessionData?.openSession }}
               </div>
             </div>
-            <div class="flex flex-column w-7 justify-content-end">
+            <div class="flex flex-column w-6">
               <div className="flex align-items-center justify-content-between">
                 <div className="flex align-items-center gap-2">
                   <i class="pi pi-check-circle text-green-600 text-lg" />
@@ -236,7 +236,8 @@ onMounted(() => {
             </div>
           </div>
         </div>
-        <div style="width: 20%">
+
+        <div class="col-12 md:col-6 lg:col-4 xl:col-2 xl:p-2">
           <div class="bg-yellow-50 border-round-lg shadow-1 border-yellow-200 border-1 p-4 h-full">
             <div class="text-md font-medium text-yellow-600">{{ 'Closed Sessions' }}</div>
             <div class="text-3xl font-bold text-yellow-600">
@@ -244,8 +245,10 @@ onMounted(() => {
             </div>
           </div>
         </div>
+
         <!-- Pending Sessions -->
-        <div style="width: 20%">
+
+        <div class="col-12 md:col-6 lg:col-4 xl:col-2 xl:p-2">
           <div class="bg-orange-50 border-round-lg shadow-1 border-orange-200 border-1 p-4 h-full">
             <div class="text-md font-medium text-orange-600">{{ t('Session.PendingSessions') }}</div>
             <div class="text-3xl font-bold text-orange-600">
@@ -255,7 +258,8 @@ onMounted(() => {
         </div>
 
         <!-- Old Sessions -->
-        <div style="width: 20%">
+
+        <div class="col-12 md:col-6 lg:col-6 xl:col-2 xl:p-2">
           <div class="bg-green-50 border-round-lg border-green-400 border-1 p-4 h-full">
             <div class="text-md font-medium text-green-600">{{ 'Approved Sessions' }}</div>
             <div class="text-3xl font-bold text-green-700">
@@ -264,7 +268,7 @@ onMounted(() => {
           </div>
         </div>
 
-        <div style="width: 20%">
+        <div class="col-12 md:col-6 lg:col-6 xl:col-3 xl:p-2">
           <div class="bg-purple-50 border-round-lg shadow-1 border-purple-200 border-1 p-4 h-full">
             <div class="text-md font-medium text-purple-500">{{ t('Session.TotalAmount') }}</div>
             <div class="text-3xl font-bold text-purple-500">{{ formatPrice(Number(sessionStore.sessionData?.totalAmount)) }}</div>
@@ -345,6 +349,9 @@ onMounted(() => {
             <template #body="slotProps">
               <div class="flex align-items-center justify-content-center text-center w-5rem">
                 <i v-if="slotProps.data.isSessionLate" class="pi flex pi-exclamation-triangle text-red-500 text-center" />
+                <div v-else style="width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center" class="text-green-500 border-1">
+                  <font-awesome-icon :icon="['fas', 'check']" class="pi flex pi-exclamation-triangle text-center" />
+                </div>
               </div>
             </template>
           </Column>

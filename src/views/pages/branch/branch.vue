@@ -139,7 +139,7 @@ const addData = async (data) => {
       <p class="text-500 text-base">{{ t('branch.Description') }}</p>
     </div>
     <div class="flex justify-content-center lg:justify-content-end col-12">
-      <Button :label="t('organizationAddButton')" @click="toggleCreateEditDialog(true, {}, false)" severity="primary" class="w-12rem h-2rem" />
+      <Button :label="t('organizationAddButton')" @click="toggleCreateEditDialog(true, {}, false)" severity="primary" class="p-button p-component px-4 py-2 bg-primary text-white border-round flex align-items-center gap-2"  />
     </div>
     <div class="col-12 md:col-6 lg:col-4 xl:col-3 border-round" v-for="data in paginatedEntities" :key="data.id">
       <Card class="flex justify-content-between flex-column" style="width: 100%; overflow: hidden; min-width: 200px; max-width: 300px; height: 374px">
@@ -148,8 +148,9 @@ const addData = async (data) => {
             <h2 class="text-xl font-bold text-white">{{ data.name }}</h2>
           </div>
         </template>
+        
         <template #title>
-          <div class="flex justify-content-between gap-1 px-3 align-items-center">
+          <div class="flex justify-content-between gap-1 px-3 align-items-center pt-3">
             <span class="text-xl">{{ data.cityName }},{{ data.countryName }}</span>
             <Tag :class="!data.isDeActivated ? 'bg-green-100 text-green-800' : 'danger'" :value="!data.isDeActivated ? 'Active' : 'Inactive'"></Tag>
           </div>
@@ -161,7 +162,7 @@ const addData = async (data) => {
           <div class="flex flex-column gap-2 px-3">
             <div class="flex gap-2 align-items-center">
               <i class="pi pi-phone mr-2"></i>
-              <span>{{ data.primaryPhone }}</span>
+              <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ data.primaryPhone }}</span>
             </div>
             <div class="flex gap-2 align-items-center">
               <i class="pi pi-envelope mr-2"></i>
@@ -174,13 +175,13 @@ const addData = async (data) => {
           </div>
         </template>
         <template #footer>
-          <div class="flex gap-3 px-3 pb-3">
-            <Button :label="t('organizationUpdateButton')" @click="toggleCreateEditDialog(false, data, false)" class="w-full h-2rem bg-primary text-xs xl:text-sm" />
+          <div class="flex gap-3 px-3 pb-3 justify-content-between">
+            <Button :label="t('organizationUpdateButton')" @click="toggleCreateEditDialog(false, data, false)"  class="p-button p-component px-3 py-2 bg-primary text-white border-round flex align-items-center "  />
             <Button
               :label="data.isDeActivated ? `${t('organizationActiveAction')}` : `${t('organizationDeactivatedAction')}`"
               :severity="data.isDeActivated ? 'success' : 'danger'"
               outlined
-              class="w-full h-2rem text-xs xl:text-sm"
+              class="p-button p-component px-3 py-2 xborder-round flex align-items-center gap-2" 
               @click="toggleActivateDeactivateDialog(data.isDeActivated, data.uniqueIdentifier)"
             />
           </div>

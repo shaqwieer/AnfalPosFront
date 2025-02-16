@@ -122,11 +122,15 @@ const filteredCustomers = computed(() => {
     return matchesTab && matchesSearch;
   });
 });
+
 </script>
 
 <template>
   <div class="h-full flex flex-column">
     <!-- Header -->
+
+   
+
     <div class="px-6">
       <div class="max-w-7xl mx-auto">
         <div class="flex align-items-center justify-content-between mb-6">
