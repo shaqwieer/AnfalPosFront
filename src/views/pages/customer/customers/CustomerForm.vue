@@ -268,6 +268,8 @@ const getCurrentLocation = async () => {
 const handleSubmit = () => {
   if (props.readOnly) return;
   formData.value.attachments = attachments.value;
+  console.log('formData.value');
+  console.log(formData.value);
   emit('submit', formData.value);
 };
 
@@ -292,20 +294,12 @@ watch(leftColumnTab, (newTab) => {
 </script>
 
 <template>
-  <Dialog
-    closable
-    :close-on-click-outside="true"
-    :modal="true"
-    v-model:visible="props.show"
-    class="flex justify-content-center"
-    style="width: 100vw; max-width: 80%; max-height: 80%"
-    :header="$t(`Customer.Customer_Details`)"
-    @update:visible="$emit('close')"
-  >
+  <Dialog closable :close-on-click-outside="true" :modal="true" v-model:visible="props.show" class="flex justify-content-center" style="width: 100vw; max-width: 80%" :header="$t(`Customer.Customer_Details`)" @update:visible="$emit('close')">
+    <!-- {{ formData }} -->
     <form @submit.prevent="handleSubmit" class="flex-1 overflow-hidden relative pb-8">
       <TabView>
-        <TabPanel header="customer Information">
-          <div v-if="show" class="inset-0 flex align-items-center justify-content-center z-5">
+        <TabPanel header="Customer Info">
+          <div v-if="show" style="height: 500px" class="inset-0 flex pt-5 justify-content-center z-5">
             <div class="surface-card border-round-xl w-full max-w-7xl max-h-90vh flex flex-column">
               <!-- Single column layout -->
               <div class="h-full flex flex-column">
@@ -326,7 +320,19 @@ watch(leftColumnTab, (newTab) => {
                       <input v-model="formData.email" type="email" :disabled="readOnly" class="w-full p-inputtext" />
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </TabPanel>
 
+        <TabPanel header="Business">
+          <div v-if="show" style="height: 500px" class="inset-0 flex pt-5 justify-content-center z-5">
+            <div class="surface-card border-round-xl w-full max-w-7xl max-h-90vh flex flex-column">
+              <!-- Single column layout -->
+              <div class="h-full flex flex-column">
+                <!-- Tab Content - Scrollable -->
+                <div class="flex-1 overflow-y-auto px-6">
                   <!-- Business Information -->
                   <div v-show="leftColumnTab === 'business'" class="flex flex-column gap-4">
                     <div>
@@ -344,8 +350,8 @@ watch(leftColumnTab, (newTab) => {
           </div>
         </TabPanel>
 
-        <TabPanel header="Financial Information">
-          <div v-if="show" class="inset-0 flex align-items-center justify-content-center z-5">
+        <TabPanel header="Bank">
+          <div v-if="show" style="height: 500px" class="inset-0 flex pt-5 justify-content-center z-5">
             <div class="surface-card border-round-xl w-full max-w-7xl max-h-90vh flex flex-column">
               <!-- Single column layout -->
               <div class="h-full flex flex-column">
@@ -353,22 +359,6 @@ watch(leftColumnTab, (newTab) => {
                 <div class="flex-1 overflow-y-auto px-6">
                   <!-- Financial Information -->
                   <div v-show="leftColumnTab === 'financial'" class="flex flex-column gap-4 mt-2">
-                    <!-- Credit and Payment Terms -->
-                    <div class="grid">
-                      <div class="col-12 md:col-6">
-                        <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Credit_Limit`) }} (SAR)</label>
-                        <input v-model="formData.creditLimit" type="number" min="0" step="1000" required :disabled="readOnly" class="w-full p-inputtext" />
-                      </div>
-                      <div class="col-12 md:col-6">
-                        <label class="block text-sm font-medium text-700 mb-1"> {{ $t(`Customer.Payment_Terms`) }} </label>
-                        <select v-model="formData.paymentTerms" required :disabled="readOnly" class="w-full p-inputtext">
-                          <option v-for="term in paymentTermsOptions" :key="term.value" :value="term.value">
-                            {{ term.label }}
-                          </option>
-                        </select>
-                      </div>
-                    </div>
-
                     <!-- Bank Information -->
                     <div class="surface-100 p-4 border-round-lg flex flex-column gap-4">
                       <h4 class="font-medium text-900">{{ $t(`Customer.Bank_Information`) }}</h4>
@@ -391,12 +381,6 @@ watch(leftColumnTab, (newTab) => {
                         </div>
                       </div>
                     </div>
-
-                    <!-- Financial Notes -->
-                    <div>
-                      <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.FinancialNotes`) }}</label>
-                      <textarea v-model="formData.financialNotes" rows="3" :disabled="readOnly" class="w-full p-inputtextarea" :placeholder="$t(`Customer.Add_any_financial_notes_or_special_payment_arrangements`)"></textarea>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -404,8 +388,8 @@ watch(leftColumnTab, (newTab) => {
           </div>
         </TabPanel>
 
-        <TabPanel header="location">
-          <div v-if="show" class="inset-0 flex align-items-center justify-content-center z-5">
+        <TabPanel header="Address">
+          <div v-if="show" style="height: 500px" class="inset-0 flex pt-5 justify-content-center z-5">
             <div class="surface-card border-round-xl w-full max-w-7xl max-h-90vh flex flex-column">
               <!-- Single column layout -->
               <div class="h-full flex flex-column">
@@ -413,6 +397,7 @@ watch(leftColumnTab, (newTab) => {
                   <!-- Address Information -->
                   <div class="flex flex-column gap-6">
                     <!-- Map View -->
+x
                     <div class="h-300px border-round-lg border-1 surface-border overflow-hidden relative">
                       <div ref="mapRef" class="w-full h-full"></div>
 
@@ -424,10 +409,12 @@ watch(leftColumnTab, (newTab) => {
                         </div>
                       </div>
                     </div>
+x
                     <!-- Location Error -->
                     <div v-if="locationError" class="text-red-600 text-sm">
                       {{ locationError }}
                     </div>
+x
                     <!-- Location Info -->
                     <div class="grid">
                       <div class="col-12 md:col-6">
@@ -439,7 +426,7 @@ watch(leftColumnTab, (newTab) => {
                         <input v-model="formData.location.lng" type="number" step="0.000001" class="w-full p-inputtext" readonly />
                       </div>
                     </div>
-
+x
                     <!-- Address Fields -->
                     <div class="grid">
                       <div class="col-12 md:col-6">
@@ -475,17 +462,6 @@ watch(leftColumnTab, (newTab) => {
                         {{ $t(`Customer.Get_Current_Location`) }}
                       </button>
                     </div>
-                  </div>
-
-                  <!-- Documents -->
-                  <div>
-                    <CustomerAttachmentsNew :customer-id="customer?.id || 'new'" :read-only="readOnly" v-model="attachments" />
-                  </div>
-
-                  <!-- Notes -->
-                  <div v-show="leftColumnTab === 'notes'" class="flex flex-column gap-4">
-                    <h3 class="text-lg font-medium text-900">{{ $t(`Customer.Additional_Notes`) }}</h3>
-                    <textarea v-model="formData.notes" rows="4" :disabled="readOnly" class="w-full p-inputtextarea" :placeholder="$t(`Customer.Add_any_additional_notes`)"></textarea>
                   </div>
                 </div>
               </div>
@@ -494,78 +470,11 @@ watch(leftColumnTab, (newTab) => {
         </TabPanel>
 
         <TabPanel header="Attachment">
-          <div v-if="show" class="inset-0 flex align-items-center justify-content-center z-5">
+          <div v-if="show" style="height: 500px" class="inset-0 flex pt-5 justify-content-center z-5">
             <div class="surface-card border-round-xl w-full max-w-7xl max-h-90vh flex flex-column">
               <!-- Single column layout -->
               <div class="h-full flex flex-column">
                 <div class="flex-1 overflow-y-auto px-6">
-                  <!-- Address Information -->
-                  <div class="flex flex-column gap-6">
-                    <!-- Map View -->
-                    <div class="h-300px border-round-lg border-1 surface-border overflow-hidden relative">
-                      <div ref="mapRef" class="w-full h-full"></div>
-
-                      <!-- Search Results Dropdown -->
-                      <div v-if="!readOnly && searchResults.length > 0" class="absolute top-4rem left-3rem w-20rem surface-card border-round-lg shadow-5 border-1 surface-border z-5 max-h-12rem overflow-y-auto">
-                        <div v-for="result in searchResults" :key="result.place_id" class="p-2 hover:surface-100 cursor-pointer" @click="selectSearchResult(result)">
-                          <div class="font-medium text-900">{{ result.display_name }}</div>
-                          <div class="text-xs text-600">{{ result.type }}</div>
-                        </div>
-                      </div>
-                    </div>
-                    <!-- Location Error -->
-                    <div v-if="locationError" class="text-red-600 text-sm">
-                      {{ locationError }}
-                    </div>
-                    <!-- Location Info -->
-                    <div class="grid">
-                      <div class="col-12 md:col-6">
-                        <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Latitude`) }}</label>
-                        <input v-model="formData.location.lat" type="number" step="0.000001" class="w-full p-inputtext" readonly />
-                      </div>
-                      <div class="col-12 md:col-6">
-                        <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Longitude`) }}</label>
-                        <input v-model="formData.location.lng" type="number" step="0.000001" class="w-full p-inputtext" readonly />
-                      </div>
-                    </div>
-
-                    <!-- Address Fields -->
-                    <div class="grid">
-                      <div class="col-12 md:col-6">
-                        <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Building_Number`) }}</label>
-                        <input v-model="formData.buildingNumber" type="text" :disabled="readOnly" class="w-full p-inputtext" />
-                      </div>
-                      <div class="col-12 md:col-6">
-                        <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Street_Name`) }}</label>
-                        <input v-model="formData.streetName" type="text" :disabled="readOnly" class="w-full p-inputtext" />
-                      </div>
-                      <div class="col-12 md:col-6">
-                        <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.District`) }}</label>
-                        <input v-model="formData.district" type="text" :disabled="readOnly" class="w-full p-inputtext" />
-                      </div>
-                      <div class="col-12 md:col-6">
-                        <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.City`) }}</label>
-                        <input v-model="formData.city" type="text" :disabled="readOnly" class="w-full p-inputtext" />
-                      </div>
-                      <div class="col-12 md:col-6">
-                        <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Postal_Code`) }}</label>
-                        <input v-model="formData.postalCode" type="text" :disabled="readOnly" class="w-full p-inputtext" />
-                      </div>
-                      <div class="col-12 md:col-6">
-                        <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Additional_Number`) }}</label>
-                        <input v-model="formData.additionalNumber" type="text" :disabled="readOnly" class="w-full p-inputtext" />
-                      </div>
-                    </div>
-
-                    <!-- Current Location Button -->
-                    <div v-if="!readOnly" class="flex justify-content-end pb-5">
-                      <button type="button" @click="getCurrentLocation" class="p-button p-button-primary">
-                        <i class="pi pi-map-marker mr-2"></i>
-                        {{ $t(`Customer.Get_Current_Location`) }}
-                      </button>
-                    </div>
-                  </div>
-
                   <!-- Documents -->
                   <div>
                     <CustomerAttachmentsNew :customer-id="customer?.id || 'new'" :read-only="readOnly" v-model="attachments" />
@@ -575,6 +484,38 @@ watch(leftColumnTab, (newTab) => {
                   <div v-show="leftColumnTab === 'notes'" class="flex flex-column gap-4">
                     <h3 class="text-lg font-medium text-900">{{ $t(`Customer.Additional_Notes`) }}</h3>
                     <textarea v-model="formData.notes" rows="4" :disabled="readOnly" class="w-full p-inputtextarea" :placeholder="$t(`Customer.Add_any_additional_notes`)"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </TabPanel>
+
+        <TabPanel header="Financial info">
+          <div v-if="show" style="height: 500px" class="inset-0 flex pt-5 justify-content-center z-5">
+            <div class="surface-card border-round-xl w-full max-w-7xl max-h-90vh flex flex-column">
+              <!-- Single column layout -->
+              <div class="h-full flex flex-column">
+                <div class="flex-1 overflow-y-auto px-6">
+                  <!-- Credit and Payment Terms -->
+                  <div class="grid">
+                    <div class="col-12 md:col-6">
+                      <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Credit_Limit`) }} (SAR)</label>
+                      <input v-model="formData.creditLimit" type="number" min="0" step="1000" required :disabled="readOnly" class="w-full p-inputtext" />
+                    </div>
+                    <div class="col-12 md:col-6">
+                      <label class="block text-sm font-medium text-700 mb-1"> {{ $t(`Customer.Payment_Terms`) }} </label>
+                      <select v-model="formData.paymentTerms" required :disabled="readOnly" class="w-full p-inputtext">
+                        <option v-for="term in paymentTermsOptions" :key="term.value" :value="term.value">
+                          {{ term.label }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                  <!-- Financial Notes -->
+                  <div>
+                    <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.FinancialNotes`) }}</label>
+                    <textarea v-model="formData.financialNotes" rows="3" :disabled="readOnly" class="w-full p-inputtextarea" :placeholder="$t(`Customer.Add_any_financial_notes_or_special_payment_arrangements`)"></textarea>
                   </div>
                 </div>
               </div>
@@ -637,4 +578,8 @@ watch(leftColumnTab, (newTab) => {
   width: 34px !important;
   height: 34px !important;
 }
+/* 
+:deep(.p-dialog .p-dialog-content) {
+  height: 500px !important;
+} */
 </style>
