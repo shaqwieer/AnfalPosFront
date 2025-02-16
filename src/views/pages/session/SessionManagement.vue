@@ -6,7 +6,9 @@ import { useDebounceFn } from '@vueuse/core';
 import Chart from 'primevue/chart';
 import { useI18n } from 'vue-i18n';
 import MultiSelect from 'primevue/multiselect';
+import { useToast } from 'primevue/usetoast';
 const { t } = useI18n();
+const toast = useToast();
 
 // Filter states
 const selectedSalesReps = ref<string[] | null>(null);
@@ -103,7 +105,7 @@ const getStatusColor = (status) => {
     case 5:
       return 'bg-yellow-100 text-yellow-800';
     case 6:
-      return 'bg-blue-100 text-blue-800';
+      return 'bg-orange-100 text-orange-800';
     case 7:
       return 'bg-green-100 text-green-800';
     default:
@@ -120,16 +122,19 @@ const applyFilters = () => {
 const getSessions = useDebounceFn(
   async () => {
     const formData = new FormData();
+    if (selectedSalesReps.value.length === 0 || selectedStatus.value.length === 0) {
+      toast.add({ severity: 'error', detail: 'برجاء اختيار حالة ومندوب', life: 3000 });
+      changedFilter.value = false;
+      return;
+    }
     selectedStatus.value.forEach((element, index) => {
       formData.append(`StatusIds[${index}]`, element);
     });
     selectedSalesReps.value.forEach((element, index) => {
       formData.append(`SalesRepIds[${index}]`, element);
     });
-    console.log(new Date(dateTo.value));
     formData.append('StartDate', new Date(dateFrom.value).toISOString());
     formData.append('EndDate', new Date(dateTo.value).toUTCString());
-    console.log(new Date(dateTo.value).getTimezoneOffset());
 
     await sessionStore.GetSessions(formData);
     changedFilter.value = false;

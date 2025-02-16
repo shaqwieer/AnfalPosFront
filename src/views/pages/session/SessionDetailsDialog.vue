@@ -39,7 +39,7 @@ const ApproveSession = (session) => {
 const ApproveSessionTransaction = (transationId, transactionType) => {
   const payload = {
     approveId: transationId,
-    sessionId: sessionData.value.sessionId,
+    sessionId: sessionData.value.id,
     isCashDeposit: transactionType === 'Deposits'
   };
   sessionStore.ApproveSessionTransaction(payload);
@@ -49,6 +49,18 @@ const statusOptions = [
   { label: `${t('Approved')}`, value: '2', color: '#3357FF' },
   { label: 'Reconciled', value: '3', color: '#FA7B00' }
 ];
+const getStatusColor = (status) => {
+  switch (status) {
+    case 1:
+      return 'bg-orange-100 text-orange-800';
+    case 2:
+      return 'bg-blue-100 text-blue-800';
+    case 3:
+      return 'bg-green-100 text-green-800';
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
+};
 const closeDialog = () => {
   emit('close');
 };
@@ -172,6 +184,13 @@ onMounted(() => {
                 <div class="flex text-lg">{{ formatPrice(slotProps.data.depositAmount) }}</div>
               </template>
             </Column>
+            <Column field="statusId" header="Status" class="" :sortable="true">
+              <template #body="slotProps">
+                <span class="px-2 py-1 flex w-fit text-sm font-semibold border-round-xl" :class="getStatusColor(slotProps.data.statusId)">
+                  {{ statusOptions.find((option) => option.value == slotProps.data.statusId)?.label }}
+                </span>
+              </template>
+            </Column>
             <Column field="attachmentUrl" header="Attachment" class="w-1rem" :sortable="true">
               <template #body="slotProps">
                 <div class="flex align-items-center justify-content-center gap-1">
@@ -185,7 +204,7 @@ onMounted(() => {
                   <div v-else class="flex w-11 justify-content-center align-items-center bg-white text-sm text-red-600">No Attachment</div>
                   <div
                     v-if="slotProps.data.statusId === 1"
-                    @click="ApproveSessionTransaction(slotProps.data.depositNo, 'Deposits')"
+                    @click="ApproveSessionTransaction(slotProps.data.id, 'Deposits')"
                     class="cursor-pointer text-green-500 border-circle border-1 border-green-200 flex align-items-center justify-content-center w-3rem h-3rem hover:bg-green-100"
                   >
                     <i class="pi pi-check-circle"></i>
