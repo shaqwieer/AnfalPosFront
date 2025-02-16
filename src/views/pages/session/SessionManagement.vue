@@ -133,8 +133,8 @@ const getSessions = useDebounceFn(
     selectedSalesReps.value.forEach((element, index) => {
       formData.append(`SalesRepIds[${index}]`, element);
     });
-    formData.append('StartDate', new Date(dateFrom.value).toISOString());
-    formData.append('EndDate', new Date(dateTo.value).toUTCString());
+    formData.append('StartDate', new Date(dateFrom.value).toDateString());
+    formData.append('EndDate', new Date(dateTo.value).toDateString());
 
     await sessionStore.GetSessions(formData);
     changedFilter.value = false;
@@ -182,7 +182,7 @@ onMounted(() => {
             <div class="h-full surface-card cursor-pointer transition-all transition-duration-200">
               <div class="w-full">
                 <label class="block text-sm font-semibold text-gray-700 mb-1">{{ t('Session.FromDate') }}</label>
-                <Calendar v-model="dateFrom" showIcon iconDisplay="input" class="w-full h-3rem" showTime />
+                <Calendar v-model="dateFrom" showIcon iconDisplay="input" class="w-full h-3rem" />
               </div>
             </div>
           </div>
@@ -191,7 +191,7 @@ onMounted(() => {
             <div class="h-full surface-card cursor-pointer">
               <div class="w-full">
                 <label class="block text-sm font-semibold text-gray-700 mb-1">{{ t('Session.ToDate') }}</label>
-                <Calendar v-model="dateTo" showIcon iconDisplay="input" showTime class="w-full h-3rem" />
+                <Calendar v-model="dateTo" showIcon iconDisplay="input" class="w-full h-3rem" />
               </div>
             </div>
           </div>

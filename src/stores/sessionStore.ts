@@ -45,8 +45,8 @@ export const useSessionStore = defineStore({
     async ApproveSessionTransaction(payload: any) {
       try {
         const response = await apiClient.post('/ShiftSessions/ApproveTransactionOrDepositForSession', payload);
-        if (payload.isCashDeposit) this.sessions.find((session: any) => session.id === payload.sessionId).shiftCashDeposits.find((deposit: any) => deposit.depositNo === payload.approveId).statusId = 2;
-        else this.sessions.find((session: any) => session.id === payload.sessionId).transactions.find((transaction: any) => transaction.id === payload.approveId).statusId = 2;
+        if (payload.isCashDeposit) this.selectedSession.shiftCashDeposits.find((deposit: any) => deposit.id === payload.approveId).statusId = 2;
+        else this.selectedSession.transactions.find((transaction: any) => transaction.id === payload.approveId).statusId = 2;
       } catch (err) {
         this.error = handleError(err, this.loading);
       }
