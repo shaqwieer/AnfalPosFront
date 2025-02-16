@@ -42,6 +42,13 @@ export const useSessionStore = defineStore({
         this.error = handleError(err, this.loading);
       }
     },
+    async ApproveSessionTransaction(payload: any) {
+      try {
+        const response = await apiClient.post('/ShiftSessions/ApproveTransactionOrDepositForSession', payload);
+      } catch (err) {
+        this.error = handleError(err, this.loading);
+      }
+    },
     async GetSalesReps() {
       try {
         const response = await apiClient.get('/BusinessEntities/GetUserVanSaleInBranch');
