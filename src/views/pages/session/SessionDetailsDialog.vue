@@ -191,7 +191,7 @@ onMounted(() => {
                 </span>
               </template>
             </Column>
-            <Column field="attachmentUrl" header="Attachment" class="w-1rem" :sortable="true">
+            <Column field="attachmentUrl" header="Attachments" class="w-1rem" :sortable="true">
               <template #body="slotProps">
                 <div class="flex align-items-center justify-content-center gap-1">
                   <div
@@ -244,7 +244,14 @@ onMounted(() => {
                 <div class="flex text-lg">{{ formatPrice(slotProps.data.amount) }}</div>
               </template>
             </Column>
-            <Column field="attachmentUrl" header="Attachment" class="w-1rem" :sortable="true">
+            <Column field="statusId" header="Status" class="" :sortable="true">
+              <template #body="slotProps">
+                <span class="px-2 py-1 flex w-fit text-sm font-semibold border-round-xl" :class="getStatusColor(slotProps.data.statusId)">
+                  {{ statusOptions.find((option) => option.value == slotProps.data.statusId)?.label }}
+                </span>
+              </template>
+            </Column>
+            <Column field="attachmentUrl" header="Attachments" class="w-1rem" :sortable="true">
               <template #body="slotProps">
                 <div class="flex align-items-center justify-content-center gap-1">
                   <div

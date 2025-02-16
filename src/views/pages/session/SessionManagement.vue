@@ -361,7 +361,7 @@ onMounted(() => {
               </div>
             </template>
           </Column>
-          <Column field="statusName" :header="t('Status')" class="w-8rem">
+          <Column field="statusName" :header="t('Actions')" class="w-8rem">
             <template #body="slotProps">
               <Button @click="viewSessionDetails(slotProps.data)" class="p-1 hover:bg-gray-100 rounded-full" size="large" text r icon="pi pi-eye" title="View Details"> </Button>
             </template>
