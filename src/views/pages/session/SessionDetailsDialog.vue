@@ -71,9 +71,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <Dialog modal style="min-width: 80vw" :closable="false" :showHeader="false" contentClass="border-round-lg p-0">
+  <Dialog modal style="min-width: 80vw; min-height: 90vh" :closable="false" :showHeader="false" contentClass="border-round-lg p-0">
     <div class="flex bg-gray-100">
-      <div class="flex flex-column gap-3 w-full p-4 bg-gray-100">
+      <div class="flex flex-column gap-3 w-full p-4 bg-gray-100 overflow-auto" style="height: 90vh">
         <div class="flex flex-row justify-content-between w-full">
           <div class="flex flex-column gap-2">
             <span class="font-bold text-xl"
