@@ -45,16 +45,16 @@ const props = defineProps({
 const branchSchema = yup.object({
   arabicName: yup.string().required(t('branchDialog.requiredError')),
   englishName: yup.string().required(t('branchDialog.requiredError')),
-  email: yup.string().required(t('branchDialog.requiredError')),
-  address: yup.string().required(t('branchDialog.requiredError')),
-  primaryPhone: yup.string().required(t('branchDialog.requiredError')),
+  email: yup.string().nullable(t('branchDialog.requiredError')),
+  address: yup.string().nullable(t('branchDialog.requiredError')),
+  primaryPhone: yup.string().nullable(t('branchDialog.requiredError')),
   secondaryPhone: yup.string().nullable(),
 
-  city: yup.mixed().required(t('branchDialog.requiredError')),
-  branchType: yup.mixed().required(t('branchDialog.requiredError')),
-  country: yup.mixed().required(t('branchDialog.requiredError')),
+  city: yup.mixed().nullable(t('branchDialog.requiredError')),
+  branchType: yup.mixed().nullable(t('branchDialog.requiredError')),
+  country: yup.mixed().nullable(t('branchDialog.requiredError')),
 
-  salesRepCode: yup.string().required(t('branchDialog.requiredError')),
+  salesRepCode: yup.string().nullable(t('branchDialog.requiredError')),
   sapStorageLocation: yup.mixed().nullable(),
   cashCustomer: yup.mixed().nullable(),
   profitCenter: yup.mixed().nullable(),
@@ -130,7 +130,7 @@ const createData = handleSubmit(async (validatedInfo) => {
 
     BankName: validatedInfo.bankName || null,
     BankCode: validatedInfo.bankCode || null,
-    
+
     BankAccountNo: validatedInfo.bankAccounts || null,
 
     bankPosFirst: validatedInfo.bankPosFirst || null,
@@ -160,7 +160,7 @@ const updateData = handleSubmit(async (validatedInfo) => {
     primaryPhone: validatedInfo.primaryPhone,
     OrganizationId: validatedInfo.organizationId || 1, // Provide default value if not present
     BankAccountId: validatedInfo.bankAccounts || null,
-    
+
     BankName: validatedInfo.bankName || null,
     BankCode: validatedInfo.bankCode || null,
 
@@ -228,7 +228,7 @@ watch(
 <template>
   <Dialog v-model:visible="visible" :breakpoints="{ '640px': '25rem' }" :header="$t('branchDialog.header')" :class="containerClass" :style="{ minWidth: '60rem' }" :modal="true" :closable="false">
     <div class="flex flex-column gap-4 p-4" style="padding-bottom: 50px !important">
-      <div class="flex flex-column w-full gap-2 border-1 p-4 border-round-lg">
+      <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
         <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.generalInformation') }}</h3>
         <div class="flex gap-2">
           <div class="field flex flex-column w-6">
@@ -243,11 +243,11 @@ watch(
           </div>
         </div>
       </div>
-      <div class="flex flex-column w-full gap-2 border-1 p-4 border-round-lg">
-        <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.sapInformation') }} || Sap Information</h3>
+      <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
+        <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.sapInformation') }}</h3>
         <div class="flex gap-2">
           <div class="field flex flex-column w-4">
-            <label for="organizationType" class="mb-3 required">{{ $t('branchDialog.sapStorageLocation') }}</label>
+            <label for="organizationType" class="mb-3 ">{{ $t('branchDialog.sapStorageLocation') }}</label>
 
             <InputText id="organizationType" v-model="sapStorageLocation" v-bind="sapStorageLocationAttrs" :invalid="!!errors.sapStorageLocation" />
 
@@ -255,7 +255,7 @@ watch(
           </div>
 
           <div class="field flex flex-column w-4">
-            <label for="cashJournal" class="mb-3 required">{{ $t('branchDialog.cashJournal') }}</label>
+            <label for="cashJournal" class="mb-3 ">{{ $t('branchDialog.cashJournal') }}</label>
 
             <InputText id="cashJournal" v-model="cashJournal" v-bind="cashJournalAttrs" :invalid="!!errors.cashJournal" />
 
@@ -263,7 +263,7 @@ watch(
           </div>
 
           <div class="field flex flex-column w-4">
-            <label for="profitCenter" class="mb-3 required">{{ $t('branchDialog.profitCenter') }}</label>
+            <label for="profitCenter" class="mb-3 ">{{ $t('branchDialog.profitCenter') }}</label>
             <InputText id="profitCenter" v-model="profitCenter" v-bind="profitCenterAttrs" :invalid="!!errors.profitCenter" />
             <small v-if="errors.profitCenter" class="text-red-600">{{ errors.profitCenter }}</small>
           </div>
@@ -271,7 +271,7 @@ watch(
 
         <div class="flex gap-2">
           <div class="field flex flex-column w-6">
-            <label for="cashCustomer" class="mb-3 required">{{ $t('branchDialog.cashCustomer') }}</label>
+            <label for="cashCustomer" class="mb-3 ">{{ $t('branchDialog.cashCustomer') }}</label>
             <!-- <Dropdown
               v-model="cashCustomer"
               disabled
@@ -296,19 +296,19 @@ watch(
             <small v-if="errors.cashCustomer" class="text-red-600">{{ errors.cashCustomer }}</small>
           </div>
           <div class="field flex flex-column w-6">
-            <label for="SalesRepCode" class="required mb-3">Sales Rep Code</label>
+            <label for="SalesRepCode" class=" mb-3">Sales Rep Code</label>
             <InputText id="SalesRepCode" v-model="salesRepCode" v-bind="salesRepCodeAttrs" autofocus :invalid="!!errors.salesRepCode" />
             <small v-if="errors.salesRepCode" class="text-red-600">{{ errors.salesRepCode }}</small>
           </div>
         </div>
       </div>
 
-      <div class="flex flex-column w-full gap-2 border-1 p-4 border-round-lg">
+      <div class="flex flex-column w-full gap-2 border-gray-300 border-1 p-4 border-round-lg">
         <h3 class="text-primary-600 text-base font-semibold">Bank Information</h3>
 
         <div class="flex gap-2">
           <div class="field flex flex-column w-6">
-            <label for="bankAccounts" class="mb-3 required">{{ $t('branchDialog.bankAccounts') }}</label>
+            <label for="bankAccounts" class="mb-3 ">{{ $t('branchDialog.bankAccounts') }}</label>
 
             <InputText id="bankAccounts" v-model="bankAccounts" v-bind="bankAccountsAttrs" :invalid="!!errors.bankAccounts" />
 
@@ -316,7 +316,7 @@ watch(
           </div>
 
           <div class="field flex flex-column w-6">
-            <label for="bankPosFirst" class="mb-3 required">Bank POS1</label>
+            <label for="bankPosFirst" class="mb-3 ">Bank POS1</label>
             <InputText id="bankPosFirst" v-model="bankPosFirst" v-bind="bankPosFirstAttrs" :invalid="!!errors.bankPosFirst" />
             <small v-if="errors.bankPosFirst" class="text-red-600">{{ errors.bankPosFirst }}</small>
           </div>
@@ -324,24 +324,24 @@ watch(
 
         <div class="flex gap-2">
           <div class="field flex flex-column w-6">
-            <label for="bankPosSecond" class="mb-3 required">Bank POS2</label>
+            <label for="bankPosSecond" class="mb-3 ">Bank POS2</label>
             <InputText id="bankPosSecond" v-model="bankPosSecond" v-bind="bankPosSecondAttrs" :invalid="!!errors.bankPosSecond" />
             <small v-if="errors.bankPosSecond" class="text-red-600">{{ errors.bankPosSecond }}</small>
           </div>
 
           <div class="field flex flex-column w-6">
-            <label for="bankPosThird" class="mb-3 required">Bank POS3</label>
+            <label for="bankPosThird" class="mb-3 ">Bank POS3</label>
             <InputText id="bankPosThird" v-model="bankPosThird" v-bind="bankPosThirdAttrs" :invalid="!!errors.bankPosThird" />
             <small v-if="errors.bankPosThird" class="text-red-600">{{ errors.bankPosThird }}</small>
           </div>
         </div>
       </div>
 
-      <div class="flex flex-column w-full gap-2 border-1 p-4 border-round-lg">
+      <div class="flex flex-column w-full gap-2 border-gray-300 border-1 p-4 border-round-lg">
         <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.additionalInformation') }}</h3>
         <div class="flex gap-2">
           <div class="field flex flex-column w-4">
-            <label for="organizationType" class="mb-3 required">{{ $t('branchDialog.country') }}</label>
+            <label for="organizationType" class="mb-3 ">{{ $t('branchDialog.country') }}</label>
             <Dropdown v-model="country" v-bind="countryAttrs" :virtualScrollerOptions="{ itemSize: 38 }" :options="countries" filter :loading="false" optionLabel="name" :placeholder="t('branchDialog.countryPlaceholder')" class="w-full">
               <template #option="slotProps">
                 <div class="flex align-items-center mx-auto gap-3">
@@ -352,7 +352,7 @@ watch(
             <small v-if="errors.country" class="text-red-600">{{ errors.country }}</small>
           </div>
           <div class="field flex flex-column w-4">
-            <label for="city" class="mb-3 required">{{ $t('branchDialog.city') }}</label>
+            <label for="city" class="mb-3 ">{{ $t('branchDialog.city') }}</label>
             <Dropdown v-model="city" v-bind="cityAttrs" :virtualScrollerOptions="{ itemSize: 38 }" :options="filterCities" filter :loading="false" optionLabel="name" :placeholder="t('branchDialog.cityPlaceholder')" class="w-full">
               <template #option="slotProps">
                 <div class="flex align-items-center mx-auto gap-3">
@@ -363,7 +363,7 @@ watch(
             <small v-if="errors.city" class="text-red-600">{{ errors.city }}</small>
           </div>
           <div class="field flex flex-column w-4">
-            <label for="branchType" class="mb-3 required">{{ $t('branchDialog.branchType') }}</label>
+            <label for="branchType" class="mb-3 ">{{ $t('branchDialog.branchType') }}</label>
             <Dropdown v-model="branchType" v-bind="branchTypeAttrs" :virtualScrollerOptions="{ itemSize: 38 }" :options="branchTypes" filter :loading="false" optionLabel="name" :placeholder="t('branchDialog.branchTypePlaceholder')" class="w-full">
               <template #option="slotProps">
                 <div class="flex align-items-center mx-auto gap-3">
@@ -376,31 +376,31 @@ watch(
         </div>
         <div class="flex gap-2">
           <div class="field flex flex-column w-6">
-            <label for="email" class="required">{{ $t('branchDialog.email') }}</label>
+            <label for="email" class="">{{ $t('branchDialog.email') }}</label>
             <InputText id="email" v-model="email" v-bind="emailAttrs" autofocus :invalid="!!errors.email" />
             <small v-if="errors.email" class="text-red-600">{{ errors.email }}</small>
           </div>
           <div class="field flex flex-column w-6">
-            <label for="primaryPhone" class="required">{{ $t('branchDialog.primaryPhone') }}</label>
+            <label for="primaryPhone" class="">{{ $t('branchDialog.primaryPhone') }}</label>
             <vue-tel-input class="w-full p-2" v-model="primaryPhone" v-bind="primaryPhoneAttrs"></vue-tel-input>
             <small v-if="errors.primaryPhone" class="text-red-600">{{ errors.primaryPhone }}</small>
           </div>
         </div>
         <div class="flex gap-2">
           <div class="field flex flex-column w-6">
-            <label for="address" class="required">{{ $t('cityDialog.address') }}</label>
+            <label for="address" class="">{{ $t('cityDialog.address') }}</label>
             <InputText id="address" v-model="address" v-bind="addressAttrs" autofocus :invalid="!!errors.address" />
             <small v-if="errors.address" class="text-red-600">{{ errors.address }}</small>
           </div>
           <div class="field flex flex-column w-6">
-            <label for="secondaryPhone" class="required">{{ $t('branchDialog.secondaryPhone') }}</label>
+            <label for="secondaryPhone" class="">{{ $t('branchDialog.secondaryPhone') }}</label>
             <vue-tel-input class="w-full p-2" v-model="secondaryPhone" v-bind="secondaryPhoneAttrs"></vue-tel-input>
             <small v-if="errors.secondaryPhone" class="text-red-600">{{ errors.secondaryPhone }}</small>
           </div>
         </div>
       </div>
 
-      <div class="flex justify-content-end gap-3 pt-2 absolute" style="bottom: 0px; right: 28px; width: 93%; background: white; height: 59px; padding-bottom: 12px; padding-right: 23px">
+      <div class="flex justify-content-end border-gray-300 gap-3 pt-2 absolute" style="bottom: 0px; right: 28px; width: 93%; background: white; height: 59px; padding-bottom: 12px; padding-right: 23px">
         <Button
           :label="$t('cityDialog.addButton')"
           v-if="IsAdd"
