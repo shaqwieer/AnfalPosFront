@@ -138,44 +138,47 @@ const addData = async (data) => {
 </script>
 <template>
   <div :class="['grid px-6', { 'rtl-direction': rtl }]">
+    <div class="flex flex-column row-gap-5 px-3 lg:flex-row justify-content-between">
+      <div class="lg:col-8 px-0 pt-2">
+        <h3 class="text-700 text-3xl font-semibold">{{ t('organizationHeader') }}</h3>
+        <p class="text-500 text-lg">{{ t('organizationDescription') }}</p>
+      </div>
+
+      <div class="flex cursor-pointer flex-row justify-content-center gap-2 align-items-center bg-primary text-white border-round h-3rem w-full lg:w-14rem" @click="toggleCreateEditDialog(true, {}, false)">
+        <div class="">+</div>
+        <div class="">{{ t('organizationAddButton') }}</div>
+      </div>
+    </div>
     <!-- <SmartUplaoder /> -->
-    <div class="col-12">
-      <h3 class="text-700 text-xl font-semibold">{{ t('organizationHeader') }}</h3>
-      <p class="text-500 text-base">{{ t('organizationDescription') }}</p>
-    </div>
 
-    <div class="flex justify-content-center lg:justify-content-end col-12">
-      <Button :label="t('organizationAddButton')" @click="toggleCreateEditDialog(true, {}, false)" class="p-button p-component px-4 py-2 bg-primary text-white border-round flex align-items-center gap-2" />
-    </div>
-
-    <div class="col-12 md:col-6 lg:col-4 xl:col-3" v-for="data in paginatedEntities" :key="data.id">
-      <Card style="width: 100%; overflow: hidden; min-width: 200px; max-width: 300px; height: 302px" class="flex justify-content-between flex-column col-12 md:col-6 lg:col-4 xl:col-3 border-round p-0">
+    <div class="col-12 md:col-6 lg:col-4 xl:col-4" v-for="data in paginatedEntities" :key="data.id">
+      <Card style="width: 100%; overflow: hidden; min-width: 200px; height: 302px; border-top: 5px solid" class="flex p-4 justify-content-between border-primary flex-column col-12 md:col-6 lg:col-4 xl:col-3 border-round p-0">
         <template #header>
           <ImageLoader style="object-fit: contain" class="w-full h-8rem border-bottom-1 border-gray-300 border-round" alt="Logo" :src="data.logoImageUrl != null ? data.logoImageUrl : placeHolderPhoto" />
         </template>
 
         <template #title>
-          <div class="flex justify-content-between gap-1 px-3 align-items-center pt-3">
+          <div class="flex justify-content-between gap-1 align-items-center">
             {{ data.name }}
           </div>
         </template>
         <template #subtitle>
-          <div class="flex justify-content-between gap-1 px-3 align-items-center pt-3">
+          <div class="flex justify-content-between gap-1 align-items-center border-round">
             <span class="text-base text-400 font-semibold">{{ data.organizationTypeName }}</span>
-            <Tag :class="!data.isDeActivated ? 'bg-green-100 text-green-800' : 'danger'" :value="!data.isDeActivated ? `${t('organizationActive')}` : `${t('organizationDeactivated')}`"></Tag>
+            <Tag :class="!data.isDeActivated ? 'bg-green-100 text-green-700 border-round-xl px-3' : 'danger'" :value="!data.isDeActivated ? `${t('organizationActive')}` : `${t('organizationDeactivated')}`"></Tag>
           </div>
         </template>
         <template #footer>
-          <div class="flex gap-3 px-3 pb-3 justify-content-between">
+          <div class="flex gap-3 justify-content-between">
             <!-- <Button :label="t('organizationUpdateButton')" @click="toggleCreateEditDialog(false, data, false)" severity="info" class=" h-2rem text-xs xl:text-sm" /> -->
-            <Button :label="t('organizationUpdateButton')" @click="toggleCreateEditDialog(false, data, false)" severity="info" class="p-button p-component px-3 py-2 bg-primary text-white border-round flex align-items-center" />
+            <Button :label="t('organizationUpdateButton')" @click="toggleCreateEditDialog(false, data, false)" severity="info" class="p-button p-component px-0 py-0 w-6 h-3rem bg-primary text-white border-round flex align-items-center" />
 
             <Button
               :label="data.isDeActivated ? `${t('organizationActiveAction')}` : `${t('organizationDeactivatedAction')}`"
               @click="toggleActivateDeactivateDialog(data.isDeActivated, data.uniqueIdentifier)"
               :severity="data.isDeActivated ? 'success' : 'danger'"
               outlined
-              class="p-button p-component px-3 py-2 xborder-round flex align-items-center gap-2"
+              class="p-button p-component w-6 border-round flex align-items-center gap-2 px-0 py-0 h-3rem"
             />
           </div>
         </template>

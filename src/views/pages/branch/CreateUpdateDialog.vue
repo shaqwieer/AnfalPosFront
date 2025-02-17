@@ -77,7 +77,7 @@ const informationInitial = ref({
   cashCustomer: null,
   profitCenter: null,
   cashJournal: null,
-  bankAccounts: null,
+  bankAccounts: '',
 
   bankPosFirst: null,
   bankPosSecond: null,
@@ -127,9 +127,11 @@ const createData = handleSubmit(async (validatedInfo) => {
     primaryPhone: validatedInfo.primaryPhone,
     OrganizationId: validatedInfo.organizationId || 1, // Provide default value if not present
     BankAccountId: validatedInfo.bankAccounts || null,
+
     BankName: validatedInfo.bankName || null,
     BankCode: validatedInfo.bankCode || null,
-    BankAccountNo: validatedInfo.bankAccountNo || null,
+    
+    BankAccountNo: validatedInfo.bankAccounts || null,
 
     bankPosFirst: validatedInfo.bankPosFirst || null,
     bankPosSecond: validatedInfo.bankPosSecond || null,
@@ -144,6 +146,8 @@ const createData = handleSubmit(async (validatedInfo) => {
     Email: validatedInfo.email,
     Address: validatedInfo.address
   };
+  console.log(validatedInfo);
+
   props.createElement(branchDto);
   resetForm();
 });
@@ -156,9 +160,11 @@ const updateData = handleSubmit(async (validatedInfo) => {
     primaryPhone: validatedInfo.primaryPhone,
     OrganizationId: validatedInfo.organizationId || 1, // Provide default value if not present
     BankAccountId: validatedInfo.bankAccounts || null,
+    
     BankName: validatedInfo.bankName || null,
     BankCode: validatedInfo.bankCode || null,
-    BankAccountNo: validatedInfo.bankAccountNo || null,
+
+    BankAccountNo: validatedInfo.bankAccounts || null,
 
     bankPosFirst: validatedInfo.bankPosFirst || null,
     bankPosSecond: validatedInfo.bankPosSecond || null,

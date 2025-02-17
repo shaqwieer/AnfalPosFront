@@ -133,33 +133,38 @@ const addData = async (data) => {
 </script>
 <template>
   <div :class="['grid px-6', { 'rtl-direction': rtl }]">
+    <div class="flex flex-column row-gap-5 px-3 lg:flex-row justify-content-between">
+      <div class="lg:col-8 px-0 pt-2">
+        <h3 class="text-700 text-3xl font-semibold">{{ t('branch.Header') }}</h3>
+        <p class="text-500 text-lg">{{ t('branch.Description') }}</p>
+      </div>
+      <div class="flex cursor-pointer flex-row justify-content-center gap-2 align-items-center bg-primary text-white border-round h-3rem w-full lg:w-14rem" @click="toggleCreateEditDialog(true, {}, false)">
+        <div class="">+</div>
+        <div class="">{{ t('AddBranch') }}</div>
+      </div>
+    </div>
+
     <!-- <SmartUplaoder /> -->
-    <div class="col-12">
-      <h3 class="text-700 text-xl font-semibold">{{ t('branch.Header') }}</h3>
-      <p class="text-500 text-base">{{ t('branch.Description') }}</p>
-    </div>
-    <div class="flex justify-content-center lg:justify-content-end col-12">
-      <Button :label="t('organizationAddButton')" @click="toggleCreateEditDialog(true, {}, false)" severity="primary" class="p-button p-component px-4 py-2 bg-primary text-white border-round flex align-items-center gap-2"  />
-    </div>
-    <div class="col-12 md:col-6 lg:col-4 xl:col-3 border-round" v-for="data in paginatedEntities" :key="data.id">
-      <Card class="flex justify-content-between flex-column" style="width: 100%; overflow: hidden; min-width: 200px; max-width: 300px; height: 374px">
+
+    <div class="col-12 md:col-6 lg:col-4 xl:col-4" v-for="data in paginatedEntities" :key="data.id">
+      <Card style="width: 100%; overflow: hidden; min-width: 200px;  border-top: 5px solid" class="flex h-full p-4 justify-content-between border-primary flex-column col-12 md:col-6 lg:col-4 xl:col-3 border-round p-0">
         <template #header>
           <div class="w-full h-8rem bg-primary flex align-items-center justify-content-center border-round">
             <h2 class="text-xl font-bold text-white">{{ data.name }}</h2>
           </div>
         </template>
-        
+
         <template #title>
-          <div class="flex justify-content-between gap-1 px-3 align-items-center pt-3">
+          <div class="flex justify-content-between gap-1  align-items-center pt-3">
             <span class="text-xl">{{ data.cityName }},{{ data.countryName }}</span>
             <Tag :class="!data.isDeActivated ? 'bg-green-100 text-green-800' : 'danger'" :value="!data.isDeActivated ? 'Active' : 'Inactive'"></Tag>
           </div>
         </template>
         <template #subtitle>
-          <span class="text-base text-500 font-semibold px-3">{{ data.branchTypeName }}</span>
+          <span class="text-base text-500 font-semibold ">{{ data.branchTypeName }}</span>
         </template>
         <template #content>
-          <div class="flex flex-column gap-2 px-3">
+          <div class="flex flex-column gap-2 ">
             <div class="flex gap-2 align-items-center">
               <i class="pi pi-phone mr-2"></i>
               <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ data.primaryPhone }}</span>
@@ -175,13 +180,13 @@ const addData = async (data) => {
           </div>
         </template>
         <template #footer>
-          <div class="flex gap-3 px-3 pb-3 justify-content-between">
-            <Button :label="t('organizationUpdateButton')" @click="toggleCreateEditDialog(false, data, false)"  class="p-button p-component px-3 py-2 bg-primary text-white border-round flex align-items-center "  />
+          <div class="flex gap-3   justify-content-between">
+            <Button :label="t('organizationUpdateButton')" @click="toggleCreateEditDialog(false, data, false)" class="p-button p-component px-0 py-0 w-6 bg-primary text-white border-round flex align-items-center" />
             <Button
               :label="data.isDeActivated ? `${t('organizationActiveAction')}` : `${t('organizationDeactivatedAction')}`"
               :severity="data.isDeActivated ? 'success' : 'danger'"
               outlined
-              class="p-button p-component px-3 py-2 xborder-round flex align-items-center gap-2" 
+             class="p-button p-component w-6 border-round flex align-items-center gap-2 px-0 py-0 h-3rem"
               @click="toggleActivateDeactivateDialog(data.isDeActivated, data.uniqueIdentifier)"
             />
           </div>

@@ -349,9 +349,9 @@ onMounted(() => {
             <template #body="slotProps">
               <div class="flex align-items-center justify-content-center text-center w-5rem">
                 <i v-if="slotProps.data.isSessionLate" class="pi flex pi-exclamation-triangle text-red-500 text-center" />
-                <div v-else style="width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center" class="text-green-500 border-1">
+                <!-- <div v-else style="width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center" class="text-green-500 border-1">
                   <font-awesome-icon :icon="['fas', 'check']" class="pi flex pi-exclamation-triangle text-center" />
-                </div>
+                </div> -->
               </div>
             </template>
           </Column>

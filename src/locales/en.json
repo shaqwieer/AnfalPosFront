@@ -308,9 +308,9 @@
   "organizationDescription": "The Companies page provides comprehensive information about our affiliated partners, their missions, and the collaborative efforts we undertake together. Explore the diverse range of organizations we work with to understand how we contribute to our shared goals and community development.",
   "organizationActive": "Actived",
   "organizationDeactivated": "DeActived",
-  "organizationAddButton": "Add",
+  "organizationAddButton": "Add Company",
   "organizationActiveAction": "Activate",
-  "organizationDeactivatedAction": "DeActivate",
+  "organizationDeactivatedAction": "Deactivate",
   "organizationUpdateButton": "Update",
   "activationDialog": {
     "confirmActivation": "Do You Want To Make This Action ?",
@@ -626,5 +626,6 @@
   "Filter": "Filter",
   "Sessions": "Sessions",
   "Status": "Status",
-  "Warning": "Warning"
+  "Warning": "Warning",
+  "AddBranch": "Add Branch"
 }
