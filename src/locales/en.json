@@ -315,7 +315,7 @@
   "activationDialog": {
     "confirmActivation": "Do You Want To Make This Action ?",
     "activate": "Activate",
-    "deactivate": "DeActivate"
+    "deactivate": "Deactivate"
   },
   "organizationDialog": {
     "requiredError": "This Field Is Required",
