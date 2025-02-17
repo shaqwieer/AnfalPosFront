@@ -150,7 +150,7 @@ const addData = async (data) => {
       <Card style="width: 100%; overflow: hidden; min-width: 200px; border-top: 5px solid" class="flex h-full p-4 justify-content-between border-primary flex-column col-12 md:col-6 lg:col-4 xl:col-3 border-round p-0">
         <template #header>
           <div class="w-full h-8rem bg-primary flex align-items-center justify-content-center border-round">
-            <h2 class="text-xl font-bold text-white">{{ data.name }}</h2>
+            <h2 class="text-xl m-0 font-bold text-white">{{ data.name }}</h2>
           </div>
         </template>
 
@@ -187,6 +187,7 @@ const addData = async (data) => {
               :label="data.isDeActivated ? `${t('organizationActiveAction')}` : `${t('organizationDeactivatedAction')}`"
               :severity="data.isDeActivated ? 'success' : 'danger'"
               outlined
+              :class="data.isDeActivated ? 'bg-green-500 border-green-500 text-white ' : '   bg-white border-red-500 text-red-500'"
               class="p-button p-component w-6 border-round shadow-none flex align-items-center gap-2 px-0 py-0 h-3rem"
               @click="toggleActivateDeactivateDialog(data.isDeActivated, data.id)"
             />
