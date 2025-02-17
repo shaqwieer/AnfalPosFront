@@ -42,6 +42,16 @@ export const useSessionStore = defineStore({
         this.error = handleError(err, this.loading);
       }
     },
+    async ApproveSessionTransaction(payload: any) {
+      try {
+        const response = await apiClient.post('/ShiftSessions/ApproveTransactionOrDepositForSession', payload);
+        if (payload.isCashDeposit) this.selectedSession.shiftCashDeposits.find((deposit: any) => deposit.id === payload.approveId).statusId = 2;
+        else this.selectedSession.transactions.find((transaction: any) => transaction.id === payload.approveId).statusId = 2;
+        if (this.selectedSession.shiftCashDeposits.some((deposit: any) => deposit.statusId === 1) && this.selectedSession.transactions.some((transaction: any) => transaction.statusId === 1)) this.selectedSession.statusId = 1;
+      } catch (err) {
+        this.error = handleError(err, this.loading);
+      }
+    },
     async GetSalesReps() {
       try {
         const response = await apiClient.get('/BusinessEntities/GetUserVanSaleInBranch');

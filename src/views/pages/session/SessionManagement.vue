@@ -6,7 +6,9 @@ import { useDebounceFn } from '@vueuse/core';
 import Chart from 'primevue/chart';
 import { useI18n } from 'vue-i18n';
 import MultiSelect from 'primevue/multiselect';
+import { useToast } from 'primevue/usetoast';
 const { t } = useI18n();
+const toast = useToast();
 
 // Filter states
 const selectedSalesReps = ref<string[] | null>(null);
@@ -103,7 +105,7 @@ const getStatusColor = (status) => {
     case 5:
       return 'bg-yellow-100 text-yellow-800';
     case 6:
-      return 'bg-blue-100 text-blue-800';
+      return 'bg-orange-100 text-orange-800';
     case 7:
       return 'bg-green-100 text-green-800';
     default:
@@ -120,14 +122,20 @@ const applyFilters = () => {
 const getSessions = useDebounceFn(
   async () => {
     const formData = new FormData();
+    if (selectedSalesReps.value.length === 0 || selectedStatus.value.length === 0) {
+      toast.add({ severity: 'error', detail: 'برجاء اختيار حالة ومندوب', life: 3000 });
+      changedFilter.value = false;
+      return;
+    }
     selectedStatus.value.forEach((element, index) => {
       formData.append(`StatusIds[${index}]`, element);
     });
     selectedSalesReps.value.forEach((element, index) => {
       formData.append(`SalesRepIds[${index}]`, element);
     });
-    formData.append('StartDate', new Date(dateFrom.value).toISOString());
-    formData.append('EndDate', new Date(dateTo.value).toISOString());
+    formData.append('StartDate', new Date(dateFrom.value).toDateString());
+    formData.append('EndDate', new Date(dateTo.value).toDateString());
+
     await sessionStore.GetSessions(formData);
     changedFilter.value = false;
   },
@@ -174,7 +182,7 @@ onMounted(() => {
             <div class="h-full surface-card cursor-pointer transition-all transition-duration-200">
               <div class="w-full">
                 <label class="block text-sm font-semibold text-gray-700 mb-1">{{ t('Session.FromDate') }}</label>
-                <Calendar v-model="dateFrom" showIcon iconDisplay="input" dateFormat="dd/mm/yy" class="w-full h-3rem" />
+                <Calendar v-model="dateFrom" showIcon iconDisplay="input" class="w-full h-3rem" />
               </div>
             </div>
           </div>
@@ -183,7 +191,7 @@ onMounted(() => {
             <div class="h-full surface-card cursor-pointer">
               <div class="w-full">
                 <label class="block text-sm font-semibold text-gray-700 mb-1">{{ t('Session.ToDate') }}</label>
-                <Calendar v-model="dateTo" showIcon iconDisplay="input" dateFormat="dd/mm/yy" class="w-full h-3rem" />
+                <Calendar v-model="dateTo" showIcon iconDisplay="input" class="w-full h-3rem" />
               </div>
             </div>
           </div>
@@ -208,7 +216,7 @@ onMounted(() => {
       </div>
 
       <!-- Summary Cards -->
-      <div class="grid mb-6 p-4">
+      <div class="grid p-2">
         <!-- Open Sessions -->
         <div class="col-12 md:col-12 lg:col-4 xl:col-3 xl:p-2">
           <div class="bg-blue-50 border-round-lg shadow-1 border-blue-200 border-1 pl-4 pt-4 pr-3 pb-3 h-full flex flex-row justify-content-between">
@@ -218,7 +226,7 @@ onMounted(() => {
                 {{ sessionStore.sessionData?.openSession }}
               </div>
             </div>
-            <div class="flex flex-column w-6">
+            <div class="flex flex-column w-6 justify-content-end">
               <div className="flex align-items-center justify-content-between">
                 <div className="flex align-items-center gap-2">
                   <i class="pi pi-check-circle text-green-600 text-lg" />
@@ -241,7 +249,7 @@ onMounted(() => {
           <div class="bg-yellow-50 border-round-lg shadow-1 border-yellow-200 border-1 p-4 h-full">
             <div class="text-md font-medium text-yellow-600">{{ 'Closed Sessions' }}</div>
             <div class="text-3xl font-bold text-yellow-600">
-              {{ sessionStore.sessionData?.pendingSession }}
+              {{ sessionStore.sessionData?.closedSession }}
             </div>
           </div>
         </div>
@@ -263,7 +271,7 @@ onMounted(() => {
           <div class="bg-green-50 border-round-lg border-green-400 border-1 p-4 h-full">
             <div class="text-md font-medium text-green-600">{{ 'Approved Sessions' }}</div>
             <div class="text-3xl font-bold text-green-700">
-              {{ sessionStore.sessionData?.oldSession }}
+              {{ sessionStore.sessionData?.approvedSession }}
             </div>
           </div>
         </div>
@@ -348,14 +356,12 @@ onMounted(() => {
           <Column field="isSessionLate" :header="'Late Session'" headerClass="" class="w-12rem">
             <template #body="slotProps">
               <div class="flex align-items-center justify-content-center text-center w-5rem">
-                <i v-if="slotProps.data.isSessionLate" class="pi flex pi-exclamation-triangle text-red-500 text-center" />
-                <!-- <div v-else style="width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center" class="text-green-500 border-1">
-                  <font-awesome-icon :icon="['fas', 'check']" class="pi flex pi-exclamation-triangle text-center" />
-                </div> -->
+                <i v-if="slotProps.data.isSessionLate" class="pi flex pi-exclamation-triangle text-red-500 text-center text-2xl" />
+                <!-- <i v-else class="pi flex pi-check-circle text-green-500 text-center text-2xl" /> -->
               </div>
             </template>
           </Column>
-          <Column field="statusName" :header="t('Status')" class="w-8rem">
+          <Column field="statusName" :header="t('Actions')" class="w-8rem">
             <template #body="slotProps">
               <Button @click="viewSessionDetails(slotProps.data)" class="p-1 hover:bg-gray-100 rounded-full" size="large" text r icon="pi pi-eye" title="View Details"> </Button>
             </template>
