@@ -67,15 +67,15 @@ const onPageChange = (event) => {
 const activateDeactivateVisible = ref(false);
 const activationStatus = ref(false);
 let selectedOrganizationUniqueIdentifier = '';
-const toggleActivateDeactivateDialog = (status, uniqueIdentifier) => {
+const toggleActivateDeactivateDialog = (status, id) => {
   activationStatus.value = status;
-  selectedOrganizationUniqueIdentifier = uniqueIdentifier;
+  selectedOrganizationUniqueIdentifier = id;
   activateDeactivateVisible.value = !activateDeactivateVisible.value;
 };
 const activateDeactivateOrganization = async () => {
   try {
     const response = await apiClient.post(`/Branches/DeActivateActivate/${selectedOrganizationUniqueIdentifier}`);
-    const index = entities.value.findIndex((entity) => entity.uniqueIdentifier === selectedOrganizationUniqueIdentifier);
+    const index = entities.value.findIndex((entity) => entity.id === selectedOrganizationUniqueIdentifier);
     entities.value[index].isDeActivated = !entities.value[index].isDeActivated;
     mainStore.loading.setNotificationInfo('success', response.data.message);
     activateDeactivateVisible.value = false;
@@ -182,12 +182,13 @@ const addData = async (data) => {
         <template #footer>
           <div class="flex gap-3 justify-content-between">
             <Button :label="t('organizationUpdateButton')" @click="toggleCreateEditDialog(false, data, false)" class="p-button shadow-none p-component px-0 py-0 w-6 bg-primary text-white border-round flex align-items-center" />
+
             <Button
               :label="data.isDeActivated ? `${t('organizationActiveAction')}` : `${t('organizationDeactivatedAction')}`"
               :severity="data.isDeActivated ? 'success' : 'danger'"
               outlined
               class="p-button p-component w-6 border-round shadow-none flex align-items-center gap-2 px-0 py-0 h-3rem"
-              @click="toggleActivateDeactivateDialog(data.isDeActivated, data.uniqueIdentifier)"
+              @click="toggleActivateDeactivateDialog(data.isDeActivated, data.id)"
             />
           </div>
         </template>
