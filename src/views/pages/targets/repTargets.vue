@@ -43,11 +43,11 @@ const editedTargets = ref(null);
 
 const creditStatus = computed(() => {
   if (!selectedRep.value) return null;
-  const remaining = creditLimit.value - currentBalance.value;
+  // const remaining = creditLimit.value - currentBalance.value;
   const usagePercentage = (currentBalance.value / creditLimit.value) * 100;
 
   return {
-    remaining,
+    // remaining,
     usagePercentage,
     status: usagePercentage >= 90 ? 'critical' : usagePercentage >= 75 ? 'warning' : 'normal'
   };
@@ -228,7 +228,7 @@ onMounted(() => {
                     'text-green-600': creditStatus.status === 'normal'
                   }"
                 >
-                  {{ formatPrice(creditStatus.remaining) }}
+                  {{ formatPrice(availableCredit) }}
                 </span>
               </div>
             </div>
