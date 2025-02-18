@@ -153,9 +153,11 @@ const savePassword = async (userId, payload) => {
           <Column field="branches" :header="t('users.branchesName')" :sortable="true" headerStyle="min-width:10rem;">
             <template #body="slotProps">
               <div class="flex justify-content-start gap-2">
-                <span v-for="(branch, index) in slotProps.data.branches" :key="index" style="padding-bo" class="flex justify-content-center align-content-center border-round-lg bg-primary-100 text-primary-800 w-max p-1 px-2 text-sm font-semibold">{{
-                  branch.name
-                }}</span>
+                <span style="padding-bo" class="flex justify-content-center align-content-center border-round-lg  w-max p-1 px-2 text-sm font-semibold">
+                  <AvatarGroup>
+                    <Avatar v-for="(branch, index) in slotProps.data.branches" :key="index" v-html="branch.name[0]" v-tooltip.top="branch.name" size="large" shape="circle" class="avatar-hover-animation cursor-pointer" />
+                  </AvatarGroup>
+                </span>
               </div>
             </template>
           </Column>
@@ -275,5 +277,16 @@ const savePassword = async (userId, payload) => {
   background-color: var(--blue-100) !important;
 
   color: var(--blue-800) !important;
+}
+
+.avatar-hover-animation {
+  transition:
+    transform 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out;
+}
+
+.avatar-hover-animation:hover {
+  transform: scale(1.2);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 </style>

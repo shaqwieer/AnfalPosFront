@@ -137,7 +137,7 @@ const addData = async (data) => {
 };
 </script>
 <template>
-  <div :class="['grid px-6', { 'rtl-direction': rtl }]">
+  <div :class="['grid px-6', { 'rtl-direction': rtl }]" >
     <div class="flex flex-column row-gap-5 px-3 lg:flex-row justify-content-between">
       <div class="lg:col-8 px-0 pt-2">
         <h3 class="text-700 text-3xl font-semibold">{{ t('organizationHeader') }}</h3>
@@ -151,6 +151,7 @@ const addData = async (data) => {
     </div>
     <!-- <SmartUplaoder /> -->
 
+   
     <div class="col-12 md:col-6 lg:col-4 xl:col-4" v-for="data in paginatedEntities" :key="data.id">
       <Card style="width: 100%; overflow: hidden; min-width: 200px; height: 302px; border-top: 5px solid" class="flex p-4 justify-content-between border-primary flex-column col-12 md:col-6 lg:col-4 xl:col-3 border-round p-0">
         <template #header>
