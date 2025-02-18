@@ -16,7 +16,8 @@ export const useMainStore = defineStore({
         error: '',
         pageTree: [],
         pathsList: ['/pages/notfound', '/auth/login', '/', '/auth/access'],
-        routeList: []
+        routeList: [],
+        userInfo: []
     }),
     getters: {
         accessAllowed: (state) => (path) => {
@@ -72,6 +73,9 @@ export const useMainStore = defineStore({
             try {
                 const response = await apiClient.post('/auth/login', userPayload);
                 const token = response.data.token;
+
+                this.userInfo = response.data;
+       
                 if (userPayload.rememberMe) {
                     saveToLocalStorage('token', token);
                     localStorage.setItem('rememberMe', userPayload.rememberMe);

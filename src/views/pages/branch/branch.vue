@@ -157,7 +157,7 @@ const addData = async (data) => {
         <template #title>
           <div class="flex justify-content-between gap-1 align-items-center pt-3">
             <span class="text-xl">{{ data.cityName }},{{ data.countryName }}</span>
-            <Tag :class="!data.isDeActivated ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" :value="!data.isDeActivated ? 'Active' : 'Inactive'"></Tag>
+            <Tag class="" :class="!data.isDeActivated ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" :value="!data.isDeActivated ? 'Active' : 'Inactive'"></Tag>
           </div>
         </template>
         <template #subtitle>
