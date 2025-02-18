@@ -7,6 +7,9 @@ import CollectionsDetails from './components/details/CollectionsDetails.vue';
 import SessionsDetails from './components/details/SessionsDetails.vue';
 import OverdueDetails from './components/details/OverdueDetails.vue';
 import StockDetails from './components/details/StockDetails.vue';
+import {useSessionStore} from '../../stores/sessionStore';
+import SessionManagement from '../pages/session/SessionManagement.vue';
+const sessionStore = useSessionStore();
 
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
@@ -21,9 +24,27 @@ const filterValues = ref({
 });
 
 // Change selectedSalesReps to use a regular array initial value
-const selectedSalesReps = ref<string[]>(['all']);
-const dateFrom = ref('');
-const dateTo = ref('');
+const selectedSalesReps = ref<string[] | null>(null);
+const dateTo = ref();
+const dateFrom = ref();
+const selectedStatus = ref<string[]>(['4', '5', '6', '7']);
+const statusOptions = [
+  // { label: `${t('All')}`, value: '8', color: '#FF5733' },
+  { label: `${t('Open')}`, value: '4', color: '#188A42' },
+  { label: `${t('Closed')}`, value: '5', color: '#FA7B00' },
+  { label: `${t('Pending')}`, value: '6', color: '#BC4819' },
+  { label: `${t('Approved')}`, value: '7', color: '#3357FF' }
+];
+
+const changedFilter = ref<boolean>(false);
+
+watch(
+  [selectedStatus, selectedSalesReps, dateFrom, dateTo],
+  () => {
+    changedFilter.value = true;
+  },
+  { deep: true }
+);
 
 // Add new ref for dropdown state
 const isDropdownOpen = ref(false);
@@ -44,6 +65,15 @@ const closeDropdown = (event: Event) => {
 // Add click outside listener
 onMounted(() => {
   document.addEventListener('click', closeDropdown);
+  sessionStore.GetSalesReps().then(() => {
+    selectedSalesReps.value = sessionStore.salesReps.map((rep) => rep.id);
+    //getSessions();
+  });
+  const currentDate = new Date();
+  dateTo.value = new Date(currentDate.toISOString());
+  const pastDate = new Date();
+  pastDate.setDate(currentDate.getDate() - 7);
+  dateFrom.value = new Date(pastDate.toISOString());
 });
 
 onUnmounted(() => {
@@ -60,42 +90,25 @@ const availableSalesReps = [
 ];
 
 // Watch for 'all' selection - FIXED to prevent recursion
-watch(
-  selectedSalesReps,
-  (newValue) => {
-    if (newValue.includes('all') && newValue.length > 1) {
-      // If 'all' is selected along with other options, only keep 'all'
-      selectedSalesReps.value = ['all'];
-    } else if (newValue.length === 0) {
-      // If nothing is selected, default to 'all'
-      selectedSalesReps.value = ['all'];
-    } else if (!newValue.includes('all') && newValue.length === availableSalesReps.length - 1) {
-      // If all individual reps are selected, switch to 'all'
-      selectedSalesReps.value = ['all'];
-    }
-  },
-  { deep: true }
-);
+// watch(
+//   selectedSalesReps,
+//   (newValue) => {
+//     if (newValue.includes('all') && newValue.length > 1) {
+//       // If 'all' is selected along with other options, only keep 'all'
+//       selectedSalesReps.value = ['all'];
+//     } else if (newValue.length === 0) {
+//       // If nothing is selected, default to 'all'
+//       selectedSalesReps.value = ['all'];
+//     } else if (!newValue.includes('all') && newValue.length === availableSalesReps.length - 1) {
+//       // If all individual reps are selected, switch to 'all'
+//       selectedSalesReps.value = ['all'];
+//     }
+//   },
+//   { deep: true }
+// );
 
 // Handle individual selection
-const handleSalesRepSelection = (repId: string) => {
-  if (repId === 'all') {
-    selectedSalesReps.value = ['all'];
-  } else {
-    // Remove 'all' if it's currently selected
-    if (selectedSalesReps.value.includes('all')) {
-      selectedSalesReps.value = [repId];
-    } else {
-      // Toggle the selection of the individual rep
-      const index = selectedSalesReps.value.indexOf(repId);
-      if (index === -1) {
-        selectedSalesReps.value.push(repId);
-      } else {
-        selectedSalesReps.value.splice(index, 1);
-      }
-    }
-  }
-};
+
 
 // Add function to handle search
 const handleSearch = () => {
@@ -182,14 +195,8 @@ const cardDetails = ref({
         completed: 15,
         productive: 13,
         avgDuration: 42,
-        conversionRate: 87,
-        visitDetails: [
-          { customer: 'Al-Futtaim Auto Services', time: '09:00', status: 'completed', duration: 45, result: 'order' },
-          { customer: 'Quick Service Center', time: '10:15', status: 'completed', duration: 35, result: 'order' },
-          { customer: 'Premium Auto Care', time: '11:30', status: 'completed', duration: 40, result: 'no-order' },
-          { customer: 'Auto Zone Services', time: '14:00', status: 'in-progress', duration: 0, result: 'pending' },
-          { customer: 'Car Care Center', time: '15:30', status: 'planned', duration: 0, result: 'pending' }
-        ]
+        conversionRate: 87
+      
       },
       {
         name: 'Abdullah Al-Qahtani',
@@ -197,13 +204,7 @@ const cardDetails = ref({
         completed: 12,
         productive: 10,
         avgDuration: 38,
-        conversionRate: 83,
-        visitDetails: [
-          { customer: 'Elite Auto Service', time: '09:30', status: 'completed', duration: 40, result: 'order' },
-          { customer: 'Master Mechanics', time: '10:45', status: 'completed', duration: 35, result: 'order' },
-          { customer: 'Pro Auto Care', time: '13:00', status: 'completed', duration: 30, result: 'no-order' },
-          { customer: 'Speed Auto Center', time: '14:30', status: 'in-progress', duration: 0, result: 'pending' }
-        ]
+        conversionRate: 83
       },
       {
         name: 'Khalid Al-Otaibi',
@@ -211,13 +212,7 @@ const cardDetails = ref({
         completed: 14,
         productive: 12,
         avgDuration: 41,
-        conversionRate: 86,
-        visitDetails: [
-          { customer: 'Royal Auto Care', time: '08:30', status: 'completed', duration: 45, result: 'order' },
-          { customer: 'Star Auto Service', time: '10:00', status: 'completed', duration: 40, result: 'order' },
-          { customer: 'Premier Auto Center', time: '11:15', status: 'completed', duration: 35, result: 'order' },
-          { customer: 'Golden Auto Care', time: '14:00', status: 'in-progress', duration: 0, result: 'pending' }
-        ]
+        conversionRate: 86
       },
       {
         name: 'Fahad Al-Harbi',
@@ -225,33 +220,10 @@ const cardDetails = ref({
         completed: 11,
         productive: 9,
         avgDuration: 39,
-        conversionRate: 82,
-        visitDetails: [
-          { customer: 'Diamond Auto Service', time: '09:15', status: 'completed', duration: 40, result: 'order' },
-          { customer: 'Crown Auto Care', time: '10:30', status: 'completed', duration: 35, result: 'no-order' },
-          { customer: 'Expert Auto Center', time: '13:30', status: 'completed', duration: 30, result: 'order' },
-          { customer: 'Supreme Auto Service', time: '15:00', status: 'planned', duration: 0, result: 'pending' }
-        ]
+        conversionRate: 82
       }
     ],
-    performance: {
-      hourly: [
-        { hour: '08:00', completed: 5, productive: 4 },
-        { hour: '09:00', completed: 8, productive: 7 },
-        { hour: '10:00', completed: 10, productive: 8 },
-        { hour: '11:00', completed: 7, productive: 6 },
-        { hour: '12:00', completed: 4, productive: 3 },
-        { hour: '13:00', completed: 6, productive: 5 },
-        { hour: '14:00', completed: 8, productive: 7 },
-        { hour: '15:00', completed: 5, productive: 4 }
-      ],
-      byRegion: [
-        { region: 'Riyadh North', planned: 45, completed: 38, productive: 32 },
-        { region: 'Riyadh South', planned: 35, completed: 28, productive: 24 },
-        { region: 'Riyadh East', planned: 40, completed: 32, productive: 28 },
-        { region: 'Riyadh West', planned: 30, completed: 24, productive: 20 }
-      ]
-    }
+  
   },
   sales: {
     summary: {
@@ -395,11 +367,11 @@ const toggleViewMode = () => {
 const filteredData = computed(() => {
   let data = { ...todayData.value };
 
-  // Filter by sales reps if not "all" selected
-  if (!selectedSalesReps.value.includes('all')) {
-    // Apply sales rep filtering logic here
-    // This is a placeholder for actual filtering logic
-  }
+  // // Filter by sales reps if not "all" selected
+  // if (!selectedSalesReps.value.includes('all')) {
+  //   // Apply sales rep filtering logic here
+  //   // This is a placeholder for actual filtering logic
+  // }
 
   // Filter by date range
   if (dateFrom.value && dateTo.value) {
@@ -445,52 +417,54 @@ const DetailsSectionTitle = computed(() => {
         </div>
 
         <!-- Filters -->
-        <div class="surface-card border-round p-4 border-1 border-gray-200">
-          <div class="grid">
-            <!-- Sales Rep Multi-select Dropdown -->
-            <div class="col-12 md:col-4 sales-rep-dropdown">
-              <label class="block text-md font-medium text-700 mb-1">{{ t('dashboard.Sales_Representatives') }}</label>
+       <!-- Filters -->
+      <div class="px-3">
+        <div class="bg-white row-gap-3 border-round-lg border-1 border-gray-300 p-4 grid gap-0 w-full align-items-end justify-content-between">
+          <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
+            <div class="h-full surface-card cursor-pointer">
               <div class="relative">
-                <button @click.stop="toggleDropdown" class="w-full h-3rem border-1 border-gray-200 surface-card border-1 border-round px-4 py-2 text-left flex align-items-center justify-content-between">
-                  <span class="text-overflow-ellipsis">
-                    {{ filterValues.salesReps.includes('all') ? `${t('dashboard.AllSalesReps')}` : filterValues.salesReps.length + ' Selected' }}
-                  </span>
-                  <i :class="['pi', isDropdownOpen ? 'pi-chevron-up' : 'pi-chevron-down', 'text-500']"></i>
-                </button>
-
-                <!-- Dropdown Menu -->
-                <div v-if="isDropdownOpen" class="border-1 border-gray-200 absolute w-full mt-1 surface-card border-1 border-round shadow-2">
-                  <div class="py-1 overflow-auto" style="max-height: 15rem">
-                    <label v-for="rep in availableSalesReps" :key="rep.id" class="flex align-items-center px-4 py-2 hover:surface-hover cursor-pointer">
-                      <div class="p-checkbox p-component">
-                        <input type="checkbox" :checked="filterValues.salesReps.includes(rep.id)" @change="handleSalesRepSelection(rep.id)" class="p-checkbox-box" />
-                      </div>
-                      <span class="ml-3 text-700">{{ rep.name }}</span>
-                    </label>
-                  </div>
-                </div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">{{ t('Session.SalesRepresentatives') }}</label>
+                <MultiSelect v-model="selectedSalesReps" :options="sessionStore.salesReps" filter optionLabel="name" optionValue="id" placeholder="Select Sales Reps" :maxSelectedLabels="3" class="w-full h-3rem" />
               </div>
             </div>
+          </div>
 
-            <!-- Date Range -->
-            <div class="col-12 md:col-4">
-              <label class="block text-md font-medium text-700 mb-1"> {{ t('dashboard.FromDate') }}</label>
-              <input type="date" v-model="filterValues.dateFrom" class="w-full border-none" />
-            </div>
-            <div class="col-12 md:col-4">
-              <label class="block text-md font-medium text-700 mb-1">{{ t('dashboard.ToDate') }}</label>
-              <input type="date" v-model="filterValues.dateTo" :min="filterValues.dateFrom" class="w-full border-none" />
+          <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
+            <div class="h-full surface-card cursor-pointer transition-all transition-duration-200">
+              <div class="w-full">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">{{ t('Session.FromDate') }}</label>
+                <Calendar v-model="dateFrom" showIcon iconDisplay="input" class="w-full h-3rem" />
+              </div>
             </div>
           </div>
 
-          <!-- Search Button -->
-          <div class="mt-4 flex justify-content-end">
-            <button @click="handleSearch" class="p-button p-component px-4 py-2 bg-primary text-white border-round flex align-items-center gap-2">
-              <i class="pi pi-search"></i>
-              <span>{{ t('dashboard.Search') }}</span>
-            </button>
+          <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
+            <div class="h-full surface-card cursor-pointer">
+              <div class="w-full">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">{{ t('Session.ToDate') }}</label>
+                <Calendar v-model="dateTo" showIcon iconDisplay="input" class="w-full h-3rem" />
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 sm:col-6 lg:col-3 xl:col-2 p-0 sm:px-2 xl:p-2">
+            <div class="h-full surface-card cursor-pointer">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1"> {{ t('Session.Status') }}</label>
+                <MultiSelect v-model="selectedStatus" :options="statusOptions" optionLabel="label" optionValue="value" placeholder="Select a Status" class="w-full h-3rem flex" />
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 xl:col-1 p-0 sm:px-2 xl:p-2">
+            <div class="w-full xl:w-fit surface-card cursor-pointer">
+              <div class="align-self-end w-full xl:w-fit">
+                <Button size="small" icon="pi pi-filter" :label="t('Filter')" :disabled="!changedFilter" class="w-full xl:w-fit h-3rem" @click="applyFilters" />
+              </div>
+            </div>
           </div>
         </div>
+      </div>
       </div>
 
       <!-- KPI Cards -->
@@ -515,7 +489,7 @@ const DetailsSectionTitle = computed(() => {
         <VisitsDetails v-if="selectedCard === 'visits' && cardDetails.visits" :data="cardDetails.visits" :view-mode="viewMode" class="" />
         <SalesDetails v-if="selectedCard === 'sales' && cardDetails.sales" :data="cardDetails.sales" :view-mode="viewMode" />
         <CollectionsDetails v-if="selectedCard === 'collections'" :data="cardDetails.collections" :view-mode="viewMode" />
-        <SessionsDetails v-if="selectedCard === 'sessions'" :data="cardDetails.sessions" :view-mode="viewMode" />
+        <SessionManagement v-if="selectedCard === 'sessions'"   :show-filter="false"   />
         <OverdueDetails v-if="selectedCard === 'overdue'" :data="cardDetails.overdue" :view-mode="viewMode" v-model="totalSalesReps" />
         <StockDetails v-if="selectedCard === 'stock'" :data="cardDetails.stock" :view-mode="viewMode" />
       </div>
