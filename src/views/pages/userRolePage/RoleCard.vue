@@ -87,10 +87,30 @@ const addPermissions = async (data) => {
 </script>
 
 <template>
-    <div class="flex flex-column gap-1">
-        <h2>{{ t('RoleCard.header') }}</h2>
-        <p class="font-medium">{{ t('RoleCard.description') }}</p>
+  
+
+
+    <div class="flex flex-column row-gap-5 px-3 lg:flex-row justify-content-between">
+      <div class="lg:col-8 px-0 pt-2">
+        <h3 class="text-700 text-3xl font-semibold">{{ t('RoleCard.header') }}</h3>
+        <p class="text-500 text-lg">{{ t('RoleCard.description') }}</p>
+      </div>
+
+
+
+      <div class="flex cursor-pointer flex-row justify-content-center gap-2 align-items-center bg-primary text-white border-round h-3rem w-full lg:w-14rem" @click="toggleCreateEditDialog(true, {}, false)">
+        <div class="">+</div>
+        <div class="">{{ t('RoleCard.addRoleButton') }}</div>
+      </div>
+
+      
     </div>
+
+
+
+
+
+
     <div class="grid">
         <div v-for="(role, index) in paginatedRoles" :key="index" class="col-12 lg:col-6 xl:col-4">
             <div class="card mb-0 flex flex-column gap-3 h-13rem">
@@ -113,7 +133,7 @@ const addPermissions = async (data) => {
             </div>
         </div>
 
-        <div class="col-12 lg:col-6 xl:col-4">
+        <!-- <div class="col-12 lg:col-6 xl:col-4">
             <div class="card mb-0 gap-3 h-13rem">
                 <div class="grid">
                     <div class="mb-4 col-5">
@@ -122,13 +142,15 @@ const addPermissions = async (data) => {
                         </div>
                     </div>
                     <div class="col-7 flex flex-column gap-4">
-                        <Button :label="t('RoleCard.addRoleButton')" class="h-2rem" severity="primary" outlined @click="toggleCreateEditDialog(true, {}, false)" />
+                        <Button :label="" class="h-2rem" severity="primary" outlined  />
                         <span class="font-medium text-base text-600">{{ t('RoleCard.addRoleDescription') }}</span>
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
+
+
     <div class="pagination-controls flex justify-content-center align-items-center mt-4">
         <Button class="h-2rem"  @click="prevPage" :disabled="currentPage === 1">{{ t('RoleCard.previousButton') }}</Button>
         <span>{{ t('RoleCard.pageInfo', { currentPage: currentPage, totalPages: totalPages }) }}</span>

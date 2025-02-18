@@ -67,15 +67,15 @@ const onPageChange = (event) => {
 const activateDeactivateVisible = ref(false);
 const activationStatus = ref(false);
 let selectedOrganizationUniqueIdentifier = '';
-const toggleActivateDeactivateDialog = (status, uniqueIdentifier) => {
+const toggleActivateDeactivateDialog = (status, id) => {
   activationStatus.value = status;
-  selectedOrganizationUniqueIdentifier = uniqueIdentifier;
+  selectedOrganizationUniqueIdentifier = id;
   activateDeactivateVisible.value = !activateDeactivateVisible.value;
 };
 const activateDeactivateOrganization = async () => {
   try {
     const response = await apiClient.post(`/Branches/DeActivateActivate/${selectedOrganizationUniqueIdentifier}`);
-    const index = entities.value.findIndex((entity) => entity.uniqueIdentifier === selectedOrganizationUniqueIdentifier);
+    const index = entities.value.findIndex((entity) => entity.id === selectedOrganizationUniqueIdentifier);
     entities.value[index].isDeActivated = !entities.value[index].isDeActivated;
     mainStore.loading.setNotificationInfo('success', response.data.message);
     activateDeactivateVisible.value = false;
@@ -130,6 +130,16 @@ const addData = async (data) => {
   }
   toggleCreateEditDialog(true, {}, true);
 };
+
+const copyToClipboard = (text) => {
+  if (!text) return;
+  navigator.clipboard
+    .writeText(text)
+    .then(() => {
+      console.log('تم نسخ النص:', text);
+    })
+    .catch((err) => console.error('فشل النسخ:', err));
+};
 </script>
 <template>
   <div :class="['grid px-6', { 'rtl-direction': rtl }]">
@@ -146,18 +156,56 @@ const addData = async (data) => {
 
     <!-- <SmartUplaoder /> -->
 
-    <div class="col-12 md:col-6 lg:col-4 xl:col-4" v-for="data in paginatedEntities" :key="data.id">
+    <div class="grid">
+      <!-- v-for="data in paginatedEntities" :key="data.id" -->
+      <div v-for="(data, index) in paginatedEntities" :key="index" class="col-12 lg:col-6 xl:col-4">
+        <div class="card mb-0 flex flex-column justify-content-between h-13rem relative">
+          <Tag class="absolute" style="right: 12px; top: 12px" :class="!data.isDeActivated ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" :value="!data.isDeActivated ? 'Active' : 'Inactive'"></Tag>
+
+          <div class="flex justify-content-between">
+            <div class="">
+              <!-- <span class="block text-500 font-medium mb-3">{{ t('RoleCard.totalUsers', { count: data.users.length }) }}</span> -->
+              <div class="text-900 font-medium text-xl">{{ data.name }}</div>
+              <div class="block text-500 font-medium mb-3">{{ data.cityName }},{{ data.countryName }}</div>
+              <div class="block text-500 font-medium mb-3">{{ data.branchTypeName }}</div>
+            </div>
+
+            <div class="flex align-items-center justify-content-center">
+              <AvatarGroup>
+                <Avatar @click="copyToClipboard(data.primaryPhone)" v-html="'<i class=\'pi pi-phone \'></i>'" v-tooltip.top="data.primaryPhone" size="large" shape="circle" class="avatar-hover-animation cursor-pointer" />
+                <Avatar @click="copyToClipboard(data.email)" v-html="'<i class=\'pi pi-envelope \'></i>'" v-tooltip.top="data.email" size="large" shape="circle" class="avatar-hover-animation cursor-pointer" />
+                <Avatar @click="copyToClipboard(data.address)" v-html="'<i class=\'pi pi-map-marker \'></i>'" v-tooltip.top="data.address" size="large" shape="circle" class="avatar-hover-animation cursor-pointer" />
+              </AvatarGroup>
+            </div>
+          </div>
+          <div class="flex justify-content-between">
+            <Button :label="t('organizationUpdateButton')" @click="toggleCreateEditDialog(false, data, false)" class="h-2rem border-1 text-primary" severity="secondary" outlined />
+
+            <Button
+              :label="data.isDeActivated ? `${t('organizationActiveAction')}` : `${t('organizationDeactivatedAction')}`"
+              @click="toggleActivateDeactivateDialog(data.isDeActivated, data.id)"
+              :severity="data.isDeActivated ? 'success' : 'danger'"
+              :class="data.isDeActivated ? 'bg-white border-green-500 text-green ' : '   bg-white border-red-500 text-red-500'"
+              class="h-2rem"
+              outlined
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- <div class="col-12 md:col-6 lg:col-4 xl:col-4" v-for="data in paginatedEntities" :key="data.id">
       <Card style="width: 100%; overflow: hidden; min-width: 200px; border-top: 5px solid" class="flex h-full p-4 justify-content-between border-primary flex-column col-12 md:col-6 lg:col-4 xl:col-3 border-round p-0">
         <template #header>
           <div class="w-full h-8rem bg-primary flex align-items-center justify-content-center border-round">
-            <h2 class="text-xl font-bold text-white">{{ data.name }}</h2>
+            <h2 class="text-xl m-0 font-bold text-white">{{ data.name }}</h2>
           </div>
         </template>
 
         <template #title>
           <div class="flex justify-content-between gap-1 align-items-center pt-3">
             <span class="text-xl">{{ data.cityName }},{{ data.countryName }}</span>
-            <Tag :class="!data.isDeActivated ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" :value="!data.isDeActivated ? 'Active' : 'Inactive'"></Tag>
+            <Tag class="" :class="!data.isDeActivated ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" :value="!data.isDeActivated ? 'Active' : 'Inactive'"></Tag>
           </div>
         </template>
         <template #subtitle>
@@ -182,17 +230,19 @@ const addData = async (data) => {
         <template #footer>
           <div class="flex gap-3 justify-content-between">
             <Button :label="t('organizationUpdateButton')" @click="toggleCreateEditDialog(false, data, false)" class="p-button shadow-none p-component px-0 py-0 w-6 bg-primary text-white border-round flex align-items-center" />
+
             <Button
               :label="data.isDeActivated ? `${t('organizationActiveAction')}` : `${t('organizationDeactivatedAction')}`"
               :severity="data.isDeActivated ? 'success' : 'danger'"
               outlined
+              :class="data.isDeActivated ? 'bg-green-500 border-green-500 text-white ' : '   bg-white border-red-500 text-red-500'"
               class="p-button p-component w-6 border-round shadow-none flex align-items-center gap-2 px-0 py-0 h-3rem"
-              @click="toggleActivateDeactivateDialog(data.isDeActivated, data.uniqueIdentifier)"
+              @click="toggleActivateDeactivateDialog(data.isDeActivated, data.id)"
             />
           </div>
         </template>
       </Card>
-    </div>
+    </div> -->
     <div class="col-12 flex justify-content-center mt-4">
       <Paginator :first="first" :rows="rows" :totalRecords="totalRecords" :rowsPerPageOptions="[6, 12, 18, 24]" @update:first="onFirstChange" @update:rows="onRowsChange" @page="onPageChange" />
     </div>
@@ -270,5 +320,16 @@ const addData = async (data) => {
 }
 :deep(.p-paginator) {
   background-color: transparent;
+}
+
+.avatar-hover-animation {
+  transition:
+    transform 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out;
+}
+
+.avatar-hover-animation:hover {
+  transform: scale(1.2);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 </style>

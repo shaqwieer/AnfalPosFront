@@ -1,44 +1,48 @@
 <script setup>
 import { useLayout } from '@/layout/composables/layout';
-const {onProfileSidebarToggle} = useLayout();
+const { onProfileSidebarToggle } = useLayout();
+
 import { useMainStore } from '@/stores/mainStore';
+
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n'; // Import useI18n hook
 import { useRouter } from 'vue-router';
 const router = useRouter();
 const goToPage = () => {
-    router.push({ name: 'available-branches' }); // Navigate to a named route
+  router.push({ name: 'available-branches' }); // Navigate to a named route
 };
 const { t } = useI18n();
 
 const mainStore = useMainStore();
 const rtlValueText = computed(() => (mainStore.isRTL ? 'rtl' : 'ltr'));
-const logOut=()=>{
-    onProfileSidebarToggle();
-    mainStore.logout();
-}
+const logOut = () => {
+  onProfileSidebarToggle();
+  mainStore.logout();
+};
 const { layoutState } = useLayout();
+
+const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
 </script>
 
 <template>
-    <Sidebar v-model:visible="layoutState.profileSidebarVisible.value" :position="'right'" class="layout-profile-sidebar w-full sm:w-25rem">
-        <div class="flex flex-column mx-auto md:mx-0" :dir="rtlValueText">
-            <span class="mb-2 font-semibold">{{ t("profileBar.welcome") }}</span>
-            <span class="text-color-secondary font-medium mb-5">Isabella Andolini</span>
+  <Sidebar v-model:visible="layoutState.profileSidebarVisible.value" :position="'right'" class="layout-profile-sidebar w-full sm:w-25rem">
+    <div class="flex flex-column mx-auto md:mx-0" :dir="rtlValueText">
+      <span class="mb-2 font-semibold">{{ t('profileBar.welcome') }}</span>
+      <span class="text-color-secondary font-medium mb-5"> {{ userInfo.personalInfo.name }}</span>
 
-            <ul class="list-none m-0 p-0">
-                <li>
-                    <a class="cursor-pointer flex surface-border mb-3 p-3 align-items-center border-1 surface-border border-round hover:surface-hover transition-colors transition-duration-150">
-                        <span>
-                            <i class="pi pi-table text-xl text-primary"></i>
-                        </span>
-                        <div class="mx-3" @click="goToPage()">
-                            <span class="mb-2 font-semibold">{{ t("profileBar.branches") }}</span>
-                            <p class="text-color-secondary m-0">{{ t("profileBar.branchesDesc") }}</p>
-                        </div>
-                    </a>
-                </li>
-                <!-- <li>
+      <ul class="list-none m-0 p-0">
+        <li>
+          <a class="cursor-pointer flex surface-border mb-3 p-3 align-items-center border-1 surface-border border-round hover:surface-hover transition-colors transition-duration-150">
+            <span>
+              <i class="pi pi-table text-xl text-primary"></i>
+            </span>
+            <div class="mx-3" @click="goToPage()">
+              <span class="mb-2 font-semibold">{{ t('profileBar.branches') }}</span>
+              <p class="text-color-secondary m-0">{{ t('profileBar.branchesDesc') }}</p>
+            </div>
+          </a>
+        </li>
+        <!-- <li>
                     <a class="cursor-pointer flex surface-border mb-3 p-3 align-items-center border-1 surface-border border-round hover:surface-hover transition-colors transition-duration-150">
                         <span>
                             <i class="pi pi-money-bill text-xl text-primary"></i>
@@ -60,21 +64,21 @@ const { layoutState } = useLayout();
                         </div>
                     </a>
                 </li> -->
-                <li>
-                    <a class="cursor-pointer flex surface-border mb-3 p-3 align-items-center border-1 surface-border border-round hover:surface-hover transition-colors transition-duration-150">
-                        <span>
-                            <i class="pi pi-power-off text-xl text-primary"></i>
-                        </span>
-                        <div class="mx-3" @click="logOut()">
-                            <span class="mb-2 font-semibold">{{ t("profileBar.logout") }}</span>
-                            <p class="text-color-secondary m-0">{{ t("profileBar.logoutDesc") }}</p>
-                        </div>
-                    </a>
-                </li>
-            </ul>
-        </div>
+        <li>
+          <a class="cursor-pointer flex surface-border mb-3 p-3 align-items-center border-1 surface-border border-round hover:surface-hover transition-colors transition-duration-150">
+            <span>
+              <i class="pi pi-power-off text-xl text-primary"></i>
+            </span>
+            <div class="mx-3" @click="logOut()">
+              <span class="mb-2 font-semibold">{{ t('profileBar.logout') }}</span>
+              <p class="text-color-secondary m-0">{{ t('profileBar.logoutDesc') }}</p>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </div>
 
-        <!-- <div class="flex flex-column mt-5 mx-auto md:mx-0">
+    <!-- <div class="flex flex-column mt-5 mx-auto md:mx-0">
             <span class="mb-2 font-semibold">Notifications</span>
             <span class="text-color-secondary font-medium mb-5">You have 3 notifications</span>
 
@@ -152,5 +156,5 @@ const { layoutState } = useLayout();
                 </li>
             </ul>
         </div> -->
-    </Sidebar>
+  </Sidebar>
 </template>
