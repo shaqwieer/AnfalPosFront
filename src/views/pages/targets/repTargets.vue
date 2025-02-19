@@ -79,11 +79,10 @@ const validateCredit = () => {
 };
 
 const isAtLeastOneTargetHasValue = () => {
-  return selectedRep.value.some(t => t.salesTarget > 0 || t.collectionTarget > 0);
+  return selectedRep.value.some((t) => t.salesTarget > 0 || t.collectionTarget > 0);
 };
 
 const saveChanges = async () => {
-  
   try {
     if (!validateCredit()) {
       return; // Stop if validation fails
@@ -99,27 +98,25 @@ const saveChanges = async () => {
     const formData = {
       businessEntityId: selectedRepId.value,
       creditLimit: parseFloat(creditLimit.value),
-      salesGoalsMonthly: months.value.map(month => ({
-        id: selectedRep.value.find(t => t.month === month.id)?.id || 0,
+      salesGoalsMonthly: months.value.map((month) => ({
+        id: selectedRep.value.find((t) => t.month === month.id)?.id || 0,
         month: month.id,
         year: selectedYear.value,
-        salesTarget: parseFloat(selectedRep.value.find(t => t.month === month.id)?.salesTarget || 0),
-        collectionTarget: parseFloat(selectedRep.value.find(t => t.month === month.id)?.collectionTarget || 0)
+        salesTarget: parseFloat(selectedRep.value.find((t) => t.month === month.id)?.salesTarget || 0),
+        collectionTarget: parseFloat(selectedRep.value.find((t) => t.month === month.id)?.collectionTarget || 0)
       }))
     };
 
     try {
-        const response = await apiClient.post('/SalesGoals/UpdateSalesGoalMonthlyData', formData);
-        mainStore.loading.setNotificationInfo('success', response.data.message);
-        isEditing.value = false;
-          editedTargets.value = null;
-          errorMessage.value = '';
-          await fetchData(); // Refresh data after save
-
-      } catch (err) {
-        this.error = handleError(err, this.loading);
-      }
- 
+      const response = await apiClient.post('/SalesGoals/UpdateSalesGoalMonthlyData', formData);
+      mainStore.loading.setNotificationInfo('success', response.data.message);
+      isEditing.value = false;
+      editedTargets.value = null;
+      errorMessage.value = '';
+      await fetchData(); // Refresh data after save
+    } catch (err) {
+      this.error = handleError(err, this.loading);
+    }
   } catch (error) {
     console.error('Failed to save changes:', error);
     errorMessage.value = 'Failed to save changes. Please try again.';
@@ -133,7 +130,7 @@ const cancelEdit = () => {
 };
 
 const updateTarget = (monthId, field, value) => {
-  const target = selectedRep.value.find(t => t.month === monthId);
+  const target = selectedRep.value.find((t) => t.month === monthId);
   if (target) {
     target[field] = parseFloat(value) || 0;
   } else {
@@ -173,6 +170,22 @@ onMounted(() => {
     fetchData();
   });
 });
+
+const rowsPerPage = ref(12);
+const currentPage = ref(0);
+
+const onPageChange = (event) => {
+  currentPage.value = event.page ?? 0;
+};
+
+const paginatedCustomers = computed(() => {
+  if (!months.value || !Array.isArray(months.value)) {
+    return [];
+  }
+  const start = currentPage.value * rowsPerPage.value;
+  const end = start + rowsPerPage.value;
+  return months.value.slice(start, end);
+});
 </script>
 
 <template>
@@ -192,133 +205,117 @@ onMounted(() => {
         {{ errorMessage }}
       </div>
 
-      <!-- Main Content -->
-      <div v-if="selectedRep" class="surface-card border-round-xl border-1 surface-border p-4">
-        <div class="flex align-items-center justify-content-between"> 
-          <div class="flex flex-column gap-2">
-            <h3 class="text-lg font-semibold text-900">{{ salesGoalsStore.salesReps.find((rep) => rep.id === selectedRepId)?.name }}</h3>
-            <div class="flex align-items-center gap-6">
-              <div class="text-sm">
-                <span class="text-500">Credit Limit:</span>
-                <span class="ml-1 font-bold">
-                  <input 
-                    v-if="isEditing" 
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    v-model="creditLimit"
-                    @input="validateCredit"
-                    class="w-32 p-2 border-round-lg border-1 surface-border"
-                    :class="{ 'border-red-500': errorMessage }"
-                  />
-                  <span v-else>{{ formatPrice(creditLimit) }}</span>
-                </span>
-              </div>
-              <div class="text-sm">
-                <span class="text-500">Current Balance:</span>
-                <span class="ml-1 font-bold">{{ formatPrice(currentBalance) }}</span>
-              </div>
-              <div class="text-sm flex align-items-center gap-2">
-                <span class="text-500">Remaining:</span>
-                <span
-                  class="font-bold"
-                  :class="{
-                    'text-red-600': creditStatus.status === 'critical',
-                    'text-yellow-600': creditStatus.status === 'warning',
-                    'text-green-600': creditStatus.status === 'normal'
-                  }"
-                >
-                  {{ formatPrice(availableCredit) }}
-                </span>
-              </div>
+      <div class="flex flex-row justify-content-between gap-2 mb-5">
+        <div class="" style="width: 70%">
+          <h3 class="text-lg font-semibold text-900">{{ salesGoalsStore.salesReps.find((rep) => rep.id === selectedRepId)?.name }}</h3>
+          <div class="flex align-items-center gap-6">
+            <div class="text-sm">
+              <span class="text-500">Credit Limit:</span>
+              <span class="ml-1 font-bold">
+                <input v-if="isEditing" type="number" step="0.01" min="0" v-model="creditLimit" @input="validateCredit" class="w-32 p-2 border-round-lg border-1 surface-border" :class="{ 'border-red-500': errorMessage }" />
+                <span v-else>{{ formatPrice(creditLimit) }}</span>
+              </span>
             </div>
-            <div style="height: 6px" class="w-full surface-200 border-round-full border-round-3xl mt-1">
-              <div
-                style="height: 6px"
-                class="border-round-3xl transition-all transition-duration-300"
+            <div class="text-sm">
+              <span class="text-500">Current Balance:</span>
+              <span class="ml-1 font-bold">{{ formatPrice(currentBalance) }}</span>
+            </div>
+            <div class="text-sm flex align-items-center gap-2">
+              <span class="text-500">Remaining:</span>
+              <span
+                class="font-bold"
                 :class="{
-                  'bg-red-500': creditStatus.status === 'critical',
-                  'bg-yellow-500': creditStatus.status === 'warning',
-                  'bg-green-500': creditStatus.status === 'normal'
+                  'text-red-600': creditStatus?.status === 'critical',
+                  'text-yellow-600': creditStatus?.status === 'warning',
+                  'text-green-600': creditStatus?.status === 'normal'
                 }"
-                :style="{ width: `${Math.min(creditStatus.usagePercentage, 100)}%` }"
-              ></div>
+              >
+                {{ formatPrice(availableCredit) }}
+              </span>
             </div>
           </div>
-          <div  class="flex justify-content-end gap-3 mt-4">
-          <button v-if="isEditing"
-            @click="cancelEdit" 
-            class="p-button p-button-warning"
-          >
-            Cancel
-          </button>
-          <button 
-            @click="isEditing ? saveChanges() : startEdit()" 
-            class="p-button p-button-primary"
-           
-          >
-            {{ isEditing ? 'Save Targets' : 'Edit Targets' }}
-          </button>
-        </div>
+          <div style="height: 6px" class="w-full surface-200 border-round-full border-round-3xl mt-1">
+            <div
+              style="height: 6px"
+              class="border-round-3xl transition-all transition-duration-300"
+              :class="{
+                'bg-red-500': creditStatus?.status === 'critical',
+                'bg-yellow-500': creditStatus?.status === 'warning',
+                'bg-green-500': creditStatus?.status === 'normal'
+              }"
+              :style="{ width: `${Math.min(creditStatus?.usagePercentage, 100)}%` }"
+            ></div>
+          </div>
         </div>
 
-        
-
-        <div class="overflow-x-auto mt-4 border-round-lg border-1 border-gray-200">
-          <DataTable :value="months">
-            <Column field="" header="#">
-              <template #body="slotProps">
-                {{ slotProps.index + 1 }}
-              </template>
-            </Column>
-            
-            <Column header="Month" field="name" />
-            
-            <Column header="Sales Target">
-              <template #body="slotProps">
-                <template v-if="isEditing">
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    :value="selectedRep.find(t => t.month === slotProps.data.id)?.salesTarget"
-                    @input="updateTarget(slotProps.data.id, 'salesTarget', $event.target.value)"
-                    class="w-full p-2 border-round-lg border-1 surface-border"
-                  />
-                </template>
-                <template v-else>
-                  {{ formatPrice(selectedRep.find(t => t.month === slotProps.data.id)?.salesTarget || 0) }}
-                </template>
-              </template>
-              <template #footer>
-                <strong>{{ formatPrice(selectedRep.reduce((sum, item) => sum + (item.salesTarget || 0), 0)) }}</strong>
-              </template>
-            </Column>
-            
-            <Column header="Collection Target">
-              <template #body="slotProps">
-                <template v-if="isEditing">
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    :value="selectedRep.find(t => t.month === slotProps.data.id)?.collectionTarget"
-                    @input="updateTarget(slotProps.data.id, 'collectionTarget', $event.target.value)"
-                    class="w-full p-2 border-round-lg border-1 surface-border"
-                  />
-                </template>
-                <template v-else>
-                  {{ formatPrice(selectedRep.find(t => t.month === slotProps.data.id)?.collectionTarget || 0) }}
-                </template>
-              </template>
-              <template #footer>
-                <strong>{{ formatPrice(selectedRep.reduce((sum, item) => sum + (item.collectionTarget || 0), 0)) }}</strong>
-              </template>
-            </Column>
-          </DataTable>
+        <div class="">
+          <div class="flex align-items-center justify-content-between">
+            <div class="flex justify-content-end gap-3 mt-4">
+              <button v-if="isEditing" @click="cancelEdit" class="p-button p-button-warning">Cancel</button>
+              <button @click="isEditing ? saveChanges() : startEdit()" class="p-button p-button-primary">
+                {{ isEditing ? 'Save Targets' : 'Edit Targets' }}
+              </button>
+            </div>
+          </div>
         </div>
+      </div>
 
-    
+      <!-- Main Content -->
+
+      <div v-if="selectedRep">
+        <DataTable :value="paginatedCustomers" class="surface-card border-round-lg mb-4 shadow-1 border-1 surface-border">
+          <Column field="" header="#">
+            <template #body="slotProps">
+              {{ slotProps.index + 1 }}
+            </template>
+          </Column>
+
+          <Column header="Month" field="name" />
+
+          <Column header="Sales Target">
+            <template #body="slotProps">
+              <template v-if="isEditing">
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  :value="selectedRep.find((t) => t.month === slotProps.data.id)?.salesTarget"
+                  @input="updateTarget(slotProps.data.id, 'salesTarget', $event.target.value)"
+                  class="w-full p-2 border-round-lg border-1 surface-border"
+                />
+              </template>
+              <template v-else>
+                {{ formatPrice(selectedRep.find((t) => t.month === slotProps.data.id)?.salesTarget || 0) }}
+              </template>
+            </template>
+            <template #footer>
+              <strong>{{ formatPrice(selectedRep.reduce((sum, item) => sum + (item.salesTarget || 0), 0)) }}</strong>
+            </template>
+          </Column>
+
+          <Column header="Collection Target">
+            <template #body="slotProps">
+              <template v-if="isEditing">
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  :value="selectedRep.find((t) => t.month === slotProps.data.id)?.collectionTarget"
+                  @input="updateTarget(slotProps.data.id, 'collectionTarget', $event.target.value)"
+                  class="w-full p-2 border-round-lg border-1 surface-border"
+                />
+              </template>
+              <template v-else>
+                {{ formatPrice(selectedRep.find((t) => t.month === slotProps.data.id)?.collectionTarget || 0) }}
+              </template>
+            </template>
+            <template #footer>
+              <strong>{{ formatPrice(selectedRep.reduce((sum, item) => sum + (item.collectionTarget || 0), 0)) }}</strong>
+            </template>
+          </Column>
+        </DataTable>
+
+        <Paginator :rows="rowsPerPage" :totalRecords="months.length" @page="onPageChange" />
       </div>
     </div>
   </div>
