@@ -170,6 +170,25 @@ const props = defineProps({
   }
 });
 
+const rowsPerPage = ref(5);
+const currentPage = ref(0);
+
+const onPageChange = (event) => {
+  currentPage.value = event.page ?? 0;
+};
+
+// const sessions = sessionStore.sessions
+
+const paginatedCustomers = computed(() => {
+  if (!sessionStore.sessions || !Array.isArray(sessionStore.sessions)) {
+    return [];
+  }
+  const start = currentPage.value * rowsPerPage.value;
+  const end = start + rowsPerPage.value;
+  return sessionStore.sessions.slice(start, end);
+});
+
+
 </script>
 
 <template>
@@ -217,7 +236,7 @@ const props = defineProps({
           <div class="col-12 xl:col-1 p-0 sm:px-2 xl:p-2">
             <div class="w-full xl:w-fit surface-card cursor-pointer">
               <div class="align-self-end w-full xl:w-fit">
-                <Button size="small" icon="pi pi-filter" :label="t('Filter')"  class="w-full xl:w-fit h-3rem" @click="applyFilters" />
+                <Button size="small" icon="pi pi-filter" :label="t('Filter')" class="w-full xl:w-fit h-3rem" @click="applyFilters" />
               </div>
             </div>
           </div>
@@ -294,32 +313,50 @@ const props = defineProps({
       </div>
       <!-- Sessions View -->
 
-      <div class="bg-white border-round-lg border-1 border-gray-300 overflow-hidden mx-3">
+      <div class="overflow-hidden mx-3">
         <!-- View Toggle Header -->
-        <div class="p-4 border-b flex align-items-center justify-content-between">
+
+        <!-- <div class="p-4 border-b flex align-items-center justify-content-between">
           <span class="text-xl font-medium"> {{ t('Sessions') }}</span>
           <div class="flex items-center space-x-2">
             <Button @click="toggleViewMode" class="p-1 rounded-lg hover:bg-gray-100 transition-colors" size="large" text :icon="viewMode === 'chart' ? 'pi pi-table' : 'pi pi-chart-bar'"> </Button>
           </div>
+        </div> -->
+
+        <div class="flex align-items-center justify-content-between mt-3 mb-4 ">
+          <span class="text-xl font-medium"> {{ t('Sessions') }}</span>
+
+          <div class="flex gap-2 align-items-center">
+            <!-- View Toggle -->
+            <div class="flex gap-2 align-items-center surface-100 border-round-lg p-1">
+              <div
+                @click="viewMode = 'table'"
+                class="p-2 flex justify-content-center align-items-center border-round-md cursor-pointer transition-colors duration-200"
+                :class="viewMode === 'table' ? 'surface-0 text-blue-600 shadow-1' : 'hover:surface-200'"
+                style="width: 35px"
+              >
+                <i class="pi pi-table"></i>
+              </div>
+              
+              <div
+                @click="viewMode = 'chart'"
+                class="p-2 flex justify-content-center align-items-center border-round-md cursor-pointer transition-colors duration-200"
+                :class="viewMode === 'chart' ? 'surface-0 text-blue-600 shadow-1' : 'hover:surface-200'"
+                style="width: 35px"
+              >
+                <i class="pi pi-chart-bar"></i>
+              </div>
+            </div>
+          </div>
         </div>
+
         <!-- Chart View -->
         <div v-if="viewMode === 'chart'" class="px-6">
           <div class="h-27rem">
             <Chart type="bar" class="h-full" :data="chartData" :options="chartOptions" />
           </div>
         </div>
-        <DataTable
-          class="surface-card border-round-lg shadow-1 border-1 surface-border"
-          v-else
-          :value="sessionStore.sessions"
-          :paginator="true"
-          :rows="5"
-          :rowsPerPageOptions="[5, 10, 25]"
-          dataKey="id"
-          :globalFilterFields="['name', 'id']"
-          :currentPageReportTemplate="''"
-          :rowClass="getRowClass"
-        >
+        <DataTable class="surface-card border-round-lg mb-4 shadow-1 border-1 surface-border" v-else :value="paginatedCustomers" :rows="5" dataKey="id" :globalFilterFields="['name', 'id']" :currentPageReportTemplate="''" :rowClass="getRowClass">
           <template #empty>
             <div class="flex justify-content-center align-items-center font-bold text-lg">
               {{ t('Session.empty') }}
@@ -376,6 +413,8 @@ const props = defineProps({
             </template>
           </Column>
         </DataTable>
+
+        <Paginator :rows="rowsPerPage" :totalRecords="sessionStore.sessions.length" @page="onPageChange" />
       </div>
     </div>
 

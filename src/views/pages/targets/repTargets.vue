@@ -171,7 +171,7 @@ onMounted(() => {
   });
 });
 
-const rowsPerPage = ref(12);
+const rowsPerPage = ref(10);
 const currentPage = ref(0);
 
 const onPageChange = (event) => {
