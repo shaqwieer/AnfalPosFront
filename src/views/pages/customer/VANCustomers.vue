@@ -134,7 +134,7 @@ const filteredCustomers = computed(() => {
     <div class="px-6">
       <div class="max-w-7xl mx-auto">
         <div class="flex align-items-center justify-content-between mb-6">
-          <h1 class="text-900 text-4xl font-bold">
+          <h1 class="text-900 m-0 text-4xl font-bold">
             {{ t(`Customer.Customers`) }}
           </h1>
           <div class="flex gap-2 align-items-center">
