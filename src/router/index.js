@@ -39,12 +39,20 @@ const router = createRouter({
           component: () => import('@/views/pages/customer/customers/CustomerDashboard.vue')
         },
         {
-          path: 'Session-analytics',
+          path: 'session-analytics',
           name: 'Sessions',
           meta: {
             breadcrumb: ['Session Managment']
           },
           component: () => import('@/views/pages/session/SessionManagement.vue')
+        },
+        {
+          path: 'visit-analytics',
+          name: 'Visits',
+          meta: {
+            breadcrumb: ['Visit Managment']
+          },
+          component: () => import('@/views/pages/visits/VisitManagement.vue')
         },
         {
           path: '/invoices/quick-invoice',
@@ -149,7 +157,15 @@ const router = createRouter({
           path: '/',
           name: 'e-commerce',
           meta: {
-            breadcrumb: ['E-Commerce Dashboard']
+            breadcrumb: ['Dashboard']
+          },
+          component: () => import('@/views/dashboards/VANDashboard.vue')
+        },
+        {
+          path: '/van-dashboard',
+          name: 'van-dashboard',
+          meta: {
+            breadcrumb: ['Van Sales Dashboard']
           },
           component: () => import('@/views/dashboards/VANDashboard.vue')
         },
