@@ -1,82 +1,85 @@
 <template>
   <div class="flex flex-column gap-2">
-    <PageTopBar v-model:searchText="filters['global'].value" :hasAddButton="false" :hasReload="true" :hasSearch="false" :title="t(`items.title`)" :addText="t('baseLookup.createButtonLabel')" simple :addButton="openCreateDialog">
-      <template #action>
-        <div class="flex flex-wrap align-items-center justify-content-between gap-2">
-          <Button icon="pi pi-refresh" class="shadow-none" rounded raised @click="getItems" />
+    
+
+    <div class="flex justify-content-between mb-5">
+      <div>
+        <h2>{{ t(`items.title`) }}</h2>
+      </div>
+
+      <div>
+        <Button icon="pi pi-refresh" class="shadow-none" rounded raised @click="getItems" />
+      </div>
+    </div>
+
+    <DataTable
+      class="surface-card border-round-lg mb-4 shadow-1 border-1 surface-border"
+      :value="paginatedCustomers"
+      dataKey="id"
+      :rows="10"
+      :filters="filters"
+      :globalFilterFields="['name', 'id']"
+      :paginatorTemplate="
+        mainStore.isRTL ? 'RowsPerPageDropdown NextPageLink LastPageLink  PageLinks FirstPageLink PrevPageLink  CurrentPageReport ' : 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
+      "
+      :currentPageReportTemplate="''"
+    >
+      <template #empty>
+        <div class="flex justify-content-center align-items-center font-bold text-lg">
+          {{ t(`items.empty`) }}
         </div>
       </template>
-    </PageTopBar>
 
-    <div class="card">
-      <DataTable
-        :value="ItemsData"
-        dataKey="id"
-        :paginator="true"
-        :rows="10"
-        :filters="filters"
-        :globalFilterFields="['name', 'id']"
-        :paginatorTemplate="
-          mainStore.isRTL ? 'RowsPerPageDropdown NextPageLink LastPageLink  PageLinks FirstPageLink PrevPageLink  CurrentPageReport ' : 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
-        "
-        :rowsPerPageOptions="[5, 10, 25]"
-        :currentPageReportTemplate="''"
-      >
-        <template #empty>
-          <div class="flex justify-content-center align-items-center font-bold text-lg">
-            {{ t(`items.empty`) }}
+      <Column field="barcode" :header="t('items.barcode')" class="" :sortable="true">
+        <template #body="slotProps">
+          <div class="flex flex-row align-items-center">
+            <span class="font-semibold text-md">{{ slotProps.data.barcode }}</span>
           </div>
         </template>
+      </Column>
 
-        <Column field="barcode" :header="t('items.barcode')" class="" :sortable="true">
-          <template #body="slotProps">
-            <div class="flex flex-row align-items-center">
-              <span class="font-semibold text-md">{{ slotProps.data.barcode }}</span>
-            </div>
-          </template>
-        </Column>
+      <Column field="brand" :header="t('items.brand')" class="" :sortable="true">
+        <template #body="slotProps">
+          <div class="flex flex-row align-items-center">
+            <span class="font-semibold text-md">{{ slotProps.data.brand }}</span>
+          </div>
+        </template>
+      </Column>
 
-        <Column field="brand" :header="t('items.brand')" class="" :sortable="true">
-          <template #body="slotProps">
-            <div class="flex flex-row align-items-center">
-              <span class="font-semibold text-md">{{ slotProps.data.brand }}</span>
-            </div>
-          </template>
-        </Column>
+      <Column field="id" :header="t('items.id')" class="" :sortable="true">
+        <template #body="slotProps">
+          <div class="flex flex-row align-items-center">
+            <span class="font-semibold text-md">{{ slotProps.data.id }}</span>
+          </div>
+        </template>
+      </Column>
 
-        <Column field="id" :header="t('items.id')" class="" :sortable="true">
-          <template #body="slotProps">
-            <div class="flex flex-row align-items-center">
-              <span class="font-semibold text-md">{{ slotProps.data.id }}</span>
-            </div>
-          </template>
-        </Column>
+      <Column field="price" :header="t('items.price')" class="" :sortable="true">
+        <template #body="slotProps">
+          <div class="flex flex-row align-items-center">
+            <span class="font-semibold text-md">{{ slotProps.data.price }}</span>
+          </div>
+        </template>
+      </Column>
 
-        <Column field="price" :header="t('items.price')" class="" :sortable="true">
-          <template #body="slotProps">
-            <div class="flex flex-row align-items-center">
-              <span class="font-semibold text-md">{{ slotProps.data.price }}</span>
-            </div>
-          </template>
-        </Column>
+      <Column field="itemGroup" :header="t('items.Group')" class="" :sortable="true">
+        <template #body="slotProps">
+          <div class="flex flex-row align-items-center">
+            <span class="font-semibold text-md">{{ slotProps.data.itemGroup }}</span>
+          </div>
+        </template>
+      </Column>
 
-        <Column field="itemGroup" :header="t('items.Group')" class="" :sortable="true">
-          <template #body="slotProps">
-            <div class="flex flex-row align-items-center">
-              <span class="font-semibold text-md">{{ slotProps.data.itemGroup }}</span>
-            </div>
-          </template>
-        </Column>
+      <Column field="sapDescAr" :header="t('items.Desc')" class="" :sortable="true">
+        <template #body="slotProps">
+          <div class="flex flex-row align-items-center">
+            <span class="font-semibold text-md">{{ slotProps.data.sapDescAr }}</span>
+          </div>
+        </template>
+      </Column>
+    </DataTable>
 
-        <Column field="sapDescAr" :header="t('items.Desc')" class="" :sortable="true">
-          <template #body="slotProps">
-            <div class="flex flex-row align-items-center">
-              <span class="font-semibold text-md">{{ slotProps.data.sapDescAr }}</span>
-            </div>
-          </template>
-        </Column>
-      </DataTable>
-    </div>
+    <Paginator :rows="rowsPerPage" :totalRecords="ItemsData.length" @page="onPageChange" />
   </div>
 </template>
 
@@ -220,6 +223,22 @@ const confirmDelete = async () => {
     handleError(err, mainStore.loading);
   }
 };
+
+const rowsPerPage = ref(10);
+const currentPage = ref(0);
+
+const onPageChange = (event) => {
+  currentPage.value = event.page ?? 0;
+};
+
+const paginatedCustomers = computed(() => {
+  if (!ItemsData.value || !Array.isArray(ItemsData.value)) {
+    return [];
+  }
+  const start = currentPage.value * rowsPerPage.value;
+  const end = start + rowsPerPage.value;
+  return ItemsData.value.slice(start, end);
+});
 </script>
 <style scoped>
 .rtl-direction :deep(.p-datatable .p-datatable-tbody > tr > td) {
