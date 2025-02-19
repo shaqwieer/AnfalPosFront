@@ -10,6 +10,10 @@ import ImageLoader from '@/components/ImageLoader.vue';
 import { handleError } from '@/utilities/errorHandler';
 import placeHolderPhoto from '@/assets/images/placeholder.jpg';
 
+const totalRecords = ref(0);
+const rows = ref(12);
+const first = ref(0);
+
 const organizationStore = useOrganizationStore();
 const countries = computed(() => organizationStore.branchLookups.countries);
 const cities = computed(() => organizationStore.branchLookups.cities);
@@ -31,9 +35,6 @@ const paginatedEntities = computed(() => {
   return entities.value.slice(first.value, first.value + rows.value);
 });
 
-const totalRecords = ref(0);
-const rows = ref(12);
-const first = ref(0);
 onMounted(async () => {
   try {
     const response = await apiClient.get(`/Branches`);
@@ -211,58 +212,8 @@ const copyToClipboard = (text) => {
       </div>
     </div>
 
-    <!-- <div class="col-12 md:col-6 lg:col-4 xl:col-4" v-for="data in paginatedEntities" :key="data.id">
-      <Card style="width: 100%; overflow: hidden; min-width: 200px; border-top: 5px solid" class="flex h-full p-4 justify-content-between border-primary flex-column col-12 md:col-6 lg:col-4 xl:col-3 border-round p-0">
-        <template #header>
-          <div class="w-full h-8rem bg-primary flex align-items-center justify-content-center border-round">
-            <h2 class="text-xl m-0 font-bold text-white">{{ data.name }}</h2>
-          </div>
-        </template>
-
-        <template #title>
-          <div class="flex justify-content-between gap-1 align-items-center pt-3">
-            <span class="text-xl">{{ data.cityName }},{{ data.countryName }}</span>
-            <Tag class="" :class="!data.isDeActivated ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" :value="!data.isDeActivated ? 'Active' : 'Inactive'"></Tag>
-          </div>
-        </template>
-        <template #subtitle>
-          <span class="text-base text-500 font-semibold">{{ data.branchTypeName }}</span>
-        </template>
-        <template #content>
-          <div class="flex flex-column gap-2">
-            <div class="flex gap-2 align-items-center">
-              
-
-              <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ data.primaryPhone }}</span>
-            </div>
-            <div class="flex gap-2 align-items-center">
-             
-              <span>{{ data.email }}</span>
-            </div>
-            <div class="flex gap-2 align-items-center">
-              
-              <span>{{ data.address }}</span>
-            </div>
-          </div>
-        </template>
-        <template #footer>
-          <div class="flex gap-3 justify-content-between">
-            <Button :label="t('organizationUpdateButton')" @click="toggleCreateEditDialog(false, data, false)" class="p-button shadow-none p-component px-0 py-0 w-6 bg-primary text-white border-round flex align-items-center" />
-
-            <Button
-              :label="data.isDeActivated ? `${t('organizationActiveAction')}` : `${t('organizationDeactivatedAction')}`"
-              :severity="data.isDeActivated ? 'success' : 'danger'"
-              outlined
-              :class="data.isDeActivated ? 'bg-green-500 border-green-500 text-white ' : '   bg-white border-red-500 text-red-500'"
-              class="p-button p-component w-6 border-round shadow-none flex align-items-center gap-2 px-0 py-0 h-3rem"
-              @click="toggleActivateDeactivateDialog(data.isDeActivated, data.id)"
-            />
-          </div>
-        </template>
-      </Card>
-    </div> -->
-    <div class="col-12 flex justify-content-center mt-4">
-      <Paginator :first="first" :rows="rows" :totalRecords="totalRecords" :rowsPerPageOptions="[6, 12, 18, 24]" @update:first="onFirstChange" @update:rows="onRowsChange" @page="onPageChange" />
+    <div class="w-full flex justify-content-center mt-4">
+      <Paginator class="w-full" :first="first" :rows="rows" :totalRecords="totalRecords" @update:first="onFirstChange" @update:rows="onRowsChange" @page="onPageChange" />
     </div>
   </div>
   <!-- Add Dialog -->
@@ -335,9 +286,6 @@ const copyToClipboard = (text) => {
 }
 .rtl-direction :deep(.p-paginator .p-paginator-last) {
   rotate: 180deg !important;
-}
-:deep(.p-paginator) {
-  background-color: transparent;
 }
 
 .avatar-hover-animation {
