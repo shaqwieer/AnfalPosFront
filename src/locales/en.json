@@ -335,8 +335,8 @@
     "secondarylabel": "Select File"
   },
   "branch": {
-    "Header": "Plants",
-    "Description": "Plants under the organization are business units or entities operating under the umbrella of the parent organization. These companies are managed independently but adhere to the strategic goals and policies set by the organization. They may specialize in different fields or sectors that complement the parent organization's objectives, such as manufacturing, services, or technology."
+    "Header": "Branches",
+    "Description": "Branches under the organization are business units or entities operating under the umbrella of the parent organization. These companies are managed independently but adhere to the strategic goals and policies set by the organization. They may specialize in different fields or sectors that complement the parent organization's objectives, such as manufacturing, services, or technology."
   },
   "branchDialog": {
     "requiredError": "This Field Is required",

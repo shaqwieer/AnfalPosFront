@@ -159,24 +159,41 @@ const copyToClipboard = (text) => {
     <div class="grid">
       <!-- v-for="data in paginatedEntities" :key="data.id" -->
       <div v-for="(data, index) in paginatedEntities" :key="index" class="col-12 lg:col-6 xl:col-4">
-        <div class="card mb-0 flex flex-column justify-content-between h-13rem relative">
+        <div class="card mb-0 flex flex-column justify-content-between relative">
           <Tag class="absolute" style="right: 12px; top: 12px" :class="!data.isDeActivated ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" :value="!data.isDeActivated ? 'Active' : 'Inactive'"></Tag>
+
+          <div style="right: 12px; top: 42px" v-if="data.branchTypeName == 'VAN'" v-tooltip.top="data.branchTypeName" class="absolute w-3rem h-3rem border-round-lg bg-blue-50 flex align-items-center justify-content-center">
+            <i class="pi pi-truck text-blue-500 text-xl"></i>
+          </div>
 
           <div class="flex justify-content-between">
             <div class="">
               <!-- <span class="block text-500 font-medium mb-3">{{ t('RoleCard.totalUsers', { count: data.users.length }) }}</span> -->
               <div class="text-900 font-medium text-xl">{{ data.name }}</div>
               <div class="block text-500 font-medium mb-3">{{ data.cityName }},{{ data.countryName }}</div>
-              <div class="block text-500 font-medium mb-3">{{ data.branchTypeName }}</div>
+              <div class="block text-500 font-medium mb-2"></div>
+
+              <div class="block text-500 font-sm">
+                <i class="pi pi-phone mr-2"></i>
+                {{ data.primaryPhone }}
+              </div>
+              <div class="block text-500 font-sm">
+                <i class="pi pi-envelope mr-2"> </i>
+                {{ data.email }}
+              </div>
+              <div class="block text-500 font-sm mb-3">
+                <i class="pi pi-map-marker mr-2"></i>
+                {{ data.address }}
+              </div>
             </div>
 
-            <div class="flex align-items-center justify-content-center">
+            <!-- <div class="flex align-items-center justify-content-center">
               <AvatarGroup>
                 <Avatar @click="copyToClipboard(data.primaryPhone)" v-html="'<i class=\'pi pi-phone \'></i>'" v-tooltip.top="data.primaryPhone" size="large" shape="circle" class="avatar-hover-animation cursor-pointer" />
                 <Avatar @click="copyToClipboard(data.email)" v-html="'<i class=\'pi pi-envelope \'></i>'" v-tooltip.top="data.email" size="large" shape="circle" class="avatar-hover-animation cursor-pointer" />
                 <Avatar @click="copyToClipboard(data.address)" v-html="'<i class=\'pi pi-map-marker \'></i>'" v-tooltip.top="data.address" size="large" shape="circle" class="avatar-hover-animation cursor-pointer" />
               </AvatarGroup>
-            </div>
+            </div> -->
           </div>
           <div class="flex justify-content-between">
             <Button :label="t('organizationUpdateButton')" @click="toggleCreateEditDialog(false, data, false)" class="h-2rem border-1 text-primary" severity="secondary" outlined />
@@ -214,15 +231,16 @@ const copyToClipboard = (text) => {
         <template #content>
           <div class="flex flex-column gap-2">
             <div class="flex gap-2 align-items-center">
-              <i class="pi pi-phone mr-2"></i>
+              
+
               <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ data.primaryPhone }}</span>
             </div>
             <div class="flex gap-2 align-items-center">
-              <i class="pi pi-envelope mr-2"></i>
+             
               <span>{{ data.email }}</span>
             </div>
             <div class="flex gap-2 align-items-center">
-              <i class="pi pi-map-marker mr-2"></i>
+              
               <span>{{ data.address }}</span>
             </div>
           </div>
