@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-column gap-2">
-    
 
     <div class="flex justify-content-between mb-5">
       <div>
