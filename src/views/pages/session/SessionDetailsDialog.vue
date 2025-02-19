@@ -61,6 +61,20 @@ const getStatusColor = (status) => {
       return 'bg-gray-100 text-gray-800';
   }
 };
+const getSessionStatusColor = (status) => {
+  switch (status) {
+    case 4:
+      return 'bg-blue-100 text-blue-800';
+    case 5:
+      return 'bg-yellow-100 text-yellow-800';
+    case 6:
+      return 'bg-orange-100 text-orange-800';
+    case 7:
+      return 'bg-green-100 text-green-800';
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
+};
 const closeDialog = () => {
   emit('close');
 };
@@ -88,9 +102,12 @@ onMounted(() => {
       <div class="flex flex-column gap-3 w-full p-4 bg-gray-100 overflow-auto" style="height: 90vh">
         <div class="flex flex-row justify-content-between w-full">
           <div class="flex flex-column gap-2">
-            <span class="font-bold text-xl"
-              >{{ 'Session #' + session.sessionId + ' - ' + session.saleName }}<span class="text-red-500">{{ session.isSessionLate ? ' (Late Session)' : '' }}</span></span
-            >
+            <span class="font-bold text-xl flex gap-2 align-items-center"
+              >{{ 'Session #' + session.sessionId + ' - ' + session.saleName }}<span class="text-red-500">{{ session.isSessionLate ? ' (Late Session)' : '' }}</span>
+              <span class="px-2 py-1 flex w-fit text-sm font-semibold border-round-xl" :class="getSessionStatusColor(session.statusId)">
+                {{ session.statusName }}
+              </span>
+            </span>
             <span class="font-light text-gray-400">{{ session.sessionStartDate + ' - ' + session.sessionEndDate }}</span>
           </div>
           <Button icon="pi pi-times" class="h-3rem w-3rem bg-white text-gray-900 border-1 border-gray-200" @click="closeDialog()" />
@@ -201,9 +218,9 @@ onMounted(() => {
                   >
                     <i class="pi pi-file"></i>
                   </div>
-                  <div v-else class="flex w-11 justify-content-center align-items-center bg-white text-sm text-red-600">No Attachment</div>
+                  <!-- <div v-else class="flex w-11 justify-content-center align-items-center bg-white text-sm text-red-600">No Attachment</div> -->
                   <div
-                    v-if="slotProps.data.statusId === 1"
+                    v-if="slotProps.data.statusId === 1 && props.session.statusId !== 4"
                     @click="ApproveSessionTransaction(slotProps.data.id, 'Deposits')"
                     class="cursor-pointer text-green-500 border-circle border-1 border-green-200 flex align-items-center justify-content-center w-3rem h-3rem hover:bg-green-100"
                   >
@@ -261,9 +278,9 @@ onMounted(() => {
                   >
                     <i class="pi pi-file"></i>
                   </div>
-                  <div v-else class="flex w-11 justify-content-center align-items-center bg-white text-sm text-red-600">No Attachment</div>
+                  <!-- <div v-else class="flex w-11 justify-content-center align-items-center bg-white text-sm text-red-600">No Attachment</div> -->
                   <div
-                    v-if="slotProps.data.statusId === 1"
+                    v-if="slotProps.data.statusId === 1 && props.session.statusId !== 4"
                     @click="ApproveSessionTransaction(slotProps.data.id, 'Transactions')"
                     class="cursor-pointer text-green-500 border-circle border-1 border-green-200 flex align-items-center justify-content-center w-3rem h-3rem hover:bg-green-100"
                   >
