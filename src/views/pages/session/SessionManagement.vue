@@ -7,6 +7,7 @@ import Chart from 'primevue/chart';
 import { useI18n } from 'vue-i18n';
 import MultiSelect from 'primevue/multiselect';
 import { useToast } from 'primevue/usetoast';
+import { boolean } from 'yup';
 const { t } = useI18n();
 const toast = useToast();
 
@@ -161,13 +162,21 @@ onMounted(() => {
   pastDate.setDate(currentDate.getDate() - 7);
   dateFrom.value = new Date(pastDate.toISOString());
 });
+
+const props = defineProps({
+  showFilter: {
+    type: Boolean,
+    default: true
+  }
+});
+
 </script>
 
 <template>
   <div class="">
     <div class="max-w-7xl mx-auto">
       <!-- Filters -->
-      <div class="px-3">
+      <div class="px-3" v-if="showFilter">
         <div class="bg-white row-gap-3 border-round-lg border-1 border-gray-300 p-4 grid gap-0 w-full align-items-end justify-content-between">
           <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
             <div class="h-full surface-card cursor-pointer">
@@ -208,7 +217,7 @@ onMounted(() => {
           <div class="col-12 xl:col-1 p-0 sm:px-2 xl:p-2">
             <div class="w-full xl:w-fit surface-card cursor-pointer">
               <div class="align-self-end w-full xl:w-fit">
-                <Button size="small" icon="pi pi-filter" :label="t('Filter')" :disabled="!changedFilter" class="w-full xl:w-fit h-3rem" @click="applyFilters" />
+                <Button size="small" icon="pi pi-filter" :label="t('Filter')"  class="w-full xl:w-fit h-3rem" @click="applyFilters" />
               </div>
             </div>
           </div>
