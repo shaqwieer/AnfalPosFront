@@ -2,9 +2,9 @@
 import { ref, computed } from 'vue';
 
 const props = defineProps<{
-  yesterdayData: any;
   todayData: any;
   selectedCard: string | null;
+  dataSummary: any;
 }>();
 
 const emit = defineEmits(['select-card']);

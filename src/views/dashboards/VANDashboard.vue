@@ -9,6 +9,10 @@ import OverdueDetails from './components/details/OverdueDetails.vue';
 import StockDetails from './components/details/StockDetails.vue';
 import {useSessionStore} from '../../stores/sessionStore';
 import SessionManagement from '../pages/session/SessionManagement.vue';
+import { useDebounceFn } from '@vueuse/core';
+import { useToast } from 'primevue/usetoast';
+
+const toast = useToast();
 const sessionStore = useSessionStore();
 
 import { useI18n } from 'vue-i18n';
@@ -67,7 +71,7 @@ onMounted(() => {
   document.addEventListener('click', closeDropdown);
   sessionStore.GetSalesReps().then(() => {
     selectedSalesReps.value = sessionStore.salesReps.map((rep) => rep.id);
-    //getSessions();
+    getDataSummary();
   });
   const currentDate = new Date();
   dateTo.value = new Date(currentDate.toISOString());
@@ -80,6 +84,29 @@ onUnmounted(() => {
   document.removeEventListener('click', closeDropdown);
 });
 
+const getDataSummary = useDebounceFn(
+  async () => {
+    const formData = new FormData();
+    if (selectedSalesReps.value == null || selectedSalesReps.value.length === 0 || selectedStatus.value.length === 0) {
+      toast.add({ severity: 'error', detail: 'برجاء اختيار حالة ومندوب', life: 3000 });
+      changedFilter.value = false;
+      return;
+    }
+    selectedStatus.value.forEach((element, index) => {
+      formData.append(`StatusIds[${index}]`, element);
+    });
+    selectedSalesReps.value.forEach((element, index) => {
+      formData.append(`SalesRepIds[${index}]`, element);
+    });
+    formData.append('StartDate', new Date(dateFrom.value).toDateString());
+    formData.append('EndDate', new Date(dateTo.value).toDateString());
+
+    await sessionStore.getDataSummary(formData);
+    changedFilter.value = false;
+  },
+  300,
+  { maxWait: 1500 }
+);
 // Available sales reps
 const availableSalesReps = [
   { id: 'all', name: `${t('dashboard.AllSalesReps')}` },
@@ -117,17 +144,7 @@ const handleSearch = () => {
   dateTo.value = filterValues.value.dateTo;
 };
 
-// Sample data for yesterday
-const yesterdayData = ref({
-  visits: 45,
-  sales: 25000,
-  collections: {
-    cash: 15000,
-    visa: 8000,
-    bank: 2000
-  },
-  openSessions: 5000
-});
+
 
 // Sample data for today
 const todayData = ref({
@@ -349,6 +366,14 @@ const cardDetails = ref({
   }
 });
 
+const dataSummary = ref<any>({
+  VisitsSummary: {},
+  SalesSummary: {},
+  CollectionsSummary: {},
+  SessionsSummary:{},
+  OverdueSummary:{}
+});
+
 // Selected card and view mode state
 const selectedCard = ref<string | null>(null);
 const viewMode = ref<'chart' | 'table'>('chart');
@@ -468,7 +493,7 @@ const DetailsSectionTitle = computed(() => {
       </div>
 
       <!-- KPI Cards -->
-      <KPICards :yesterday-data="yesterdayData" :today-data="filteredData" :selected-card="selectedCard" v-model="totalSalesReps" @select-card="handleCardSelect" class="mb-6" />
+      <KPICards :today-data="filteredData" :selected-card="selectedCard" :data-summary="sessionStore.dataSummary" v-model="totalSalesReps" @select-card="handleCardSelect" class="mb-6" />
 
       <!-- Details Section -->
       <div v-if="selectedCard" class="surface-card border-round-xl border-1 p-4 border-gray-200">
