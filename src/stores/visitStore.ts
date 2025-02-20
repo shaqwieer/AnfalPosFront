@@ -17,7 +17,7 @@ export const useVisitStore = defineStore({
   actions: {
     async GetVisits(payload) {
       try {
-        const response = await apiClient.post('/ShiftSessions/GetSessionsManagment', payload);
+        const response = await apiClient.post('/ShiftSessions/GetVanSalesDashboard', payload);
         console.log(response);
 
         this.visitData = response.data.data;

@@ -226,68 +226,42 @@ const props = defineProps({
       <!-- Summary Cards -->
       <div class="grid p-2">
         <!-- Open Visits -->
+        <div class="col-12 md:col-6 lg:col-6 xl:col-2 xl:p-2">
+          <div class="bg-gray-50 border-round-lg border-gray-400 border-1 p-4 h-full">
+            <div class="text-md font-medium text-gray-600">{{ t('Visit.PlannedVisits') }}</div>
+            <div class="text-3xl font-bold text-gray-700">
+              {{ visitStore.visitData?.totalPlanned }}
+            </div>
+          </div>
+        </div>
         <div class="col-12 md:col-12 lg:col-4 xl:col-3 xl:p-2">
           <div class="bg-blue-50 border-round-lg shadow-1 border-blue-200 border-1 pl-4 pt-4 pr-3 pb-3 h-full flex flex-row justify-content-between">
-            <div>
-              <div class="text-md font-medium text-blue-500">{{ t('Visit.OpenVisits') }}</div>
-              <div class="text-3xl font-bold text-blue-500">
-                {{ visitStore.visitData?.openVisit }}
-              </div>
-            </div>
-            <div class="flex flex-column w-6 justify-content-end">
-              <div className="flex align-items-center justify-content-between">
-                <div className="flex align-items-center gap-2">
-                  <i class="pi pi-check-circle text-green-600 text-lg" />
-                  <span className="text-green-600 font-semibold text-lg">On Track</span>
-                </div>
-                <span className="font-semibold text-green-600 text-lg">{{ visitStore.visitData?.openVisit - visitStore.visitData?.oldVisit }}</span>
-              </div>
-              <div className="flex align-items-center justify-content-between">
-                <div className="flex align-items-center gap-2">
-                  <i class="pi pi-exclamation-circle text-orange-500 text-lg" />
-                  <span className="text-orange-500 text-lg font-semibold">Late</span>
-                </div>
-                <span className="font-semibold text-orange-500 text-lg">{{ visitStore.visitData?.oldVisit }}</span>
-              </div>
+            <div class="text-md font-medium text-blue-500">{{ t('Visit.OpenVisits') }}</div>
+            <div class="text-3xl font-bold text-blue-500">
+              {{ visitStore.visitData?.openVisit }}
             </div>
           </div>
         </div>
 
         <div class="col-12 md:col-6 lg:col-4 xl:col-2 xl:p-2">
           <div class="bg-yellow-50 border-round-lg shadow-1 border-yellow-200 border-1 p-4 h-full">
-            <div class="text-md font-medium text-yellow-600">{{ 'Closed Visits' }}</div>
+            <div class="text-md font-medium text-yellow-600">{{ t('Visit.CompletedVisits') }}</div>
             <div class="text-3xl font-bold text-yellow-600">
-              {{ visitStore.visitData?.closedVisit }}
-            </div>
-          </div>
-        </div>
-
-        <!-- Pending Visits -->
-
-        <div class="col-12 md:col-6 lg:col-4 xl:col-2 xl:p-2">
-          <div class="bg-orange-50 border-round-lg shadow-1 border-orange-200 border-1 p-4 h-full">
-            <div class="text-md font-medium text-orange-600">{{ t('Visit.PendingVisits') }}</div>
-            <div class="text-3xl font-bold text-orange-600">
-              {{ visitStore.visitData?.pendingVisit }}
-            </div>
-          </div>
-        </div>
-
-        <!-- Old Visits -->
-
-        <div class="col-12 md:col-6 lg:col-6 xl:col-2 xl:p-2">
-          <div class="bg-green-50 border-round-lg border-green-400 border-1 p-4 h-full">
-            <div class="text-md font-medium text-green-600">{{ 'Approved Visits' }}</div>
-            <div class="text-3xl font-bold text-green-700">
-              {{ visitStore.visitData?.approvedVisit }}
+              {{ visitStore.visitData?.totalCompleted }}
             </div>
           </div>
         </div>
 
         <div class="col-12 md:col-6 lg:col-6 xl:col-3 xl:p-2">
+          <div class="bg-green-50 border-round-lg shadow-1 border-green-200 border-1 p-4 h-full">
+            <div class="text-md font-medium text-green-500">{{ t('Visit.Productivity') }}</div>
+            <div class="text-3xl font-bold text-green-500">{{ visitStore.visitData?.totalProductive }}</div>
+          </div>
+        </div>
+        <div class="col-12 md:col-6 lg:col-6 xl:col-3 xl:p-2">
           <div class="bg-purple-50 border-round-lg shadow-1 border-purple-200 border-1 p-4 h-full">
-            <div class="text-md font-medium text-purple-500">{{ t('Visit.TotalAmount') }}</div>
-            <div class="text-3xl font-bold text-purple-500">{{ formatPrice(Number(visitStore.visitData?.totalAmount)) }}</div>
+            <div class="text-md font-medium text-purple-500">{{ t('Visit.AverageCompletionRate') }}</div>
+            <div class="text-3xl font-bold text-purple-500">{{ ((visitStore.visitData?.totalCompleted / visitStore.visitData?.totalPlanned) * 100).toFixed(1) }}%</div>
           </div>
         </div>
       </div>
@@ -341,15 +315,6 @@ const props = defineProps({
               <span class="text-md flex">{{ slotProps.data.visitStartDate }}</span>
             </template>
           </Column>
-          <Column field="cashAmount" class="">
-            <template #header>
-              <span class="text-lg flex font-bold"> {{ t('Visit.CashAmount') }} </span>
-            </template>
-
-            <template #body="slotProps">
-              <div class="text-md font-semibold flex">{{ formatPrice(slotProps.data.allAmount) }}</div>
-            </template>
-          </Column>
           <Column field="Credit Limit" class="" :sortable="true">
             <template #header>
               <span class="text-lg flex font-bold"> {{ t('Status') }} </span>
@@ -361,11 +326,10 @@ const props = defineProps({
               </span>
             </template>
           </Column>
-          <Column field="isVisitLate" :header="'Late Visit'" headerClass="" class="w-12rem">
+          <Column field="isVisitProductive" :header="'Productive Visit'" headerClass="" class="w-12rem">
             <template #body="slotProps">
               <div class="flex align-items-center justify-content-center text-center w-5rem">
-                <i v-if="slotProps.data.isVisitLate" class="pi flex pi-exclamation-triangle text-red-500 text-center text-2xl" />
-                <!-- <i v-else class="pi flex pi-check-circle text-green-500 text-center text-2xl" /> -->
+                <i v-if="slotProps.data.isVisitProductive" class="pi flex pi-check-circle text-green-500 text-center text-2xl" />
               </div>
             </template>
           </Column>
