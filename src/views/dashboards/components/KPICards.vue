@@ -2,15 +2,16 @@
 import { ref, computed } from 'vue';
 
 const props = defineProps<{
-  yesterdayData: any;
   todayData: any;
   selectedCard: string | null;
+  dataSummary: any;
 }>();
 
 const emit = defineEmits(['select-card']);
 
 const Rtl = localStorage.getItem('Rtl') === 'true';
 const formatPrice = (price: number): string => {
+  if (!price) return '0.00';
   return price.toLocaleString(Rtl ? 'ar-SA' : 'en-US', {
     style: 'currency',
     currency: 'SAR',
@@ -44,25 +45,25 @@ const totalSalesReps = defineModel();
           </div>
           <div>
             <h3 class="text-base text-900 m-0 text-900 m-0">{{ t('dashboard.Visits') }}</h3>
-            <p class="text-md text-500 m-0">{{ t('dashboard.Today_Performance') }}</p>
+            <!-- <p class="text-md text-500 m-0">{{ t('dashboard.Today_Performance') }}</p> -->
           </div>
         </div>
         <div class="flex flex-column gap-2">
           <div class="flex align-items-center justify-content-between">
             <span class="text-md text-500"> {{ t('dashboard.Planned') }}</span>
-            <span class="font-medium">{{ todayData.plannedVisits }}</span>
+            <span class="font-medium">{{ dataSummary.visitsSummary?.totalPlanned }}</span>
           </div>
           <div class="flex align-items-center justify-content-between">
             <span class="text-md text-500"> {{ t('dashboard.Completed') }}</span>
-            <span class="font-medium text-green-600">{{ todayData.completedVisits }}</span>
+            <span class="font-medium text-green-600">{{ dataSummary.visitsSummary?.totalCompleted }}</span>
           </div>
           <div class="flex align-items-center justify-content-between">
             <span class="text-md text-500">{{ t('dashboard.Productive') }}</span>
-            <span class="font-medium text-blue-600">{{ todayData.productiveVisits }}</span>
+            <span class="font-medium text-blue-600">{{ dataSummary.visitsSummary?.totalProductive }}</span>
           </div>
         </div>
         <div class="mt-2 pt-2 border-top-1 border-gray-200">
-          <div class="text-md text-500">{{ t('dashboard.Productivity_Rate') }} : {{ Math.round((todayData.productiveVisits / todayData.completedVisits) * 100) }}%</div>
+          <div class="text-md text-500">{{ t('dashboard.Productivity_Rate') }} : {{ dataSummary.visitsSummary?.conversionRate }}%</div>
         </div>
       </div>
     </div>
@@ -80,22 +81,22 @@ const totalSalesReps = defineModel();
           </div>
           <div>
             <h3 class="text-base m-0">{{ t('dashboard.Sales') }}</h3>
-            <p class="text-md text-500 m-0">{{ t('dashboard.Daily_Revenue') }}</p>
+            <!-- <p class="text-md text-500 m-0">{{ t('dashboard.Daily_Revenue') }}</p> -->
           </div>
         </div>
         <div class="flex flex-column gap-3">
           <div class="flex align-items-center justify-content-between">
             <span class="text-md text-500"> {{ t('dashboard.Target') }} </span>
-            <span class="font-medium text-900">{{ formatPrice(todayData.sales * 1.2) }}</span>
+            <span class="font-medium text-900">{{ formatPrice(dataSummary.salesSummary?.salesTarget) }}</span>
           </div>
           <div class="flex align-items-center justify-content-between">
             <span class="text-md text-500"> {{ t('dashboard.Actual') }} </span>
-            <span class="font-medium text-green-600">{{ formatPrice(todayData.sales) }}</span>
+            <span class="font-medium text-green-600">{{ formatPrice(dataSummary.salesSummary?.salesActual) }}</span>
           </div>
           <div class="surface-200 border-round w-full" style="height: 8px">
-            <div class="bg-green-500 h-2 border-round" style="height: 8px" :style="{ width: `${Math.min((todayData.sales / (todayData.sales * 1.2)) * 100, 100)}%` }"></div>
+            <div class="bg-green-500 h-2 border-round" style="height: 8px" :style="{ width: `${Math.min(dataSummary.salesSummary?.percantage * 100, 100)}%` }"></div>
           </div>
-          <div class="text-md text-500 text-right">{{ Math.round((todayData.sales / (todayData.sales * 1.2)) * 100) }}% {{ t('dashboard.of_target') }}</div>
+          <div class="text-md text-500 text-right">{{ Math.round(dataSummary.salesSummary?.percantage * 100) }}% {{ t('dashboard.of_target') }}</div>
         </div>
       </div>
     </div>
@@ -113,21 +114,21 @@ const totalSalesReps = defineModel();
           </div>
           <div>
             <h3 class="text-base text-900 m-0">{{ t('dashboard.Collections') }}</h3>
-            <p class="text-md text-500 m-0">{{ t('dashboard.Payment_Methods') }}</p>
+            <!-- <p class="text-md text-500 m-0">{{ t('dashboard.Payment_Methods') }}</p> -->
           </div>
         </div>
         <div class="flex flex-column gap-2">
           <div class="flex align-items-center justify-content-between">
             <span class="text-md text-500"> {{ t('dashboard.Cash') }}</span>
-            <span class="font-medium">{{ formatPrice(todayData.collections.cash) }}</span>
+            <span class="font-medium">{{ formatPrice(dataSummary.collectionsSummary?.cash) }}</span>
           </div>
           <div class="flex align-items-center justify-content-between">
             <span class="text-md text-500"> {{ t('dashboard.VISA') }}</span>
-            <span class="font-medium">{{ formatPrice(todayData.collections.visa) }}</span>
+            <span class="font-medium">{{ formatPrice(dataSummary.collectionsSummary?.visa) }}</span>
           </div>
           <div class="flex align-items-center justify-content-between">
             <span class="text-md text-500"> {{ t('dashboard.Bank') }}</span>
-            <span class="font-medium">{{ formatPrice(todayData.collections.bank) }}</span>
+            <span class="font-medium">{{ formatPrice(dataSummary.collectionsSummary?.bank) }}</span>
           </div>
         </div>
       </div>
@@ -149,8 +150,24 @@ const totalSalesReps = defineModel();
             <p class="text-md text-500 m-0">{{ t('dashboard.Payment_Methods') }}</p>
           </div>
         </div>
-        <div class="text-2xl font-bold text-900">5 {{ t('dashboard.Rep') }}</div>
-        <div class="text-md text-500">{{ formatPrice(todayData.openSessions) }}</div>
+        <div class="flex flex-column gap-2">
+          <div class="flex align-items-center justify-content-between">
+            <span class="text-md text-500"> {{ t('dashboard.open') }}</span>
+            <span class="font-medium text-green-600">{{ dataSummary.sessionsSummary?.open }}</span>
+          </div>
+          <div class="flex align-items-center justify-content-between">
+            <span class="text-md text-500"> {{ t('dashboard.closed') }}</span>
+            <span class="font-medium text-orange-600">{{ dataSummary.sessionsSummary?.closed }}</span>
+          </div>
+          <div class="flex align-items-center justify-content-between">
+            <span class="text-md text-500"> {{ t('dashboard.pending') }}</span>
+            <span class="font-medium text-yellow-600">{{ dataSummary.sessionsSummary?.pending }}</span>
+          </div>
+          <div class="flex align-items-center justify-content-between">
+            <span class="text-md text-500"> {{ t('dashboard.accepted') }}</span>
+            <span class="font-medium text-blue-600">{{ dataSummary.sessionsSummary?.accepts }}</span>
+          </div>
+        </div>
       </div>
     </div>
 

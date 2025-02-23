@@ -11,6 +11,8 @@ export const useSessionStore = defineStore({
     selectedSession: <any>{},
     salesReps: [],
     attachmentTypes: <any[]>[],
+    dataSummary: <any>{},
+    dashBoardData: <any>{},
     loading: useLoadingStore(),
     error: ''
   }),
@@ -56,6 +58,24 @@ export const useSessionStore = defineStore({
       try {
         const response = await apiClient.get('/BusinessEntities/GetUserVanSaleInBranch');
         this.salesReps = response.data.data;
+      } catch (err) {
+        this.error = handleError(err, this.loading);
+      }
+    },
+    async getDashBoardSummary(payload) {
+      try {
+        const response = await apiClient.post('/ShiftSessions/GetVanSalesDashboard', payload);
+        this.dashBoardData = response.data.data;
+      } catch (err) {
+        this.error = handleError(err, this.loading);
+      }
+    },
+    async getDataSummary(payload) {
+      try {
+        const response = await apiClient.post('/ShiftSessions/GetVanDashboardCards', payload);
+        console.log(response);
+
+        this.dataSummary = response.data.data;
       } catch (err) {
         this.error = handleError(err, this.loading);
       }

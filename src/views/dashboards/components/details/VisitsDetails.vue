@@ -166,7 +166,7 @@ const getStatusColor = (rate: number) => {
           </template>
 
           <template #body="slotProps">
-            <div class="flex flex-row justify-content-center align-items-center">
+            <div class="flex flex-row justify-content-center align-items-center text-green-600">
               <span class="font-semibold text-md">{{ slotProps.data.completed }}</span>
             </div>
           </template>
@@ -180,50 +180,36 @@ const getStatusColor = (rate: number) => {
           </template>
 
           <template #body="slotProps">
-            <div class="flex flex-row justify-content-center align-items-center">
+            <div class="flex flex-row justify-content-center align-items-center text-blue-600">
               <span class="font-semibold text-md">{{ slotProps.data.productive }}</span>
             </div>
           </template>
         </Column>
 
-        <Column field="sales" class="font-normal">
+        <Column field="avgDuration" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Sales') }}</span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.AvgDuration') }}</span>
             </div>
           </template>
 
           <template #body="slotProps">
-            <div class="flex flex-row justify-content-center align-items-center text-center text-green-600 font-medium">
-              <span class="font-semibold text-md">{{ slotProps.data.transactions.sales }}</span>
+            <div class="flex flex-row justify-content-center align-items-center text-center text-600 font-medium">
+              <span class="font-semibold text-md">{{ slotProps.data.avgDuration }}</span>
             </div>
           </template>
         </Column>
 
-        <Column field="returns" class="font-normal">
+        <Column field="conversionRate" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Return') }}</span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.ConversionRate') }}</span>
             </div>
           </template>
 
           <template #body="slotProps">
             <div class="flex flex-row justify-content-center align-items-center text-red-600">
-              <span class="font-semibold text-md">{{ slotProps.data.transactions.returns }}</span>
-            </div>
-          </template>
-        </Column>
-
-        <Column field="collections" class="font-normal">
-          <template #header="slotProps">
-            <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Collection') }}</span>
-            </div>
-          </template>
-
-          <template #body="slotProps">
-            <div class="flex flex-row justify-content-center align-items-center text-blue-600">
-              <span class="font-semibold text-md">{{ slotProps.data.transactions.collections }}</span>
+              <span class="font-semibold text-md">{{ slotProps.data.conversionRate }}%</span>
             </div>
           </template>
         </Column>
