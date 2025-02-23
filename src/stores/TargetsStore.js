@@ -45,6 +45,14 @@ export const useSalesGoalsStore = defineStore({
       } catch (err) {
         this.error = handleError(err, this.loading);
       }
+    },
+    async GetSalesRepsForOrganization() {
+      try {
+        const response = await apiClient.get('/BusinessEntities/GetUserInOrganization');
+        this.salesReps = response.data.data;
+      } catch (err) {
+        this.error = handleError(err, this.loading);
+      }
     }
   }
 });
