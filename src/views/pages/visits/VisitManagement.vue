@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import VisitDetailsDialog from './VisitDetailsDialog.vue';
 import { useVisitStore } from '../../../stores/visitStore';
-import { useDebounceFn } from '@vueuse/core';
+import { get, useDebounceFn } from '@vueuse/core';
 import Chart from 'primevue/chart';
 import { useI18n } from 'vue-i18n';
 import MultiSelect from 'primevue/multiselect';
@@ -26,15 +26,15 @@ const visitStore = useVisitStore();
 const statusOptions = [
   // { label: `${t('All')}`, value: '8', color: '#FF5733' },
   { label: `${t('Open')}`, value: '4', color: '#188A42' },
-  { label: `${t('Closed')}`, value: '5', color: '#FA7B00' },
-  { label: `${t('Pending')}`, value: '6', color: '#BC4819' },
-  { label: `${t('Approved')}`, value: '7', color: '#3357FF' }
+  { label: `${t('Completed')}`, value: '5', color: '#FA7B00' },
+  { label: `${t('Planned')}`, value: '6', color: '#BC4819' },
+  { label: `${t('Productive')}`, value: '7', color: '#3357FF' }
 ];
 // Chart data
 const getCashPerSalesRep = computed(() => {
   const statusMap = Object.fromEntries(statusOptions.map(({ label, value, color }) => [parseInt(value), { label, color }]));
-  const statusCountObj = visitStore.visits.reduce((acc, { statusId }) => {
-    const { label, color } = statusMap[statusId] || { label: `Unknown (${statusId})`, color: '#FF5733' };
+  const statusCountObj = visitStore.visits.reduce((acc, { visitStatus }) => {
+    const { label, color } = statusMap[visitStatus] || { label: `Unknown (${visitStatus})`, color: '#FF5733' };
     acc[label] = acc[label] || { statusName: label, visitCount: 0, color };
     acc[label].visitCount += 1;
     return acc;
@@ -113,6 +113,21 @@ const getStatusColor = (status) => {
       return 'bg-gray-100 text-gray-800';
   }
 };
+
+const getStatusName = (status) => {
+  switch (status) {
+    case 4:
+      return 'Open';
+    case 5:
+      return 'Completed';
+    case 6:
+      return 'Planned';
+    case 7:
+      return 'Produtive';
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
+};
 const getRowClass = (data) => {
   return data.isVisitLate ? 'bg-red-100' : '';
 };
@@ -122,22 +137,29 @@ const applyFilters = () => {
 };
 const getVisits = useDebounceFn(
   async () => {
-    const formData = new FormData();
-    if (selectedSalesReps.value.length === 0 || selectedStatus.value.length === 0) {
-      toast.add({ severity: 'error', detail: 'برجاء اختيار حالة ومندوب', life: 3000 });
-      changedFilter.value = false;
-      return;
-    }
-    selectedStatus.value.forEach((element, index) => {
-      formData.append(`StatusIds[${index}]`, element);
-    });
-    selectedSalesReps.value.forEach((element, index) => {
-      formData.append(`SalesRepIds[${index}]`, element);
-    });
-    formData.append('StartDate', new Date(dateFrom.value).toDateString());
-    formData.append('EndDate', new Date(dateTo.value).toDateString());
+    // const formData = new FormData();
+    // if (selectedSalesReps.value.length === 0 || selectedStatus.value.length === 0) {
+    //   toast.add({ severity: 'error', detail: 'برجاء اختيار حالة ومندوب', life: 3000 });
+    //   changedFilter.value = false;
+    //   return;
+    // }
+    // selectedStatus.value.forEach((element, index) => {
+    //   formData.append(`StatusIds[${index}]`, element);
+    // });
+    // selectedSalesReps.value.forEach((element, index) => {
+    //   formData.append(`SalesRepIds[${index}]`, element);
+    // });
+    // formData.append('StartDate', new Date(dateFrom.value).toDateString());
+    // formData.append('EndDate', new Date(dateTo.value).toDateString());
 
-    await visitStore.GetVisits(formData);
+    var payload = {
+      StatusIds: selectedStatus.value,
+      SalesRepIds: selectedSalesReps.value,
+      StartDate: new Date(dateFrom.value.setHours(0, 0, 0, 0)),
+      EndDate: new Date(dateTo.value.setHours(new Date().getHours(), new Date().getMinutes() - new Date().getTimezoneOffset(), 0, 0)),
+      forSalesRep: false
+    };
+    await visitStore.GetVisits(payload);
     changedFilter.value = false;
   },
   300,
@@ -159,7 +181,7 @@ onMounted(() => {
   const currentDate = new Date();
   dateTo.value = new Date(currentDate.toISOString());
   const pastDate = new Date();
-  pastDate.setDate(currentDate.getDate() - 7);
+  pastDate.setDate(currentDate.getDate() - 30);
   dateFrom.value = new Date(pastDate.toISOString());
 });
 
@@ -226,7 +248,7 @@ const props = defineProps({
       <!-- Summary Cards -->
       <div class="grid p-2">
         <!-- Open Visits -->
-        <div class="col-12 md:col-6 lg:col-6 xl:col-2 xl:p-2">
+        <div class="col-12 md:col-6 lg:col-6 xl:col-3 xl:p-2">
           <div class="bg-gray-50 border-round-lg border-gray-400 border-1 p-4 h-full">
             <div class="text-md font-medium text-gray-600">{{ t('Visit.PlannedVisits') }}</div>
             <div class="text-3xl font-bold text-gray-700">
@@ -234,16 +256,16 @@ const props = defineProps({
             </div>
           </div>
         </div>
-        <div class="col-12 md:col-12 lg:col-4 xl:col-3 xl:p-2">
-          <div class="bg-blue-50 border-round-lg shadow-1 border-blue-200 border-1 pl-4 pt-4 pr-3 pb-3 h-full flex flex-row justify-content-between">
+        <div class="col-12 md:col-12 lg:col-6 xl:col-2 xl:p-2">
+          <div class="bg-blue-50 border-round-lg shadow-1 border-blue-200 border-1 p-4 h-full">
             <div class="text-md font-medium text-blue-500">{{ t('Visit.OpenVisits') }}</div>
             <div class="text-3xl font-bold text-blue-500">
-              {{ visitStore.visitData?.openVisit }}
+              {{ visitStore.visitData?.totalOpen }}
             </div>
           </div>
         </div>
 
-        <div class="col-12 md:col-6 lg:col-4 xl:col-2 xl:p-2">
+        <div class="col-12 md:col-6 lg:col-6 xl:col-2 xl:p-2">
           <div class="bg-yellow-50 border-round-lg shadow-1 border-yellow-200 border-1 p-4 h-full">
             <div class="text-md font-medium text-yellow-600">{{ t('Visit.CompletedVisits') }}</div>
             <div class="text-3xl font-bold text-yellow-600">
@@ -252,9 +274,9 @@ const props = defineProps({
           </div>
         </div>
 
-        <div class="col-12 md:col-6 lg:col-6 xl:col-3 xl:p-2">
+        <div class="col-12 md:col-6 lg:col-6 xl:col-2 xl:p-2">
           <div class="bg-green-50 border-round-lg shadow-1 border-green-200 border-1 p-4 h-full">
-            <div class="text-md font-medium text-green-500">{{ t('Visit.Productivity') }}</div>
+            <div class="text-md font-medium text-green-500">{{ t('Visit.Productive') }}</div>
             <div class="text-3xl font-bold text-green-500">{{ visitStore.visitData?.totalProductive }}</div>
           </div>
         </div>
@@ -298,46 +320,46 @@ const props = defineProps({
               {{ t('Visit.empty') }}
             </div>
           </template>
-          <Column field="salesRep" class="" :sortable="true">
+          <Column field="name" class="" :sortable="true">
             <template #header>
               <span class="text-lg font-bold"> {{ t('Visit.SalesRep') }}</span>
             </template>
 
             <template #body="slotProps">
-              <div class="flex text-lg">{{ slotProps.data.saleName }}</div>
+              <div class="flex text-lg">{{ slotProps.data.name }}</div>
             </template>
           </Column>
-          <Column field="visitStartDate" class="">
+          <Column field="visitDate" class="">
             <template #header>
               <span class="text-lg font-bold"> {{ t('Visit.VisitDate') }} </span>
             </template>
             <template #body="slotProps">
-              <span class="text-md flex">{{ slotProps.data.visitStartDate }}</span>
+              <span class="text-md flex">{{ new Date(slotProps.data.visitDate).toLocaleDateString() }}</span>
             </template>
           </Column>
-          <Column field="Credit Limit" class="" :sortable="true">
+          <Column field="visitStatus" class="" :sortable="true">
             <template #header>
               <span class="text-lg flex font-bold"> {{ t('Status') }} </span>
             </template>
 
             <template #body="slotProps">
-              <span class="px-2 py-1 flex w-fit text-sm font-semibold border-round-xl" :class="getStatusColor(slotProps.data.statusId)">
-                {{ slotProps.data.statusName }}
+              <span class="px-2 py-1 flex w-fit text-sm font-semibold border-round-xl" :class="getStatusColor(slotProps.data.visitStatus)">
+                {{ getStatusName(slotProps.data.visitStatus) }}
               </span>
             </template>
           </Column>
-          <Column field="isVisitProductive" :header="'Productive Visit'" headerClass="" class="w-12rem">
+          <Column field="productive" :header="'Productive Visit'" headerClass="" class="w-12rem">
             <template #body="slotProps">
               <div class="flex align-items-center justify-content-center text-center w-5rem">
-                <i v-if="slotProps.data.isVisitProductive" class="pi flex pi-check-circle text-green-500 text-center text-2xl" />
+                <i v-if="slotProps.data.productive" class="pi flex pi-check text-green-500 text-center text-2xl" />
               </div>
             </template>
           </Column>
-          <Column field="statusName" :header="t('Actions')" class="w-8rem">
+          <!-- <Column field="statusName" :header="t('Actions')" class="w-8rem">
             <template #body="slotProps">
               <Button @click="viewVisitDetails(slotProps.data)" class="p-1 hover:bg-gray-100 rounded-full" size="large" text r icon="pi pi-eye" title="View Details"> </Button>
             </template>
-          </Column>
+          </Column> -->
         </DataTable>
       </div>
     </div>

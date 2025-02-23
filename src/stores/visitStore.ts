@@ -17,11 +17,11 @@ export const useVisitStore = defineStore({
   actions: {
     async GetVisits(payload) {
       try {
-        const response = await apiClient.post('/ShiftSessions/GetVanSalesDashboard', payload);
+        const response = await apiClient.post('/Visits/GetVisitManagmentAnalytics', payload);
         console.log(response);
 
-        this.visitData = response.data.data;
-        this.visits = response.data.data.sessionSales;
+        this.visitData = response.data.data.visitsSummary;
+        this.visits = response.data.data.visitsSalesInfo;
       } catch (err) {
         this.error = handleError(err, this.loading);
       }

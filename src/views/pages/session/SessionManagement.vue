@@ -10,7 +10,13 @@ import { useToast } from 'primevue/usetoast';
 import { boolean } from 'yup';
 const { t } = useI18n();
 const toast = useToast();
+import { useLayout } from '../../../layout/composables/layout';
 
+const { layoutConfig } = useLayout();
+
+const darkMode = computed(() => {
+  return layoutConfig.colorScheme.value !== 'light';
+});
 // Filter states
 const selectedSalesReps = ref<string[] | null>(null);
 const dateTo = ref();
@@ -114,7 +120,7 @@ const getStatusColor = (status) => {
   }
 };
 const getRowClass = (data) => {
-  return data.isSessionLate ? 'bg-red-100' : '';
+  return data.isSessionLate ? (darkMode.value ? 'bg-red-900' : 'bg-red-100') : '';
 };
 
 const applyFilters = () => {
@@ -135,7 +141,7 @@ const getSessions = useDebounceFn(
       formData.append(`SalesRepIds[${index}]`, element);
     });
     formData.append('StartDate', new Date(dateFrom.value).toDateString());
-    formData.append('EndDate', new Date(dateTo.value).toDateString());
+    formData.append('EndDate', new Date(dateTo.value.setHours(new Date().getHours(), new Date().getMinutes() - new Date().getTimezoneOffset(), 0, 0)).toDateString());
 
     await sessionStore.GetSessions(formData);
     changedFilter.value = false;
@@ -159,7 +165,7 @@ onMounted(() => {
   const currentDate = new Date();
   dateTo.value = new Date(currentDate.toISOString());
   const pastDate = new Date();
-  pastDate.setDate(currentDate.getDate() - 7);
+  pastDate.setDate(currentDate.getDate() - 30);
   dateFrom.value = new Date(pastDate.toISOString());
 });
 
@@ -187,8 +193,6 @@ const paginatedCustomers = computed(() => {
   const end = start + rowsPerPage.value;
   return sessionStore.sessions.slice(start, end);
 });
-
-
 </script>
 
 <template>
@@ -196,11 +200,11 @@ const paginatedCustomers = computed(() => {
     <div class="max-w-7xl mx-auto">
       <!-- Filters -->
       <div class="px-3" v-if="showFilter">
-        <div class="bg-white row-gap-3 border-round-lg border-1 border-gray-300 p-4 grid gap-0 w-full align-items-end justify-content-between">
+        <div class="row-gap-3 border-round-lg border-1 p-4 grid gap-0 w-full align-items-end justify-content-between" :class="[darkMode ? 'bg-surface-card text-white border-gray-600' : 'bg-white text-gray-700 border-gray-300']">
           <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
             <div class="h-full surface-card cursor-pointer">
               <div class="relative">
-                <label class="block text-sm font-semibold text-gray-700 mb-1">{{ t('Session.SalesRepresentatives') }}</label>
+                <label class="block text-sm font-semibold mb-1">{{ t('Session.SalesRepresentatives') }}</label>
                 <MultiSelect v-model="selectedSalesReps" :options="sessionStore.salesReps" filter optionLabel="name" optionValue="id" placeholder="Select Sales Reps" :maxSelectedLabels="3" class="w-full h-3rem" />
               </div>
             </div>
@@ -209,7 +213,7 @@ const paginatedCustomers = computed(() => {
           <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
             <div class="h-full surface-card cursor-pointer transition-all transition-duration-200">
               <div class="w-full">
-                <label class="block text-sm font-semibold text-gray-700 mb-1">{{ t('Session.FromDate') }}</label>
+                <label class="block text-sm font-semibold mb-1">{{ t('Session.FromDate') }}</label>
                 <Calendar v-model="dateFrom" showIcon iconDisplay="input" class="w-full h-3rem" />
               </div>
             </div>
@@ -218,7 +222,7 @@ const paginatedCustomers = computed(() => {
           <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
             <div class="h-full surface-card cursor-pointer">
               <div class="w-full">
-                <label class="block text-sm font-semibold text-gray-700 mb-1">{{ t('Session.ToDate') }}</label>
+                <label class="block text-sm font-semibold mb-1">{{ t('Session.ToDate') }}</label>
                 <Calendar v-model="dateTo" showIcon iconDisplay="input" class="w-full h-3rem" />
               </div>
             </div>
@@ -227,7 +231,7 @@ const paginatedCustomers = computed(() => {
           <div class="col-12 sm:col-6 lg:col-3 xl:col-2 p-0 sm:px-2 xl:p-2">
             <div class="h-full surface-card cursor-pointer">
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1"> {{ t('Session.Status') }}</label>
+                <label class="block text-sm font-semibold mb-1"> {{ t('Session.Status') }}</label>
                 <MultiSelect v-model="selectedStatus" :options="statusOptions" optionLabel="label" optionValue="value" placeholder="Select a Status" class="w-full h-3rem flex" />
               </div>
             </div>
@@ -247,10 +251,10 @@ const paginatedCustomers = computed(() => {
       <div class="grid p-2">
         <!-- Open Sessions -->
         <div class="col-12 md:col-12 lg:col-4 xl:col-3 xl:p-2">
-          <div class="bg-blue-50 border-round-lg shadow-1 border-blue-200 border-1 pl-4 pt-4 pr-3 pb-3 h-full flex flex-row justify-content-between">
+          <div class="dark:surface-900 border-round-lg shadow-1 border-1 pl-4 pt-4 pr-3 pb-3 h-full flex flex-row justify-content-between" :class="[darkMode ? 'bg-blue-900 border-blue-500 text-blue-300' : 'bg-blue-50 border-blue-200 text-blue-500']">
             <div>
-              <div class="text-md font-medium text-blue-500">{{ t('Session.OpenSessions') }}</div>
-              <div class="text-3xl font-bold text-blue-500">
+              <div class="text-md font-medium">{{ t('Session.OpenSessions') }}</div>
+              <div class="text-3xl font-bold">
                 {{ sessionStore.sessionData?.openSession }}
               </div>
             </div>
@@ -274,9 +278,9 @@ const paginatedCustomers = computed(() => {
         </div>
 
         <div class="col-12 md:col-6 lg:col-4 xl:col-2 xl:p-2">
-          <div class="bg-yellow-50 border-round-lg shadow-1 border-yellow-200 border-1 p-4 h-full">
-            <div class="text-md font-medium text-yellow-600">{{ 'Closed Sessions' }}</div>
-            <div class="text-3xl font-bold text-yellow-600">
+          <div class="border-round-lg shadow-1 border-yellow-200 border-1 p-4 h-full" :class="[darkMode ? 'bg-yellow-900 border-yellow-500 text-yellow-400' : 'bg-yellow-50 border-yellow-200 text-yellow-600']">
+            <div class="text-md font-medium">{{ 'Closed Sessions' }}</div>
+            <div class="text-3xl font-bold">
               {{ sessionStore.sessionData?.closedSession }}
             </div>
           </div>
@@ -285,9 +289,9 @@ const paginatedCustomers = computed(() => {
         <!-- Pending Sessions -->
 
         <div class="col-12 md:col-6 lg:col-4 xl:col-2 xl:p-2">
-          <div class="bg-orange-50 border-round-lg shadow-1 border-orange-200 border-1 p-4 h-full">
-            <div class="text-md font-medium text-orange-600">{{ t('Session.PendingSessions') }}</div>
-            <div class="text-3xl font-bold text-orange-600">
+          <div class="border-round-lg shadow-1 border-orange-200 border-1 p-4 h-full" :class="[darkMode ? 'bg-orange-900 border-orange-500 text-orange-400' : 'bg-orange-50 border-orange-200 text-orange-600']">
+            <div class="text-md font-medium">{{ t('Session.PendingSessions') }}</div>
+            <div class="text-3xl font-bold">
               {{ sessionStore.sessionData?.pendingSession }}
             </div>
           </div>
@@ -296,18 +300,18 @@ const paginatedCustomers = computed(() => {
         <!-- Old Sessions -->
 
         <div class="col-12 md:col-6 lg:col-6 xl:col-2 xl:p-2">
-          <div class="bg-green-50 border-round-lg border-green-400 border-1 p-4 h-full">
-            <div class="text-md font-medium text-green-600">{{ 'Approved Sessions' }}</div>
-            <div class="text-3xl font-bold text-green-700">
+          <div class="border-round-lg shadow-1 border-green-400 border-1 p-4 h-full" :class="[darkMode ? 'bg-green-900 border-green-500 text-green-400' : 'bg-green-50 border-green-400 text-green-600']">
+            <div class="text-md font-medium">{{ 'Approved Sessions' }}</div>
+            <div class="text-3xl font-bold">
               {{ sessionStore.sessionData?.approvedSession }}
             </div>
           </div>
         </div>
 
         <div class="col-12 md:col-6 lg:col-6 xl:col-3 xl:p-2">
-          <div class="bg-purple-50 border-round-lg shadow-1 border-purple-200 border-1 p-4 h-full">
-            <div class="text-md font-medium text-purple-500">{{ t('Session.TotalAmount') }}</div>
-            <div class="text-3xl font-bold text-purple-500">{{ formatPrice(Number(sessionStore.sessionData?.totalAmount)) }}</div>
+          <div class="border-round-lg shadow-1 border-1 p-4 h-full" :class="[darkMode ? 'bg-purple-900 border-purple-500 text-purple-300' : 'bg-purple-50 border-purple-200 text-purple-500']">
+            <div class="text-md font-medium">{{ t('Session.TotalAmount') }}</div>
+            <div class="text-3xl font-bold">{{ formatPrice(Number(sessionStore.sessionData?.totalAmount)) }}</div>
           </div>
         </div>
       </div>
@@ -323,7 +327,7 @@ const paginatedCustomers = computed(() => {
           </div>
         </div> -->
 
-        <div class="flex align-items-center justify-content-between mt-3 mb-4 ">
+        <div class="flex align-items-center justify-content-between mt-3 mb-4">
           <span class="text-xl font-medium"> {{ t('Sessions') }}</span>
 
           <div class="flex gap-2 align-items-center">
@@ -337,7 +341,7 @@ const paginatedCustomers = computed(() => {
               >
                 <i class="pi pi-table"></i>
               </div>
-              
+
               <div
                 @click="viewMode = 'chart'"
                 class="p-2 flex justify-content-center align-items-center border-round-md cursor-pointer transition-colors duration-200"
