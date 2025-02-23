@@ -101,13 +101,22 @@ const getDataSummary = useDebounceFn(
     formData.append('StartDate', new Date(dateFrom.value).toDateString());
     formData.append('EndDate', new Date(dateTo.value).toDateString());
 
-    await sessionStore.getDashBoardSummary(formData);
     await sessionStore.getDataSummary(formData);
     changedFilter.value = false;
   },
   300,
   { maxWait: 1500 }
 );
+const getVisitData = useDebounceFn(async () => {
+  var payload = {
+    StatusIds: selectedStatus.value,
+    SalesRepIds: selectedSalesReps.value,
+    StartDate: new Date(dateFrom.value.setHours(0, 0, 0, 0)),
+    EndDate: new Date(dateTo.value.setHours(new Date().getHours(), new Date().getMinutes() - new Date().getTimezoneOffset(), 0, 0)),
+    forSalesRep: false
+  };
+  await sessionStore.getVisitsSummary(payload);
+});
 // Available sales reps
 const availableSalesReps = [
   { id: 'all', name: `${t('dashboard.AllSalesReps')}` },
@@ -423,6 +432,15 @@ const DetailsSectionTitle = computed(() => {
   return t(`dashboard.${selectedCard.value}Details`);
   // return  t(`dashboard.stockDetails`);
 });
+const applyFilters = () => {
+  getDataSummary();
+  getVisitData();
+};
+watch(selectedCard, () => {
+  if (selectedCard.value == 'visits') {
+    getVisitData();
+  }
+});
 </script>
 
 <template>
@@ -480,7 +498,7 @@ const DetailsSectionTitle = computed(() => {
             <div class="col-12 xl:col-1 p-0 sm:px-2 xl:p-2">
               <div class="w-full xl:w-fit surface-card cursor-pointer">
                 <div class="align-self-end w-full xl:w-fit">
-                  <Button size="small" icon="pi pi-filter" :label="t('Filter')" :disabled="!changedFilter" class="w-full xl:w-fit h-3rem" @click="applyFilters" />
+                  <Button size="small" icon="pi pi-filter" :label="t('Filter')" class="w-full xl:w-fit h-3rem" @click="applyFilters" />
                 </div>
               </div>
             </div>
@@ -506,7 +524,7 @@ const DetailsSectionTitle = computed(() => {
           </div>
         </div>
         <!-- Dynamic Details Component -->
-        <VisitsDetails v-if="selectedCard === 'visits' && cardDetails.visits" :data="sessionStore.dashBoardData.visits" :view-mode="viewMode" class="" />
+        <VisitsDetails v-if="selectedCard === 'visits' && cardDetails.visits" :data="sessionStore.visitsSummary" :cards="sessionStore.dataSummary.visitsSummary" :view-mode="viewMode" class="" />
         <SalesDetails v-if="selectedCard === 'sales' && cardDetails.sales" :data="cardDetails.sales" :view-mode="viewMode" />
         <CollectionsDetails v-if="selectedCard === 'collections'" :data="cardDetails.collections" :view-mode="viewMode" />
         <SessionsDetails v-if="selectedCard === 'sessions'" :data="cardDetails.sessions" :view-mode="viewMode" />

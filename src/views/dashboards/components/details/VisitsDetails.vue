@@ -10,28 +10,29 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 const props = defineProps<{
   data: any;
+  cards: any;
   viewMode: 'chart' | 'table';
 }>();
 
 // Chart data for sales rep performance
 const chartData = computed(() => ({
-  labels: props.data.salesReps.map((rep: any) => rep.name),
+  labels: props.data.map((rep: any) => rep.name),
   datasets: [
     {
       label: t('dashboard.PlannedVisits'),
-      data: props.data.salesReps.map((rep: any) => rep.planned),
+      data: props.data.map((rep: any) => rep.planned),
       backgroundColor: '#94a3b8',
       stack: 'Stack 0'
     },
     {
       label: t('dashboard.CompletedVisits'),
-      data: props.data.salesReps.map((rep: any) => rep.completed),
+      data: props.data.map((rep: any) => rep.completed),
       backgroundColor: '#22c55e',
       stack: 'Stack 1'
     },
     {
       label: t('dashboard.ProductiveVisits'),
-      data: props.data.salesReps.map((rep: any) => rep.productive),
+      data: props.data.map((rep: any) => rep.productive),
       backgroundColor: '#3b82f6',
       stack: 'Stack 1'
     }
@@ -63,14 +64,7 @@ const chartOptions = {
 
 // Sample transaction data for each sales rep
 const transactionData = computed(() => {
-  return props.data.salesReps.map((rep: any) => ({
-    ...rep,
-    transactions: {
-      sales: Math.floor(Math.random() * 10) + 5, // 5-15 sales transactions
-      returns: Math.floor(Math.random() * 3), // 0-2 return transactions
-      collections: Math.floor(Math.random() * 5) + 3 // 3-7 collection transactions
-    }
-  }));
+  return props.data;
 });
 
 // Get status color based on rate
@@ -89,7 +83,7 @@ const getStatusColor = (rate: number) => {
         <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
           <div class="text-sm text-gray-500">{{ t('dashboard.TotalPlanned') }}</div>
           <div class="text-2xl font-bold text-gray-900">
-            {{ data.summary.totalPlanned }}
+            {{ cards.totalPlanned }}
           </div>
         </div>
       </div>
@@ -98,7 +92,7 @@ const getStatusColor = (rate: number) => {
         <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
           <div class="text-sm text-gray-500">{{ t('dashboard.TotalCompleted') }}</div>
           <div class="text-2xl font-bold text-green-600">
-            {{ data.summary.totalCompleted }}
+            {{ cards.totalCompleted }}
           </div>
         </div>
       </div>
@@ -107,7 +101,7 @@ const getStatusColor = (rate: number) => {
         <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
           <div class="text-sm text-gray-500">{{ t('dashboard.TotalProductive') }}</div>
           <div class="text-2xl font-bold text-blue-600">
-            {{ data.summary.totalProductive }}
+            {{ cards.totalProductive }}
           </div>
         </div>
       </div>
@@ -115,7 +109,7 @@ const getStatusColor = (rate: number) => {
       <div class="col-12 p-2 md:col-6 lg:col-3">
         <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
           <div class="text-sm text-gray-500">{{ t('dashboard.AverageCompletionRate') }}</div>
-          <div class="text-2xl font-bold text-purple-600">{{ ((data.summary.totalCompleted / data.summary.totalPlanned) * 100).toFixed(1) }}%</div>
+          <div class="text-2xl font-bold text-purple-600">{{ ((cards.totalCompleted / cards.totalPlanned) * 100).toFixed(1) }}%</div>
         </div>
       </div>
     </div>
@@ -186,30 +180,42 @@ const getStatusColor = (rate: number) => {
           </template>
         </Column>
 
-        <Column field="avgDuration" class="font-normal">
+        <Column field="sales" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.AvgDuration') }}</span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Sales') }}</span>
             </div>
           </template>
 
           <template #body="slotProps">
             <div class="flex flex-row justify-content-center align-items-center text-center text-600 font-medium">
-              <span class="font-semibold text-md">{{ slotProps.data.avgDuration }}</span>
+              <span class="font-semibold text-md">{{ slotProps.data.sales }}</span>
             </div>
           </template>
         </Column>
-
-        <Column field="conversionRate" class="font-normal">
+        <Column field="returns" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.ConversionRate') }}</span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Returns') }}</span>
+            </div>
+          </template>
+
+          <template #body="slotProps">
+            <div class="flex flex-row justify-content-center align-items-center text-center text-600 font-medium">
+              <span class="font-semibold text-md">{{ slotProps.data.returns }}</span>
+            </div>
+          </template>
+        </Column>
+        <Column field="collections" class="font-normal">
+          <template #header="slotProps">
+            <div class="w-full">
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Collections') }}</span>
             </div>
           </template>
 
           <template #body="slotProps">
             <div class="flex flex-row justify-content-center align-items-center text-red-600">
-              <span class="font-semibold text-md">{{ slotProps.data.conversionRate }}%</span>
+              <span class="font-semibold text-md">{{ slotProps.data.collections }}%</span>
             </div>
           </template>
         </Column>

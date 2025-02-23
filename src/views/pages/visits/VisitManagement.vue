@@ -10,7 +10,13 @@ import { useToast } from 'primevue/usetoast';
 import { boolean } from 'yup';
 const { t } = useI18n();
 const toast = useToast();
+import { useLayout } from '../../../layout/composables/layout';
 
+const { layoutConfig } = useLayout();
+
+const darkMode = computed(() => {
+  return layoutConfig.colorScheme.value !== 'light';
+});
 // Filter states
 const selectedSalesReps = ref<string[] | null>(null);
 const dateTo = ref();
@@ -327,6 +333,15 @@ const props = defineProps({
 
             <template #body="slotProps">
               <div class="flex text-lg">{{ slotProps.data.name }}</div>
+            </template>
+          </Column>
+          <Column field="customerName" class="" :sortable="true">
+            <template #header>
+              <span class="text-lg font-bold"> {{ t('Visit.CustomerName') }}</span>
+            </template>
+
+            <template #body="slotProps">
+              <div class="flex text-lg">{{ slotProps.data.customerName }}</div>
             </template>
           </Column>
           <Column field="visitDate" class="">

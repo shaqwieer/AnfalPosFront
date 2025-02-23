@@ -486,6 +486,7 @@
   "dashboard": {
     "VANSalesDashboard": "VAN Sales Dashboard",
     "Search": "Search",
+    "Returns": "Returns",
     "Sales_Representatives": "Sales Representatives",
     "ToDate": "To Date",
     "FromDate": "From Date",
@@ -623,6 +624,7 @@
     "Details": "Session Details"
   },
   "Visit": {
+    "CustomerName": "Customer Name",
     "VisitManagement": "Visit Management",
     "SalesRepresentatives": "Sales Representatives",
     "FromDate": "From Date",

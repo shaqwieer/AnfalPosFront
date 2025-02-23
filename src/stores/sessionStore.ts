@@ -12,6 +12,7 @@ export const useSessionStore = defineStore({
     salesReps: [],
     attachmentTypes: <any[]>[],
     dataSummary: <any>{},
+    visitsSummary: <any>[],
     dashBoardData: <any>{},
     loading: useLoadingStore(),
     error: ''
@@ -76,6 +77,16 @@ export const useSessionStore = defineStore({
         console.log(response);
 
         this.dataSummary = response.data.data;
+      } catch (err) {
+        this.error = handleError(err, this.loading);
+      }
+    },
+    async getVisitsSummary(payload) {
+      try {
+        const response = await apiClient.post('/Visits/GetVisitSalesRepForDashboard', payload);
+        console.log(response);
+
+        this.visitsSummary = response.data.data;
       } catch (err) {
         this.error = handleError(err, this.loading);
       }
