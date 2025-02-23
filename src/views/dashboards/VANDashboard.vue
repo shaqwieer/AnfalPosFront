@@ -505,7 +505,6 @@ const DetailsSectionTitle = computed(() => {
             </div>
           </div>
         </div>
-
         <!-- Dynamic Details Component -->
         <VisitsDetails v-if="selectedCard === 'visits' && cardDetails.visits" :data="sessionStore.dashBoardData.visits" :view-mode="viewMode" class="" />
         <SalesDetails v-if="selectedCard === 'sales' && cardDetails.sales" :data="cardDetails.sales" :view-mode="viewMode" />
