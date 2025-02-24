@@ -117,6 +117,35 @@ const getVisitData = useDebounceFn(async () => {
   };
   await sessionStore.getVisitsSummary(payload);
 });
+
+const getCollectionData = useDebounceFn(async () => {
+  var payload = {
+    StatusIds: selectedStatus.value,
+    SalesRepIds: selectedSalesReps.value,
+    StartDate: new Date(dateFrom.value.setHours(0, 0, 0, 0)),
+    EndDate: new Date(dateTo.value.setHours(new Date().getHours(), new Date().getMinutes() - new Date().getTimezoneOffset(), 0, 0)),
+    forSalesRep: false
+  };
+  await sessionStore.getCollectionSummary(payload);
+});
+const getSalesData = useDebounceFn(async () => {
+  const formData = new FormData();
+  if (selectedSalesReps.value == null || selectedSalesReps.value.length === 0 || selectedStatus.value.length === 0) {
+    toast.add({ severity: 'error', detail: 'برجاء اختيار حالة ومندوب', life: 3000 });
+    changedFilter.value = false;
+    return;
+  }
+  selectedStatus.value.forEach((element, index) => {
+    formData.append(`StatusIds[${index}]`, element);
+  });
+  selectedSalesReps.value.forEach((element, index) => {
+    formData.append(`SalesRepIds[${index}]`, element);
+  });
+  formData.append('StartDate', new Date(dateFrom.value).toDateString());
+  formData.append('EndDate', new Date(dateTo.value).toDateString());
+  formData.append('ForSalesRep', 'false');
+  await sessionStore.getSalesSummary(formData);
+});
 // Available sales reps
 const availableSalesReps = [
   { id: 'all', name: `${t('dashboard.AllSalesReps')}` },
@@ -439,6 +468,10 @@ const applyFilters = () => {
 watch(selectedCard, () => {
   if (selectedCard.value == 'visits') {
     getVisitData();
+  } else if (selectedCard.value == 'sales') {
+    getSalesData();
+  } else if (selectedCard.value == 'collections') {
+    getCollectionData();
   }
 });
 </script>
@@ -525,8 +558,8 @@ watch(selectedCard, () => {
         </div>
         <!-- Dynamic Details Component -->
         <VisitsDetails v-if="selectedCard === 'visits' && cardDetails.visits" :data="sessionStore.visitsSummary" :cards="sessionStore.dataSummary.visitsSummary" :view-mode="viewMode" class="" />
-        <SalesDetails v-if="selectedCard === 'sales' && cardDetails.sales" :data="cardDetails.sales" :view-mode="viewMode" />
-        <CollectionsDetails v-if="selectedCard === 'collections'" :data="cardDetails.collections" :view-mode="viewMode" />
+        <SalesDetails v-if="selectedCard === 'sales' && cardDetails.sales" :cards="sessionStore.dataSummary.salesSummary" :data="sessionStore.salesSummary" :view-mode="viewMode" />
+        <CollectionsDetails v-if="selectedCard === 'collections'" :data="sessionStore.collectionSummary" :view-mode="viewMode" />
         <SessionsDetails v-if="selectedCard === 'sessions'" :data="cardDetails.sessions" :view-mode="viewMode" />
         <!-- <SessionManagement v-if="selectedCard === 'sessions'"   :show-filter="false"   /> -->
         <OverdueDetails v-if="selectedCard === 'overdue'" :data="cardDetails.overdue" :view-mode="viewMode" v-model="totalSalesReps" />
