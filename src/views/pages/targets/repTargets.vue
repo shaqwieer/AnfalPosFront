@@ -165,7 +165,7 @@ watch(
 );
 
 onMounted(() => {
-  salesGoalsStore.GetSalesReps().then(() => {
+  salesGoalsStore.GetSalesRepsForOrganization().then(() => {
     selectedRepId.value = salesGoalsStore.salesReps[0].id;
     fetchData();
   });

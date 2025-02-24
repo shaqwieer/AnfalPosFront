@@ -486,6 +486,7 @@
   "dashboard": {
     "VANSalesDashboard": "VAN Sales Dashboard",
     "Search": "Search",
+    "Returns": "Returns",
     "Sales_Representatives": "Sales Representatives",
     "ToDate": "To Date",
     "FromDate": "From Date",
@@ -623,6 +624,7 @@
     "Details": "Session Details"
   },
   "Visit": {
+    "CustomerName": "Customer Name",
     "VisitManagement": "Visit Management",
     "SalesRepresentatives": "Sales Representatives",
     "FromDate": "From Date",
@@ -633,7 +635,7 @@
     "PendingVisits": "Pending Visits",
     "CompletedVisits": "Completed Visits",
     "AverageCompletionRate": "Average Completion Rate",
-    "Productivity": "Productivity",
+    "Productive": "Productive Visits",
     "OldVisits": "Old Visits (>1 day)",
     "empty": "No Visits Found",
     "SalesRep": "Sales Rep",
