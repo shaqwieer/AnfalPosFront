@@ -96,7 +96,7 @@ const totalSalesReps = defineModel();
           <div class="surface-200 border-round w-full" style="height: 8px">
             <div class="bg-green-500 h-2 border-round" style="height: 8px" :style="{ width: `${Math.min(dataSummary.salesSummary?.percantage * 100, 100)}%` }"></div>
           </div>
-          <div class="text-md text-500 text-right">{{ Math.round(dataSummary.salesSummary?.percantage * 100) }}% {{ t('dashboard.of_target') }}</div>
+          <div class="text-md text-500 text-right">{{ dataSummary.salesSummary?.percantage  }}% {{ t('dashboard.of_target') }}</div>
         </div>
       </div>
     </div>
