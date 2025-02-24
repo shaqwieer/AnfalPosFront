@@ -132,7 +132,7 @@ const transactionData = computed(() => {
     </div>
 
     <!-- View Selector -->
-    <div class="mb-6">
+    <div v-if="viewMode === 'chart'" class="mb-6">
       <div class="inline-flex border-round-lg border-1 gap-2 border-gray-200 p-1 bg-gray-50">
         <div
           v-for="view in ['product', 'category', 'hourly']"

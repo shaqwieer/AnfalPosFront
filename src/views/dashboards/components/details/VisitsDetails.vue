@@ -4,6 +4,13 @@ import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
 import { useI18n } from 'vue-i18n';
+import { useLayout } from '../../../../layout/composables/layout';
+
+const { layoutConfig } = useLayout();
+
+const darkMode = computed(() => {
+  return layoutConfig.colorScheme.value !== 'light';
+});
 const { t } = useI18n();
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -80,9 +87,9 @@ const getStatusColor = (rate: number) => {
     <!-- Summary Cards -->
     <div class="grid mb-6">
       <div class="col-12 p-2 md:col-6 lg:col-3">
-        <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-          <div class="text-sm text-gray-500">{{ t('dashboard.TotalPlanned') }}</div>
-          <div class="text-2xl font-bold text-gray-900">
+        <div class="border-1 border-round-lg shadow-sm border-gray-200 p-4">
+          <div class="text-sm" :class="[darkMode ? 'text-gray-100' : 'text-gray-500']">{{ t('dashboard.TotalPlanned') }}</div>
+          <div class="text-2xl font-bold" :class="[darkMode ? 'text-gray-100' : 'text-gray-900']">
             {{ cards.totalPlanned }}
           </div>
         </div>
@@ -90,7 +97,7 @@ const getStatusColor = (rate: number) => {
 
       <div class="col-12 p-2 md:col-6 lg:col-3">
         <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-          <div class="text-sm text-gray-500">{{ t('dashboard.TotalCompleted') }}</div>
+          <div class="text-sm" :class="[darkMode ? 'text-gray-100' : 'text-gray-500']">{{ t('dashboard.TotalCompleted') }}</div>
           <div class="text-2xl font-bold text-green-600">
             {{ cards.totalCompleted }}
           </div>
@@ -99,7 +106,7 @@ const getStatusColor = (rate: number) => {
 
       <div class="col-12 p-2 md:col-6 lg:col-3">
         <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-          <div class="text-sm text-gray-500">{{ t('dashboard.TotalProductive') }}</div>
+          <div class="text-sm" :class="[darkMode ? 'text-gray-100' : 'text-gray-500']">{{ t('dashboard.TotalProductive') }}</div>
           <div class="text-2xl font-bold text-blue-600">
             {{ cards.totalProductive }}
           </div>
@@ -108,7 +115,7 @@ const getStatusColor = (rate: number) => {
 
       <div class="col-12 p-2 md:col-6 lg:col-3">
         <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-          <div class="text-sm text-gray-500">{{ t('dashboard.AverageCompletionRate') }}</div>
+          <div class="text-sm" :class="[darkMode ? 'text-gray-100' : 'text-gray-500']">{{ t('dashboard.AverageCompletionRate') }}</div>
           <div class="text-2xl font-bold text-purple-600">{{ ((cards.totalCompleted / cards.totalPlanned) * 100).toFixed(1) }}%</div>
         </div>
       </div>
@@ -124,8 +131,8 @@ const getStatusColor = (rate: number) => {
 
     <!-- Table View -->
 
-    <div v-else class="card bg-white p-0 round shadow-none border">
-      <DataTable :value="transactionData" :paginator="transactionData.lenth > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" :currentPageReportTemplate="''">
+    <div v-else class="card bg-white p-0 round shadow-none border border-round-xl">
+      <DataTable :value="transactionData" :paginator="transactionData.lenth > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" :currentPageReportTemplate="''" class="border-round-xl">
         <template #empty>
           <div class="flex justify-content-center align-items-center font-bold text-lg">{{ t('dashboard.empty') }}</div>
         </template>

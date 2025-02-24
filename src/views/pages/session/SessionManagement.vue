@@ -202,7 +202,7 @@ const paginatedCustomers = computed(() => {
       <div class="px-3" v-if="showFilter">
         <div class="row-gap-3 border-round-lg border-1 p-4 grid gap-0 w-full align-items-end justify-content-between" :class="[darkMode ? 'bg-surface-card text-white border-gray-600' : 'bg-white text-gray-700 border-gray-300']">
           <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
-            <div class="h-full surface-card cursor-pointer">
+            <div class="h-full cursor-pointer">
               <div class="relative">
                 <label class="block text-sm font-semibold mb-1">{{ t('Session.SalesRepresentatives') }}</label>
                 <MultiSelect v-model="selectedSalesReps" :options="sessionStore.salesReps" filter optionLabel="name" optionValue="id" placeholder="Select Sales Reps" :maxSelectedLabels="3" class="w-full h-3rem" />
@@ -211,7 +211,7 @@ const paginatedCustomers = computed(() => {
           </div>
 
           <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
-            <div class="h-full surface-card cursor-pointer transition-all transition-duration-200">
+            <div class="h-full cursor-pointer transition-all transition-duration-200">
               <div class="w-full">
                 <label class="block text-sm font-semibold mb-1">{{ t('Session.FromDate') }}</label>
                 <Calendar v-model="dateFrom" showIcon iconDisplay="input" class="w-full h-3rem" />
@@ -220,7 +220,7 @@ const paginatedCustomers = computed(() => {
           </div>
 
           <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
-            <div class="h-full surface-card cursor-pointer">
+            <div class="h-full  cursor-pointer">
               <div class="w-full">
                 <label class="block text-sm font-semibold mb-1">{{ t('Session.ToDate') }}</label>
                 <Calendar v-model="dateTo" showIcon iconDisplay="input" class="w-full h-3rem" />
@@ -229,7 +229,7 @@ const paginatedCustomers = computed(() => {
           </div>
 
           <div class="col-12 sm:col-6 lg:col-3 xl:col-2 p-0 sm:px-2 xl:p-2">
-            <div class="h-full surface-card cursor-pointer">
+            <div class="h-full cursor-pointer">
               <div>
                 <label class="block text-sm font-semibold mb-1"> {{ t('Session.Status') }}</label>
                 <MultiSelect v-model="selectedStatus" :options="statusOptions" optionLabel="label" optionValue="value" placeholder="Select a Status" class="w-full h-3rem flex" />
@@ -360,7 +360,7 @@ const paginatedCustomers = computed(() => {
             <Chart type="bar" class="h-full" :data="chartData" :options="chartOptions" />
           </div>
         </div>
-        <DataTable class="surface-card border-round-lg mb-4 shadow-1 border-1 surface-border" v-else :value="paginatedCustomers" :rows="5" dataKey="id" :globalFilterFields="['name', 'id']" :currentPageReportTemplate="''" :rowClass="getRowClass">
+        <DataTable class="surface-card border-round-lg mb-4 shadow-1 border-1border-gray-300" v-else :value="paginatedCustomers" :rows="5" dataKey="id" :globalFilterFields="['name', 'id']" :currentPageReportTemplate="''" :rowClass="getRowClass">
           <template #empty>
             <div class="flex justify-content-center align-items-center font-bold text-lg">
               {{ t('Session.empty') }}
