@@ -161,8 +161,8 @@ const getVisits = useDebounceFn(
     var payload = {
       StatusIds: selectedStatus.value,
       SalesRepIds: selectedSalesReps.value,
-      StartDate: new Date(dateFrom.value.setHours(0, 0, 0, 0)),
-      EndDate: new Date(dateTo.value.setHours(new Date().getHours(), new Date().getMinutes() - new Date().getTimezoneOffset(), 0, 0)),
+      StartDate: new Date(dateFrom.value.toDateString()),
+      EndDate: new Date(new Date(dateTo.value).toDateString()),
       forSalesRep: false
     };
     await visitStore.GetVisits(payload);

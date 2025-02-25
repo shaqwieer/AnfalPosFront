@@ -141,7 +141,7 @@ const getSessions = useDebounceFn(
       formData.append(`SalesRepIds[${index}]`, element);
     });
     formData.append('StartDate', new Date(dateFrom.value).toDateString());
-    formData.append('EndDate', new Date(dateTo.value.setHours(new Date().getHours(), new Date().getMinutes() - new Date().getTimezoneOffset(), 0, 0)).toDateString());
+    formData.append('EndDate', new Date(dateTo.value).toDateString());
 
     await sessionStore.GetSessions(formData);
     changedFilter.value = false;
