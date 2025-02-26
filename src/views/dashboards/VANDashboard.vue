@@ -531,11 +531,11 @@ watch(selectedCard, () => {
               </div>
             </div>
 
-            <div class="col-12 sm:col-6 lg:col-3 xl:col-2 p-0 sm:px-2 xl:p-2">
+            <div class="col-12 sm:col-6 lg:col-3 xl:col-2 p-0 sm:px-2 xl:p-2" v-if="false">
               <div class="h-full cursor-pointer">
                 <div>
                   <label class="block text-sm font-semibold mb-1"> {{ t('Session.Status') }}</label>
-                  <MultiSelect v-model="selectedStatus" :options="statusOptions" optionLabel="label" optionValue="value" placeholder="Select a Status" class="w-full h-3rem flex" />
+                  <MultiSelect  v-model="selectedStatus" :options="statusOptions" optionLabel="label" optionValue="value" placeholder="Select a Status" class="w-full h-3rem flex" />
                 </div>
               </div>
             </div>
