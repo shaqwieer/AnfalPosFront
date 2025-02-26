@@ -118,7 +118,13 @@ const createData = handleSubmit(async (validatedInfo) => {
     props.createElement(transformedInfo, validatedInfo.country.name, validatedInfo.organization.name);
     resetForm();
 });
-
+const handleUpdate=(newValues)=> {
+      if (newValues.length > 1) {
+        roles.value = [newValues[newValues.length - 1]];
+      } else {
+        roles.value = newValues;
+      }
+    }
 const updateData = handleSubmit(async (validatedInfo) => {
     const transformedInfo = {
         id: props.selectedData.id,
@@ -214,10 +220,11 @@ getBranchs();
                         v-model="roles"
                         display="chip"
                         v-bind="rolesAttrs"
+                        @update:modelValue="handleUpdate"
                         :virtualScrollerOptions="{ itemSize: 38 }"
                         :invalid="!!errors.roles"
                         :options="rolesOptions"
-                        :maxSelectedLabels="3"
+                        :maxSelectedLabels="1"
                         filter
                         optionLabel="name"
                         :placeholder="t('CreateUpdateUsersRoles.rolesPlaceholder')"
@@ -277,7 +284,6 @@ getBranchs();
                         :virtualScrollerOptions="{ itemSize: 38 }"
                         :invalid="!!errors.branches"
                         :options="filterBranches"
-                        :maxSelectedLabels="3"
                         filter
                         optionLabel="name"
                         :placeholder="t('CreateUpdateUsersRoles.branchesPlaceholder')"

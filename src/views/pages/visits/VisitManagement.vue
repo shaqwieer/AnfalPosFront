@@ -33,8 +33,8 @@ const statusOptions = [
   // { label: `${t('All')}`, value: '8', color: '#FF5733' },
   { label: `${t('Open')}`, value: '4', color: '#188A42' },
   { label: `${t('Completed')}`, value: '5', color: '#FA7B00' },
-  { label: `${t('Planned')}`, value: '6', color: '#BC4819' },
-  { label: `${t('Productive')}`, value: '7', color: '#3357FF' }
+  // { label: `${t('Planned')}`, value: '6', color: '#BC4819' },
+  // { label: `${t('Productive')}`, value: '7', color: '#3357FF' }
 ];
 // Chart data
 const getCashPerSalesRep = computed(() => {

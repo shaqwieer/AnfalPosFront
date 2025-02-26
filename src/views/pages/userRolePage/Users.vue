@@ -273,7 +273,7 @@ const paginatedCustomers = computed(() => {
               <Column :header="t('users.actions')" headerStyle="min-width:10rem;">
                 <template #body="slotProps">
                   <div class="flex flex-nowrap">
-                    <Button icon="pi pi-trash" class="w-3rem h-3rem" v-tooltip.top="t('users.deleteTooltip')" text rounded aria-label="Delete" severity="danger" @click="toggleDeleteDialog(slotProps.data, false)" />
+                    <Button icon="pi pi-trash" v-if="false" class="w-3rem h-3rem" v-tooltip.top="t('users.deleteTooltip')" text rounded aria-label="Delete" severity="danger" @click="toggleDeleteDialog(slotProps.data, false)" />
                     <Button icon="pi pi-pencil" class="p-0 w-3rem h-3rem" v-tooltip.top="t('users.updateTooltip')" text rounded aria-label="Update" severity="success" @click="toggleCreateEditDialog(false, slotProps.data, false)" />
                     <Button icon="pi pi-lock" class="w-3rem h-3rem" v-tooltip.top="t('users.passwordTooltip')" text rounded aria-label="Password" severity="secondary" @click="toggleChangePasswordDialog(slotProps.data, false)" />
                   </div>
