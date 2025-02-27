@@ -11,6 +11,7 @@ const { t } = useI18n();
 
 const props = defineProps<{
   data: any;
+  cards: any;
   viewMode: 'chart' | 'table';
 }>();
 
@@ -24,22 +25,22 @@ const chartData = computed(() => {
   switch (selectedView.value) {
     case 'product':
       return {
-        labels: props.data.salesReps.flatMap((rep) => rep.topProducts.map((p) => p.name)),
+        labels: props.data.flatMap((rep) => rep.topProduct?.map((p) => p.name)),
         datasets: [
           {
             label: 'Sales Value',
-            data: props.data.salesReps.flatMap((rep) => rep.topProducts.map((p) => p.value)),
+            data: props.data.flatMap((rep) => rep.topProduct?.map((p) => p.value)),
             backgroundColor: '#3b82f6'
           }
         ]
       };
     case 'category':
       return {
-        labels: props.data.summary.topCategories.map((cat) => cat.name),
+        labels: props.data.topCategories.map((cat) => cat.name),
         datasets: [
           {
             label: 'Sales Value',
-            data: props.data.summary.topCategories.map((cat) => cat.sales),
+            data: props.data.topCategories.map((cat) => cat.sales),
             backgroundColor: '#3b82f6'
           }
         ]
@@ -98,6 +99,9 @@ const getGrowthIcon = (growth: number) => {
   if (growth < 0) return 'trending_down';
   return 'remove';
 };
+const transactionData = computed(() => {
+  return props.data;
+});
 </script>
 
 <template>
@@ -105,37 +109,30 @@ const getGrowthIcon = (growth: number) => {
     <!-- Summary Cards -->
 
     <div class="grid mb-6">
-      <div class="col-12 p-2 md:col-6 lg:col-3">
-        <div class="border-1 border-round-lg shadow-sm shadow-1 border-1 border-gray-200 p-4">
-          <div class="text-sm text-gray-500">{{ t('dashboard.TotalSales') }}</div>
-          <div class="text-2xl font-bold text-gray-900">{{ formatPrice(data.summary.totalSales) }}</div>
+      <div class="col-12 p-2 md:col-6 lg:col-4">
+        <div class="border-1 border-round-lg shadow-sm shadow-1 border-gray-200 p-4">
+          <div class="text-sm text-gray-500">{{ t('dashboard.Target') }}</div>
+          <div class="text-2xl font-bold text-gray-900">{{ formatPrice(cards.salesTarget) }}</div>
         </div>
       </div>
 
-      <div class="col-12 p-2 md:col-6 lg:col-3">
-        <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-          <div class="text-sm text-gray-500">{{ t('dashboard.TotalOrders') }}</div>
-          <div class="text-2xl font-bold text-blue-600">{{ data.summary.totalOrders }}</div>
+      <div class="col-12 p-2 md:col-6 lg:col-4">
+        <div class="border-1 border-round-lg shadow-sm border-gray-200 p-4">
+          <div class="text-sm text-gray-500">{{ t('dashboard.Actual') }}</div>
+          <div class="text-2xl font-bold text-blue-600">{{ formatPrice(cards.salesActual) }}</div>
         </div>
       </div>
 
-      <div class="col-12 p-2 md:col-6 lg:col-3">
-        <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
-          <div class="text-sm text-gray-500">{{ t('dashboard.AvgOrderValue') }}</div>
-          <div class="text-2xl font-bold text-green-600">{{ formatPrice(data.summary.avgOrderValue) }}</div>
-        </div>
-      </div>
-
-      <div class="col-12 p-2 md:col-6 lg:col-3">
-        <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
+      <div class="col-12 p-2 md:col-6 lg:col-4">
+        <div class="border-1 border-round-lg shadow-sm border-gray-200 p-4">
           <div class="text-sm text-gray-500">{{ t('dashboard.TargetAchievement') }}</div>
-          <div class="text-2xl font-bold text-purple-600">{{ data.summary.targetAchievement }}%</div>
+          <div class="text-2xl font-bold text-purple-600">{{ cards.percantage }}%</div>
         </div>
       </div>
     </div>
 
     <!-- View Selector -->
-    <div class="mb-6">
+    <div v-if="viewMode === 'chart'" class="mb-6">
       <div class="inline-flex border-round-lg border-1 gap-2 border-gray-200 p-1 bg-gray-50">
         <div
           v-for="view in ['product', 'category', 'hourly']"
@@ -158,31 +155,30 @@ const getGrowthIcon = (growth: number) => {
     </div>
 
     <!-- Table View -->
-    <div v-else class="bg-white border-1 border-gray-200 border-round-lg shadow-sm border overflow-hidden">
-      <DataTable :value="data.salesReps" :paginator="data.salesReps.lenth > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" :currentPageReportTemplate="''">
+    <div v-else class="bg-white border-gray-200 border-round-lg shadow-sm border overflow-hidden">
+      <DataTable :value="transactionData" :paginator="transactionData.lenth > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" :currentPageReportTemplate="''">
         <template #empty>
           <div class="flex justify-content-center align-items-center font-bold text-lg">{{ t('dashboard.empty') }}</div>
         </template>
 
         <Column field="name" :header="t('dashboard.SalesRep')" class="font-normal">
           <template #body="slotProps">
-            <div class="flex flex-column align-items-start">
-              <div class="font-semibold text-md">{{ slotProps.data.name }}</div>
-              <div class="text-sm text-gray-500">{{ t('dashboard.TopProduct') }}: {{ slotProps.data.topProducts[0].name }}</div>
+            <div class="flex flex-row align-items-center">
+              <span class="font-semibold text-md">{{ slotProps.data.name }}</span>
             </div>
           </template>
         </Column>
 
-        <Column field="orders" class="font-normal">
+        <Column field="orderCount" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Orders') }}</span>
+              <span class="text-md flex justify-content-center font-normal">{{ t('dashboard.Orders') }}</span>
             </div>
           </template>
 
           <template #body="slotProps">
             <div class="flex flex-row justify-content-center align-items-center">
-              <span class="text-md">{{ slotProps.data.orders }}</span>
+              <span class="font-semibold text-md">{{ slotProps.data.orderCount }}</span>
             </div>
           </template>
         </Column>
@@ -190,13 +186,13 @@ const getGrowthIcon = (growth: number) => {
         <Column field="totalSales" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.TotalSales') }}</span>
+              <span class="text-md flex justify-content-center font-normal">{{ t('dashboard.TotalSales') }}</span>
             </div>
           </template>
 
           <template #body="slotProps">
-            <div class="flex flex-row justify-content-center align-items-center">
-              <span class="text-md"> {{ formatPrice(slotProps.data.totalSales) }}</span>
+            <div class="flex flex-row justify-content-center align-items-center text-green-600">
+              <span class="font-semibold text-md">{{ slotProps.data.totalSales }}</span>
             </div>
           </template>
         </Column>
@@ -204,13 +200,13 @@ const getGrowthIcon = (growth: number) => {
         <Column field="target" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Target') }}</span>
+              <span class="text-md flex justify-content-center font-normal">{{ t('dashboard.Target') }}</span>
             </div>
           </template>
 
           <template #body="slotProps">
-            <div class="flex flex-row justify-content-center align-items-center">
-              <span class="text-md">{{ formatPrice(slotProps.data.target) }} </span>
+            <div class="flex flex-row justify-content-center align-items-center text-blue-600">
+              <span class="font-semibold text-md">{{ slotProps.data.target }}</span>
             </div>
           </template>
         </Column>
@@ -223,22 +219,21 @@ const getGrowthIcon = (growth: number) => {
           </template>
 
           <template #body="slotProps">
-            <div class="flex flex-row justify-content-center align-items-center">
-              <span class="text-sm px-2 py-1 border-round-lg bg-yellow-100 text-xs text-yellow-800">{{ slotProps.data.achievement }}%</span>
+            <div class="flex flex-row justify-content-center align-items-center text-center text-600 font-medium">
+              <span class="font-semibold text-md">{{ slotProps.data.achievement }}%</span>
             </div>
           </template>
         </Column>
-
         <Column field="avgOrderValue" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">{{ t('dashboard.AvgOrderValue') }}</span>
+              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.AvgOrderValue') }}</span>
             </div>
           </template>
 
           <template #body="slotProps">
-            <div class="flex flex-row justify-content-center align-items-center">
-              <span class="text-md">{{ formatPrice(slotProps.data.avgOrderValue) }}</span>
+            <div class="flex flex-row justify-content-center align-items-center text-center text-600 font-medium">
+              <span class="font-semibold text-md">{{ slotProps.data.avgOrderValue }}</span>
             </div>
           </template>
         </Column>

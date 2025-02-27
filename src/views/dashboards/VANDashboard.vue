@@ -11,7 +11,13 @@ import { useSessionStore } from '../../stores/sessionStore';
 import SessionManagement from '../pages/session/SessionManagement.vue';
 import { useDebounceFn } from '@vueuse/core';
 import { useToast } from 'primevue/usetoast';
+import { useLayout } from '../../layout/composables/layout';
 
+const { layoutConfig } = useLayout();
+
+const darkMode = computed(() => {
+  return layoutConfig.colorScheme.value !== 'light';
+});
 const toast = useToast();
 const sessionStore = useSessionStore();
 
@@ -116,6 +122,35 @@ const getVisitData = useDebounceFn(async () => {
     forSalesRep: false
   };
   await sessionStore.getVisitsSummary(payload);
+});
+
+const getCollectionData = useDebounceFn(async () => {
+  var payload = {
+    StatusIds: selectedStatus.value,
+    SalesRepIds: selectedSalesReps.value,
+    StartDate: new Date(dateFrom.value.setHours(0, 0, 0, 0)),
+    EndDate: new Date(dateTo.value.setHours(new Date().getHours(), new Date().getMinutes() - new Date().getTimezoneOffset(), 0, 0)),
+    forSalesRep: false
+  };
+  await sessionStore.getCollectionSummary(payload);
+});
+const getSalesData = useDebounceFn(async () => {
+  const formData = new FormData();
+  if (selectedSalesReps.value == null || selectedSalesReps.value.length === 0 || selectedStatus.value.length === 0) {
+    toast.add({ severity: 'error', detail: 'برجاء اختيار حالة ومندوب', life: 3000 });
+    changedFilter.value = false;
+    return;
+  }
+  selectedStatus.value.forEach((element, index) => {
+    formData.append(`StatusIds[${index}]`, element);
+  });
+  selectedSalesReps.value.forEach((element, index) => {
+    formData.append(`SalesRepIds[${index}]`, element);
+  });
+  formData.append('StartDate', new Date(dateFrom.value).toDateString());
+  formData.append('EndDate', new Date(dateTo.value).toDateString());
+  formData.append('ForSalesRep', 'false');
+  await sessionStore.getSalesSummary(formData);
 });
 // Available sales reps
 const availableSalesReps = [
@@ -434,11 +469,21 @@ const DetailsSectionTitle = computed(() => {
 });
 const applyFilters = () => {
   getDataSummary();
-  getVisitData();
+  if (selectedCard.value == 'visits') {
+    getVisitData();
+  } else if (selectedCard.value == 'sales') {
+    getSalesData();
+  } else if (selectedCard.value == 'collections') {
+    getCollectionData();
+  }
 };
 watch(selectedCard, () => {
   if (selectedCard.value == 'visits') {
     getVisitData();
+  } else if (selectedCard.value == 'sales') {
+    getSalesData();
+  } else if (selectedCard.value == 'collections') {
+    getCollectionData();
   }
 });
 </script>
@@ -458,39 +503,39 @@ watch(selectedCard, () => {
         <!-- Filters -->
         <!-- Filters -->
         <div class="px-3">
-          <div class="bg-white row-gap-3 border-round-lg border-1 border-gray-300 p-4 grid gap-0 w-full align-items-end justify-content-between">
+          <div class="row-gap-3 border-round-lg border-1 p-4 grid gap-0 w-full align-items-end justify-content-between" :class="[darkMode ? 'bg-surface-card text-white border-gray-600' : 'bg-white text-gray-700 border-gray-300']">
             <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
-              <div class="h-full surface-card cursor-pointer">
+              <div class="h-full cursor-pointer">
                 <div class="relative">
-                  <label class="block text-sm font-semibold text-gray-700 mb-1">{{ t('Session.SalesRepresentatives') }}</label>
+                  <label class="block text-sm font-semibold mb-1">{{ t('Session.SalesRepresentatives') }}</label>
                   <MultiSelect v-model="selectedSalesReps" :options="sessionStore.salesReps" filter optionLabel="name" optionValue="id" placeholder="Select Sales Reps" :maxSelectedLabels="3" class="w-full h-3rem" />
                 </div>
               </div>
             </div>
 
             <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
-              <div class="h-full surface-card cursor-pointer transition-all transition-duration-200">
+              <div class="h-full cursor-pointer transition-all transition-duration-200">
                 <div class="w-full">
-                  <label class="block text-sm font-semibold text-gray-700 mb-1">{{ t('Session.FromDate') }}</label>
+                  <label class="block text-sm font-semibold mb-1">{{ t('Session.FromDate') }}</label>
                   <Calendar v-model="dateFrom" showIcon iconDisplay="input" class="w-full h-3rem" />
                 </div>
               </div>
             </div>
 
             <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
-              <div class="h-full surface-card cursor-pointer">
+              <div class="h-full cursor-pointer">
                 <div class="w-full">
-                  <label class="block text-sm font-semibold text-gray-700 mb-1">{{ t('Session.ToDate') }}</label>
+                  <label class="block text-sm font-semibold mb-1">{{ t('Session.ToDate') }}</label>
                   <Calendar v-model="dateTo" showIcon iconDisplay="input" class="w-full h-3rem" />
                 </div>
               </div>
             </div>
 
-            <div class="col-12 sm:col-6 lg:col-3 xl:col-2 p-0 sm:px-2 xl:p-2">
-              <div class="h-full surface-card cursor-pointer">
+            <div class="col-12 sm:col-6 lg:col-3 xl:col-2 p-0 sm:px-2 xl:p-2" v-if="false">
+              <div class="h-full cursor-pointer">
                 <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-1"> {{ t('Session.Status') }}</label>
-                  <MultiSelect v-model="selectedStatus" :options="statusOptions" optionLabel="label" optionValue="value" placeholder="Select a Status" class="w-full h-3rem flex" />
+                  <label class="block text-sm font-semibold mb-1"> {{ t('Session.Status') }}</label>
+                  <MultiSelect  v-model="selectedStatus" :options="statusOptions" optionLabel="label" optionValue="value" placeholder="Select a Status" class="w-full h-3rem flex" />
                 </div>
               </div>
             </div>
@@ -525,8 +570,8 @@ watch(selectedCard, () => {
         </div>
         <!-- Dynamic Details Component -->
         <VisitsDetails v-if="selectedCard === 'visits' && cardDetails.visits" :data="sessionStore.visitsSummary" :cards="sessionStore.dataSummary.visitsSummary" :view-mode="viewMode" class="" />
-        <SalesDetails v-if="selectedCard === 'sales' && cardDetails.sales" :data="cardDetails.sales" :view-mode="viewMode" />
-        <CollectionsDetails v-if="selectedCard === 'collections'" :data="cardDetails.collections" :view-mode="viewMode" />
+        <SalesDetails v-if="selectedCard === 'sales' && cardDetails.sales" :cards="sessionStore.dataSummary.salesSummary" :data="sessionStore.salesSummary" :view-mode="viewMode" />
+        <CollectionsDetails v-if="selectedCard === 'collections'" :data="sessionStore.collectionSummary" :view-mode="viewMode" />
         <SessionsDetails v-if="selectedCard === 'sessions'" :data="cardDetails.sessions" :view-mode="viewMode" />
         <!-- <SessionManagement v-if="selectedCard === 'sessions'"   :show-filter="false"   /> -->
         <OverdueDetails v-if="selectedCard === 'overdue'" :data="cardDetails.overdue" :view-mode="viewMode" v-model="totalSalesReps" />

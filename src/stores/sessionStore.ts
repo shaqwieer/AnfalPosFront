@@ -13,6 +13,8 @@ export const useSessionStore = defineStore({
     attachmentTypes: <any[]>[],
     dataSummary: <any>{},
     visitsSummary: <any>[],
+    salesSummary: <any>[],
+    collectionSummary: <any>[],
     dashBoardData: <any>{},
     loading: useLoadingStore(),
     error: ''
@@ -90,6 +92,26 @@ export const useSessionStore = defineStore({
       } catch (err) {
         this.error = handleError(err, this.loading);
       }
-    }
+    },
+    async getSalesSummary(payload) {
+      try {
+        const response = await apiClient.post('/ShiftSessions/GetSalesOrdersRepDashboard', payload);
+        console.log(response);
+
+        this.salesSummary = response.data.data;
+      } catch (err) {
+        this.error = handleError(err, this.loading);
+      }
+    },
+    // async getCollectionSummary(payload) {
+    //   try {
+    //     const response = await apiClient.post('/Visits/GetCollectionsPaymentSalesReps', payload);
+    //     console.log(response);
+
+    //     this.collectionSummary = response.data.data;
+    //   } catch (err) {
+    //     this.error = handleError(err, this.loading);
+    //   }
+    // }
   }
 });
