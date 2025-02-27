@@ -185,7 +185,10 @@
     "defaultImage": "https://www.pngall.com/wp-content/uploads/5/User-Profile-PNG.png",
     "uploadImageError": "يرجى رفع صورة",
     "uploadItemImages": "رفع صور العنصر",
-    "uploadAudio": "رفع صوت"
+    "uploadAudio": "رفع صوت",
+    "prefix": "بادئة",
+    "from": "من",
+    "to": "إلى"
   },
   "label": {
     "search": "بحث"
@@ -251,7 +254,12 @@
     "PaymentMethod": "ادارة نوع الدفع الالكترونى",
     "editPaymentMethod": "تعديل نوع الدفع الالكترونى",
     "addPaymentMethod": "اضافة نوع الدفع الالكترونى",
-    "emptyPaymentMethod": "لا يوجد نوع دفع الالكترونى"
+    "emptyPaymentMethod": "لا يوجد نوع دفع الالكترونى",
+    "edit": "يحرر",
+    "Name": "اسم",
+    "prefix": "بادئة",
+    "from": "من",
+    "to": "الي"
   },
   "pagination": {
     "currentPageReportTemplate": "عرض {first} إلى {last} من أصل {totalRecords} إدخالات"
@@ -654,5 +662,6 @@
   "Filter": "فلتر",
   "Sessions": "جلسات",
   "Status": "حالة",
-  "Warning": "تحذير"
+  "Warning": "تحذير",
+  "customerCode": "رمز العميل"
 }

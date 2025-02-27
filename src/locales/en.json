@@ -224,7 +224,10 @@
     "email": "E-mail",
     "username": "Username",
     "password": "Password",
-    "confirmPassword": "Confirm Password"
+    "confirmPassword": "Confirm Password",
+    "prefix": "prefix",
+    "from": "from",
+    "to": "to"
   },
   "status": {
     "active": "Active",
@@ -258,7 +261,12 @@
     "PaymentMethod": "Manage Payment Methods",
     "editPaymentMethod": "Edit Payment Method",
     "addPaymentMethod": "Add Payment Method",
-    "emptyPaymentMethod": "No Payment Methods exists"
+    "emptyPaymentMethod": "No Payment Methods exists",
+    "edit": "edit",
+    "Name": "Name",
+    "prefix": "prefix",
+    "from": "from",
+    "to": "to"
   },
   "pagination": {
     "currentPageReportTemplate": "Showing {first} to {last} of {totalRecords} entries"
@@ -667,5 +675,6 @@
   "Sessions": "Sessions",
   "Status": "Status",
   "Warning": "Warning",
-  "AddBranch": "Add Branch"
+  "AddBranch": "Add Branch",
+  "customerCode": "Customer Code"
 }

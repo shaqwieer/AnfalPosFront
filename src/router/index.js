@@ -34,6 +34,11 @@ const router = createRouter({
           component: () => import('@/views/pages/customer/customers/VANCustomerVisit.vue')
         },
         {
+          path: 'customer-code',
+          name: 'customer-code',
+          component: () => import('@/views/pages/customerCodes/customerCodes.vue')
+        },
+        {
           path: 'customer-dashboard',
           name: 'customer-dashboard',
           component: () => import('@/views/pages/customer/customers/CustomerDashboard.vue')
