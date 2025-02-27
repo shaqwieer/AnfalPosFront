@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, computed } from 'vue';
+import {inject, ref, watch, computed } from 'vue';
 import { useMainStore } from '@/stores/mainStore';
 import { useI18n } from 'vue-i18n';
 import { useForm } from 'vee-validate';
@@ -10,7 +10,7 @@ import { ImageIcon, XIcon } from 'lucide-vue-next';
 import placeHolderPhoto from '@/assets/images/placeholder.jpg';
 import OrganizationSettings from './OrganizationSettings.vue';
 const organizationStore = useOrganizationStore();
-
+const getOrganizations = inject('getOrganizations');
 const mainStore = useMainStore();
 const { t } = useI18n();
 const visible = defineModel();
@@ -93,6 +93,7 @@ const createData = handleSubmit(async (validatedInfo) => {
   logoFile.value = null;
   selectedFile.value = null;
   resetForm();
+  getOrganizations();
 });
 const updateData = handleSubmit(async (validatedInfo) => {
   const formData = new FormData();
@@ -108,7 +109,10 @@ const updateData = handleSubmit(async (validatedInfo) => {
     formData.append('LogoFile', selectedFile.value == null ? emptyBlob : selectedFile.value);
   }
   props.editElement(props.selectedData.id, formData);
+  logoFile.value = null;
+  selectedFile.value = null;
   resetForm();
+  getOrganizations();
 });
 //
 const fileInput = ref(null);
