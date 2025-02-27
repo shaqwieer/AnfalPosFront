@@ -71,6 +71,7 @@ const [sapConfiguration, sapConfigurationAttrs] = defineField('sapConfiguration'
 const [organizationType, organizationTypeAttrs] = defineField('organizationType');
 const [invoiceTemplate, invoiceTemplateAttrs] = defineField('invoiceTemplate');
 const selectedFile = ref(null);
+const logoFile = ref(null);
 
 const loadPlaceholderBlob = async () => {
   const response = await fetch(placeHolderPhoto);
@@ -89,6 +90,8 @@ const createData = handleSubmit(async (validatedInfo) => {
     formData.append('LogoFile', selectedFile.value == null ? emptyBlob : selectedFile.value);
   }
   props.createElement(formData);
+  logoFile.value = null;
+  selectedFile.value = null;
   resetForm();
 });
 const updateData = handleSubmit(async (validatedInfo) => {
@@ -160,6 +163,7 @@ const removeFile = () => {
 };
 //
 const setFormValues = () => {
+  debugger;
   setValues({
     arabicName: props.selectedData.arabicName,
     englishName: props.selectedData.englishName,
@@ -312,8 +316,7 @@ watch(
               @click="
                 () => {
                   createData();
-                  selectedFile = null;
-                  logoFile = null;
+                 
                 }
               "
             />
@@ -324,8 +327,7 @@ watch(
               @click="
                 () => {
                   updateData();
-                  logoFile = null;
-                  selectedFile = null;
+             
                 }
               "
             />
