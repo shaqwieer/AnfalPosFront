@@ -80,28 +80,29 @@ const loadPlaceholderBlob = async () => {
 
 const createData = handleSubmit(async (validatedInfo) => {
   const formData = new FormData();
-  formData.append('arabicName', validatedInfo.arabicName);
-  formData.append('englishName', validatedInfo.englishName);
-  formData.append('organizationTypeId', validatedInfo.organizationType.id);
-  formData.append('invoiceTemplateId', validatedInfo.invoiceTemplate.id);
-  formData.append('organizationConfigId', validatedInfo.sapConfiguration == null ? 0 : validatedInfo.sapConfiguration);
+  formData.append('ArabicName', validatedInfo.arabicName);
+  formData.append('EnglishName', validatedInfo.englishName);
+  formData.append('OrganizationTypeId', validatedInfo.organizationType.id);
+  formData.append('InvoiceTemplateId', validatedInfo.invoiceTemplate.id);
+  formData.append('OrganizationConfigId', validatedInfo.sapConfiguration == null ? 0 : validatedInfo.sapConfiguration);
   if (selectedFile.value != null) {
-    formData.append('logoFile', selectedFile.value == null ? emptyBlob : selectedFile.value);
+    formData.append('LogoFile', selectedFile.value == null ? emptyBlob : selectedFile.value);
   }
   props.createElement(formData);
   resetForm();
 });
 const updateData = handleSubmit(async (validatedInfo) => {
   const formData = new FormData();
-  formData.append('uniqueIdentifier', props.selectedData.uniqueIdentifier);
-  formData.append('arabicName', validatedInfo.arabicName);
-  formData.append('englishName', validatedInfo.englishName);
-  formData.append('organizationTypeId', validatedInfo.organizationType.id);
-  formData.append('invoiceTemplateId', validatedInfo.invoiceTemplate.id);
-  formData.append('isChangedLogo', isChangedLogo.value);
-  formData.append('organizationConfigId', validatedInfo.sapConfiguration == null ? 0 : validatedInfo.sapConfiguration.id);
+  formData.append('UniqueIdentifier', props.selectedData.uniqueIdentifier);
+  formData.append('ArabicName', validatedInfo.arabicName);
+  formData.append('EnglishName', validatedInfo.englishName);
+  formData.append('OrganizationTypeId', validatedInfo.organizationType.id);
+  formData.append('InvoiceTemplateId', validatedInfo.invoiceTemplate.id);
+  formData.append('IsChangedLogo', isChangedLogo.value);
+  formData.append('OrganizationConfigId', validatedInfo.sapConfiguration == null ? 0 : validatedInfo.sapConfiguration.id);
+  debugger;
   if (selectedFile.value != null) {
-    formData.append('logoFile', selectedFile.value == null ? emptyBlob : selectedFile.value);
+    formData.append('LogoFile', selectedFile.value == null ? emptyBlob : selectedFile.value);
   }
   props.editElement(props.selectedData.id, formData);
   resetForm();
@@ -135,6 +136,7 @@ const handleFileSelect = (e) => {
   if (file) addFile(file);
 };
 const addFile = (file) => {
+  debugger;
   if (file.type.startsWith('image/')) {
     if (file.size <= 5 * 1024 * 1024) {
       if (selectedFile.value instanceof Blob) {
@@ -151,6 +153,7 @@ const addFile = (file) => {
   }
 };
 const removeFile = () => {
+  debugger
   selectedFile.value = null;
   isChangedLogo.value = true;
   errorMessage.value = '';

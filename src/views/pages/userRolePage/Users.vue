@@ -307,6 +307,7 @@ const paginatedCustomers = computed(() => {
       }
     "
     :IsAdd="isAddFlag"
+    :vanSalesRepBranches="users.filter((user)=>user.roles.some((role) => role.isVanSalesRep === true)).flatMap((user) => user.branches.map((branch) => branch.id))"
     :selectedData="updateData"
     :createElement="addData"
     :editElement="editData"
