@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, computed } from 'vue';
+import {inject, ref, watch, computed } from 'vue';
 import { useMainStore } from '@/stores/mainStore';
 import { useI18n } from 'vue-i18n';
 import { useForm } from 'vee-validate';
@@ -10,7 +10,7 @@ import { ImageIcon, XIcon } from 'lucide-vue-next';
 import placeHolderPhoto from '@/assets/images/placeholder.jpg';
 import OrganizationSettings from './OrganizationSettings.vue';
 const organizationStore = useOrganizationStore();
-
+const getOrganizations = inject('getOrganizations');
 const mainStore = useMainStore();
 const { t } = useI18n();
 const visible = defineModel();
@@ -71,6 +71,7 @@ const [sapConfiguration, sapConfigurationAttrs] = defineField('sapConfiguration'
 const [organizationType, organizationTypeAttrs] = defineField('organizationType');
 const [invoiceTemplate, invoiceTemplateAttrs] = defineField('invoiceTemplate');
 const selectedFile = ref(null);
+const logoFile = ref(null);
 
 const loadPlaceholderBlob = async () => {
   const response = await fetch(placeHolderPhoto);
@@ -89,7 +90,10 @@ const createData = handleSubmit(async (validatedInfo) => {
     formData.append('LogoFile', selectedFile.value == null ? emptyBlob : selectedFile.value);
   }
   props.createElement(formData);
+  logoFile.value = null;
+  selectedFile.value = null;
   resetForm();
+  getOrganizations();
 });
 const updateData = handleSubmit(async (validatedInfo) => {
   const formData = new FormData();
@@ -105,7 +109,10 @@ const updateData = handleSubmit(async (validatedInfo) => {
     formData.append('LogoFile', selectedFile.value == null ? emptyBlob : selectedFile.value);
   }
   props.editElement(props.selectedData.id, formData);
+  logoFile.value = null;
+  selectedFile.value = null;
   resetForm();
+  getOrganizations();
 });
 //
 const fileInput = ref(null);
@@ -160,6 +167,7 @@ const removeFile = () => {
 };
 //
 const setFormValues = () => {
+  debugger;
   setValues({
     arabicName: props.selectedData.arabicName,
     englishName: props.selectedData.englishName,
@@ -312,8 +320,7 @@ watch(
               @click="
                 () => {
                   createData();
-                  selectedFile = null;
-                  logoFile = null;
+                 
                 }
               "
             />
@@ -324,8 +331,7 @@ watch(
               @click="
                 () => {
                   updateData();
-                  logoFile = null;
-                  selectedFile = null;
+             
                 }
               "
             />
