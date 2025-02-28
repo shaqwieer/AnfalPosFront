@@ -69,19 +69,28 @@ export const useCustomerStore = defineStore({
     async EditCustomerBasedOnBranchType(customer: any) {
       try {
         console.log(customer);
-        debugger;
+        // debugger;
+
         const formData = new FormData();
-        formData.append('Id', customer.id);
-        formData.append('Name', customer.name);
-        formData.append('PrimaryPhone', customer.mobile);
-        formData.append('Email', customer.email);
-        formData.append('CrNumber', customer.cr);
-        formData.append('VatNumber', customer.vat);
+        formData.append('Id', customer.id.toString());
+
+        formData.append('Name', customer.name || '');
+        formData.append('PrimaryPhone', customer.mobile || '');
+        formData.append('Email', customer.email || '');
+        formData.append('CrNumber', customer.cr || '');
+        formData.append('VatNumber', customer.vat || '');
         formData.append('Industry', '');
-        formData.append('CreditLimit', customer.creditLimit);
-        formData.append('PaymentTerm', customer.paymentTerm);
-        formData.append('Latitude', customer.location.lat);
-        formData.append('Altitude', customer.location.lng);
+        formData.append('CreditLimit', customer.creditLimit?.toString() || '0');
+        formData.append('PaymentTerm', customer.paymentTerm?.toString() || '0');
+
+        if (customer.location) {
+          formData.append('Latitude', customer.location.lat?.toString() || '0');
+          formData.append('Altitude', customer.location.lng?.toString() || '0');
+        }
+
+        // formData.append('Latitude', customer.location.lat);
+        // formData.append('Altitude', customer.location.lng);
+
         formData.append('BuildingNumber', customer.buildingNumber);
         formData.append('StreetName', customer.streetName);
         formData.append('District', customer.district);
@@ -95,17 +104,40 @@ export const useCustomerStore = defineStore({
         formData.append('FinanceNotes', customer.financialNotes);
         formData.append('IsBusinessPartner', 'true');
         formData.append('AdditionalNotes', customer.notes);
-        customer.attachments.forEach((file, index) => {
-          formData.append(`CustomerAttachments[${index}].attachmentTypeId`, file.id);
-          formData.append(`CustomerAttachments[${index}].attachmentTypeData`, file.file);
-        });
+
+        if (customer.attachments && Array.isArray(customer.attachments)) {
+          customer.attachments.forEach((file, index) => {
+            if (file.id && file.file) {
+              formData.append(`CustomerAttachments[${index}].attachmentTypeId`, file.id.toString());
+              formData.append(`CustomerAttachments[${index}].attachmentTypeData`, file.file);
+            } else {
+              console.warn(`تحذير: الملف رقم ${index} غير مكتمل`);
+            }
+          });
+        }
+
+        // customer.attachments.forEach((file, index) => {
+        //   formData.append(`CustomerAttachments[${index}].attachmentTypeId`, file.id);
+        //   formData.append(`CustomerAttachments[${index}].attachmentTypeData`, file.file);
+        // });
+
         const response = await apiClient.put('/Customers/UpdateCustomerBasedOnBranchType', formData);
+
+        if (!response || !response.data || !response.data.data) {
+          throw new Error('استجابة غير صحيحة من السيرفر');
+        }
+
         const index = this.customers.findIndex((c) => c.id === customer.id);
-        this.customers[index] = response.data.data;
+        if (index !== -1) {
+          this.customers[index] = response.data.data;
+        }
+
+        // this.customers[index] = response.data.data;
       } catch (err) {
         this.error = handleError(err, this.loading);
       }
     },
+
     async ApproveCustomer(customer: any) {
       try {
         const formData = {

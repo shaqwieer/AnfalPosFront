@@ -5,6 +5,10 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import CustomerAttachmentsNew from './CustomerAttachmentsNew.vue';
 
+import apiClient from '@/api/apiClient';
+
+import { handleError } from '@/utilities/errorHandler';
+
 const props = defineProps<{
   show: boolean;
   customer?: any; // For edit mode
@@ -26,6 +30,8 @@ const searchQuery = ref('');
 const locationError = ref('');
 const mapZoom = ref(12);
 
+const selectedRegion = ref('');
+
 // Form data with all fields
 const formData = ref({
   // Basic Information
@@ -34,6 +40,8 @@ const formData = ref({
   type: props.customer?.type || 'business',
   mobile: props.customer?.primaryPhone || '',
   email: props.customer?.email || '',
+
+  Region: props.customer?.selectedRegion || '',
 
   // Business Information
   cr: props.customer?.crNumber || '',
@@ -304,11 +312,22 @@ const isLoaded = ref(false);
 onMounted(() => {
   isLoaded.value = true;
 });
+
+const Regions = ref([]);
+
+const gitRegions = async () => {
+  try {
+    const response = await apiClient.get(`/Regions`);
+    Regions.value = response.data.data;
+    console.log(Regions.value);
+  } catch (err) {
+    handleError(err);
+  }
+};
 </script>
 
 <template>
   <Dialog closable :close-on-click-outside="true" :modal="true" v-model:visible="props.show" class="flex justify-content-center" style="width: 100vw; max-width: 80%" :header="$t(`Customer.Customer_Details`)" @update:visible="$emit('close')">
-    <!-- {{ formData }} -->
     <form @submit.prevent="handleSubmit" class="flex-1 overflow-hidden relative pb-8">
       <TabView>
         <TabPanel header="Customer Info">
@@ -356,6 +375,16 @@ onMounted(() => {
                       <label class="block text-sm font-medium text-700 mb-1">VAT </label>
                       <input v-model="formData.vat" type="text" :disabled="readOnly" class="w-full p-inputtext" />
                     </div>
+
+                    {{ selectedRegion.regionCode }}
+
+                    <Dropdown @click="gitRegions" v-model="selectedRegion" :options="Regions" optionLabel="name" placeholder="Select a City" class="w-full md:w-14rem">
+                      <template #option="slotProps">
+                        {{ slotProps.option.name }}
+                      </template>
+                    </Dropdown>
+
+                    <!-- <Dropdown @click="gitRegions" v-model="selectedCity" :options="cities" optionLabel="name" placeholder="Select a City" class="w-full md:w-14rem" /> -->
                   </div>
                 </div>
               </div>
@@ -549,6 +578,7 @@ onMounted(() => {
         <button type="button" @click="$emit('close')" class="p-button p-button-outlined">
           {{ readOnly ? `${$t('Customer.Close')}` : `${$t('Customer.Cancel')}` }}
         </button>
+
         <button v-if="!readOnly" type="submit" class="p-button p-button-primary">
           {{ customer ? `${$t('Customer.Update_Customer')}` : `${$t('Customer.Create_Customer')}` }}
         </button>

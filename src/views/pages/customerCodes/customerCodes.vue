@@ -45,7 +45,7 @@
       </div>
     </div>
     <p class="font-medium">{{ t('users.description') }}</p>
-
+{{paginatedCustomers}}
     <DataTable
       :value="paginatedCustomers"
       dataKey="id"
