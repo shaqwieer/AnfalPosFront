@@ -96,7 +96,7 @@ const saveChanges = async () => {
 
     // Format data according to backend DTO structure
     const formData = {
-      businessEntityId: selectedRepId.value,
+      branchId: selectedRepId.value,
       creditLimit: parseFloat(creditLimit.value),
       salesGoalsMonthly: months.value.map((month) => ({
         id: selectedRep.value.find((t) => t.month === month.id)?.id || 0,
@@ -149,7 +149,7 @@ const businessEntityId = ref(1);
 const year = ref(new Date().getFullYear());
 
 const fetchData = async () => {
-  await salesGoalsStore.fetchSalesGoals({ businessEntityId: selectedRepId.value, year: selectedYear.value });
+  await salesGoalsStore.fetchSalesGoals({ branchId: selectedRepId.value, year: selectedYear.value });
   selectedRep.value = salesGoalsStore.salesGoals.filter((rep) => rep.businessEntityId == selectedRepId.value);
   creditLimit.value = salesGoalsStore.creditLimit;
   availableCredit.value = salesGoalsStore.availableCredit;
@@ -165,7 +165,7 @@ watch(
 );
 
 onMounted(() => {
-  salesGoalsStore.GetSalesRepsForOrganization().then(() => {
+  salesGoalsStore.GetSalesReps().then(() => {
     selectedRepId.value = salesGoalsStore.salesReps[0].id;
     fetchData();
   });
