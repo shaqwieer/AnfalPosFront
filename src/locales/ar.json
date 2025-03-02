@@ -364,7 +364,12 @@
     "email": "الايميل",
     "primaryPhone": "رقم الموبايل الاساسى",
     "secondaryPhone": "رقم الموبايل الثانوى",
-    "customerCode": "رمز العميل"
+    "customerCode": "رمز العميل",
+    "cajoNumber": "رقم Cajo",
+    "bankAccountId": "معرف الحساب المصرفي",
+    "bankName": "اسم البنك",
+    "bankCode": "رمز البنك",
+    "bankAccountNo": "حساب مصرفي"
   },
   "items": {
     "title": "الاصناف",

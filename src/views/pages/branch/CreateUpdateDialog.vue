@@ -276,6 +276,7 @@ const customerCodes = ref([
           </div>
         </div>
       </div>
+      x
       <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
         <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.sapInformation') }}</h3>
 
@@ -313,13 +314,13 @@ const customerCodes = ref([
           </div>
 
           <div class="field flex flex-column w-6">
-            <label for="bankAccountNo" class="mb-3">Sales Rep Code</label>
+            <label for="bankAccountNo" class="mb-3">{{ $t('branchDialog.bankAccountNo') }}</label>
             <InputText id="bankAccountNo" v-model="bankAccountNo" v-bind="bankAccountNoAttrs" autofocus :invalid="!!errors.bankAccountNo" />
             <small v-if="errors.bankAccountNo" class="text-red-600">{{ errors.bankAccountNo }}</small>
           </div>
         </div>
       </div>
-
+      x
       <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
         <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.sapInformation') }}</h3>
         <div class="flex gap-2">

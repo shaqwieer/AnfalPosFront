@@ -371,7 +371,12 @@
     "email": "Email",
     "primaryPhone": "Primary Phone Number",
     "secondaryPhone": "Secondary Phone Number",
-    "customerCode": "Customer Code"
+    "customerCode": "Customer Code",
+    "cajoNumber": "cajo Number",
+    "bankAccountId": "bank Account Id",
+    "bankName": "bank Name",
+    "bankCode": "bank Code",
+    "bankAccountNo": "bank Account"
   },
   "items": {
     "title": "items",
