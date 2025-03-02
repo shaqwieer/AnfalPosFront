@@ -59,6 +59,12 @@ const branchSchema = yup.object({
   cashCustomer: yup.mixed().nullable(),
   profitCenter: yup.mixed().nullable(),
   cashJournal: yup.mixed().nullable(),
+  cajoNumber: yup.mixed().nullable(),
+  bankAccountId: yup.mixed().nullable(),
+  bankName: yup.mixed().nullable(),
+  bankCode: yup.mixed().nullable(),
+  bankAccountNo: yup.mixed().nullable(),
+
   bankAccounts: yup.mixed().nullable()
 });
 
@@ -77,7 +83,12 @@ const informationInitial = ref({
   cashCustomer: null,
   profitCenter: null,
   cashJournal: null,
+  cajoNumber: '',
+  bankAccountId: '',
   bankAccounts: '',
+  bankName: '',
+  bankCode: '',
+  bankAccountNo: '',
 
   bankPosFirst: null,
   bankPosSecond: null,
@@ -112,6 +123,12 @@ const [sapStorageLocation, sapStorageLocationAttrs] = defineField('sapStorageLoc
 const [cashCustomer, cashCustomerAttrs] = defineField('cashCustomer');
 const [profitCenter, profitCenterAttrs] = defineField('profitCenter');
 const [cashJournal, cashJournalAttrs] = defineField('cashJournal');
+const [cajoNumber, cajoNumberAttrs] = defineField('cajoNumber');
+const [bankAccountId, bankAccountIdAttrs] = defineField('bankAccountId');
+const [bankName, bankNameAttrs] = defineField('bankName');
+const [bankCode, bankCodeAttrs] = defineField('bankCode');
+const [bankAccountNo, bankAccountNoAttrs] = defineField('bankAccountNo');
+
 const [bankAccounts, bankAccountsAttrs] = defineField('bankAccounts');
 
 const [bankPosFirst, bankPosFirstAttrs] = defineField('bankPosFirst');
@@ -126,12 +143,14 @@ const createData = handleSubmit(async (validatedInfo) => {
     profitCenter: validatedInfo.profitCenter || null,
     primaryPhone: validatedInfo.primaryPhone,
     OrganizationId: validatedInfo.organizationId || 1, // Provide default value if not present
-    BankAccountId: validatedInfo.bankAccounts || null,
+    bankAccountId: validatedInfo.bankAccounts || null,
 
-    BankName: validatedInfo.bankName || null,
-    BankCode: validatedInfo.bankCode || null,
+    bankName: validatedInfo.bankName || null,
+    bankCode: validatedInfo.bankCode || null,
 
-    BankAccountNo: validatedInfo.bankAccounts || null,
+    bankAccountNo: validatedInfo.bankAccounts || null,
+    cajoNumber: validatedInfo.cajoNumber || null,
+    bankAccountId: validatedInfo.bankAccountId || null,
 
     bankPosFirst: validatedInfo.bankPosFirst || null,
     bankPosSecond: validatedInfo.bankPosSecond || null,
@@ -159,12 +178,14 @@ const updateData = handleSubmit(async (validatedInfo) => {
     profitCenter: validatedInfo.profitCenter || null,
     primaryPhone: validatedInfo.primaryPhone,
     OrganizationId: validatedInfo.organizationId || 1, // Provide default value if not present
-    BankAccountId: validatedInfo.bankAccounts || null,
+    bankAccounts: validatedInfo.bankAccounts || null,
 
-    BankName: validatedInfo.bankName || null,
-    BankCode: validatedInfo.bankCode || null,
+    bankName: validatedInfo.bankName || null,
+    bankCode: validatedInfo.bankCode || null,
+    cajoNumber: validatedInfo.cajoNumber || null,
+    bankAccountId: validatedInfo.bankAccountId || null,
 
-    BankAccountNo: validatedInfo.bankAccounts || null,
+    bankAccountNo: validatedInfo.bankAccountNo || null,
 
     bankPosFirst: validatedInfo.bankPosFirst || null,
     bankPosSecond: validatedInfo.bankPosSecond || null,
@@ -202,6 +223,12 @@ const setFormValues = () => {
     bankPosThird: props.selectedData.bankPosThird,
 
     cashJournal: props.selectedData.cashJournal,
+    cajoNumber: props.selectedData.cajoNumber,
+    bankAccountId: props.selectedData.bankAccountId,
+    bankName: props.selectedData.bankName,
+    bankCode: props.selectedData.bankCode,
+    bankAccountNo: props.selectedData.bankAccountNo,
+
     country: countries.find((e) => e.id === props.selectedData.countryId),
     branchType: branchTypes.find((e) => e.id === props.selectedData.branchTypeId),
     city: cities.value.find((e) => e.id === props.selectedData.cityId)
@@ -249,6 +276,50 @@ const customerCodes = ref([
           </div>
         </div>
       </div>
+      <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
+        <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.sapInformation') }}</h3>
+
+        <div class="flex gap-2">
+          <div class="field flex flex-column w-4">
+            <label for="cajoNumber" class="mb-3">{{ $t('branchDialog.cajoNumber') }}</label>
+
+            <InputText id="cajoNumber" v-model="cajoNumber" v-bind="cajoNumberAttrs" :invalid="!!errors.cajoNumber" />
+
+            <small v-if="errors.cajoNumber" class="text-red-600">{{ errors.cajoNumber }}</small>
+          </div>
+
+          <div class="field flex flex-column w-4">
+            <label for="bankAccountId" class="mb-3">{{ $t('branchDialog.bankAccountId') }}</label>
+
+            <InputText id="bankAccountId" v-model="bankAccountId" v-bind="bankAccountIdAttrs" :invalid="!!errors.bankAccountId" />
+
+            <small v-if="errors.bankAccountId" class="text-red-600">{{ errors.bankAccountId }}</small>
+          </div>
+
+          <div class="field flex flex-column w-4">
+            <label for="bankName" class="mb-3">{{ $t('branchDialog.bankName') }}</label>
+            <InputText id="bankName" v-model="bankName" v-bind="bankNameAttrs" :invalid="!!errors.bankName" />
+            <small v-if="errors.bankName" class="text-red-600">{{ errors.bankName }}</small>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <div class="field flex flex-column w-6">
+            <label for="bankCode" class="mb-3">{{ $t('branchDialog.bankCode') }}</label>
+
+            <InputText id="bankCode" v-model="bankCode" v-bind="bankCodeAttrs" :invalid="!!errors.bankCode" />
+
+            <small v-if="errors.bankCode" class="text-red-600">{{ errors.bankCode }}</small>
+          </div>
+
+          <div class="field flex flex-column w-6">
+            <label for="bankAccountNo" class="mb-3">Sales Rep Code</label>
+            <InputText id="bankAccountNo" v-model="bankAccountNo" v-bind="bankAccountNoAttrs" autofocus :invalid="!!errors.bankAccountNo" />
+            <small v-if="errors.bankAccountNo" class="text-red-600">{{ errors.bankAccountNo }}</small>
+          </div>
+        </div>
+      </div>
+
       <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
         <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.sapInformation') }}</h3>
         <div class="flex gap-2">

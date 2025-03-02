@@ -1,7 +1,6 @@
 <template>
   <div class="flex flex-column gap-2 px-6">
     <!-- <PageTopBar v-model:searchText="filters['global'].value" :title="t(`baseLookup.${name}`)" :addText="t('baseLookup.createButtonLabel')" simple :addButton="openCreateDialog"></PageTopBar> -->
-
     <div class="flex justify-content-between h-fit">
       <div>
         <h2 class="m-0">{{ t(`customerCode`) }}</h2>
@@ -37,7 +36,7 @@
         </div></template
       >
 
-      <Column field="name" :header="t('labels.name')" class="" :sortable="true">
+      <Column field="ID" :header="t('labels.ID')" class="" :sortable="true">
         <template #body="slotProps">
           <div class="flex flex-row align-items-center">
             <span class="font-semibold text-md">{{ slotProps.data.id }}</span>
@@ -45,26 +44,26 @@
         </template>
       </Column>
 
-      <Column field="prefix" :header="t('labels.prefix')" class="" :sortable="true">
+      <Column field="Code" :header="t('labels.Code')" class="" :sortable="true">
         <template #body="slotProps">
           <div class="flex flex-row align-items-center">
-            <span class="font-semibold text-md">{{ slotProps.data.Code }}</span>
+            <span class="font-semibold text-md">{{ slotProps.data.code }}</span>
           </div>
         </template>
       </Column>
 
-      <Column field="from" :header="t('labels.from')" class="" :sortable="true">
+      <Column field="Description" :header="t('labels.Description')" class="" :sortable="true">
         <template #body="slotProps">
           <div class="flex flex-row align-items-center">
-            <span class="font-semibold text-md">{{ slotProps.data.Description }}</span>
+            <span class="font-semibold text-md">{{ slotProps.data.description }}</span>
           </div>
         </template>
       </Column>
 
-      <Column field="to" :header="t('labels.to')" class="" :sortable="true">
+      <Column field="Days" :header="t('labels.Days')" class="" :sortable="true">
         <template #body="slotProps">
           <div class="flex flex-row align-items-center">
-            <span class="font-semibold text-md">{{ slotProps.data.Days }}</span>
+            <span class="font-semibold text-md">{{ slotProps.data.days }}</span>
           </div>
         </template>
       </Column>
@@ -186,7 +185,7 @@ import PageTopBar from '../../../components/pageTopBar.vue';
 const entities = ref([]);
 onMounted(async () => {
   try {
-    const response = await apiClient.get(`/CustomerCodes`);
+    const response = await apiClient.get(`/PaymentTerms`);
     entities.value = response.data.data;
   } catch (err) {
     handleError(err, mainStore.loading);
@@ -259,7 +258,7 @@ const createData = handleSubmit(async (validatedInfo) => {
     to: validatedInfo.editTo
   };
   try {
-    const response = await apiClient.post(`/CustomerCodes`, transformedInfo);
+    const response = await apiClient.post(`/PaymentTerms`, transformedInfo);
     entities.value.push(response.data.data);
     mainStore.loading.setNotificationInfo('success', response.data.message);
     resetForm();
@@ -279,7 +278,7 @@ const updateData = handleSubmit(async (validatedInfo) => {
   };
   console.log(transformedInfo);
   try {
-    const response = await apiClient.put(`/CustomerCodes/${editId.value}`, transformedInfo);
+    const response = await apiClient.put(`/PaymentTerms/${editId.value}`, transformedInfo);
     const index = entities.value.findIndex((entity) => entity.id === editId.value);
     entities.value[index] = { ...entities.value[index], ...response.data.data };
     mainStore.loading.setNotificationInfo('success', response.data.message);
@@ -322,7 +321,7 @@ const deletedKey = ref('');
 const confirmDelete = async () => {
   console.log(deletedKey.value);
   try {
-    const response = await apiClient.delete(`/CustomerCodes/${deletedKey.value}`);
+    const response = await apiClient.delete(`/PaymentTerms/${deletedKey.value}`);
     const index = entities.value.findIndex((entity) => entity.id === deletedKey.value);
     entities.value.splice(index, 1);
     deleteDialogVisible.value = false;
