@@ -116,8 +116,8 @@
   <Dialog v-model:visible="visible" :breakpoints="{ '640px': '25rem' }" :header="t(`baseLookup.edit`) + ' ' + name" :class="containerClass" :style="{ width: '35rem' }" :modal="true" :closable="false">
     <div class="flex flex-column gap-4 p-4">
       <div class="field flex flex-column">
-        <label for="Name" class="">{{ t(`baseLookup.Name`) }}</label>
-        <InputText id="Name" v-model="editName" v-bind="editNameAttrs" autofocus :invalid="!!errors.arabicName" />
+        <label for="code" class="">{{ t(`baseLookup.code`) }}</label>
+        <InputText id="code" v-model="editcode" v-bind="editCodeAttrs" autofocus :invalid="!!errors.arabicName" />
         <small v-if="errors.arabicName" class="text-red-600">{{ errors.arabicName }}</small>
       </div>
 
