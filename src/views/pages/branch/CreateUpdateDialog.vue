@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 import { useMainStore } from '@/stores/mainStore';
 import { useI18n } from 'vue-i18n';
 import { useForm } from 'vee-validate';
@@ -251,11 +251,19 @@ watch(
   }
 );
 
-const customerCodes = ref([
-  { name: 'avs', prefix: 'as', from: 234, to: 234, id: 30, uniqueIdentifier: '84e366fd-b420-461f-a174-d70665cbd064', createdAt: '2025-02-27T12:56:19.744434Z' },
-  { name: 'ascasc', prefix: '23234', from: 234234, to: 234243, id: 31, uniqueIdentifier: 'dcc0fd49-2a81-4651-b967-ce322ee726e6', createdAt: '2025-02-27T12:56:28.42559Z' },
-  { name: 'المنطقة الغربية', prefix: 'WST', from: 100000, to: 199999, id: 1, uniqueIdentifier: '3fa85f64-5717-4562-b3fc-2c963f66afa6', createdAt: '2025-02-14T17:16:11.569884Z' }
-]);
+const customerCodes = ref([]);
+
+import apiClient from '@/api/apiClient';
+import { handleError } from '@/utilities/errorHandler';
+
+onMounted(async () => {
+  try {
+    const response = await apiClient.get(`/CustomerCodes`);
+    customerCodes.value = response.data.data;
+  } catch (err) {
+    handleError(err, mainStore.loading);
+  }
+});
 </script>
 
 <template>
@@ -276,7 +284,6 @@ const customerCodes = ref([
           </div>
         </div>
       </div>
-      x
       <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
         <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.sapInformation') }}</h3>
 
@@ -320,7 +327,6 @@ const customerCodes = ref([
           </div>
         </div>
       </div>
-      x
       <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
         <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.sapInformation') }}</h3>
         <div class="flex gap-2">
@@ -457,7 +463,18 @@ const customerCodes = ref([
 
           <div class="field flex flex-column w-6">
             <label for="branchType" class="mb-3">{{ $t('branchDialog.customerCode') }}</label>
-            <Dropdown v-model="customerCode" v-bind="customerCodeAttrs" :virtualScrollerOptions="{ itemSize: 38 }" :options="customerCodes" filter :loading="false" optionLabel="name" :placeholder="t('branchDialog.customerCode')" class="w-full">
+            <Dropdown
+              v-model="customerCode"
+              @click="getCustomerCodes"
+              v-bind="customerCodeAttrs"
+              :virtualScrollerOptions="{ itemSize: 38 }"
+              :options="customerCodes"
+              filter
+              :loading="false"
+              optionLabel="name"
+              :placeholder="t('branchDialog.customerCode')"
+              class="w-full"
+            >
               <template #option="slotProps">
                 <div class="flex align-items-center mx-auto gap-3">
                   <div>{{ slotProps.option.name }}</div>
