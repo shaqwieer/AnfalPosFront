@@ -467,7 +467,16 @@
     "SalesDistributionConfiguration": "Sales & Distribution Configuration",
     "PricingDiscountConfiguration": "Pricing & Discount Configuration",
     "OrderBillingTypes": "Order & Billing Types",
-    "ReturnsRefunds": "Returns & Refunds"
+    "ReturnsRefunds": "Returns & Refunds",
+    "CustomerPriceGroup": "Customer Price Group",
+    "BusinessPartnerGrouping": "Business Partner Grouping",
+    "PaymentTerms": "Payment Terms",
+    "ReconciliationAccount": "Reconciliation Account",
+    "SalesDistrict": "Sales District",
+    "ReferenceSDDocumentCategory": "Reference SD Document Category",
+    "BillingDocumentType": "Billing Document Type",
+    "RequestedBillingDocumentType": "Requested Billing Document Type",
+    "Additionalfields": "Additional fields"
   },
   "availableBranch": {
     "title": "Available Branches"

@@ -460,7 +460,16 @@
     "SalesDistributionConfiguration": "تكوين المبيعات والتوزيع",
     "PricingDiscountConfiguration": "التسعير",
     "OrderBillingTypes": "طلب",
-    "ReturnsRefunds": "عودة"
+    "ReturnsRefunds": "عودة",
+    "CustomerPriceGroup": "مجموعة أسعار العميل",
+    "BusinessPartnerGrouping": "تجميع شريك العمل",
+    "PaymentTerms": "شروط الدفع",
+    "ReconciliationAccount": "حساب المصالحة",
+    "SalesDistrict": "منطقة المبيعات",
+    "ReferenceSDDocumentCategory": "مرجع فئة وثيقة SD",
+    "BillingDocumentType": "نوع وثيقة الفواتير",
+    "RequestedBillingDocumentType": "نوع مستند الفواتير المطلوب",
+    "Additionalfields": "حقول إضافية"
   },
   "availableBranch": {
     "title": "الفروع المتاحة"

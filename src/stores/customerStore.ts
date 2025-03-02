@@ -31,7 +31,7 @@ export const useCustomerStore = defineStore({
     async CreateCustomerBasedOnBranchType(customer: any) {
       try {
         console.log(customer);
-        debugger;
+        // debugger;
         const formData = new FormData();
         formData.append('Name', customer.name);
         formData.append('PrimaryPhone', customer.mobile);

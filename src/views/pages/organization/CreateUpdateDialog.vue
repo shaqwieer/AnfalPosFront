@@ -104,7 +104,7 @@ const updateData = handleSubmit(async (validatedInfo) => {
   formData.append('InvoiceTemplateId', validatedInfo.invoiceTemplate.id);
   formData.append('IsChangedLogo', isChangedLogo.value);
   formData.append('OrganizationConfigId', validatedInfo.sapConfiguration == null ? 0 : validatedInfo.sapConfiguration.id);
-  debugger;
+  //debugger;
   if (selectedFile.value != null) {
     formData.append('LogoFile', selectedFile.value == null ? emptyBlob : selectedFile.value);
   }
@@ -143,7 +143,7 @@ const handleFileSelect = (e) => {
   if (file) addFile(file);
 };
 const addFile = (file) => {
-  debugger;
+  //debugger;
   if (file.type.startsWith('image/')) {
     if (file.size <= 5 * 1024 * 1024) {
       if (selectedFile.value instanceof Blob) {
@@ -160,14 +160,14 @@ const addFile = (file) => {
   }
 };
 const removeFile = () => {
-  debugger
+  //debugger
   selectedFile.value = null;
   isChangedLogo.value = true;
   errorMessage.value = '';
 };
 //
 const setFormValues = () => {
-  debugger;
+  //debugger;
   setValues({
     arabicName: props.selectedData.arabicName,
     englishName: props.selectedData.englishName,
