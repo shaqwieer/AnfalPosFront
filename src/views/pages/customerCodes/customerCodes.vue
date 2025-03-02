@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-column gap-2 px-6">
     <!-- <PageTopBar v-model:searchText="filters['global'].value" :title="t(`baseLookup.${name}`)" :addText="t('baseLookup.createButtonLabel')" simple :addButton="openCreateDialog"></PageTopBar> -->
-
+{{ paginatedCustomers }}
     <div class="flex justify-content-between h-fit">
       <div>
         <h2 class="m-0">{{ t(`customerCode`) }}</h2>

@@ -363,7 +363,8 @@
     "branchType": "نوع الفرع",
     "email": "الايميل",
     "primaryPhone": "رقم الموبايل الاساسى",
-    "secondaryPhone": "رقم الموبايل الثانوى"
+    "secondaryPhone": "رقم الموبايل الثانوى",
+    "customerCode": "رمز العميل"
   },
   "items": {
     "title": "الاصناف",

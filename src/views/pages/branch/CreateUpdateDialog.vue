@@ -223,6 +223,12 @@ watch(
     }
   }
 );
+
+const customerCodes = ref([
+  { name: 'avs', prefix: 'as', from: 234, to: 234, id: 30, uniqueIdentifier: '84e366fd-b420-461f-a174-d70665cbd064', createdAt: '2025-02-27T12:56:19.744434Z' },
+  { name: 'ascasc', prefix: '23234', from: 234234, to: 234243, id: 31, uniqueIdentifier: 'dcc0fd49-2a81-4651-b967-ce322ee726e6', createdAt: '2025-02-27T12:56:28.42559Z' },
+  { name: 'المنطقة الغربية', prefix: 'WST', from: 100000, to: 199999, id: 1, uniqueIdentifier: '3fa85f64-5717-4562-b3fc-2c963f66afa6', createdAt: '2025-02-14T17:16:11.569884Z' }
+]);
 </script>
 
 <template>
@@ -247,7 +253,7 @@ watch(
         <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.sapInformation') }}</h3>
         <div class="flex gap-2">
           <div class="field flex flex-column w-4">
-            <label for="organizationType" class="mb-3 ">{{ $t('branchDialog.sapStorageLocation') }}</label>
+            <label for="organizationType" class="mb-3">{{ $t('branchDialog.sapStorageLocation') }}</label>
 
             <InputText id="organizationType" v-model="sapStorageLocation" v-bind="sapStorageLocationAttrs" :invalid="!!errors.sapStorageLocation" />
 
@@ -255,7 +261,7 @@ watch(
           </div>
 
           <div class="field flex flex-column w-4">
-            <label for="cashJournal" class="mb-3 ">{{ $t('branchDialog.cashJournal') }}</label>
+            <label for="cashJournal" class="mb-3">{{ $t('branchDialog.cashJournal') }}</label>
 
             <InputText id="cashJournal" v-model="cashJournal" v-bind="cashJournalAttrs" :invalid="!!errors.cashJournal" />
 
@@ -263,7 +269,7 @@ watch(
           </div>
 
           <div class="field flex flex-column w-4">
-            <label for="profitCenter" class="mb-3 ">{{ $t('branchDialog.profitCenter') }}</label>
+            <label for="profitCenter" class="mb-3">{{ $t('branchDialog.profitCenter') }}</label>
             <InputText id="profitCenter" v-model="profitCenter" v-bind="profitCenterAttrs" :invalid="!!errors.profitCenter" />
             <small v-if="errors.profitCenter" class="text-red-600">{{ errors.profitCenter }}</small>
           </div>
@@ -271,7 +277,7 @@ watch(
 
         <div class="flex gap-2">
           <div class="field flex flex-column w-6">
-            <label for="cashCustomer" class="mb-3 ">{{ $t('branchDialog.cashCustomer') }}</label>
+            <label for="cashCustomer" class="mb-3">{{ $t('branchDialog.cashCustomer') }}</label>
             <!-- <Dropdown
               v-model="cashCustomer"
               disabled
@@ -296,7 +302,7 @@ watch(
             <small v-if="errors.cashCustomer" class="text-red-600">{{ errors.cashCustomer }}</small>
           </div>
           <div class="field flex flex-column w-6">
-            <label for="SalesRepCode" class=" mb-3">Sales Rep Code</label>
+            <label for="SalesRepCode" class="mb-3">Sales Rep Code</label>
             <InputText id="SalesRepCode" v-model="salesRepCode" v-bind="salesRepCodeAttrs" autofocus :invalid="!!errors.salesRepCode" />
             <small v-if="errors.salesRepCode" class="text-red-600">{{ errors.salesRepCode }}</small>
           </div>
@@ -308,7 +314,7 @@ watch(
 
         <div class="flex gap-2">
           <div class="field flex flex-column w-6">
-            <label for="bankAccounts" class="mb-3 ">{{ $t('branchDialog.bankAccounts') }}</label>
+            <label for="bankAccounts" class="mb-3">{{ $t('branchDialog.bankAccounts') }}</label>
 
             <InputText id="bankAccounts" v-model="bankAccounts" v-bind="bankAccountsAttrs" :invalid="!!errors.bankAccounts" />
 
@@ -316,7 +322,7 @@ watch(
           </div>
 
           <div class="field flex flex-column w-6">
-            <label for="bankPosFirst" class="mb-3 ">Bank POS1</label>
+            <label for="bankPosFirst" class="mb-3">Bank POS1</label>
             <InputText id="bankPosFirst" v-model="bankPosFirst" v-bind="bankPosFirstAttrs" :invalid="!!errors.bankPosFirst" />
             <small v-if="errors.bankPosFirst" class="text-red-600">{{ errors.bankPosFirst }}</small>
           </div>
@@ -324,13 +330,13 @@ watch(
 
         <div class="flex gap-2">
           <div class="field flex flex-column w-6">
-            <label for="bankPosSecond" class="mb-3 ">Bank POS2</label>
+            <label for="bankPosSecond" class="mb-3">Bank POS2</label>
             <InputText id="bankPosSecond" v-model="bankPosSecond" v-bind="bankPosSecondAttrs" :invalid="!!errors.bankPosSecond" />
             <small v-if="errors.bankPosSecond" class="text-red-600">{{ errors.bankPosSecond }}</small>
           </div>
 
           <div class="field flex flex-column w-6">
-            <label for="bankPosThird" class="mb-3 ">Bank POS3</label>
+            <label for="bankPosThird" class="mb-3">Bank POS3</label>
             <InputText id="bankPosThird" v-model="bankPosThird" v-bind="bankPosThirdAttrs" :invalid="!!errors.bankPosThird" />
             <small v-if="errors.bankPosThird" class="text-red-600">{{ errors.bankPosThird }}</small>
           </div>
@@ -340,8 +346,8 @@ watch(
       <div class="flex flex-column w-full gap-2 border-gray-300 border-1 p-4 border-round-lg">
         <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.additionalInformation') }}</h3>
         <div class="flex gap-2">
-          <div class="field flex flex-column w-4">
-            <label for="organizationType" class="mb-3 ">{{ $t('branchDialog.country') }}</label>
+          <div class="field flex flex-column w-6">
+            <label for="organizationType" class="mb-3">{{ $t('branchDialog.country') }}</label>
             <Dropdown v-model="country" v-bind="countryAttrs" :virtualScrollerOptions="{ itemSize: 38 }" :options="countries" filter :loading="false" optionLabel="name" :placeholder="t('branchDialog.countryPlaceholder')" class="w-full">
               <template #option="slotProps">
                 <div class="flex align-items-center mx-auto gap-3">
@@ -351,8 +357,8 @@ watch(
             </Dropdown>
             <small v-if="errors.country" class="text-red-600">{{ errors.country }}</small>
           </div>
-          <div class="field flex flex-column w-4">
-            <label for="city" class="mb-3 ">{{ $t('branchDialog.city') }}</label>
+          <div class="field flex flex-column w-6">
+            <label for="city" class="mb-3">{{ $t('branchDialog.city') }}</label>
             <Dropdown v-model="city" v-bind="cityAttrs" :virtualScrollerOptions="{ itemSize: 38 }" :options="filterCities" filter :loading="false" optionLabel="name" :placeholder="t('branchDialog.cityPlaceholder')" class="w-full">
               <template #option="slotProps">
                 <div class="flex align-items-center mx-auto gap-3">
@@ -362,8 +368,11 @@ watch(
             </Dropdown>
             <small v-if="errors.city" class="text-red-600">{{ errors.city }}</small>
           </div>
-          <div class="field flex flex-column w-4">
-            <label for="branchType" class="mb-3 ">{{ $t('branchDialog.branchType') }}</label>
+        </div>
+
+        <div class="flex gap-2">
+          <div class="field flex flex-column w-6">
+            <label for="branchType" class="mb-3">{{ $t('branchDialog.branchType') }}</label>
             <Dropdown v-model="branchType" v-bind="branchTypeAttrs" :virtualScrollerOptions="{ itemSize: 38 }" :options="branchTypes" filter :loading="false" optionLabel="name" :placeholder="t('branchDialog.branchTypePlaceholder')" class="w-full">
               <template #option="slotProps">
                 <div class="flex align-items-center mx-auto gap-3">
@@ -373,7 +382,20 @@ watch(
             </Dropdown>
             <small v-if="errors.branchType" class="text-red-600">{{ errors.branchType }}</small>
           </div>
+
+          <div class="field flex flex-column w-6">
+            <label for="branchType" class="mb-3">{{ $t('branchDialog.customerCode') }}</label>
+            <Dropdown v-model="customerCode" v-bind="customerCodeAttrs" :virtualScrollerOptions="{ itemSize: 38 }" :options="customerCodes" filter :loading="false" optionLabel="name" :placeholder="t('branchDialog.customerCode')" class="w-full">
+              <template #option="slotProps">
+                <div class="flex align-items-center mx-auto gap-3">
+                  <div>{{ slotProps.option.name }}</div>
+                </div>
+              </template>
+            </Dropdown>
+            <small v-if="errors.branchType" class="text-red-600">{{ errors.branchType }}</small>
+          </div>
         </div>
+
         <div class="flex gap-2">
           <div class="field flex flex-column w-6">
             <label for="email" class="">{{ $t('branchDialog.email') }}</label>

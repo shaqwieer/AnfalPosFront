@@ -370,7 +370,8 @@
     "branchType": "Branch Type",
     "email": "Email",
     "primaryPhone": "Primary Phone Number",
-    "secondaryPhone": "Secondary Phone Number"
+    "secondaryPhone": "Secondary Phone Number",
+    "customerCode": "Customer Code"
   },
   "items": {
     "title": "items",
