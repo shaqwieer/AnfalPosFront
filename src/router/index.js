@@ -39,6 +39,11 @@ const router = createRouter({
           component: () => import('@/views/pages/customerCodes/customerCodes.vue')
         },
         {
+          path: 'payment-term',
+          name: 'payment-term',
+          component: () => import('@/views/pages/paymentTerm/paymentTerm.vue')
+        },
+        {
           path: 'customer-dashboard',
           name: 'customer-dashboard',
           component: () => import('@/views/pages/customer/customers/CustomerDashboard.vue')

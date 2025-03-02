@@ -40,7 +40,7 @@
       <Column field="name" :header="t('labels.name')" class="" :sortable="true">
         <template #body="slotProps">
           <div class="flex flex-row align-items-center">
-            <span class="font-semibold text-md">{{ slotProps.data.name }}</span>
+            <span class="font-semibold text-md">{{ slotProps.data.id }}</span>
           </div>
         </template>
       </Column>
@@ -48,7 +48,7 @@
       <Column field="prefix" :header="t('labels.prefix')" class="" :sortable="true">
         <template #body="slotProps">
           <div class="flex flex-row align-items-center">
-            <span class="font-semibold text-md">{{ slotProps.data.prefix }}</span>
+            <span class="font-semibold text-md">{{ slotProps.data.Code }}</span>
           </div>
         </template>
       </Column>
@@ -56,7 +56,7 @@
       <Column field="from" :header="t('labels.from')" class="" :sortable="true">
         <template #body="slotProps">
           <div class="flex flex-row align-items-center">
-            <span class="font-semibold text-md">{{ slotProps.data.from }}</span>
+            <span class="font-semibold text-md">{{ slotProps.data.Description }}</span>
           </div>
         </template>
       </Column>
@@ -64,7 +64,7 @@
       <Column field="to" :header="t('labels.to')" class="" :sortable="true">
         <template #body="slotProps">
           <div class="flex flex-row align-items-center">
-            <span class="font-semibold text-md">{{ slotProps.data.to }}</span>
+            <span class="font-semibold text-md">{{ slotProps.data.Days }}</span>
           </div>
         </template>
       </Column>
