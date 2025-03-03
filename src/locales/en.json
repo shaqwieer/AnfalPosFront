@@ -227,7 +227,11 @@
     "confirmPassword": "Confirm Password",
     "prefix": "prefix",
     "from": "from",
-    "to": "to"
+    "to": "to",
+    "ID": "ID",
+    "Code": "Code",
+    "Description": "Description",
+    "Days": "Days"
   },
   "status": {
     "active": "Active",
@@ -691,5 +695,6 @@
   "Status": "Status",
   "Warning": "Warning",
   "AddBranch": "Add Branch",
-  "customerCode": "Customer Code"
+  "customerCode": "Customer Code",
+  "paymentTerm": "payment Term"
 }

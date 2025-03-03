@@ -3,7 +3,7 @@
     <!-- <PageTopBar v-model:searchText="filters['global'].value" :title="t(`baseLookup.${name}`)" :addText="t('baseLookup.createButtonLabel')" simple :addButton="openCreateDialog"></PageTopBar> -->
     <div class="flex justify-content-between h-fit">
       <div>
-        <h2 class="m-0">{{ t(`customerCode`) }}</h2>
+        <h2 class="m-0">{{ t(`paymentTerm`) }}</h2>
       </div>
 
       <div class="flex gap-3">
@@ -33,8 +33,8 @@
       <template #empty>
         <div class="flex justify-content-center align-items-center font-bold text-lg">
           {{ t(`baseLookup.empty${name}`) }}
-        </div></template
-      >
+        </div>
+      </template>
 
       <Column field="ID" :header="t('labels.ID')" class="" :sortable="true">
         <template #body="slotProps">
@@ -116,27 +116,27 @@
   <Dialog v-model:visible="visible" :breakpoints="{ '640px': '25rem' }" :header="t(`baseLookup.edit`) + ' ' + name" :class="containerClass" :style="{ width: '35rem' }" :modal="true" :closable="false">
     <div class="flex flex-column gap-4 p-4">
       <div class="field flex flex-column">
-        <label for="code" class="">{{ t(`baseLookup.code`) }}</label>
-        <InputText id="code" v-model="editcode" v-bind="editCodeAttrs" autofocus :invalid="!!errors.arabicName" />
-        <small v-if="errors.arabicName" class="text-red-600">{{ errors.arabicName }}</small>
+        <label for="code" class="">{{ t(`labels.Code`) }}</label>
+        <InputText id="code" v-model="editCode" v-bind="editCodeAttrs" autofocus :invalid="!!errors.editCode" />
+        <small v-if="errors.editCode" class="text-red-600">{{ errors.editCode }}</small>
       </div>
 
       <div class="field flex flex-column">
-        <label for="editPrefix" class="">{{ t(`baseLookup.prefix`) }}</label>
-        <InputText id="editPrefix" v-model="editPrefix" v-bind="editPrefixAttrs" autofocus :invalid="!!errors.englishName" />
-        <small v-if="errors.englishName" class="text-red-600">{{ errors.englishName }}</small>
+        <label for="editDescription" class="">{{ t(`labels.Description`) }}</label>
+        <InputText id="editDescription" v-model="editDescription" v-bind="editDescriptionAttrs" autofocus :invalid="!!errors.editDescription" />
+        <small v-if="errors.editDescription" class="text-red-600">{{ errors.editDescription }}</small>
       </div>
 
       <div class="field flex flex-column">
-        <label for="editForm" class="">{{ t(`baseLookup.from`) }}</label>
-        <InputText id="editForm" v-model="editForm" v-bind="editFormAttrs" autofocus :invalid="!!errors.englishName" />
-        <small v-if="errors.englishName" class="text-red-600">{{ errors.englishName }}</small>
+        <label for="editDays" class="">{{ t(`labels.Days`) }}</label>
+        <InputText id="editDays" v-model="editDays" v-bind="editDaysAttrs" autofocus :invalid="!!errors.editDays" />
+        <small v-if="errors.editDays" class="text-red-600">{{ errors.editDays }}</small>
       </div>
 
-      <div class="field flex flex-column">
-        <label for="editTo" class="">{{ t(`baseLookup.to`) }}</label>
-        <InputText id="editTo" v-model="editTo" v-bind="editToAttrs" autofocus :invalid="!!errors.englishName" />
-        <small v-if="errors.englishName" class="text-red-600">{{ errors.englishName }}</small>
+      <div v-if="!isEdit" class="field flex flex-column">
+        <label for="editId" class="">{{ t(`labels.ID`) }}</label>
+        <InputText id="editId" v-model="editId" v-bind="editIdAttrs" autofocus :invalid="!!errors.editId" />
+        <small v-if="errors.editId" class="text-red-600">{{ errors.editId }}</small>
       </div>
 
       <div class="flex justify-content-end gap-3 pt-2">
@@ -222,23 +222,22 @@ const initialValues = ref({
 });
 
 const schema = yup.object().shape({
-  arabicName: yup.string('Arabic Name is required'),
-  englishName: yup.string('English Name is required')
+  editCode: yup.string().required('Arabic Name is required'),
+  editDescription: yup.string().required('English Name is required'),
+  editDays: yup.string().required('English Name is required'),
+  editId: yup.string().required('English Name is required')
 });
 const { handleSubmit, errors, resetForm, setValues, defineField } = useForm({
   validationSchema: schema,
   initialValues: initialValues.value
 });
-const [arabicName, arabicNameAttrs] = defineField('arabicName');
-const [englishName, englishNameAttrs] = defineField('englishName');
 
-const [editName, editNameAttrs] = defineField('editName');
-const [editPrefix, editPrefixAttrs] = defineField('editPrefix');
-const [editForm, editFormAttrs] = defineField('editForm');
-const [editTo, editToAttrs] = defineField('editTo');
+const [editCode, editCodeAttrs] = defineField('editCode');
+const [editDescription, editDescriptionAttrs] = defineField('editDescription');
+const [editDays, editDaysAttrs] = defineField('editDays');
+const [editId, editIdAttrs] = defineField('editId');
 
 // Update create Functionality
-const editId = ref(0);
 
 const isEdit = ref(false);
 const openCreateDialog = () => {
@@ -249,13 +248,10 @@ const openCreateDialog = () => {
 
 const createData = handleSubmit(async (validatedInfo) => {
   const transformedInfo = {
-    arabicName: validatedInfo.arabicName,
-    englishName: validatedInfo.englishName,
-
-    name: validatedInfo.editName,
-    prefix: validatedInfo.editPrefix,
-    from: validatedInfo.editForm,
-    to: validatedInfo.editTo
+    code: validatedInfo.editCode,
+    description: validatedInfo.editDescription,
+    days: validatedInfo.editDays,
+    id: validatedInfo.editId
   };
   try {
     const response = await apiClient.post(`/PaymentTerms`, transformedInfo);
@@ -270,12 +266,12 @@ const createData = handleSubmit(async (validatedInfo) => {
 
 const updateData = handleSubmit(async (validatedInfo) => {
   const transformedInfo = {
-    id: editId.value,
-    name: validatedInfo.editName,
-    prefix: validatedInfo.editPrefix,
-    from: validatedInfo.editForm,
-    to: validatedInfo.editTo
+    id: validatedInfo.editId,
+    code: validatedInfo.editCode,
+    description: validatedInfo.editDescription,
+    days: validatedInfo.editDays
   };
+  console.log('transformedInfo');
   console.log(transformedInfo);
   try {
     const response = await apiClient.put(`/PaymentTerms/${editId.value}`, transformedInfo);
@@ -296,21 +292,19 @@ const name = ref('');
 const editItem = async (data) => {
   console.log(data);
   setValues({
-    arabicName: data.arabicName,
-    englishName: data.englishName
+    code: data.editCode,
+    description: data.editDescription,
+    days: data.editDays
   });
+  visible.value = true;
+
   isEdit.value = true;
 
   editId.value = data.id;
 
-  editName.value = data.name;
-  name.value = data.name;
-
-  editPrefix.value = data.prefix;
-  editForm.value = data.from;
-  editTo.value = data.to;
-
-  visible.value = true;
+  editCode.value = data.code;
+  editDescription.value = data.description;
+  editDays.value = data.days;
 };
 
 //Delete Option

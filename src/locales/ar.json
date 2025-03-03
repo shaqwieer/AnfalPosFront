@@ -188,7 +188,11 @@
     "uploadAudio": "رفع صوت",
     "prefix": "بادئة",
     "from": "من",
-    "to": "إلى"
+    "to": "إلى",
+    "ID": "المعرف",
+    "Code": "الرمز",
+    "Description": "وصف",
+    "Days": "أيام"
   },
   "label": {
     "search": "بحث"
@@ -678,5 +682,6 @@
   "Sessions": "جلسات",
   "Status": "حالة",
   "Warning": "تحذير",
-  "customerCode": "رمز العميل"
+  "customerCode": "رمز العميل",
+  "paymentTerm": "مدة الدفع"
 }
