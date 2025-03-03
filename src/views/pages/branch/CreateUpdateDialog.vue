@@ -64,6 +64,7 @@ const branchSchema = yup.object({
   bankName: yup.mixed().nullable(),
   bankCode: yup.mixed().nullable(),
   bankAccountNo: yup.mixed().nullable(),
+  customerCodeId: yup.mixed().nullable(),
 
   bankAccounts: yup.mixed().nullable()
 });
@@ -92,6 +93,8 @@ const informationInitial = ref({
 
   bankPosFirst: null,
   bankPosSecond: null,
+  customerCodeId: null,
+
   bankPosThird: null
 });
 
@@ -128,6 +131,7 @@ const [bankAccountId, bankAccountIdAttrs] = defineField('bankAccountId');
 const [bankName, bankNameAttrs] = defineField('bankName');
 const [bankCode, bankCodeAttrs] = defineField('bankCode');
 const [bankAccountNo, bankAccountNoAttrs] = defineField('bankAccountNo');
+const [customerCodeId, customerCodeIdAttrs] = defineField('customerCodeId');
 
 const [bankAccounts, bankAccountsAttrs] = defineField('bankAccounts');
 
@@ -147,6 +151,7 @@ const createData = handleSubmit(async (validatedInfo) => {
 
     bankName: validatedInfo.bankName || null,
     bankCode: validatedInfo.bankCode || null,
+    customerCodeId: validatedInfo.customerCodeId || null,
 
     bankAccountNo: validatedInfo.bankAccounts || null,
     cajoNumber: validatedInfo.cajoNumber || null,
@@ -179,6 +184,7 @@ const updateData = handleSubmit(async (validatedInfo) => {
     primaryPhone: validatedInfo.primaryPhone,
     OrganizationId: validatedInfo.organizationId || 1, // Provide default value if not present
     bankAccounts: validatedInfo.bankAccounts || null,
+    customerCodeId: validatedInfo.customerCodeId || null,
 
     bankName: validatedInfo.bankName || null,
     bankCode: validatedInfo.bankCode || null,
@@ -221,6 +227,7 @@ const setFormValues = () => {
     bankPosFirst: props.selectedData.bankPosFirst,
     bankPosSecond: props.selectedData.bankPosSecond,
     bankPosThird: props.selectedData.bankPosThird,
+    customerCodeId: props.selectedData.customerCodeId,
 
     cashJournal: props.selectedData.cashJournal,
     cajoNumber: props.selectedData.cajoNumber,
@@ -464,11 +471,11 @@ onMounted(async () => {
           <div class="field flex flex-column w-6">
             <label for="branchType" class="mb-3">{{ $t('branchDialog.customerCode') }}</label>
             <Dropdown
-              v-model="customerCode"
-              @click="getCustomerCodes"
-              v-bind="customerCodeAttrs"
+              v-model="customerCodeId"
+              v-bind="customerCodeIdAttrs"
               :virtualScrollerOptions="{ itemSize: 38 }"
               :options="customerCodes"
+              optionValue="id"
               filter
               :loading="false"
               optionLabel="name"
