@@ -191,6 +191,11 @@ onMounted(() => {
                 <div class="flex text-lg">{{ slotProps.data.depositNo }}</div>
               </template>
             </Column>
+            <Column field="sapFinancialDoc" header="SAP Doc" class="" :sortable="true">
+              <template #body="slotProps">
+                <div class="flex text-lg">{{ slotProps.data.sapFinancialDoc }}</div>
+              </template>
+            </Column>
             <Column field="createdAt" header="Date" class="" :sortable="true">
               <template #body="slotProps">
                 <div class="flex text-lg">{{ new Date(slotProps.data.createdAt).toLocaleDateString('en-GB') }}</div>
@@ -201,6 +206,7 @@ onMounted(() => {
                 <div class="flex text-lg">{{ formatPrice(slotProps.data.depositAmount) }}</div>
               </template>
             </Column>
+
             <Column field="statusId" header="Status" class="" :sortable="true">
               <template #body="slotProps">
                 <span class="px-2 py-1 flex w-fit text-sm font-semibold border-round-xl" :class="getStatusColor(slotProps.data.statusId)">
@@ -249,6 +255,11 @@ onMounted(() => {
             <Column field="id" header="Transaction ID" class="" :sortable="true">
               <template #body="slotProps">
                 <div class="flex text-lg">{{ slotProps.data.id }}</div>
+              </template>
+            </Column>
+            <Column field="sapFinancialDoc" header="SAP Doc" class="" :sortable="true">
+              <template #body="slotProps">
+                <div class="flex text-lg">{{ slotProps.data.sapFinancialDoc }}</div>
               </template>
             </Column>
             <Column field="createdAt" header="Date" class="" :sortable="true">

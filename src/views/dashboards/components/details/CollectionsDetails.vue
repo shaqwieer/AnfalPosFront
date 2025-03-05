@@ -10,70 +10,36 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 const props = defineProps<{
   data: any;
+  cards: any;
   viewMode: 'chart' | 'table';
 }>();
 
 // Sample collections data
-const collectionsData = ref([
-  {
-    salesRep: 'Mohammed Al-Saud',
-    cash: 25000,
-    card: 15000,
-    bank: 8000,
-    total: 48000
-  },
-  {
-    salesRep: 'Abdullah Al-Qahtani',
-    cash: 18000,
-    card: 12000,
-    bank: 5000,
-    total: 35000
-  },
-  {
-    salesRep: 'Khalid Al-Otaibi',
-    cash: 22000,
-    card: 14000,
-    bank: 6000,
-    total: 42000
-  },
-  {
-    salesRep: 'Fahad Al-Harbi',
-    cash: 20000,
-    card: 13000,
-    bank: 7000,
-    total: 40000
-  },
-  {
-    salesRep: 'Omar Al-Ghamdi',
-    cash: 19000,
-    card: 11000,
-    bank: 4000,
-    total: 34000
-  }
-]);
 
 // Chart data
 const chartData = computed(() => ({
-  labels: collectionsData.value.map((item) => item.salesRep),
+  labels: props.data.map((item) => item.name),
   datasets: [
     {
       label: t('dashboard.Cash'),
-      data: collectionsData.value.map((item) => item.cash),
+      data: props.data.map((item) => item.cash),
       backgroundColor: '#22c55e'
     },
     {
       label: t('dashboard.Card'),
-      data: collectionsData.value.map((item) => item.card),
+      data: props.data.map((item) => item.visa),
       backgroundColor: '#3b82f6'
     },
     {
       label: t('dashboard.Bank'),
-      data: collectionsData.value.map((item) => item.bank),
+      data: props.data.map((item) => item.bank),
       backgroundColor: '#8b5cf6'
     }
   ]
 }));
-
+const transactionData = computed(() => {
+  return props.data;
+});
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
@@ -106,14 +72,6 @@ const formatPrice = (price: number): string => {
     maximumFractionDigits: 2
   });
 };
-
-// Summary calculations
-const summary = computed(() => ({
-  totalCash: collectionsData.value.reduce((sum, item) => sum + item.cash, 0),
-  totalCard: collectionsData.value.reduce((sum, item) => sum + item.card, 0),
-  totalBank: collectionsData.value.reduce((sum, item) => sum + item.bank, 0),
-  grandTotal: collectionsData.value.reduce((sum, item) => sum + item.total, 0)
-}));
 </script>
 
 <template>
@@ -127,7 +85,7 @@ const summary = computed(() => ({
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
                 <div class="text-sm text-gray-500">{{ t('dashboard.TotalCash') }}</div>
                 <div class="text-2xl font-bold text-green-600">
-                  {{ formatPrice(summary.totalCash) }}
+                  {{ formatPrice(cards.cash) }}
                 </div>
               </div>
             </div>
@@ -136,7 +94,7 @@ const summary = computed(() => ({
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
                 <div class="text-sm text-gray-500">{{ t('dashboard.TotalCard') }}</div>
                 <div class="text-2xl font-bold text-blue-600">
-                  {{ formatPrice(summary.totalCard) }}
+                  {{ formatPrice(cards.visa) }}
                 </div>
               </div>
             </div>
@@ -145,7 +103,7 @@ const summary = computed(() => ({
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
                 <div class="text-sm text-gray-500">{{ t('dashboard.TotalBank') }}</div>
                 <div class="text-2xl font-bold text-purple-600">
-                  {{ formatPrice(summary.totalBank) }}
+                  {{ formatPrice(cards.bank) }}
                 </div>
               </div>
             </div>
@@ -154,7 +112,7 @@ const summary = computed(() => ({
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
                 <div class="text-sm text-gray-500">{{ t('dashboard.GrandTotal') }}</div>
                 <div class="text-2xl font-bold text-gray-900">
-                  {{ formatPrice(summary.grandTotal) }}
+                  {{ formatPrice(cards.cash + cards.visa + cards.bank) }}
                 </div>
               </div>
             </div>
@@ -172,107 +130,71 @@ const summary = computed(() => ({
 
     <!-- Table View -->
     <div v-else class="bg-white border-1 border-gray-200 border-round-lg shadow-sm border overflow-hidden">
-      <DataTable :value="collectionsData" :paginator="collectionsData.length > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" class="">
+      <DataTable :value="transactionData" :paginator="transactionData.lenth > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" :currentPageReportTemplate="''" class="border-round-xl">
         <template #empty>
           <div class="flex justify-content-center align-items-center font-bold text-lg">{{ t('dashboard.empty') }}</div>
         </template>
 
-        <!-- Sales Rep Column -->
-        <Column field="salesRep" :header="t('dashboard.SalesRep')">
+        <Column field="name" :header="t('dashboard.SalesRep')" class="font-normal">
           <template #body="slotProps">
-            <div class="flex flex-column align-items-start">
-              <div class="font-semibold text-md">{{ slotProps.data.salesRep }}</div>
-            </div>
-          </template>
-
-          <template #footer="slotProps">
-            <div class="flex flex-column align-items-start">
-              <div class="font-semibold text-md">{{ t('dashboard.Total') }}</div>
+            <div class="flex flex-row align-items-center">
+              <span class="font-semibold text-md">{{ slotProps.data.name }}</span>
             </div>
           </template>
         </Column>
 
-        <!-- Cash Column -->
-        <Column field="cash">
+        <Column field="cash" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Cash') }}</span>
+              <span class="text-md flex justify-content-center font-normal">{{ t('dashboard.cash') }}</span>
             </div>
           </template>
 
           <template #body="slotProps">
-            <div class="flex flex-column align-items-center text-md text-green-600 text-right">
-              {{ formatPrice(slotProps.data.cash) }}
-            </div>
-          </template>
-
-          <template #footer="slotProps">
-            <div class="flex flex-column align-items-center">
-              <div class="font-semibold text-md text-green-600">
-                {{ formatPrice(summary.totalCash) }}
-              </div>
+            <div class="flex flex-row justify-content-center align-items-center">
+              <span class="font-semibold text-md">{{ slotProps.data.cash }}</span>
             </div>
           </template>
         </Column>
 
-        <!-- Card Column -->
-        <Column field="card">
+        <Column field="visa" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Card') }}</span>
-            </div>
-          </template>
-          <template #body="slotProps">
-            <div class="flex flex-column align-items-center text-md text-blue-600 text-right">
-              {{ formatPrice(slotProps.data.card) }}
+              <span class="text-md flex justify-content-center font-normal">{{ t('dashboard.Card') }}</span>
             </div>
           </template>
 
-          <template #footer="slotProps">
-            <div class="flex flex-column align-items-center">
-              <div class="font-semibold text-md text-blue-600">
-                {{ formatPrice(summary.totalCard) }}
-              </div>
+          <template #body="slotProps">
+            <div class="flex flex-row justify-content-center align-items-center text-green-600">
+              <span class="font-semibold text-md">{{ slotProps.data.visa }}</span>
             </div>
           </template>
         </Column>
 
-        <!-- Bank Column -->
-        <Column field="bank">
+        <Column field="bank" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Bank') }}</span>
-            </div>
-          </template>
-          <template #body="slotProps">
-            <div class="flex flex-column align-items-center text-md text-right text-purple-600">
-              {{ formatPrice(slotProps.data.bank) }}
+              <span class="text-md flex justify-content-center font-normal">{{ t('dashboard.Bank') }}</span>
             </div>
           </template>
 
-          <template #footer="slotProps">
-            <div class="flex flex-column align-items-center text-purple-600">
-              <div class="font-semibold text-md">{{ formatPrice(summary.totalBank) }}</div>
+          <template #body="slotProps">
+            <div class="flex flex-row justify-content-center align-items-center text-blue-600">
+              <span class="font-semibold text-md">{{ slotProps.data.bank }}</span>
             </div>
           </template>
         </Column>
 
-        <!-- Total Column -->
-        <Column field="total">
+        <Column field="total" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
               <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Total') }}</span>
             </div>
           </template>
-          <template #body="slotProps">
-            <div class="flex flex-column align-items-center font-semibold text-md text-right">
-              {{ formatPrice(slotProps.data.total) }}
-            </div>
-          </template>
 
-          <template #footer="slotProps">
-            <div class="flex flex-column align-items-center">
-              <div class="font-semibold text-md">{{ formatPrice(summary.grandTotal) }}</div>
+          <template #body="slotProps">
+            <div class="flex flex-row justify-content-center align-items-center text-center text-600 font-medium">
+              <span class="font-semibold text-md">{{ slotProps.data.total }}</span>
             </div>
           </template>
         </Column>
