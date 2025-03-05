@@ -134,6 +134,16 @@ const getCollectionData = useDebounceFn(async () => {
   };
   await sessionStore.getCollectionSummary(payload);
 });
+const getOverdueData = useDebounceFn(async () => {
+  var payload = {
+    StatusIds: selectedStatus.value,
+    SalesRepIds: selectedSalesReps.value,
+    StartDate: new Date(dateFrom.value.setHours(0, 0, 0, 0)),
+    EndDate: new Date(dateTo.value.setHours(new Date().getHours(), new Date().getMinutes() - new Date().getTimezoneOffset(), 0, 0)),
+    forSalesRep: false
+  };
+  await sessionStore.getOverdueSalesSummary(payload);
+});
 const getSalesData = useDebounceFn(async () => {
   const formData = new FormData();
   if (selectedSalesReps.value == null || selectedSalesReps.value.length === 0 || selectedStatus.value.length === 0) {
@@ -475,6 +485,8 @@ const applyFilters = () => {
     getSalesData();
   } else if (selectedCard.value == 'collections') {
     getCollectionData();
+  } else if (selectedCard.value == 'overdue') {
+    getOverdueData();
   }
 };
 watch(selectedCard, () => {
@@ -484,6 +496,8 @@ watch(selectedCard, () => {
     getSalesData();
   } else if (selectedCard.value == 'collections') {
     getCollectionData();
+  } else if (selectedCard.value == 'overdue') {
+    getOverdueData();
   }
 });
 </script>
@@ -535,7 +549,7 @@ watch(selectedCard, () => {
               <div class="h-full cursor-pointer">
                 <div>
                   <label class="block text-sm font-semibold mb-1"> {{ t('Session.Status') }}</label>
-                  <MultiSelect  v-model="selectedStatus" :options="statusOptions" optionLabel="label" optionValue="value" placeholder="Select a Status" class="w-full h-3rem flex" />
+                  <MultiSelect v-model="selectedStatus" :options="statusOptions" optionLabel="label" optionValue="value" placeholder="Select a Status" class="w-full h-3rem flex" />
                 </div>
               </div>
             </div>
@@ -569,12 +583,12 @@ watch(selectedCard, () => {
           </div>
         </div>
         <!-- Dynamic Details Component -->
-        <VisitsDetails v-if="selectedCard === 'visits' && cardDetails.visits" :data="sessionStore.visitsSummary" :cards="sessionStore.dataSummary.visitsSummary" :view-mode="viewMode" class="" />
-        <SalesDetails v-if="selectedCard === 'sales' && cardDetails.sales" :cards="sessionStore.dataSummary.salesSummary" :data="sessionStore.salesSummary" :view-mode="viewMode" />
-        <CollectionsDetails v-if="selectedCard === 'collections'" :data="sessionStore.collectionSummary" :view-mode="viewMode" />
+        <VisitsDetails v-if="selectedCard === 'visits'" :data="sessionStore.visitsSummary" :cards="sessionStore.dataSummary.visitsSummary" :view-mode="viewMode" class="" />
+        <SalesDetails v-if="selectedCard === 'sales'" :cards="sessionStore.dataSummary.salesSummary" :data="sessionStore.salesSummary" :view-mode="viewMode" />
+        <CollectionsDetails v-if="selectedCard === 'collections'" :cards="sessionStore.dataSummary.collectionsSummary" :data="sessionStore.collectionSummary" :view-mode="viewMode" />
         <SessionsDetails v-if="selectedCard === 'sessions'" :data="cardDetails.sessions" :view-mode="viewMode" />
         <!-- <SessionManagement v-if="selectedCard === 'sessions'"   :show-filter="false"   /> -->
-        <OverdueDetails v-if="selectedCard === 'overdue'" :data="cardDetails.overdue" :view-mode="viewMode" v-model="totalSalesReps" />
+        <OverdueDetails v-if="selectedCard === 'overdue'" :cards="sessionStore.dataSummary.overdueSummary" :data="sessionStore.overdueSalesSummary" :view-mode="viewMode" v-model="totalSalesReps" />
         <StockDetails v-if="selectedCard === 'stock'" :data="cardDetails.stock" :view-mode="viewMode" />
       </div>
     </div>

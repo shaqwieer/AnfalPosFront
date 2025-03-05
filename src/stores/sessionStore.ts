@@ -15,6 +15,7 @@ export const useSessionStore = defineStore({
     visitsSummary: <any>[],
     salesSummary: <any>[],
     collectionSummary: <any>[],
+    overdueSalesSummary: <any>[],
     dashBoardData: <any>{},
     loading: useLoadingStore(),
     error: ''
@@ -103,15 +104,25 @@ export const useSessionStore = defineStore({
         this.error = handleError(err, this.loading);
       }
     },
-    // async getCollectionSummary(payload) {
-    //   try {
-    //     const response = await apiClient.post('/Visits/GetCollectionsPaymentSalesReps', payload);
-    //     console.log(response);
+    async getCollectionSummary(payload) {
+      try {
+        const response = await apiClient.post('/Payments/GetCollectionsPaymentSalesReps', payload);
+        console.log(response);
 
-    //     this.collectionSummary = response.data.data;
-    //   } catch (err) {
-    //     this.error = handleError(err, this.loading);
-    //   }
-    // }
+        this.collectionSummary = response.data.data;
+      } catch (err) {
+        this.error = handleError(err, this.loading);
+      }
+    },
+    async getOverdueSalesSummary(payload) {
+      try {
+        const response = await apiClient.post('/Invoices/GetOverdueSalesDashboard', payload);
+        console.log(response);
+
+        this.overdueSalesSummary = response.data.data;
+      } catch (err) {
+        this.error = handleError(err, this.loading);
+      }
+    }
   }
 });
