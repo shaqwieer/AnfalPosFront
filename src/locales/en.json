@@ -380,7 +380,10 @@
     "bankAccountId": "bank Account Id",
     "bankName": "bank Name",
     "bankCode": "bank Code",
-    "bankAccountNo": "bank Account"
+    "bankAccountNo": "bank Account",
+    "additionalfields": "additional fields",
+    "EnablePriceChange": "Enable Price Change",
+    "disablePriceChange": "Disable Price Change"
   },
   "items": {
     "title": "items",

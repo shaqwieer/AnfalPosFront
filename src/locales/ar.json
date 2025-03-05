@@ -373,7 +373,10 @@
     "bankAccountId": "معرف الحساب المصرفي",
     "bankName": "اسم البنك",
     "bankCode": "رمز البنك",
-    "bankAccountNo": "حساب مصرفي"
+    "bankAccountNo": "حساب مصرفي",
+    "additionalfields": "حقول إضافية",
+    "EnablePriceChange ": "تمكين تغيير السعر",
+    "disablePriceChange": "تعطيل تغيير السعر"
   },
   "items": {
     "title": "الاصناف",

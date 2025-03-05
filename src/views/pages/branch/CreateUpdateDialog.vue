@@ -58,13 +58,13 @@ const branchSchema = yup.object({
   sapStorageLocation: yup.mixed().nullable(),
   cashCustomer: yup.mixed().nullable(),
   profitCenter: yup.mixed().nullable(),
-  cashJournal: yup.mixed().nullable(),
   cajoNumber: yup.mixed().nullable(),
   bankAccountId: yup.mixed().nullable(),
   bankName: yup.mixed().nullable(),
   bankCode: yup.mixed().nullable(),
   bankAccountNo: yup.mixed().nullable(),
   customerCodeId: yup.mixed().nullable(),
+  EnablePriceChange: yup.mixed().nullable(),
 
   bankAccounts: yup.mixed().nullable()
 });
@@ -83,7 +83,6 @@ const informationInitial = ref({
   sapStorageLocation: '',
   cashCustomer: null,
   profitCenter: null,
-  cashJournal: null,
   cajoNumber: '',
   bankAccountId: '',
   bankAccounts: '',
@@ -94,6 +93,7 @@ const informationInitial = ref({
   bankPosFirst: null,
   bankPosSecond: null,
   customerCodeId: null,
+  EnablePriceChange: null,
 
   bankPosThird: null
 });
@@ -116,6 +116,7 @@ const [email, emailAttrs] = defineField('email');
 const [address, addressAttrs] = defineField('address');
 const [primaryPhone, primaryPhoneAttrs] = defineField('primaryPhone');
 const [secondaryPhone, secondaryPhoneAttrs] = defineField('secondaryPhone');
+const [EnablePriceChange, EnablePriceChangeAttrs] = defineField('EnablePriceChange');
 
 const [city, cityAttrs] = defineField('city');
 const [branchType, branchTypeAttrs] = defineField('branchType');
@@ -125,7 +126,6 @@ const [salesRepCode, salesRepCodeAttrs] = defineField('salesRepCode');
 const [sapStorageLocation, sapStorageLocationAttrs] = defineField('sapStorageLocation');
 const [cashCustomer, cashCustomerAttrs] = defineField('cashCustomer');
 const [profitCenter, profitCenterAttrs] = defineField('profitCenter');
-const [cashJournal, cashJournalAttrs] = defineField('cashJournal');
 const [cajoNumber, cajoNumberAttrs] = defineField('cajoNumber');
 const [bankAccountId, bankAccountIdAttrs] = defineField('bankAccountId');
 const [bankName, bankNameAttrs] = defineField('bankName');
@@ -148,6 +148,7 @@ const createData = handleSubmit(async (validatedInfo) => {
     primaryPhone: validatedInfo.primaryPhone,
     OrganizationId: validatedInfo.organizationId || 1, // Provide default value if not present
     bankAccountId: validatedInfo.bankAccounts || null,
+    EnablePriceChange: validatedInfo.EnablePriceChange || null,
 
     bankName: validatedInfo.bankName || null,
     bankCode: validatedInfo.bankCode || null,
@@ -185,6 +186,7 @@ const updateData = handleSubmit(async (validatedInfo) => {
     OrganizationId: validatedInfo.organizationId || 1, // Provide default value if not present
     bankAccounts: validatedInfo.bankAccounts || null,
     customerCodeId: validatedInfo.customerCodeId || null,
+    EnablePriceChange: validatedInfo.EnablePriceChange || null,
 
     bankName: validatedInfo.bankName || null,
     bankCode: validatedInfo.bankCode || null,
@@ -222,14 +224,14 @@ const setFormValues = () => {
     sapStorageLocation: props.selectedData.sapStorageLocation,
     cashCustomer: props.selectedData.cashCustomer,
     profitCenter: props.selectedData.profitCenter,
-    bankAccounts: props.selectedData.bankAccountId,
+    bankAccounts: props.selectedData.bankAccounts,
+    EnablePriceChange: props.selectedData.EnablePriceChange,
 
     bankPosFirst: props.selectedData.bankPosFirst,
     bankPosSecond: props.selectedData.bankPosSecond,
     bankPosThird: props.selectedData.bankPosThird,
     customerCodeId: props.selectedData.customerCodeId,
 
-    cashJournal: props.selectedData.cashJournal,
     cajoNumber: props.selectedData.cajoNumber,
     bankAccountId: props.selectedData.bankAccountId,
     bankName: props.selectedData.bankName,
@@ -271,6 +273,12 @@ onMounted(async () => {
     handleError(err, mainStore.loading);
   }
 });
+import TriStateCheckbox from 'primevue/tristatecheckbox';
+
+const toggleCheckbox = () => {
+  EnablePriceChange.value = EnablePriceChange.value === true ? false : true;
+  console.log(EnablePriceChange.value)
+};
 </script>
 
 <template>
@@ -291,53 +299,11 @@ onMounted(async () => {
           </div>
         </div>
       </div>
-      <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
-        <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.sapInformation') }}</h3>
 
-        <div class="flex gap-2">
-          <div class="field flex flex-column w-4">
-            <label for="cajoNumber" class="mb-3">{{ $t('branchDialog.cajoNumber') }}</label>
-
-            <InputText id="cajoNumber" v-model="cajoNumber" v-bind="cajoNumberAttrs" :invalid="!!errors.cajoNumber" />
-
-            <small v-if="errors.cajoNumber" class="text-red-600">{{ errors.cajoNumber }}</small>
-          </div>
-
-          <div class="field flex flex-column w-4">
-            <label for="bankAccountId" class="mb-3">{{ $t('branchDialog.bankAccountId') }}</label>
-
-            <InputText id="bankAccountId" v-model="bankAccountId" v-bind="bankAccountIdAttrs" :invalid="!!errors.bankAccountId" />
-
-            <small v-if="errors.bankAccountId" class="text-red-600">{{ errors.bankAccountId }}</small>
-          </div>
-
-          <div class="field flex flex-column w-4">
-            <label for="bankName" class="mb-3">{{ $t('branchDialog.bankName') }}</label>
-            <InputText id="bankName" v-model="bankName" v-bind="bankNameAttrs" :invalid="!!errors.bankName" />
-            <small v-if="errors.bankName" class="text-red-600">{{ errors.bankName }}</small>
-          </div>
-        </div>
-
-        <div class="flex gap-2">
-          <div class="field flex flex-column w-6">
-            <label for="bankCode" class="mb-3">{{ $t('branchDialog.bankCode') }}</label>
-
-            <InputText id="bankCode" v-model="bankCode" v-bind="bankCodeAttrs" :invalid="!!errors.bankCode" />
-
-            <small v-if="errors.bankCode" class="text-red-600">{{ errors.bankCode }}</small>
-          </div>
-
-          <div class="field flex flex-column w-6">
-            <label for="bankAccountNo" class="mb-3">{{ $t('branchDialog.bankAccountNo') }}</label>
-            <InputText id="bankAccountNo" v-model="bankAccountNo" v-bind="bankAccountNoAttrs" autofocus :invalid="!!errors.bankAccountNo" />
-            <small v-if="errors.bankAccountNo" class="text-red-600">{{ errors.bankAccountNo }}</small>
-          </div>
-        </div>
-      </div>
       <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
         <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.sapInformation') }}</h3>
         <div class="flex gap-2">
-          <div class="field flex flex-column w-4">
+          <div class="field flex flex-column w-6">
             <label for="organizationType" class="mb-3">{{ $t('branchDialog.sapStorageLocation') }}</label>
 
             <InputText id="organizationType" v-model="sapStorageLocation" v-bind="sapStorageLocationAttrs" :invalid="!!errors.sapStorageLocation" />
@@ -345,15 +311,7 @@ onMounted(async () => {
             <small v-if="errors.sapStorageLocation" class="text-red-600">{{ errors.sapStorageLocation }}</small>
           </div>
 
-          <div class="field flex flex-column w-4">
-            <label for="cashJournal" class="mb-3">{{ $t('branchDialog.cashJournal') }}</label>
-
-            <InputText id="cashJournal" v-model="cashJournal" v-bind="cashJournalAttrs" :invalid="!!errors.cashJournal" />
-
-            <small v-if="errors.cashJournal" class="text-red-600">{{ errors.cashJournal }}</small>
-          </div>
-
-          <div class="field flex flex-column w-4">
+          <div class="field flex flex-column w-6">
             <label for="profitCenter" class="mb-3">{{ $t('branchDialog.profitCenter') }}</label>
             <InputText id="profitCenter" v-model="profitCenter" v-bind="profitCenterAttrs" :invalid="!!errors.profitCenter" />
             <small v-if="errors.profitCenter" class="text-red-600">{{ errors.profitCenter }}</small>
@@ -424,6 +382,73 @@ onMounted(async () => {
             <label for="bankPosThird" class="mb-3">Bank POS3</label>
             <InputText id="bankPosThird" v-model="bankPosThird" v-bind="bankPosThirdAttrs" :invalid="!!errors.bankPosThird" />
             <small v-if="errors.bankPosThird" class="text-red-600">{{ errors.bankPosThird }}</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
+        <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.additionalfields') }}</h3>
+
+        <div class="flex gap-2">
+          <div class="field flex flex-column w-4">
+            <label for="cajoNumber" class="mb-3">{{ $t('branchDialog.cajoNumber') }}</label>
+
+            <InputText id="cajoNumber" v-model="cajoNumber" v-bind="cajoNumberAttrs" :invalid="!!errors.cajoNumber" />
+
+            <small v-if="errors.cajoNumber" class="text-red-600">{{ errors.cajoNumber }}</small>
+          </div>
+
+          <div class="field flex flex-column w-4">
+            <label for="bankAccountId" class="mb-3">{{ $t('branchDialog.bankAccountId') }}</label>
+
+            <InputText id="bankAccountId" v-model="bankAccountId" v-bind="bankAccountIdAttrs" :invalid="!!errors.bankAccountId" />
+
+            <small v-if="errors.bankAccountId" class="text-red-600">{{ errors.bankAccountId }}</small>
+          </div>
+
+          <div class="field flex flex-column w-4">
+            <label for="bankName" class="mb-3">{{ $t('branchDialog.bankName') }}</label>
+            <InputText id="bankName" v-model="bankName" v-bind="bankNameAttrs" :invalid="!!errors.bankName" />
+            <small v-if="errors.bankName" class="text-red-600">{{ errors.bankName }}</small>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <div class="field flex flex-column w-4">
+            <label for="bankCode" class="mb-3">{{ $t('branchDialog.bankCode') }}</label>
+
+            <InputText id="bankCode" v-model="bankCode" v-bind="bankCodeAttrs" :invalid="!!errors.bankCode" />
+
+            <small v-if="errors.bankCode" class="text-red-600">{{ errors.bankCode }}</small>
+          </div>
+
+          <div class="field flex flex-column w-4">
+            <label for="bankAccountNo" class="mb-3">{{ $t('branchDialog.bankAccountNo') }}</label>
+            <InputText id="bankAccountNo" v-model="bankAccountNo" v-bind="bankAccountNoAttrs" autofocus :invalid="!!errors.bankAccountNo" />
+            <small v-if="errors.bankAccountNo" class="text-red-600">{{ errors.bankAccountNo }}</small>
+          </div>
+
+          <div class="field flex flex-column justify-content-center w-4">
+            <!-- <InputText id="bankAccountNo" v-model="bankAccountNo" v-bind="bankAccountNoAttrs" autofocus :invalid="!!errors.bankAccountNo" /> -->
+
+            <div  class="flex justify-content-center align-content-center w-full gap-2" style="margin-top: 30px">
+              <!-- <label for="EnablePriceChange" class="">{{ $t('branchDialog.EnablePriceChange') }}</label> -->
+              <!-- <input style="width: 15px; margin: 0px; margin-right: 5px;" type="checkbox" @click.stop id="EnablePriceChange" v-model="EnablePriceChange" v-bind="EnablePriceChangeAttrs" :invalid="!!errors.EnablePriceChange" /> -->
+              <!-- <TriStateCheckbox  /> -->
+
+              <Button
+                :label="EnablePriceChange ? `${$t('branchDialog.EnablePriceChange')}` : `${t('branchDialog.disablePriceChange')}`"
+                @click="toggleCheckbox" 
+                
+                :severity="EnablePriceChange ? 'success' : 'danger'"
+                :class="EnablePriceChange ? 'bg-white border-green-500 text-green ' : '   bg-white border-red-500 text-red-500'"
+                class=" p-2 w-full shadow-none"
+                style="height: 40px;"
+                outlined
+              />
+            </div>
+
+            <small v-if="errors.EnablePriceChange" class="text-red-600">{{ errors.EnablePriceChange }}</small>
           </div>
         </div>
       </div>
