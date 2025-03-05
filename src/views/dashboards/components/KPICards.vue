@@ -191,8 +191,9 @@ const totalSalesReps = defineModel();
             <p class="text-md text-500 m-0">{{ t('dashboard.AgingBuckets') }}</p>
           </div>
         </div>
-        <div class="text-2xl font-bold text-900">{{ totalSalesReps ? totalSalesReps : 5 }} {{ t('dashboard.Rep') }}</div>
-        <div class="text-lg text-500">50 {{ t('dashboard.Cst') }}. {{ formatPrice(dataSummary.overdueSummary?.amount) }}</div>
+        <div class="text-2xl font-bold text-900">{{ dataSummary.overdueSummary?.totalSalesRepCount }} {{ t('dashboard.Rep') }}</div>
+        <div class="text-lg text-500">{{ dataSummary.overdueSummary?.totalCustomer }} {{ t('dashboard.Customers') }}</div>
+        <div class="text-lg text-500">{{ formatPrice(dataSummary.overdueSummary?.amount) }}</div>
       </div>
     </div>
 

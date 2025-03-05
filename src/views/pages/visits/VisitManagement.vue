@@ -382,15 +382,6 @@ const props = defineProps({
               <div class="flex text-lg">{{ slotProps.data.customerName }}</div>
             </template>
           </Column>
-          <Column field="location" class="" :sortable="true">
-            <template #header>
-              <span class="text-lg font-bold"> {{ t('Visit.Location') }}</span>
-            </template>
-
-            <template #body="slotProps">
-              <div class="flex text-lg">{{ slotProps.data.customerName }}</div>
-            </template>
-          </Column>
           <Column field="visitDate" class="">
             <template #header>
               <span class="text-lg font-bold"> {{ t('Visit.VisitDate') }} </span>
