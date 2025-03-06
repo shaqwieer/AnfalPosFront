@@ -96,7 +96,7 @@ const totalSalesReps = defineModel();
           <div class="surface-200 border-round w-full" style="height: 8px">
             <div class="bg-green-500 h-2 border-round" style="height: 8px" :style="{ width: `${Math.min(dataSummary.salesSummary?.percantage * 100, 100)}%` }"></div>
           </div>
-          <div class="text-md text-500 text-right">{{ dataSummary.salesSummary?.percantage  }}% {{ t('dashboard.of_target') }}</div>
+          <div class="text-md text-500 text-right">{{ dataSummary.salesSummary?.percantage }}% {{ t('dashboard.of_target') }}</div>
         </div>
       </div>
     </div>
@@ -130,6 +130,10 @@ const totalSalesReps = defineModel();
             <span class="text-md text-500"> {{ t('dashboard.Bank') }}</span>
             <span class="font-medium">{{ formatPrice(dataSummary.collectionsSummary?.bank) }}</span>
           </div>
+        </div>
+        <div class="flex align-items-center justify-content-between mt-2 pt-2 border-top-1 border-gray-200">
+          <span>{{ t('dashboard.Total') }}: </span>
+          <div class="text-md text-500 font-bold text-blue-600">{{ formatPrice(dataSummary.collectionsSummary?.bank + dataSummary.collectionsSummary?.cash + dataSummary.collectionsSummary?.visa) }}</div>
         </div>
       </div>
     </div>
@@ -187,8 +191,9 @@ const totalSalesReps = defineModel();
             <p class="text-md text-500 m-0">{{ t('dashboard.AgingBuckets') }}</p>
           </div>
         </div>
-        <div class="text-2xl font-bold text-900">{{ totalSalesReps ? totalSalesReps : 5 }} {{ t('dashboard.Rep') }}</div>
-        <div class="text-lg text-500">50 {{ t('dashboard.Cst') }}. {{ formatPrice(5000) }}</div>
+        <div class="text-2xl font-bold text-900">{{ dataSummary.overdueSummary?.totalSalesRepCount }} {{ t('dashboard.Rep') }}</div>
+        <div class="text-lg text-500">{{ dataSummary.overdueSummary?.totalCustomer }} {{ t('dashboard.Customers') }}</div>
+        <div class="text-lg text-500">{{ formatPrice(dataSummary.overdueSummary?.amount) }}</div>
       </div>
     </div>
 

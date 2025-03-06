@@ -25,6 +25,10 @@ const props = defineProps({
   selectedData: {
     required: false
   },
+  organizationConfigs: {
+    required: false
+  },
+
   createElement: {
     type: Function,
     required: false
@@ -51,20 +55,20 @@ const organizationConfigSchema = yup.object({
   customerDiscountFixedCode: yup.mixed().nullable(),
   customerDiscountPercentageCode: yup.mixed().nullable(),
   customerReturnOrderType: yup.mixed().nullable(),
-  RequestedBillingDocumentType: yup.mixed().nullable(),
+  requestedBillingDocumentType: yup.mixed().nullable(),
 
-  BillingDocumentType: yup.mixed().nullable(),
+  billingDocumentType: yup.mixed().nullable(),
 
-  ReferenceSDDocumentCategory: yup.mixed().nullable(),
+  referenceSDDocumentCategory: yup.mixed().nullable(),
 
-  SalesDistrict: yup.mixed().nullable(),
+  salesDistrict: yup.mixed().nullable(),
 
-  ReconciliationAccount: yup.mixed().nullable(),
+  reconciliationAccount: yup.mixed().nullable(),
 
-  PaymentTerms: yup.mixed().nullable(),
+  paymentTerms: yup.mixed().nullable(),
 
-  BusinessPartnerGrouping: yup.mixed().nullable(),
-  CustomerPriceGroup: yup.mixed().nullable(),
+  businessPartnerGrouping: yup.mixed().nullable(),
+  customerPriceGroup: yup.mixed().nullable(),
 
   DistributionChannel: yup.mixed().nullable(),
   IncotermsClassification: yup.mixed().nullable(),
@@ -87,21 +91,21 @@ const informationInitial = ref({
   customerDiscountFixedCode: '',
   customerDiscountPercentageCode: '',
   customerReturnOrderType: '',
-  RequestedBillingDocumentType: '',
+  requestedBillingDocumentType: '',
 
-  BillingDocumentType: '',
+  billingDocumentType: '',
 
-  ReferenceSDDocumentCategory: '',
+  referenceSDDocumentCategory: '',
 
-  SalesDistrict: '',
+  salesDistrict: '',
 
-  ReconciliationAccount: '',
+  reconciliationAccount: '',
 
-  PaymentTerms: '',
+  paymentTerms: '',
 
-  BusinessPartnerGrouping: '',
+  businessPartnerGrouping: '',
 
-  CustomerPriceGroup: '',
+  customerPriceGroup: '',
   DistributionChannel: '',
   IncotermsClassification: '',
   OrganizationDivision: '',
@@ -127,19 +131,19 @@ const [cashSalesOrderType, cashSalesOrderTypeAttrs] = defineField('cashSalesOrde
 const [customerDiscountFixedCode, customerDiscountFixedCodeAttrs] = defineField('customerDiscountFixedCode');
 const [customerDiscountPercentageCode, customerDiscountPercentageCodeAttrs] = defineField('customerDiscountPercentageCode');
 const [customerReturnOrderType, customerReturnOrderTypeAttrs] = defineField('customerReturnOrderType');
-const [RequestedBillingDocumentType, RequestedBillingDocumentTypeAttrs] = defineField('RequestedBillingDocumentType');
+const [requestedBillingDocumentType, requestedBillingDocumentTypeAttrs] = defineField('requestedBillingDocumentType');
 
-const [BillingDocumentType, BillingDocumentTypeAttrs] = defineField('BillingDocumentType');
+const [billingDocumentType, billingDocumentTypeAttrs] = defineField('billingDocumentType');
 
-const [ReferenceSDDocumentCategory, ReferenceSDDocumentCategoryAttrs] = defineField('ReferenceSDDocumentCategory');
+const [referenceSDDocumentCategory, referenceSDDocumentCategoryAttrs] = defineField('referenceSDDocumentCategory');
 
-const [SalesDistrict, SalesDistrictAttrs] = defineField('SalesDistrict');
+const [salesDistrict, salesDistrictAttrs] = defineField('salesDistrict');
 
-const [ReconciliationAccount, ReconciliationAccountAttrs] = defineField('ReconciliationAccount');
+const [reconciliationAccount, reconciliationAccountAttrs] = defineField('reconciliationAccount');
 
-const [PaymentTerms, PaymentTermsAttrs] = defineField('PaymentTerms');
-const [BusinessPartnerGrouping, BusinessPartnerGroupingAttrs] = defineField('BusinessPartnerGrouping');
-const [CustomerPriceGroup, CustomerPriceGroupAttrs] = defineField('CustomerPriceGroup');
+const [paymentTerms, paymentTermsAttrs] = defineField('paymentTerms');
+const [businessPartnerGrouping, businessPartnerGroupingAttrs] = defineField('businessPartnerGrouping');
+const [customerPriceGroup, customerPriceGroupAttrs] = defineField('customerPriceGroup');
 const [DistributionChannel, DistributionChannelAttrs] = defineField('DistributionChannel');
 const [IncotermsClassification, IncotermsClassificationAttrs] = defineField('IncotermsClassification');
 const [OrganizationDivision, OrganizationDivisionAttrs] = defineField('OrganizationDivision');
@@ -163,20 +167,20 @@ const setFormValues = () => {
     customerDiscountFixedCode: config.customerDiscountFixedCode,
     customerDiscountPercentageCode: config.customerDiscountPercentageCode,
     customerReturnOrderType: config.customerReturnOrderType,
-    RequestedBillingDocumentType: config.RequestedBillingDocumentType,
+    requestedBillingDocumentType: config.requestedBillingDocumentType,
 
-    BillingDocumentType: config.BillingDocumentType,
+    billingDocumentType: config.billingDocumentType,
 
-    ReferenceSDDocumentCategory: config.ReferenceSDDocumentCategory,
-    SalesDistrict: config.SalesDistrict,
+    referenceSDDocumentCategory: config.referenceSDDocumentCategory,
+    salesDistrict: config.salesDistrict,
 
-    ReconciliationAccount: config.ReconciliationAccount,
+    reconciliationAccount: config.reconciliationAccount,
 
-    PaymentTerms: config.PaymentTerms,
+    paymentTerms: config.paymentTerms,
 
-    BusinessPartnerGrouping: config.BusinessPartnerGrouping,
+    businessPartnerGrouping: config.businessPartnerGrouping,
 
-    CustomerPriceGroup: config.CustomerPriceGroup,
+    customerPriceGroup: config.customerPriceGroup,
     DistributionChannel: config.distributionChannel,
 
     IncotermsClassification: config.incotermsClassification,
@@ -214,20 +218,20 @@ const updateData = handleSubmit(async (validatedInfo) => {
   formData.append('customerDiscountFixedCode', validatedInfo.customerDiscountFixedCode);
   formData.append('customerDiscountPercentageCode', validatedInfo.customerDiscountPercentageCode);
   formData.append('customerReturnOrderType', validatedInfo.customerReturnOrderType);
-  formData.append('RequestedBillingDocumentType', validatedInfo.RequestedBillingDocumentType);
+  formData.append('requestedBillingDocumentType', validatedInfo.requestedBillingDocumentType);
 
-  formData.append('BillingDocumentType', validatedInfo.BillingDocumentType);
+  formData.append('billingDocumentType', validatedInfo.billingDocumentType);
 
-  formData.append('ReferenceSDDocumentCategory', validatedInfo.ReferenceSDDocumentCategory);
+  formData.append('referenceSDDocumentCategory', validatedInfo.referenceSDDocumentCategory);
 
-  formData.append('SalesDistrict', validatedInfo.SalesDistrict);
+  formData.append('salesDistrict', validatedInfo.salesDistrict);
 
-  formData.append('ReconciliationAccount', validatedInfo.ReconciliationAccount);
+  formData.append('reconciliationAccount', validatedInfo.reconciliationAccount);
 
-  formData.append('PaymentTerms', validatedInfo.PaymentTerms);
-  formData.append('BusinessPartnerGrouping', validatedInfo.BusinessPartnerGrouping);
+  formData.append('paymentTerms', validatedInfo.paymentTerms);
+  formData.append('businessPartnerGrouping', validatedInfo.businessPartnerGrouping);
 
-  formData.append('CustomerPriceGroup', validatedInfo.CustomerPriceGroup);
+  formData.append('customerPriceGroup', validatedInfo.customerPriceGroup);
 
   formData.append('DistributionChannel', validatedInfo.DistributionChannel);
   formData.append('IncotermsClassification', validatedInfo.IncotermsClassification);
@@ -250,10 +254,11 @@ onMounted(async () => {
 });
 </script>
 <template>
+  {{ props.selectedData.id }}
+
   <div class="flex flex-column gap-4 p-4">
     <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
       <h3 data-v-2f754343="" class="text-primary-600 text-base font-semibold">{{ $t('organizationConfig.OrganizationalStructure') }}</h3>
-
       <div class="flex gap-2 flex-wrap flex-column">
         <div class="flex gap-2">
           <div class="field flex flex-column w-6">
@@ -399,65 +404,64 @@ onMounted(async () => {
         </div>
       </div>
     </div>
-
+    <!-- {{ organizationConfigs }} -->
     <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
       <h3 data-v-2f754343="" class="text-primary-600 text-base font-semibold">{{ $t('organizationConfig.Additionalfields') }}</h3>
 
       <div class="flex gap-2 flex-wrap flex-column">
         <div class="flex gap-2">
           <div class="field flex flex-column w-6">
-            <label for="CustomerPriceGroup" class="required">{{ $t('organizationConfig.CustomerPriceGroup') }}</label>
-            <InputText id="CustomerPriceGroup" v-model="CustomerPriceGroup" v-bind="CustomerPriceGroupAttrs" autofocus :invalid="!!errors.CustomerPriceGroup" />
-            <small v-if="errors.CustomerPriceGroup" class="text-red-600">{{ errors.CustomerPriceGroup }}</small>
+            <label for="customerPriceGroup" class="required">{{ $t('organizationConfig.customerPriceGroup') }}</label>
+            <InputText id="customerPriceGroup" v-model="customerPriceGroup" v-bind="customerPriceGroupAttrs" autofocus :invalid="!!errors.customerPriceGroup" />
+            <small v-if="errors.customerPriceGroup" class="text-red-600">{{ errors.customerPriceGroup }}</small>
           </div>
 
           <div class="field flex flex-column w-6">
-            <label for="BusinessPartnerGrouping" class="required">{{ $t('organizationConfig.BusinessPartnerGrouping') }}</label>
-            <InputText id="BusinessPartnerGrouping" v-model="BusinessPartnerGrouping" v-bind="BusinessPartnerGroupingAttrs" autofocus :invalid="!!errors.BusinessPartnerGrouping" />
-            <small v-if="errors.BusinessPartnerGrouping" class="text-red-600">{{ errors.BusinessPartnerGrouping }}</small>
-          </div>
-        </div>
-
-        <div class="flex gap-2">
-          <div class="field flex flex-column w-6">
-            <label for="PaymentTerms" class="required">{{ $t('organizationConfig.PaymentTerms') }}</label>
-            <InputText id="PaymentTerms" v-model="PaymentTerms" v-bind="PaymentTermsAttrs" autofocus :invalid="!!errors.PaymentTerms" />
-            <small v-if="errors.PaymentTerms" class="text-red-600">{{ errors.PaymentTerms }}</small>
-          </div>
-
-          <div class="field flex flex-column w-6">
-            <label for="ReconciliationAccount" class="required">{{ $t('organizationConfig.ReconciliationAccount') }}</label>
-            <InputText id="ReconciliationAccount" v-model="ReconciliationAccount" v-bind="ReconciliationAccountAttrs" autofocus :invalid="!!errors.ReconciliationAccount" />
-            <small v-if="errors.ReconciliationAccount" class="text-red-600">{{ errors.ReconciliationAccount }}</small>
+            <label for="businessPartnerGrouping" class="required">{{ $t('organizationConfig.businessPartnerGrouping') }}</label>
+            <InputText id="businessPartnerGrouping" v-model="businessPartnerGrouping" v-bind="businessPartnerGroupingAttrs" autofocus :invalid="!!errors.businessPartnerGrouping" />
+            <small v-if="errors.businessPartnerGrouping" class="text-red-600">{{ errors.businessPartnerGrouping }}</small>
           </div>
         </div>
 
         <div class="flex gap-2">
           <div class="field flex flex-column w-6">
-            <label for="SalesDistrict" class="required">{{ $t('organizationConfig.SalesDistrict') }}</label>
-            <InputText id="SalesDistrict" v-model="SalesDistrict" v-bind="SalesDistrictAttrs" autofocus :invalid="!!errors.SalesDistrict" />
-            <small v-if="errors.SalesDistrict" class="text-red-600">{{ errors.SalesDistrict }}</small>
+            <label for="paymentTerms" class="required">{{ $t('organizationConfig.paymentTerms') }}</label>
+            <InputText id="paymentTerms" v-model="paymentTerms" v-bind="paymentTermsAttrs" autofocus :invalid="!!errors.paymentTerms" />
+            <small v-if="errors.paymentTerms" class="text-red-600">{{ errors.paymentTerms }}</small>
           </div>
 
           <div class="field flex flex-column w-6">
-            <label for="ReferenceSDDocumentCategory" class="required">{{ $t('organizationConfig.ReferenceSDDocumentCategory') }}</label>
-            <InputText id="ReferenceSDDocumentCategory" v-model="ReferenceSDDocumentCategory" v-bind="ReferenceSDDocumentCategoryAttrs" autofocus :invalid="!!errors.ReferenceSDDocumentCategory" />
-            <small v-if="errors.ReferenceSDDocumentCategory" class="text-red-600">{{ errors.ReferenceSDDocumentCategory }}</small>
+            <label for="reconciliationAccount" class="required">{{ $t('organizationConfig.reconciliationAccount') }}</label>
+            <InputText id="reconciliationAccount" v-model="reconciliationAccount" v-bind="reconciliationAccountAttrs" autofocus :invalid="!!errors.reconciliationAccount" />
+            <small v-if="errors.reconciliationAccount" class="text-red-600">{{ errors.reconciliationAccount }}</small>
           </div>
         </div>
 
         <div class="flex gap-2">
           <div class="field flex flex-column w-6">
-            <label for="BillingDocumentType" class="required">{{ $t('organizationConfig.BillingDocumentType') }}</label>
-            <InputText id="BillingDocumentType" v-model="BillingDocumentType" v-bind="BillingDocumentTypeAttrs" autofocus :invalid="!!errors.BillingDocumentType" />
-            <small v-if="errors.BillingDocumentType" class="text-red-600">{{ errors.BillingDocumentType }}</small>
+            <label for="salesDistrict" class="required">{{ $t('organizationConfig.salesDistrict') }}</label>
+            <InputText id="salesDistrict" v-model="salesDistrict" v-bind="salesDistrictAttrs" autofocus :invalid="!!errors.salesDistrict" />
+            <small v-if="errors.salesDistrict" class="text-red-600">{{ errors.salesDistrict }}</small>
           </div>
 
           <div class="field flex flex-column w-6">
-            {{ RequestedBillingDocumentType }}
-            <label for="RequestedBillingDocumentType" class="required">{{ $t('organizationConfig.RequestedBillingDocumentType') }}</label>
-            <InputText id="RequestedBillingDocumentType" v-model="RequestedBillingDocumentType" v-bind="RequestedBillingDocumentTypeAttrs" autofocus :invalid="!!errors.RequestedBillingDocumentType" />
-            <small v-if="errors.RequestedBillingDocumentType" class="text-red-600">{{ errors.RequestedBillingDocumentType }}</small>
+            <label for="referenceSDDocumentCategory" class="required">{{ $t('organizationConfig.referenceSDDocumentCategory') }}</label>
+            <InputText id="referenceSDDocumentCategory" v-model="referenceSDDocumentCategory" v-bind="referenceSDDocumentCategoryAttrs" autofocus :invalid="!!errors.referenceSDDocumentCategory" />
+            <small v-if="errors.referenceSDDocumentCategory" class="text-red-600">{{ errors.referenceSDDocumentCategory }}</small>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <div class="field flex flex-column w-6">
+            <label for="billingDocumentType" class="required">{{ $t('organizationConfig.billingDocumentType') }}</label>
+            <InputText id="billingDocumentType" v-model="billingDocumentType" v-bind="billingDocumentTypeAttrs" autofocus :invalid="!!errors.billingDocumentType" />
+            <small v-if="errors.billingDocumentType" class="text-red-600">{{ errors.billingDocumentType }}</small>
+          </div>
+
+          <div class="field flex flex-column w-6">
+            <label for="requestedBillingDocumentType" class="required">{{ $t('organizationConfig.requestedBillingDocumentType') }}</label>
+            <InputText id="requestedBillingDocumentType" v-model="requestedBillingDocumentType" v-bind="requestedBillingDocumentTypeAttrs" autofocus :invalid="!!errors.requestedBillingDocumentType" />
+            <small v-if="errors.requestedBillingDocumentType" class="text-red-600">{{ errors.requestedBillingDocumentType }}</small>
           </div>
         </div>
       </div>

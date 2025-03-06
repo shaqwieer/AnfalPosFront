@@ -227,7 +227,11 @@
     "confirmPassword": "Confirm Password",
     "prefix": "prefix",
     "from": "from",
-    "to": "to"
+    "to": "to",
+    "ID": "ID",
+    "Code": "Code",
+    "Description": "Description",
+    "Days": "Days"
   },
   "status": {
     "active": "Active",
@@ -371,7 +375,15 @@
     "email": "Email",
     "primaryPhone": "Primary Phone Number",
     "secondaryPhone": "Secondary Phone Number",
-    "customerCode": "Customer Code"
+    "customerCode": "Customer Code",
+    "cajoNumber": "cajo Number",
+    "bankAccountId": "bank Account Id",
+    "bankName": "bank Name",
+    "bankCode": "bank Code",
+    "bankAccountNo": "bank Account",
+    "additionalfields": "additional fields",
+    "EnablePriceChange": "Enable Price Change",
+    "disablePriceChange": "Disable Price Change"
   },
   "items": {
     "title": "items",
@@ -584,6 +596,7 @@
     "AvgDuration": "Avg Duration",
     "ConversionRate": "Conversion Rate",
     "OverdueAnalysisbySalesRep": "Overdue Analysis by Sales Rep",
+    "0-30Days": "0-30 Days",
     "30-60Days": "30-60 Days",
     "invoices": "invoices",
     "60-90Days": "60-90 Days",
@@ -658,6 +671,9 @@
     "empty": "No Visits Found",
     "SalesRep": "Sales Rep",
     "VisitDate": "Visit Date",
+    "Location": "Location",
+    "Reason": "Reason",
+    "NextTrip": "Next Trip",
     "CashAmount": "Cash Amount",
     "Start": "Visit Start",
     "Close": "Visit Close",
@@ -686,5 +702,6 @@
   "Status": "Status",
   "Warning": "Warning",
   "AddBranch": "Add Branch",
-  "customerCode": "Customer Code"
+  "customerCode": "Customer Code",
+  "paymentTerm": "payment Term"
 }

@@ -188,7 +188,11 @@
     "uploadAudio": "رفع صوت",
     "prefix": "بادئة",
     "from": "من",
-    "to": "إلى"
+    "to": "إلى",
+    "ID": "المعرف",
+    "Code": "الرمز",
+    "Description": "وصف",
+    "Days": "أيام"
   },
   "label": {
     "search": "بحث"
@@ -364,7 +368,15 @@
     "email": "الايميل",
     "primaryPhone": "رقم الموبايل الاساسى",
     "secondaryPhone": "رقم الموبايل الثانوى",
-    "customerCode": "رمز العميل"
+    "customerCode": "رمز العميل",
+    "cajoNumber": "رقم Cajo",
+    "bankAccountId": "معرف الحساب المصرفي",
+    "bankName": "اسم البنك",
+    "bankCode": "رمز البنك",
+    "bankAccountNo": "حساب مصرفي",
+    "additionalfields": "حقول إضافية",
+    "EnablePriceChange ": "تمكين تغيير السعر",
+    "disablePriceChange": "تعطيل تغيير السعر"
   },
   "items": {
     "title": "الاصناف",
@@ -646,6 +658,9 @@
     "empty": "لم يتم العثور على زيارات",
     "SalesRep": "مندوب المبيعات",
     "VisitDate": "تاريخ الزيارة",
+    "Location": "الموقع",
+    "Reason": "السبب",
+    "NextTrip": "الزيارة التالية",
     "CashAmount": "مبلغ نقدي",
     "Start": "بدء الزيارة",
     "Close": "زيارة إغلاق",
@@ -673,5 +688,6 @@
   "Sessions": "جلسات",
   "Status": "حالة",
   "Warning": "تحذير",
-  "customerCode": "رمز العميل"
+  "customerCode": "رمز العميل",
+  "paymentTerm": "مدة الدفع"
 }

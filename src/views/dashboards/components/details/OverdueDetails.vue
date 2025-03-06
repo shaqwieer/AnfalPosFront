@@ -10,6 +10,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 const props = defineProps<{
   data: any;
+  cards: any;
   viewMode: 'chart' | 'table';
 }>();
 
@@ -65,33 +66,40 @@ const overdueData = ref([
 // Chart data
 const chartData = computed(() => {
   const salesRepData = {};
-  overdueData.value.forEach((item) => {
-    if (!salesRepData[item.salesRep]) {
-      salesRepData[item.salesRep] = {
-        '30-60': 0,
-        '60-90': 0,
-        '90+': 0
+  props.data.overdueSalesDashboardDtos?.forEach((item) => {
+    if (!salesRepData[item.name]) {
+      salesRepData[item.name] = {
+        '0-30 Days': 0,
+        '30-60 Days': 0,
+        '60-90 Days': 0,
+        '90+ Days': 0
       };
     }
-    salesRepData[item.salesRep][item.category] += item.amount;
+    salesRepData[item.name][item.aging] += item.amount;
   });
+  console.log(salesRepData);
 
   return {
     labels: Object.keys(salesRepData),
     datasets: [
       {
+        label: t('dashboard.0-30Days'),
+        data: Object.values(salesRepData).map((data) => data['0-30 Days']),
+        backgroundColor: '#199e0b'
+      },
+      {
         label: t('dashboard.30-60Days'),
-        data: Object.values(salesRepData).map((data) => data['30-60']),
+        data: Object.values(salesRepData).map((data) => data['30-60 Days']),
         backgroundColor: '#f59e0b'
       },
       {
         label: t('dashboard.60-90Days'),
-        data: Object.values(salesRepData).map((data) => data['60-90']),
+        data: Object.values(salesRepData).map((data) => data['60-90 Days']),
         backgroundColor: '#f97316'
       },
       {
-        label: t('dashboard.90Days'),
-        data: Object.values(salesRepData).map((data) => data['90+']),
+        label: t('dashboard.90+Days'),
+        data: Object.values(salesRepData).map((data) => data['90+ Days']),
         backgroundColor: '#ef4444'
       }
     ]
@@ -159,11 +167,13 @@ const summary = computed(() => {
 
 const getAgingColor = (category: string) => {
   switch (category) {
-    case '30-60':
+    case '0-30 Days':
+      return 'bg-green-100 text-green-800';
+    case '30-60 Days':
       return 'bg-yellow-100 text-yellow-800';
-    case '60-90':
+    case '60-90 Days':
       return 'bg-orange-100 text-orange-800';
-    case '90+':
+    case '90+ Days':
       return 'bg-red-100 text-red-800';
     default:
       return 'bg-gray-100 text-gray-800';
@@ -175,7 +185,7 @@ const getAgingColor = (category: string) => {
   <div>
     <!-- Summary Cards -->
 
-    <div class="p-grid p-dir-col p-md-dir-row p-align-start p-justify-between">
+    <!-- <div class="p-grid p-dir-col p-md-dir-row p-align-start p-justify-between">
       <div class="p-col-12">
         <div class="bg-white border-round-lg shadow-sm border p-0">
           <div class="grid mb-6">
@@ -213,7 +223,7 @@ const getAgingColor = (category: string) => {
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <!-- Chart View -->
 
@@ -225,27 +235,21 @@ const getAgingColor = (category: string) => {
 
     <!-- Table View -->
     <div v-else class="bg-white border-1 border-gray-200 border-round-lg shadow-sm border overflow-hidden">
-      <DataTable :value="overdueData" :paginator="overdueData.length > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" class="">
+      <DataTable :value="data.overdueSalesDashboardDtos" :paginator="data.overdueSalesDashboardDtos.length > 10" :rows="5" :rowsPerPageOptions="[5, 10, 25]" class="">
         <template #empty>
           <div class="flex justify-content-center align-items-center font-bold text-lg">No Data Available</div>
         </template>
 
         <!-- Sales Rep Column -->
-        <Column field="salesRep" :header="t('dashboard.SalesRep')">
+        <Column field="name" :header="t('dashboard.SalesRep')">
           <template #body="slotProps">
             <div class="flex flex-column align-items-start">
-              <div class="font-semibold text-md">{{ slotProps.data.salesRep }}</div>
-            </div>
-          </template>
-
-          <template #footer="slotProps">
-            <div class="flex flex-column align-items-start">
-              <div class="font-semibold text-md">{{ t('dashboard.Total') }} ({{ summary.totalSalesReps }} {{ t('dashboard.SalesReps') }} )</div>
+              <div class="font-semibold text-md">{{ slotProps.data.name }}</div>
             </div>
           </template>
         </Column>
 
-        <Column field="customer">
+        <Column field="customerName">
           <template #header="slotProps">
             <div class="w-full">
               <span class="text-md flex justify-content-start font-normal"> {{ t('dashboard.customer') }} </span>
@@ -254,18 +258,12 @@ const getAgingColor = (category: string) => {
 
           <template #body="slotProps">
             <div class="flex flex-column align-items-start text-md">
-              {{ slotProps.data.customer }}
-            </div>
-          </template>
-
-          <template #footer="slotProps">
-            <div class="flex flex-column align-items-start">
-              <div class="font-semibold text-md">{{ summary.totalCustomers }} {{ t('dashboard.Customers') }}</div>
+              {{ slotProps.data.customerName }}
             </div>
           </template>
         </Column>
 
-        <Column field="invoice">
+        <Column field="invoiceNumber">
           <template #header="slotProps">
             <div class="w-full">
               <span class="text-md flex justify-content-start font-normal"> {{ t('dashboard.invoice') }}</span>
@@ -273,18 +271,18 @@ const getAgingColor = (category: string) => {
           </template>
           <template #body="slotProps">
             <div class="flex flex-column align-items-start text-md">
-              {{ slotProps.data.invoice }}
+              {{ slotProps.data.invoiceNumber }}
             </div>
           </template>
 
           <template #footer="slotProps">
             <div class="flex flex-column align-items-start">
-              <div class="font-semibold text-md">{{ summary.totalInvoices }} {{ t('dashboard.invoices') }}</div>
+              <div class="font-semibold text-md">{{ data.overdueAging[0].incoiceCount }} {{ t('dashboard.invoices') }}</div>
             </div>
           </template>
         </Column>
 
-        <Column field="date">
+        <Column field="invoiceDate">
           <template #header="slotProps">
             <div class="w-full">
               <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.date') }}</span>
@@ -292,7 +290,7 @@ const getAgingColor = (category: string) => {
           </template>
           <template #body="slotProps">
             <div class="flex flex-column align-items-center text-md">
-              {{ slotProps.data.date }}
+              {{ new Date(slotProps.data.invoiceDate).toLocaleDateString('en-GB') }}
             </div>
           </template>
         </Column>
@@ -311,7 +309,7 @@ const getAgingColor = (category: string) => {
 
           <template #footer="slotProps">
             <div class="flex flex-column align-items-center">
-              <div class="font-semibold text-md">{{ formatPrice(summary.totalOverdue) }}</div>
+              <div class="font-semibold text-md">{{ formatPrice(data.overdueAging[0].amount) }}</div>
             </div>
           </template>
         </Column>
@@ -337,7 +335,7 @@ const getAgingColor = (category: string) => {
           </template>
           <template #body="slotProps">
             <div class="flex flex-column align-items-center text-md">
-              <span class="px-2 py-1 text-xs border-round-xl" :class="getAgingColor(slotProps.data.category)"> {{ slotProps.data.category }} {{ t('dashboard.Days') }} </span>
+              <span class="px-2 py-1 text-xs border-round-xl" :class="getAgingColor(slotProps.data.aging)"> {{ slotProps.data.aging.split(' ')[0] }} {{ t('dashboard.Days') }} </span>
             </div>
           </template>
         </Column>

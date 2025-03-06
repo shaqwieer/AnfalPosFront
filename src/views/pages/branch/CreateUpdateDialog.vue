@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 import { useMainStore } from '@/stores/mainStore';
 import { useI18n } from 'vue-i18n';
 import { useForm } from 'vee-validate';
@@ -58,7 +58,14 @@ const branchSchema = yup.object({
   sapStorageLocation: yup.mixed().nullable(),
   cashCustomer: yup.mixed().nullable(),
   profitCenter: yup.mixed().nullable(),
-  cashJournal: yup.mixed().nullable(),
+  cajoNumber: yup.mixed().nullable(),
+  bankAccountId: yup.mixed().nullable(),
+  bankName: yup.mixed().nullable(),
+  bankCode: yup.mixed().nullable(),
+  bankAccountNo: yup.mixed().nullable(),
+  customerCodeId: yup.mixed().nullable(),
+  EnablePriceChange: yup.mixed().nullable(),
+
   bankAccounts: yup.mixed().nullable()
 });
 
@@ -76,11 +83,18 @@ const informationInitial = ref({
   sapStorageLocation: '',
   cashCustomer: null,
   profitCenter: null,
-  cashJournal: null,
+  cajoNumber: '',
+  bankAccountId: '',
   bankAccounts: '',
+  bankName: '',
+  bankCode: '',
+  bankAccountNo: '',
 
   bankPosFirst: null,
   bankPosSecond: null,
+  customerCodeId: null,
+  EnablePriceChange: null,
+
   bankPosThird: null
 });
 
@@ -102,6 +116,7 @@ const [email, emailAttrs] = defineField('email');
 const [address, addressAttrs] = defineField('address');
 const [primaryPhone, primaryPhoneAttrs] = defineField('primaryPhone');
 const [secondaryPhone, secondaryPhoneAttrs] = defineField('secondaryPhone');
+const [EnablePriceChange, EnablePriceChangeAttrs] = defineField('EnablePriceChange');
 
 const [city, cityAttrs] = defineField('city');
 const [branchType, branchTypeAttrs] = defineField('branchType');
@@ -111,7 +126,13 @@ const [salesRepCode, salesRepCodeAttrs] = defineField('salesRepCode');
 const [sapStorageLocation, sapStorageLocationAttrs] = defineField('sapStorageLocation');
 const [cashCustomer, cashCustomerAttrs] = defineField('cashCustomer');
 const [profitCenter, profitCenterAttrs] = defineField('profitCenter');
-const [cashJournal, cashJournalAttrs] = defineField('cashJournal');
+const [cajoNumber, cajoNumberAttrs] = defineField('cajoNumber');
+const [bankAccountId, bankAccountIdAttrs] = defineField('bankAccountId');
+const [bankName, bankNameAttrs] = defineField('bankName');
+const [bankCode, bankCodeAttrs] = defineField('bankCode');
+const [bankAccountNo, bankAccountNoAttrs] = defineField('bankAccountNo');
+const [customerCodeId, customerCodeIdAttrs] = defineField('customerCodeId');
+
 const [bankAccounts, bankAccountsAttrs] = defineField('bankAccounts');
 
 const [bankPosFirst, bankPosFirstAttrs] = defineField('bankPosFirst');
@@ -126,12 +147,16 @@ const createData = handleSubmit(async (validatedInfo) => {
     profitCenter: validatedInfo.profitCenter || null,
     primaryPhone: validatedInfo.primaryPhone,
     OrganizationId: validatedInfo.organizationId || 1, // Provide default value if not present
-    BankAccountId: validatedInfo.bankAccounts || null,
+    bankAccountId: validatedInfo.bankAccounts || null,
+    EnablePriceChange: validatedInfo.EnablePriceChange || null,
 
-    BankName: validatedInfo.bankName || null,
-    BankCode: validatedInfo.bankCode || null,
+    bankName: validatedInfo.bankName || null,
+    bankCode: validatedInfo.bankCode || null,
+    customerCodeId: validatedInfo.customerCodeId || null,
 
-    BankAccountNo: validatedInfo.bankAccounts || null,
+    bankAccountNo: validatedInfo.bankAccounts || null,
+    cajoNumber: validatedInfo.cajoNumber || null,
+    bankAccountId: validatedInfo.bankAccountId || null,
 
     bankPosFirst: validatedInfo.bankPosFirst || null,
     bankPosSecond: validatedInfo.bankPosSecond || null,
@@ -159,12 +184,16 @@ const updateData = handleSubmit(async (validatedInfo) => {
     profitCenter: validatedInfo.profitCenter || null,
     primaryPhone: validatedInfo.primaryPhone,
     OrganizationId: validatedInfo.organizationId , // Provide default value if not present
-    BankAccountId: validatedInfo.bankAccounts || null,
+    bankAccounts: validatedInfo.bankAccounts || null,
+    customerCodeId: validatedInfo.customerCodeId || null,
+    EnablePriceChange: validatedInfo.EnablePriceChange || null,
 
-    BankName: validatedInfo.bankName || null,
-    BankCode: validatedInfo.bankCode || null,
+    bankName: validatedInfo.bankName || null,
+    bankCode: validatedInfo.bankCode || null,
+    cajoNumber: validatedInfo.cajoNumber || null,
+    bankAccountId: validatedInfo.bankAccountId || null,
 
-    BankAccountNo: validatedInfo.bankAccounts || null,
+    bankAccountNo: validatedInfo.bankAccountNo || null,
 
     bankPosFirst: validatedInfo.bankPosFirst || null,
     bankPosSecond: validatedInfo.bankPosSecond || null,
@@ -195,13 +224,20 @@ const setFormValues = () => {
     sapStorageLocation: props.selectedData.sapStorageLocation,
     cashCustomer: props.selectedData.cashCustomer,
     profitCenter: props.selectedData.profitCenter,
-    bankAccounts: props.selectedData.bankAccountId,
+    bankAccounts: props.selectedData.bankAccounts,
+    EnablePriceChange: props.selectedData.EnablePriceChange,
 
     bankPosFirst: props.selectedData.bankPosFirst,
     bankPosSecond: props.selectedData.bankPosSecond,
     bankPosThird: props.selectedData.bankPosThird,
+    customerCodeId: props.selectedData.customerCodeId,
 
-    cashJournal: props.selectedData.cashJournal,
+    cajoNumber: props.selectedData.cajoNumber,
+    bankAccountId: props.selectedData.bankAccountId,
+    bankName: props.selectedData.bankName,
+    bankCode: props.selectedData.bankCode,
+    bankAccountNo: props.selectedData.bankAccountNo,
+
     country: countries.find((e) => e.id === props.selectedData.countryId),
     branchType: branchTypes.find((e) => e.id === props.selectedData.branchTypeId),
     city: cities.value.find((e) => e.id === props.selectedData.cityId)
@@ -224,11 +260,25 @@ watch(
   }
 );
 
-const customerCodes = ref([
-  { name: 'avs', prefix: 'as', from: 234, to: 234, id: 30, uniqueIdentifier: '84e366fd-b420-461f-a174-d70665cbd064', createdAt: '2025-02-27T12:56:19.744434Z' },
-  { name: 'ascasc', prefix: '23234', from: 234234, to: 234243, id: 31, uniqueIdentifier: 'dcc0fd49-2a81-4651-b967-ce322ee726e6', createdAt: '2025-02-27T12:56:28.42559Z' },
-  { name: 'المنطقة الغربية', prefix: 'WST', from: 100000, to: 199999, id: 1, uniqueIdentifier: '3fa85f64-5717-4562-b3fc-2c963f66afa6', createdAt: '2025-02-14T17:16:11.569884Z' }
-]);
+const customerCodes = ref([]);
+
+import apiClient from '@/api/apiClient';
+import { handleError } from '@/utilities/errorHandler';
+
+onMounted(async () => {
+  try {
+    const response = await apiClient.get(`/CustomerCodes`);
+    customerCodes.value = response.data.data;
+  } catch (err) {
+    handleError(err, mainStore.loading);
+  }
+});
+import TriStateCheckbox from 'primevue/tristatecheckbox';
+
+const toggleCheckbox = () => {
+  EnablePriceChange.value = EnablePriceChange.value === true ? false : true;
+  console.log(EnablePriceChange.value)
+};
 </script>
 
 <template>
@@ -249,10 +299,11 @@ const customerCodes = ref([
           </div>
         </div>
       </div>
+
       <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
         <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.sapInformation') }}</h3>
         <div class="flex gap-2">
-          <div class="field flex flex-column w-4">
+          <div class="field flex flex-column w-6">
             <label for="organizationType" class="mb-3">{{ $t('branchDialog.sapStorageLocation') }}</label>
 
             <InputText id="organizationType" v-model="sapStorageLocation" v-bind="sapStorageLocationAttrs" :invalid="!!errors.sapStorageLocation" />
@@ -260,15 +311,7 @@ const customerCodes = ref([
             <small v-if="errors.sapStorageLocation" class="text-red-600">{{ errors.sapStorageLocation }}</small>
           </div>
 
-          <div class="field flex flex-column w-4">
-            <label for="cashJournal" class="mb-3">{{ $t('branchDialog.cashJournal') }}</label>
-
-            <InputText id="cashJournal" v-model="cashJournal" v-bind="cashJournalAttrs" :invalid="!!errors.cashJournal" />
-
-            <small v-if="errors.cashJournal" class="text-red-600">{{ errors.cashJournal }}</small>
-          </div>
-
-          <div class="field flex flex-column w-4">
+          <div class="field flex flex-column w-6">
             <label for="profitCenter" class="mb-3">{{ $t('branchDialog.profitCenter') }}</label>
             <InputText id="profitCenter" v-model="profitCenter" v-bind="profitCenterAttrs" :invalid="!!errors.profitCenter" />
             <small v-if="errors.profitCenter" class="text-red-600">{{ errors.profitCenter }}</small>
@@ -343,6 +386,73 @@ const customerCodes = ref([
         </div>
       </div>
 
+      <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
+        <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.additionalfields') }}</h3>
+
+        <div class="flex gap-2">
+          <div class="field flex flex-column w-4">
+            <label for="cajoNumber" class="mb-3">{{ $t('branchDialog.cajoNumber') }}</label>
+
+            <InputText id="cajoNumber" v-model="cajoNumber" v-bind="cajoNumberAttrs" :invalid="!!errors.cajoNumber" />
+
+            <small v-if="errors.cajoNumber" class="text-red-600">{{ errors.cajoNumber }}</small>
+          </div>
+
+          <div class="field flex flex-column w-4">
+            <label for="bankAccountId" class="mb-3">{{ $t('branchDialog.bankAccountId') }}</label>
+
+            <InputText id="bankAccountId" v-model="bankAccountId" v-bind="bankAccountIdAttrs" :invalid="!!errors.bankAccountId" />
+
+            <small v-if="errors.bankAccountId" class="text-red-600">{{ errors.bankAccountId }}</small>
+          </div>
+
+          <div class="field flex flex-column w-4">
+            <label for="bankName" class="mb-3">{{ $t('branchDialog.bankName') }}</label>
+            <InputText id="bankName" v-model="bankName" v-bind="bankNameAttrs" :invalid="!!errors.bankName" />
+            <small v-if="errors.bankName" class="text-red-600">{{ errors.bankName }}</small>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <div class="field flex flex-column w-4">
+            <label for="bankCode" class="mb-3">{{ $t('branchDialog.bankCode') }}</label>
+
+            <InputText id="bankCode" v-model="bankCode" v-bind="bankCodeAttrs" :invalid="!!errors.bankCode" />
+
+            <small v-if="errors.bankCode" class="text-red-600">{{ errors.bankCode }}</small>
+          </div>
+
+          <div class="field flex flex-column w-4">
+            <label for="bankAccountNo" class="mb-3">{{ $t('branchDialog.bankAccountNo') }}</label>
+            <InputText id="bankAccountNo" v-model="bankAccountNo" v-bind="bankAccountNoAttrs" autofocus :invalid="!!errors.bankAccountNo" />
+            <small v-if="errors.bankAccountNo" class="text-red-600">{{ errors.bankAccountNo }}</small>
+          </div>
+
+          <div class="field flex flex-column justify-content-center w-4">
+            <!-- <InputText id="bankAccountNo" v-model="bankAccountNo" v-bind="bankAccountNoAttrs" autofocus :invalid="!!errors.bankAccountNo" /> -->
+
+            <div  class="flex justify-content-center align-content-center w-full gap-2" style="margin-top: 30px">
+              <!-- <label for="EnablePriceChange" class="">{{ $t('branchDialog.EnablePriceChange') }}</label> -->
+              <!-- <input style="width: 15px; margin: 0px; margin-right: 5px;" type="checkbox" @click.stop id="EnablePriceChange" v-model="EnablePriceChange" v-bind="EnablePriceChangeAttrs" :invalid="!!errors.EnablePriceChange" /> -->
+              <!-- <TriStateCheckbox  /> -->
+
+              <Button
+                :label="EnablePriceChange ? `${$t('branchDialog.EnablePriceChange')}` : `${t('branchDialog.disablePriceChange')}`"
+                @click="toggleCheckbox" 
+                
+                :severity="EnablePriceChange ? 'success' : 'danger'"
+                :class="EnablePriceChange ? 'bg-white border-green-500 text-green ' : '   bg-white border-red-500 text-red-500'"
+                class=" p-2 w-full shadow-none"
+                style="height: 40px;"
+                outlined
+              />
+            </div>
+
+            <small v-if="errors.EnablePriceChange" class="text-red-600">{{ errors.EnablePriceChange }}</small>
+          </div>
+        </div>
+      </div>
+
       <div class="flex flex-column w-full gap-2 border-gray-300 border-1 p-4 border-round-lg">
         <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.additionalInformation') }}</h3>
         <div class="flex gap-2">
@@ -385,7 +495,18 @@ const customerCodes = ref([
 
           <div class="field flex flex-column w-6">
             <label for="branchType" class="mb-3">{{ $t('branchDialog.customerCode') }}</label>
-            <Dropdown v-model="customerCode" v-bind="customerCodeAttrs" :virtualScrollerOptions="{ itemSize: 38 }" :options="customerCodes" filter :loading="false" optionLabel="name" :placeholder="t('branchDialog.customerCode')" class="w-full">
+            <Dropdown
+              v-model="customerCodeId"
+              v-bind="customerCodeIdAttrs"
+              :virtualScrollerOptions="{ itemSize: 38 }"
+              :options="customerCodes"
+              optionValue="id"
+              filter
+              :loading="false"
+              optionLabel="name"
+              :placeholder="t('branchDialog.customerCode')"
+              class="w-full"
+            >
               <template #option="slotProps">
                 <div class="flex align-items-center mx-auto gap-3">
                   <div>{{ slotProps.option.name }}</div>

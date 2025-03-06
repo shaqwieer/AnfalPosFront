@@ -32,7 +32,7 @@ const visitStore = useVisitStore();
 const statusOptions = [
   // { label: `${t('All')}`, value: '8', color: '#FF5733' },
   { label: `${t('Open')}`, value: '4', color: '#188A42' },
-  { label: `${t('Completed')}`, value: '5', color: '#FA7B00' },
+  { label: `${t('Completed')}`, value: '5', color: '#FA7B00' }
   // { label: `${t('Planned')}`, value: '6', color: '#BC4819' },
   // { label: `${t('Productive')}`, value: '7', color: '#3357FF' }
 ];
@@ -364,6 +364,24 @@ const props = defineProps({
               <div class="flex text-lg">{{ slotProps.data.customerName }}</div>
             </template>
           </Column>
+          <Column field="location" class="" :sortable="true">
+            <template #header>
+              <span class="text-lg font-bold"> {{ t('Visit.Location') }}</span>
+            </template>
+
+            <template #body="slotProps">
+              <div class="flex text-lg">{{ slotProps.data.customerName }}</div>
+            </template>
+          </Column>
+          <Column field="reason" class="" :sortable="true">
+            <template #header>
+              <span class="text-lg font-bold"> {{ t('Visit.Reason') }}</span>
+            </template>
+
+            <template #body="slotProps">
+              <div class="flex text-lg">{{ slotProps.data.customerName }}</div>
+            </template>
+          </Column>
           <Column field="visitDate" class="">
             <template #header>
               <span class="text-lg font-bold"> {{ t('Visit.VisitDate') }} </span>
@@ -388,6 +406,14 @@ const props = defineProps({
               <div class="flex align-items-center justify-content-center text-center w-5rem">
                 <i v-if="slotProps.data.productive" class="pi flex pi-check text-green-500 text-center text-2xl" />
               </div>
+            </template>
+          </Column>
+          <Column field="nextTrip" class="">
+            <template #header>
+              <span class="text-lg font-bold"> {{ t('Visit.NextTrip') }} </span>
+            </template>
+            <template #body="slotProps">
+              <span class="text-md flex">{{ new Date(slotProps.data.visitDate).toLocaleDateString() }}</span>
             </template>
           </Column>
           <!-- <Column field="statusName" :header="t('Actions')" class="w-8rem">
