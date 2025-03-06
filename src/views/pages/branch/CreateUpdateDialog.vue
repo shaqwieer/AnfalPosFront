@@ -158,7 +158,7 @@ const updateData = handleSubmit(async (validatedInfo) => {
     sapStorageLocation: validatedInfo.sapStorageLocation || null,
     profitCenter: validatedInfo.profitCenter || null,
     primaryPhone: validatedInfo.primaryPhone,
-    OrganizationId: validatedInfo.organizationId || 1, // Provide default value if not present
+    OrganizationId: validatedInfo.organizationId , // Provide default value if not present
     BankAccountId: validatedInfo.bankAccounts || null,
 
     BankName: validatedInfo.bankName || null,
