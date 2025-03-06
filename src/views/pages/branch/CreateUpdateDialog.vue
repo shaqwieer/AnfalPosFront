@@ -183,7 +183,7 @@ const updateData = handleSubmit(async (validatedInfo) => {
     sapStorageLocation: validatedInfo.sapStorageLocation || null,
     profitCenter: validatedInfo.profitCenter || null,
     primaryPhone: validatedInfo.primaryPhone,
-    OrganizationId: validatedInfo.organizationId , // Provide default value if not present
+    OrganizationId: validatedInfo.organizationId, // Provide default value if not present
     bankAccounts: validatedInfo.bankAccounts || null,
     customerCodeId: validatedInfo.customerCodeId || null,
     EnablePriceChange: validatedInfo.EnablePriceChange || null,
@@ -277,7 +277,7 @@ import TriStateCheckbox from 'primevue/tristatecheckbox';
 
 const toggleCheckbox = () => {
   EnablePriceChange.value = EnablePriceChange.value === true ? false : true;
-  console.log(EnablePriceChange.value)
+  console.log(EnablePriceChange.value);
 };
 </script>
 
@@ -414,7 +414,7 @@ const toggleCheckbox = () => {
         </div>
 
         <div class="flex gap-2">
-          <div class="field flex flex-column w-4">
+          <div class="field flex flex-column w-6">
             <label for="bankCode" class="mb-3">{{ $t('branchDialog.bankCode') }}</label>
 
             <InputText id="bankCode" v-model="bankCode" v-bind="bankCodeAttrs" :invalid="!!errors.bankCode" />
@@ -422,21 +422,23 @@ const toggleCheckbox = () => {
             <small v-if="errors.bankCode" class="text-red-600">{{ errors.bankCode }}</small>
           </div>
 
-          <div class="field flex flex-column w-4">
+          <div class="field flex flex-column w-6">
             <label for="bankAccountNo" class="mb-3">{{ $t('branchDialog.bankAccountNo') }}</label>
             <InputText id="bankAccountNo" v-model="bankAccountNo" v-bind="bankAccountNoAttrs" autofocus :invalid="!!errors.bankAccountNo" />
             <small v-if="errors.bankAccountNo" class="text-red-600">{{ errors.bankAccountNo }}</small>
           </div>
+        </div>
 
-          <div class="field flex flex-column justify-content-center w-4">
-            <!-- <InputText id="bankAccountNo" v-model="bankAccountNo" v-bind="bankAccountNoAttrs" autofocus :invalid="!!errors.bankAccountNo" /> -->
+        <div class=" ">
+          <!-- <InputText id="bankAccountNo" v-model="bankAccountNo" v-bind="bankAccountNoAttrs" autofocus :invalid="!!errors.bankAccountNo" /> -->
 
-            <div  class="flex justify-content-center align-content-center w-full gap-2" style="margin-top: 30px">
-              <!-- <label for="EnablePriceChange" class="">{{ $t('branchDialog.EnablePriceChange') }}</label> -->
-              <!-- <input style="width: 15px; margin: 0px; margin-right: 5px;" type="checkbox" @click.stop id="EnablePriceChange" v-model="EnablePriceChange" v-bind="EnablePriceChangeAttrs" :invalid="!!errors.EnablePriceChange" /> -->
-              <!-- <TriStateCheckbox  /> -->
+          <div class="">
+            <input type="checkbox" @click.stop id="EnablePriceChange" class="m-0 mr-2 mt-2" v-model="EnablePriceChange" v-bind="EnablePriceChangeAttrs" :invalid="!!errors.EnablePriceChange" />
 
-              <Button
+            <label for="EnablePriceChange" class="m-0" style="position: relative; top: -2px">{{ $t('branchDialog.EnablePriceChange') }}</label>
+            <!-- <TriStateCheckbox  /> -->
+
+            <!-- <Button
                 :label="EnablePriceChange ? `${$t('branchDialog.EnablePriceChange')}` : `${t('branchDialog.disablePriceChange')}`"
                 @click="toggleCheckbox" 
                 
@@ -445,11 +447,10 @@ const toggleCheckbox = () => {
                 class=" p-2 w-full shadow-none"
                 style="height: 40px;"
                 outlined
-              />
-            </div>
-
-            <small v-if="errors.EnablePriceChange" class="text-red-600">{{ errors.EnablePriceChange }}</small>
+              /> -->
           </div>
+
+          <small v-if="errors.EnablePriceChange" class="text-red-600">{{ errors.EnablePriceChange }}</small>
         </div>
       </div>
 
