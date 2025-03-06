@@ -489,7 +489,10 @@
     "ReferenceSDDocumentCategory": "Reference SD Document Category",
     "BillingDocumentType": "Billing Document Type",
     "RequestedBillingDocumentType": "Requested Billing Document Type",
-    "Additionalfields": "Additional fields"
+    "Additionalfields": "Additional fields",
+    "customerPriceGroup": "Customer Price Group",
+    "businessPartnerGrouping": "Business Partner Grouping",
+    "paymentTerms": "Payment Terms"
   },
   "availableBranch": {
     "title": "Available Branches"
@@ -703,5 +706,7 @@
   "Warning": "Warning",
   "AddBranch": "Add Branch",
   "customerCode": "Customer Code",
-  "paymentTerm": "payment Term"
+  "paymentTerm": "payment Term",
+  "Actions": "Actions",
+  "Late_Session": "Late Session"
 }

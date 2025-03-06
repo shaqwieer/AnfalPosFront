@@ -482,7 +482,10 @@
     "ReferenceSDDocumentCategory": "مرجع فئة وثيقة SD",
     "BillingDocumentType": "نوع وثيقة الفواتير",
     "RequestedBillingDocumentType": "نوع مستند الفواتير المطلوب",
-    "Additionalfields": "حقول إضافية"
+    "Additionalfields": "حقول إضافية",
+    "customerPriceGroup": "مجموعة أسعار العميل",
+    "businessPartnerGrouping": "تجميع شريك العمل",
+    "paymentTerms": "شروط الدفع"
   },
   "availableBranch": {
     "title": "الفروع المتاحة"
@@ -689,5 +692,7 @@
   "Status": "حالة",
   "Warning": "تحذير",
   "customerCode": "رمز العميل",
-  "paymentTerm": "مدة الدفع"
+  "paymentTerm": "مدة الدفع",
+  "Actions": "الإجراءات",
+  "Late_Session": "الجلسة المتأخرة"
 }
