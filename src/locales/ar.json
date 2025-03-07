@@ -485,7 +485,12 @@
     "Additionalfields": "حقول إضافية",
     "customerPriceGroup": "مجموعة أسعار العميل",
     "businessPartnerGrouping": "تجميع شريك العمل",
-    "paymentTerms": "شروط الدفع"
+    "paymentTerms": "شروط الدفع",
+    "reconciliationAccount": "حساب المصالحة",
+    "salesDistrict": "منطقة المبيعات",
+    "referenceSDDocumentCategory": "مرجع فئة وثيقة SD",
+    "billingDocumentType": "نوع وثيقة الفواتير",
+    "requestedBillingDocumentType": "نوع مستند الفواتير المطلوب"
   },
   "availableBranch": {
     "title": "الفروع المتاحة"
