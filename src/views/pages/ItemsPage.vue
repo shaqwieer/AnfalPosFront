@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-column gap-2">
-
     <div class="flex justify-content-between mb-5">
       <div>
         <h2>{{ t(`items.title`) }}</h2>
@@ -78,7 +77,7 @@
       </Column>
     </DataTable>
 
-    <Paginator :rows="rowsPerPage" :totalRecords="ItemsData.length" @page="onPageChange" />
+    <Paginator :rows="rowsPerPage" :rowsPerPageOptions="[5, 10, 20, 25, 50]" :totalRecords="ItemsData.length" @page="onPageChange" @update:rows="onRowsChange" />
   </div>
 </template>
 
@@ -223,11 +222,16 @@ const confirmDelete = async () => {
   }
 };
 
-const rowsPerPage = ref(10);
+const rowsPerPage = ref(20);
 const currentPage = ref(0);
 
 const onPageChange = (event) => {
   currentPage.value = event.page ?? 0;
+};
+
+const onRowsChange = (newRows) => {
+  rowsPerPage.value = newRows;
+  currentPage.value = 0;
 };
 
 const paginatedCustomers = computed(() => {
@@ -239,6 +243,7 @@ const paginatedCustomers = computed(() => {
   return ItemsData.value.slice(start, end);
 });
 </script>
+
 <style scoped>
 .rtl-direction :deep(.p-datatable .p-datatable-tbody > tr > td) {
   text-align: right;

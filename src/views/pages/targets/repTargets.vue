@@ -171,11 +171,16 @@ onMounted(() => {
   });
 });
 
-const rowsPerPage = ref(12);
+const rowsPerPage = ref(20);
 const currentPage = ref(0);
 
 const onPageChange = (event) => {
   currentPage.value = event.page ?? 0;
+};
+
+const onRowsChange = (newRows) => {
+  rowsPerPage.value = newRows;
+  currentPage.value = 0;
 };
 
 const paginatedCustomers = computed(() => {
@@ -315,7 +320,7 @@ const paginatedCustomers = computed(() => {
           </Column>
         </DataTable>
 
-        <Paginator :rows="rowsPerPage" :totalRecords="months.length" @page="onPageChange" />
+        <Paginator :rows="rowsPerPage" :rowsPerPageOptions="[5, 10, 20, 25, 50]" :totalRecords="months.length" @page="onPageChange" @update:rows="onRowsChange" />
       </div>
     </div>
   </div>

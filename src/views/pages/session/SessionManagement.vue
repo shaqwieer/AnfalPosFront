@@ -176,14 +176,17 @@ const props = defineProps({
   }
 });
 
-const rowsPerPage = ref(5);
+const rowsPerPage = ref(20);
 const currentPage = ref(0);
 
 const onPageChange = (event) => {
   currentPage.value = event.page ?? 0;
 };
 
-// const sessions = sessionStore.sessions
+const onRowsChange = (newRows) => {
+  rowsPerPage.value = newRows;
+  currentPage.value = 0;
+};
 
 const paginatedCustomers = computed(() => {
   if (!sessionStore.sessions || !Array.isArray(sessionStore.sessions)) {
@@ -220,7 +223,7 @@ const paginatedCustomers = computed(() => {
           </div>
 
           <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
-            <div class="h-full  cursor-pointer">
+            <div class="h-full cursor-pointer">
               <div class="w-full">
                 <label class="block text-sm font-semibold mb-1">{{ t('Session.ToDate') }}</label>
                 <Calendar v-model="dateTo" showIcon iconDisplay="input" class="w-full h-3rem" />
@@ -320,13 +323,6 @@ const paginatedCustomers = computed(() => {
       <div class="overflow-hidden mx-3">
         <!-- View Toggle Header -->
 
-        <!-- <div class="p-4 border-b flex align-items-center justify-content-between">
-          <span class="text-xl font-medium"> {{ t('Sessions') }}</span>
-          <div class="flex items-center space-x-2">
-            <Button @click="toggleViewMode" class="p-1 rounded-lg hover:bg-gray-100 transition-colors" size="large" text :icon="viewMode === 'chart' ? 'pi pi-table' : 'pi pi-chart-bar'"> </Button>
-          </div>
-        </div> -->
-
         <div class="flex align-items-center justify-content-between mt-3 mb-4">
           <span class="text-xl font-medium"> {{ t('Sessions') }}</span>
 
@@ -360,7 +356,7 @@ const paginatedCustomers = computed(() => {
             <Chart type="bar" class="h-full" :data="chartData" :options="chartOptions" />
           </div>
         </div>
-        <DataTable class="surface-card border-round-lg mb-4 shadow-1 border-1border-gray-300" v-else :value="paginatedCustomers" :rows="5" dataKey="id" :globalFilterFields="['name', 'id']" :currentPageReportTemplate="''" :rowClass="getRowClass">
+        <DataTable class="surface-card border-round-lg mb-4 shadow-1 border-1border-gray-300" v-else :value="paginatedCustomers" dataKey="id" :globalFilterFields="['name', 'id']" :currentPageReportTemplate="''" :rowClass="getRowClass">
           <template #empty>
             <div class="flex justify-content-center align-items-center font-bold text-lg">
               {{ t('Session.empty') }}
@@ -403,7 +399,7 @@ const paginatedCustomers = computed(() => {
               </span>
             </template>
           </Column>
-          <Column field="isSessionLate" :header="'Late Session'" headerClass="" class="w-12rem">
+          <Column field="isSessionLate" :header="t('Late_Session')" headerClass="" class="w-12rem">
             <template #body="slotProps">
               <div class="flex align-items-center justify-content-center text-center w-5rem">
                 <i v-if="slotProps.data.isSessionLate" class="pi flex pi-exclamation-triangle text-red-500 text-center text-2xl" />
@@ -418,7 +414,7 @@ const paginatedCustomers = computed(() => {
           </Column>
         </DataTable>
 
-        <Paginator :rows="rowsPerPage" :totalRecords="sessionStore.sessions.length" @page="onPageChange" />
+        <Paginator :rows="rowsPerPage" :rowsPerPageOptions="[5, 10, 20, 25, 50]" :totalRecords="sessionStore.sessions.length" @page="onPageChange" @update:rows="onRowsChange" />
       </div>
     </div>
 

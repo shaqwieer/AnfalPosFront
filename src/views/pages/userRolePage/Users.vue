@@ -93,11 +93,16 @@ const savePassword = async (userId, payload) => {
 //   }
 // };
 
-const rowsPerPage = ref(10);
+const rowsPerPage = ref(20);
 const currentPage = ref(0);
 
 const onPageChange = (event) => {
   currentPage.value = event.page ?? 0;
+};
+
+const onRowsChange = (newRows) => {
+  rowsPerPage.value = newRows;
+  currentPage.value = 0;
 };
 
 const paginatedCustomers = computed(() => {
@@ -281,7 +286,7 @@ const paginatedCustomers = computed(() => {
               </Column>
             </DataTable>
 
-            <Paginator :rows="rowsPerPage" :totalRecords="users.length" @page="onPageChange" />
+            <Paginator :rows="rowsPerPage" :rowsPerPageOptions="[5, 10, 20, 25, 50]" :totalRecords="users.length" @page="onPageChange" @update:rows="onRowsChange" />
           </div>
         </div>
       </div>
@@ -307,7 +312,7 @@ const paginatedCustomers = computed(() => {
       }
     "
     :IsAdd="isAddFlag"
-    :vanSalesRepBranches="users.filter((user)=>user.roles.some((role) => role.isVanSalesRep === true)).flatMap((user) => user.branches.map((branch) => branch.id))"
+    :vanSalesRepBranches="users.filter((user) => user.roles.some((role) => role.isVanSalesRep === true)).flatMap((user) => user.branches.map((branch) => branch.id))"
     :selectedData="updateData"
     :createElement="addData"
     :editElement="editData"

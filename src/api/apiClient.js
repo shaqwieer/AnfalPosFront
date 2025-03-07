@@ -127,7 +127,7 @@ export default apiClient;
 
 async function refreshAuthToken() {
     try {
-        const response = await axios.post(`${import.meta.env.VITE_API}/auth/refresh`, {
+        const response = await axios.post(`${import.meta.env.VITE_API}/auth/refresh-token`, {
             token: getFromLocalStorage('refreshToken'),
         });
 

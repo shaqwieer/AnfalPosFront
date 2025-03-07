@@ -90,12 +90,16 @@ import { useMainStore } from '../../../stores/mainStore';
 const mainStore = useMainStore();
 const { t, locale } = useI18n();
 
-const rowsPerPage = ref(10);
+const rowsPerPage = ref(20);
 const currentPage = ref(0);
 
-// تحديث الصفحة عند تغيير `Paginator`
-const onPageChange = (event: { page: number }) => {
+const onPageChange = (event) => {
   currentPage.value = event.page ?? 0;
+};
+
+const onRowsChange = (newRows) => {
+  rowsPerPage.value = newRows;
+  currentPage.value = 0;
 };
 
 const paginatedCustomers = computed(() => {
@@ -314,7 +318,8 @@ const filteredCustomers = computed(() => {
           <div v-else>
             <CustomerList :customers="paginatedCustomers" @view-details="handleViewDetails" @edit-customer="handleEditCustomer" @submit-approval="handleSubmitApproval" @approve="handleApprove" @reject="handleReject" />
           </div>
-          <Paginator :rows="rowsPerPage" :totalRecords="filteredCustomers.length" @page="onPageChange" />
+
+          <Paginator :rows="rowsPerPage" :rowsPerPageOptions="[5, 10, 20, 25, 50]" :totalRecords="filteredCustomers.length" @page="onPageChange" @update:rows="onRowsChange" />
 
           <!-- ----------------------------------------------------------- -->
         </div>

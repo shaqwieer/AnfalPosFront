@@ -92,7 +92,7 @@
       </Column>
     </DataTable>
 
-    <Paginator :rows="rowsPerPage" :totalRecords="entities.length" @page="onPageChange" />
+    <Paginator :rows="rowsPerPage" :rowsPerPageOptions="[5, 10, 20, 25, 50]" :totalRecords="entities.length" @page="onPageChange" @update:rows="onRowsChange" />
   </div>
   <Dialog v-model:visible="visible" :breakpoints="{ '640px': '25rem' }" :header="t(`baseLookup.${isEdit ? 'edit' : 'add'}${name}`)" :class="containerClass" :style="{ width: '35rem' }" :modal="true" :closable="false">
     <div class="flex flex-column gap-4 p-4">
@@ -266,12 +266,16 @@ const confirmDelete = async () => {
     handleError(err, mainStore.loading);
   }
 };
-
-const rowsPerPage = ref(10);
+const rowsPerPage = ref(20);
 const currentPage = ref(0);
 
 const onPageChange = (event) => {
   currentPage.value = event.page ?? 0;
+};
+
+const onRowsChange = (newRows) => {
+  rowsPerPage.value = newRows;
+  currentPage.value = 0;
 };
 
 const paginatedCustomers = computed(() => {
@@ -283,6 +287,7 @@ const paginatedCustomers = computed(() => {
   return entities.value.slice(start, end);
 });
 </script>
+
 <style scoped>
 .rtl-direction :deep(.p-datatable .p-datatable-tbody > tr > td) {
   text-align: right;

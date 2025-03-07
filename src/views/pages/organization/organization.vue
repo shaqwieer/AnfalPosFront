@@ -33,8 +33,22 @@ const paginatedEntities = computed(() => {
 });
 
 const totalRecords = ref(0);
-const rows = ref(12);
+const rows = ref(20);
+
 const first = ref(0);
+
+const rowsPerPage = ref(20);
+const currentPage = ref(0);
+
+const onPageChange = (event) => {
+  first.value = event.first;
+  rows.value = event.rows;
+};
+
+const onRowsChange = (newRows) => {
+  rows.value = newRows;
+  first.value = 0;
+};
 
 const getOrganizations = async () => {
   try {
@@ -61,15 +75,6 @@ const onFirstChange = (newFirst) => {
   first.value = newFirst;
 };
 
-const onRowsChange = (newRows) => {
-  rows.value = newRows;
-  first.value = 0; // Reset to first page when rows per page changes
-};
-
-const onPageChange = (event) => {
-  first.value = event.first;
-  rows.value = event.rows;
-};
 // Deactivate Activate Organization
 const activateDeactivateVisible = ref(false);
 const activationStatus = ref(false);
@@ -137,7 +142,7 @@ const addData = async (data) => {
 };
 </script>
 <template>
-  <div :class="['grid px-6', { 'rtl-direction': rtl }]" >
+  <div :class="['grid px-6', { 'rtl-direction': rtl }]">
     <div class="flex flex-column row-gap-5 px-3 lg:flex-row justify-content-between">
       <div class="lg:col-8 px-0 pt-2">
         <h3 class="text-700 text-3xl font-semibold">{{ t('organizationHeader') }}</h3>
@@ -151,7 +156,6 @@ const addData = async (data) => {
     </div>
     <!-- <SmartUplaoder /> -->
 
-   
     <div class="col-12 md:col-6 lg:col-4 xl:col-4" v-for="data in paginatedEntities" :key="data.id">
       <Card style="width: 100%; overflow: hidden; min-width: 200px; height: 302px; border-top: 5px solid" class="flex p-4 justify-content-between border-primary flex-column col-12 md:col-6 lg:col-4 xl:col-3 border-round p-0">
         <template #header>
@@ -186,7 +190,7 @@ const addData = async (data) => {
       </Card>
     </div>
     <div class="col-12 flex justify-content-center mt-4">
-      <Paginator :first="first" :rows="rows" :totalRecords="totalRecords" :rowsPerPageOptions="[6, 12, 18, 24]" @update:first="onFirstChange" @update:rows="onRowsChange" @page="onPageChange" />
+      <Paginator :first="first" :rows="rowsPerPage" :rowsPerPageOptions="[5, 10, 20, 25, 50]" :totalRecords="totalRecords" @page="onPageChange" @update:first="onFirstChange" @update:rows="onRowsChange" />
     </div>
   </div>
   <!-- Add Dialog -->
