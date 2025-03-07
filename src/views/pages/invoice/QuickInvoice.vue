@@ -160,11 +160,16 @@ const getData = () => {
   console.log(filteredMenuItems.value);
 };
 
-const rowsPerPage = ref(10);
+const rowsPerPage = ref(20);
 const currentPage = ref(0);
 
 const onPageChange = (event) => {
   currentPage.value = event.page ?? 0;
+};
+
+const onRowsChange = (newRows) => {
+  rowsPerPage.value = newRows;
+  currentPage.value = 0;
 };
 
 const paginatedCustomers = computed(() => {
@@ -177,7 +182,6 @@ const paginatedCustomers = computed(() => {
 });
 
 const viewMode = ref<'grid' | 'list'>('list');
-
 </script>
 
 <template>
@@ -203,7 +207,7 @@ const viewMode = ref<'grid' | 'list'>('list');
                         <Button label="Draft Orders" icon="pi pi-file" class="border-primary-200" outlined @click="navigateToDraft"></Button> -->
           </div>
           <InputText v-model="searchQuery" id="productSearch" type="text" placeholder="Search Products..." class="w-full shadow-none" />
-        
+
           <!-- <SelectButton v-model="currentView" :options="options" optionLabel="value" dataKey="value" optionValue="value" :allowEmpty="false" aria-labelledby="custom" :class="['flex', mainStore.isRTL ? 'flex-row-reverse' : 'flex-row']">
             <template #option="slotProps">
               <i :class="slotProps.option.icon"></i>
@@ -230,8 +234,6 @@ const viewMode = ref<'grid' | 'list'>('list');
                 <i class="pi pi-list"></i>
               </div>
             </div>
-
-            
           </div>
         </div>
 
@@ -386,7 +388,8 @@ const viewMode = ref<'grid' | 'list'>('list');
             </Column>
           </DataTable>
 
-          <Paginator :rows="rowsPerPage" :totalRecords="filteredMenuItems.filter((i) => i.itemGroup === selectedCategory).length" @page="onPageChange" />
+          <Paginator :rows="rowsPerPage" :rowsPerPageOptions="[5, 10, 20, 25, 50]" :totalRecords="filteredMenuItems.filter((i) => i.itemGroup === selectedCategory).length" @page="onPageChange"  @update:rows="onRowsChange" />
+
         </div>
 
         <!-- other tabs -->

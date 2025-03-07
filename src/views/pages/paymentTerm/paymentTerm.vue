@@ -110,7 +110,7 @@
       </Column>
     </DataTable>
 
-    <Paginator :rows="rowsPerPage" :totalRecords="entities.length" @page="onPageChange" />
+    <Paginator :rows="rowsPerPage" :rowsPerPageOptions="[5, 10, 20, 25, 50]" :totalRecords="entities.length" @page="onPageChange" @update:rows="onRowsChange" />
   </div>
 
   <Dialog v-model:visible="visible" :breakpoints="{ '640px': '25rem' }" :header="t(`baseLookup.edit`) + ' ' + name" :class="containerClass" :style="{ width: '35rem' }" :modal="true" :closable="false">
@@ -325,11 +325,16 @@ const confirmDelete = async () => {
   }
 };
 
-const rowsPerPage = ref(10);
+const rowsPerPage = ref(20);
 const currentPage = ref(0);
 
 const onPageChange = (event) => {
   currentPage.value = event.page ?? 0;
+};
+
+const onRowsChange = (newRows) => {
+  rowsPerPage.value = newRows;
+  currentPage.value = 0;
 };
 
 const paginatedCustomers = computed(() => {

@@ -55,15 +55,18 @@ const onFirstChange = (newFirst) => {
   first.value = newFirst;
 };
 
-const onRowsChange = (newRows) => {
-  rows.value = newRows;
-  first.value = 0; // Reset to first page when rows per page changes
-};
+const rowsPerPage = ref(20);
+const currentPage = ref(0);
 
 const onPageChange = (event) => {
-  first.value = event.first;
-  rows.value = event.rows;
+  currentPage.value = event.page ?? 0;
 };
+
+const onRowsChange = (newRows) => {
+  rowsPerPage.value = newRows;
+  currentPage.value = 0;
+};
+
 // Deactivate Activate Organization
 const activateDeactivateVisible = ref(false);
 const activationStatus = ref(false);
@@ -157,7 +160,7 @@ const copyToClipboard = (text) => {
 
     <!-- <SmartUplaoder /> -->
 
-    <div class="grid">
+    <div class="grid" style="min-width: 100%">
       <!-- v-for="data in paginatedEntities" :key="data.id" -->
       <div v-for="(data, index) in paginatedEntities" :key="index" class="col-12 lg:col-6 xl:col-4">
         <div class="card mb-0 flex flex-column justify-content-between relative">
@@ -213,7 +216,7 @@ const copyToClipboard = (text) => {
     </div>
 
     <div class="w-full flex justify-content-center mt-4">
-      <Paginator class="w-full" :first="first" :rows="rows" :totalRecords="totalRecords" @update:first="onFirstChange" @update:rows="onRowsChange" @page="onPageChange" />
+      <Paginator class="w-full" :first="first" @update:rows="onRowsChange" @page="onPageChange" @update:first="onFirstChange" :totalRecords="totalRecords" :rows="rowsPerPage" :rowsPerPageOptions="[5, 10, 20, 25, 50]" />
     </div>
   </div>
   <!-- Add Dialog -->
