@@ -31,7 +31,7 @@ const handleHttpResponseOrError = (status, data) => {
       break;
     case 403:
       console.error('Forbidden:', data);
-      router.push('/');
+      router.push('/auth/login');
       break;
     case 404:
       console.error('Not Found:', data);
