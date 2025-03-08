@@ -646,8 +646,7 @@ router.beforeEach(async (to, from, next) => {
   if (token && mainStore.pageTree.length == 0) {
     await mainStore.getMenu();
   }
-  const hasBranchIdKey = token ? mainStore.hasBranchIdKey(token) : false;
-  console.log(hasBranchIdKey);
+  const hasBranchIdKey = true;
   const isAllowed = mainStore.accessAllowed(to.path);
   console.log(`Navigating to: ${to.path}, Allowed: ${isAllowed}`);
 
