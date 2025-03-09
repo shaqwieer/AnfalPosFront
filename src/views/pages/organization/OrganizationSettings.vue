@@ -254,7 +254,6 @@ onMounted(async () => {
 });
 </script>
 <template>
-  {{ props.selectedData.id }}
 
   <div class="flex flex-column gap-4 p-4">
     <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">

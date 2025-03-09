@@ -231,7 +231,10 @@
     "ID": "ID",
     "Code": "Code",
     "Description": "Description",
-    "Days": "Days"
+    "Days": "Days",
+    "GlAccount": "GlAccount",
+    "BusinessTransaction": "Business Transaction",
+    "ExpensesCategory": "Expenses Category"
   },
   "status": {
     "active": "Active",
@@ -266,7 +269,7 @@
     "editPaymentMethod": "Edit Payment Method",
     "addPaymentMethod": "Add Payment Method",
     "emptyPaymentMethod": "No Payment Methods exists",
-    "edit": "edit",
+    "edit": "Edit",
     "Name": "Name",
     "prefix": "prefix",
     "from": "from",
@@ -724,5 +727,6 @@
   "customerCode": "Customer Code",
   "paymentTerm": "Payment Term",
   "Actions": "Actions",
-  "Late_Session": "Late Session"
+  "Late_Session": "Late Session",
+  "ExpenseTypes": "Expense Types"
 }

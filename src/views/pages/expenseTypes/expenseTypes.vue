@@ -1,0 +1,422 @@
+<template>
+  <div class="flex flex-column gap-2 px-6">
+    <!-- <PageTopBar v-model:searchText="filters['global'].value" :title="t(`baseLookup.${name}`)" :addText="t('baseLookup.createButtonLabel')" simple :addButton="openCreateDialog"></PageTopBar> -->
+    <div class="flex justify-content-between h-fit">
+      <div>
+        <h2 class="m-0">{{ t(`ExpenseTypes`) }}</h2>
+      </div>
+
+      <div class="flex gap-3">
+        <IconField iconPosition="left">
+          <InputText type="text" v-model="searchText" :placeholder="t('labels.search')" class="w-full" />
+          <InputIcon class="pi pi-search" />
+        </IconField>
+
+        <!-- <Button :label="t('users.createButtonLabel')" v-tooltip.top="t('users.createButtonLabel')" class="w-full md:w-12rem h-fit" icon="pi pi-plus" @click="CreateCustomerCode(true, {}, false)" /> -->
+        <Button :label="t('users.createButtonLabel')" v-tooltip.top="t('users.createButtonLabel')" class="w-full md:w-12rem h-fit" icon="pi pi-plus" @click="openCreateDialog(true, {}, false)" />
+      </div>
+    </div>
+    <p class="font-medium">{{ t('users.description') }}</p>
+    <DataTable
+      :value="paginatedCustomers"
+      dataKey="id"
+      :rows="10"
+      :filters="filters"
+      :globalFilterFields="['name', 'id']"
+      class="surface-card border-round-lg mb-4 shadow-1 border-1 surface-border"
+      :paginatorTemplate="
+        mainStore.isRTL ? 'RowsPerPageDropdown NextPageLink LastPageLink  PageLinks FirstPageLink PrevPageLink  CurrentPageReport ' : 'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
+      "
+      :rowsPerPageOptions="[5, 10, 25]"
+      :currentPageReportTemplate="''"
+    >
+      <template #empty>
+        <div class="flex justify-content-center align-items-center font-bold text-lg">
+          {{ t(`baseLookup.empty${name}`) }}
+        </div>
+      </template>
+
+      <Column field="name" :header="t('labels.name')" class="" :sortable="true">
+        <template #body="slotProps">
+          <div class="flex flex-row align-items-center">
+            <span class="font-semibold text-md">{{ slotProps.data.name }}</span>
+          </div>
+        </template>
+      </Column>
+
+      <Column field="glAccount" :header="t('labels.GlAccount')" class="" :sortable="true">
+        <template #body="slotProps">
+          <div class="flex flex-row align-items-center">
+            <span class="font-semibold text-md">{{ slotProps.data.glAccount }}</span>
+          </div>
+        </template>
+      </Column>
+
+      <Column field="businessTransaction" :header="t('labels.BusinessTransaction')" class="" :sortable="true">
+        <template #body="slotProps">
+          <div class="flex flex-row align-items-center">
+            <span class="font-semibold text-md">{{ slotProps.data.businessTransaction }}</span>
+          </div>
+        </template>
+      </Column>
+
+      <Column field="expensesCategoryName" :header="t('labels.ExpensesCategory')" class="" :sortable="true">
+        <template #body="slotProps">
+          <div class="flex flex-row align-items-center">
+            <span class="font-semibold text-md">{{ slotProps.data.expensesCategoryName }}</span>
+          </div>
+        </template>
+      </Column>
+
+      <Column field="actions">
+        <template #header="">
+          <div class="flex flex-row align-items-center">
+            <span class="font-semibold text-md px-3">{{ t('labels.actions') }}</span>
+          </div>
+        </template>
+
+        <template #body="slotProps">
+          <div class="flex gap-2">
+            <Button
+              icon="pi pi-trash"
+              v-tooltip.top="t('users.deleteTooltip')"
+              text
+              rounded
+              aria-label="Delete"
+              severity="danger"
+              @click="
+                () => {
+                  deleteText = slotProps.data.name;
+                  deletedKey = slotProps.data.id;
+                  deleteDialogVisible = true;
+                }
+              "
+            />
+            <Button
+              icon="pi pi-pencil"
+              v-tooltip.top="t('users.updateTooltip')"
+              text
+              rounded
+              aria-label="Update"
+              severity="success"
+              @click="
+                () => {
+                  editItem(slotProps.data);
+                }
+              "
+            />
+          </div>
+        </template>
+      </Column>
+    </DataTable>
+
+    <Paginator :rows="rowsPerPage" :rowsPerPageOptions="[5, 10, 20, 25, 50]" :totalRecords="entities.length" @page="onPageChange" @update:rows="onRowsChange" />
+  </div>
+
+  <Dialog v-model:visible="visible" :breakpoints="{ '640px': '25rem' }" :header="t(`baseLookup.edit`) + ' ' + name" :class="containerClass" :style="{ width: '35rem' }" :modal="true" :closable="false">
+    <div class="flex flex-column gap-4 p-4">
+      <div class="field flex flex-column">
+        <label for="Name" class="">{{ t(`labels.name`) }}</label>
+        <InputText id="Name" v-model="editName" v-bind="editNameAttrs" autofocus :invalid="!!errors.editName" />
+        <small v-if="errors.editName" class="text-red-600">{{ errors.editName }}</small>
+      </div>
+
+      <div class="field flex flex-column">
+        <label for="GlAccount" class="">{{ t(`labels.GlAccount`) }}</label>
+        <InputText id="GlAccount" v-model="editGlAccount" v-bind="editGlAccountAttrs" autofocus :invalid="!!errors.editGlAccount" />
+        <small v-if="errors.editGlAccount" class="text-red-600">{{ errors.editGlAccount }}</small>
+      </div>
+
+      <div class="field flex flex-column">
+        <label for="editBusinessTransaction" class="">{{ t(`labels.BusinessTransaction`) }}</label>
+        <InputText id="editBusinessTransaction" v-model="editBusinessTransaction" v-bind="editBusinessTransactionAttrs" autofocus :invalid="!!errors.editBusinessTransaction" />
+        <small v-if="errors.editBusinessTransaction" class="text-red-600">{{ errors.editBusinessTransaction }}</small>
+      </div>
+
+      <div class="field flex flex-column w-6">
+        <label for="editExpensesCategoryName" class="">{{ t(`labels.ExpensesCategory`) }}</label>
+
+        <Dropdown
+          v-model="editExpensesCategoryName"
+          v-bind="editExpensesCategoryNameAttrs"
+          :virtualScrollerOptions="{ itemSize: 38 }"
+          :options="ExpensesCategory"
+          optionValue="id"
+          filter
+          :loading="false"
+          optionLabel="name"
+          :placeholder="t('labels.ExpensesCategory')"
+          class="w-full"
+        >
+          <template #option="slotProps">
+            <div class="flex align-items-center mx-auto gap-3">
+              <div>{{ slotProps.option.name }}</div>
+            </div>
+          </template>
+        </Dropdown>
+        <small v-if="errors.branchType" class="text-red-600">{{ errors.branchType }}</small>
+      </div>
+
+      <div class="flex justify-content-end gap-3 pt-2">
+        <Button :label="t('RoleCreateUpdateDialog.addButton')" v-if="!isEdit" icon="pi pi-check" @click="createData" />
+        <Button :label="t('RoleCreateUpdateDialog.updateButton')" v-else icon="pi pi-check" @click="updateData" />
+        <Button
+          :label="t('RoleCreateUpdateDialog.cancelButton')"
+          severity="danger"
+          icon="pi pi-times"
+          outlined
+          @click="
+            () => {
+              visible = false;
+              resetForm();
+            }
+          "
+        />
+      </div>
+    </div>
+  </Dialog>
+
+  <DeleteDialog
+    v-model="deleteDialogVisible"
+    :confirmDelete="
+      () => {
+        confirmDelete();
+      }
+    "
+    :deleteText="deleteText"
+    :deletedKey="deletedKey"
+  />
+</template>
+
+<script setup>
+import DeleteDialog from '@/components/DeleteDialog.vue';
+import { handleError } from '@/utilities/errorHandler';
+import { FilterMatchMode } from 'primevue/api';
+import { ref, onMounted, computed } from 'vue';
+import * as yup from 'yup';
+import { useI18n } from 'vue-i18n';
+import apiClient from '@/api/apiClient';
+import { useMainStore } from '@/stores/mainStore';
+import { useForm } from 'vee-validate';
+import PageTopBar from '../../../components/pageTopBar.vue';
+
+const ExpensesCategory = ref([
+  { id: 1, name: 'Bonus' },
+  { id: 2, name: 'Incentive' },
+  { id: 3, name: 'Expenses' }
+]);
+
+const entities = ref([]);
+
+onMounted(async () => {
+  try {
+    const response = await apiClient.get(`/ExpenseTypes`);
+    entities.value = response.data.data;
+  } catch (err) {
+    handleError(err, mainStore.loading);
+  }
+});
+
+const mainStore = useMainStore();
+const rtl = computed(() => mainStore.isRTL);
+const containerClass = computed(() => ({
+  rtl: mainStore.isRTL,
+  ltr: !mainStore.isRTL
+}));
+const { t, locale } = useI18n();
+
+const props = defineProps({
+  name: {
+    type: String,
+    required: true
+  },
+  controllerName: {
+    type: String,
+    required: true
+  }
+});
+
+const filters = ref({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS }
+});
+
+const visible = ref(false);
+const initialValues = ref({
+  arabicName: '',
+  englishName: ''
+});
+
+const schema = yup.object().shape({
+  editName: yup.string().required('Arabic Name is required'),
+  editGlAccount: yup.string().required('English Name is required'),
+  editBusinessTransaction: yup.string().required('English Name is required'),
+
+  editExpensesCategoryName: yup.string().required('English Name is required'),
+
+  editId: yup.string('editId')
+});
+const { handleSubmit, errors, resetForm, setValues, defineField } = useForm({
+  validationSchema: schema,
+  initialValues: initialValues.value
+});
+
+const [editName, editNameAttrs] = defineField('editName');
+const [editGlAccount, editGlAccountAttrs] = defineField('editGlAccount');
+const [editBusinessTransaction, editBusinessTransactionAttrs] = defineField('editBusinessTransaction');
+const [editExpensesCategoryName, editExpensesCategoryNameAttrs] = defineField('editExpensesCategoryName');
+
+const [editId, editIdAttrs] = defineField('editId');
+
+// Update create Functionality
+
+const isEdit = ref(false);
+const openCreateDialog = () => {
+  visible.value = true;
+  isEdit.value = false;
+};
+
+const createData = handleSubmit(async (validatedInfo) => {
+  const transformedInfo = {
+    name: validatedInfo.editName,
+    glAccount: validatedInfo.editGlAccount,
+    businessTransaction: validatedInfo.editBusinessTransaction,
+    expensesCategory: validatedInfo.editExpensesCategoryName
+  };
+  try {
+    const response = await apiClient.post(`/ExpenseTypes`, transformedInfo);
+    entities.value.push(response.data.data);
+    mainStore.loading.setNotificationInfo('success', response.data.message);
+    resetForm();
+    visible.value = false;
+    editExpensesCategoryName.value = validatedInfo.editExpensesCategoryName;
+  } catch (err) {
+    handleError(err, mainStore.loading);
+  }
+});
+
+const updateData = handleSubmit(async (validatedInfo) => {
+  // const selectedCategory = ;
+
+  const transformedInfo = {
+    id: validatedInfo.editId,
+
+    name: validatedInfo.editName,
+    glAccount: validatedInfo.editGlAccount,
+    businessTransaction: validatedInfo.editBusinessTransaction,
+    expensesCategory: validatedInfo.editExpensesCategoryName
+    // expensesCategoryName: selectedCategory.name
+  };
+  console.log('transformedInfo');
+  console.log(transformedInfo);
+  console.log(editId.value);
+  try {
+    const response = await apiClient.put(`/ExpenseTypes/${editId.value}`, transformedInfo);
+
+    const index = entities.value.findIndex((entity) => entity.id === editId.value);
+
+    entities.value[index] = { ...entities.value[index], ...response.data.data };
+
+    entities.value[index].expensesCategoryName = ExpensesCategory.value.find((category) => category.id === validatedInfo.editExpensesCategoryName).name;
+
+    mainStore.loading.setNotificationInfo('success', response.data.message);
+
+    resetForm();
+    isEdit.value = false;
+    visible.value = false;
+    transformedInfo.value = {};
+  } catch (err) {
+    handleError(err, mainStore.loading);
+  }
+});
+
+const name = ref('');
+
+const editItem = async (data) => {
+  console.log(data);
+  console.log('ccccccccccccccccccccccc');
+  setValues({
+    name: data.editName,
+    glAccount: data.editGlAccount,
+    businessTransaction: data.editBusinessTransaction,
+    expensesCategoryName: data.editExpensesCategoryName,
+
+    editId: data.id
+  });
+  visible.value = true;
+
+  isEdit.value = true;
+
+  editName.value = data.name;
+
+  editGlAccount.value = data.glAccount;
+  editBusinessTransaction.value = data.businessTransaction;
+  editExpensesCategoryName.value = data.expensesCategoryName;
+};
+
+//Delete Option
+const deleteDialogVisible = ref(false);
+const deleteText = ref('');
+const deletedKey = ref('');
+
+const confirmDelete = async () => {
+  console.log(deletedKey.value);
+  try {
+    const response = await apiClient.delete(`/ExpenseTypes/${deletedKey.value}`);
+    const index = entities.value.findIndex((entity) => entity.id === deletedKey.value);
+    entities.value.splice(index, 1);
+    deleteDialogVisible.value = false;
+    mainStore.loading.setNotificationInfo('success', response.data.message);
+  } catch (err) {
+    handleError(err, mainStore.loading);
+  }
+};
+
+const rowsPerPage = ref(20);
+const currentPage = ref(0);
+
+const onPageChange = (event) => {
+  currentPage.value = event.page ?? 0;
+};
+
+const onRowsChange = (newRows) => {
+  rowsPerPage.value = newRows;
+  currentPage.value = 0;
+};
+
+const paginatedCustomers = computed(() => {
+  if (!entities.value || !Array.isArray(entities.value)) {
+    return [];
+  }
+  const start = currentPage.value * rowsPerPage.value;
+  const end = start + rowsPerPage.value;
+  return entities.value.slice(start, end);
+});
+
+// watch(editExpensesCategoryName, (newId) => {
+//   const selectedCategory = ExpensesCategory.value.find(category => category.id === newId);
+//   editExpensesCategoryName.value = selectedCategory ? selectedCategory.id : null;
+// });
+
+// const selectedCategory = ExpensesCategory.value.find(category => category.id === editExpensesCategoryName);
+</script>
+
+<style scoped>
+.rtl-direction :deep(.p-datatable .p-datatable-tbody > tr > td) {
+  text-align: right;
+}
+:deep(.p-paginator .p-dropdown .p-dropdown-label) {
+  padding-right: 1rem;
+}
+.rtl-direction :deep(.p-paginator .p-paginator-first) {
+  rotate: 180deg;
+}
+.rtl-direction :deep(.p-paginator .p-paginator-prev) {
+  rotate: 180deg;
+}
+.rtl-direction :deep(.p-paginator .p-paginator-next) {
+  rotate: 180deg;
+}
+.rtl-direction :deep(.p-paginator .p-paginator-last) {
+  rotate: 180deg;
+}
+</style>

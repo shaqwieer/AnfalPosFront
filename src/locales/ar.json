@@ -192,7 +192,10 @@
     "ID": "المعرّف",
     "Code": "الرمز",
     "Description": "الوصف",
-    "Days": "الأيام"
+    "Days": "الأيام",
+    "GlAccount": "Gl حساب",
+    "BusinessTransaction": "صفقة العمل",
+    "ExpensesCategory": "فئة النفقات"
   },
   "label": {
     "search": "بحث"
@@ -710,5 +713,6 @@
   "customerCode": "رمز العميل",
   "paymentTerm": "مدة الدفع",
   "Actions": "الإجراءات",
-  "Late_Session": "الجلسة المتأخرة"
+  "Late_Session": "الجلسة المتأخرة",
+  "ExpenseTypes": "أنواع النفقات"
 }
