@@ -591,7 +591,6 @@ onMounted(async () => {
 
           <div class="field flex flex-column w-6">
             <label for="branchType" class="mb-3">{{ $t('branchDialog.customerCode') }}</label>
-            {{ customerCodeId }}
 
             <Dropdown
               v-model="customerCodeId"
