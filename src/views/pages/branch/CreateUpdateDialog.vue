@@ -418,44 +418,35 @@ onMounted(async () => {
 
         <div class="flex gap-2">
           <div class="field flex flex-column w-6">
-            <label for="bankAccounts" class="mb-3">{{ $t('branchDialog.bankAccounts') }}</label>
-
-            <InputText id="bankAccounts" v-model="bankAccounts" v-bind="bankAccountsAttrs" :invalid="!!errors.bankAccounts" />
-
-            <small v-if="errors.bankAccounts" class="text-red-600">{{ errors.bankAccounts }}</small>
-          </div>
-
-          <div class="field flex flex-column w-6">
             <label for="bankPosFirst" class="mb-3">Bank POS1</label>
             <InputText id="bankPosFirst" v-model="bankPosFirst" v-bind="bankPosFirstAttrs" :invalid="!!errors.bankPosFirst" />
             <small v-if="errors.bankPosFirst" class="text-red-600">{{ errors.bankPosFirst }}</small>
           </div>
-        </div>
 
-        <div class="flex gap-2">
           <div class="field flex flex-column w-6">
             <label for="bankPosSecond" class="mb-3">Bank POS2</label>
             <InputText id="bankPosSecond" v-model="bankPosSecond" v-bind="bankPosSecondAttrs" :invalid="!!errors.bankPosSecond" />
             <small v-if="errors.bankPosSecond" class="text-red-600">{{ errors.bankPosSecond }}</small>
           </div>
+        </div>
 
+        <div class="flex gap-2">
           <div class="field flex flex-column w-6">
             <label for="bankPosThird" class="mb-3">Bank POS3</label>
             <InputText id="bankPosThird" v-model="bankPosThird" v-bind="bankPosThirdAttrs" :invalid="!!errors.bankPosThird" />
             <small v-if="errors.bankPosThird" class="text-red-600">{{ errors.bankPosThird }}</small>
           </div>
-        </div>
-
-        <div class="flex gap-2">
-          <div class="field flex flex-column w-4">
+          <div class="field flex flex-column w-6">
             <label for="cajoNumber" class="mb-3">{{ $t('branchDialog.cajoNumber') }}</label>
 
             <InputText id="cajoNumber" v-model="cajoNumber" v-bind="cajoNumberAttrs" :invalid="!!errors.cajoNumber" />
 
             <small v-if="errors.cajoNumber" class="text-red-600">{{ errors.cajoNumber }}</small>
           </div>
+        </div>
 
-          <div class="field flex flex-column w-4">
+        <div class="flex gap-2">
+          <div class="field flex flex-column w-6">
             <label for="bankAccountId" class="mb-3">{{ $t('branchDialog.bankAccountId') }}</label>
 
             <InputText id="bankAccountId" v-model="bankAccountId" v-bind="bankAccountIdAttrs" :invalid="!!errors.bankAccountId" />
@@ -463,7 +454,7 @@ onMounted(async () => {
             <small v-if="errors.bankAccountId" class="text-red-600">{{ errors.bankAccountId }}</small>
           </div>
 
-          <div class="field flex flex-column w-4">
+          <div class="field flex flex-column w-6">
             <label for="bankName" class="mb-3">{{ $t('branchDialog.bankName') }}</label>
             <InputText id="bankName" v-model="bankName" v-bind="bankNameAttrs" :invalid="!!errors.bankName" />
             <small v-if="errors.bankName" class="text-red-600">{{ errors.bankName }}</small>
