@@ -421,6 +421,8 @@
     "pending": "pending",
     "rejected": "rejected",
     "New": "New Customer",
+    "Region": "Region",
+    "Branch": "Branch",
     "Location": "Location",
     "Created": "Created",
     "View": "View",

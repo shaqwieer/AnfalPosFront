@@ -146,7 +146,7 @@ const formatPrice = (price: number): string => {
         <Column field="cash" class="font-normal">
           <template #header="slotProps">
             <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal">{{ t('dashboard.cash') }}</span>
+              <span class="text-md flex justify-content-center font-normal">{{ t('dashboard.Cash') }}</span>
             </div>
           </template>
 
