@@ -401,6 +401,8 @@
     "Business_Info": "معلومات الشركة",
     "Credit_Limit": "حد الائتمان",
     "Balance": "الرصيد",
+    "Region": "المنطقة",
+    "Branch": "الفرع",
     "Status": "الحالة",
     "Customers": "العملاء",
     "all": "الكل",

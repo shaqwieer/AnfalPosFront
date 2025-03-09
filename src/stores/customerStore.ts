@@ -39,7 +39,7 @@ export const useCustomerStore = defineStore({
         formData.append('CrNumber', customer.cr);
         formData.append('VatNumber', customer.vat);
         formData.append('Industry', '');
-        formData.append('CreditLimit', customer.creditLimit);
+        //formData.append('CreditLimit', customer.creditLimit);
         formData.append('PaymentTerm', customer.paymentTerm);
         formData.append('Latitude', customer.location.lat);
         formData.append('Altitude', customer.location.lng);
@@ -56,6 +56,9 @@ export const useCustomerStore = defineStore({
         formData.append('FinanceNotes', customer.financialNotes);
         formData.append('IsBusinessPartner', 'true');
         formData.append('AdditionalNotes', customer.notes);
+        formData.append('PaymentTermId', customer.paymentTerm);
+        formData.append('RegionId', customer.Region);
+        formData.append('BranchId', customer.branchId);
         customer.attachments.forEach((file, index) => {
           formData.append(`CustomerAttachments[${index}].attachmentTypeId`, file.id);
           formData.append(`CustomerAttachments[${index}].attachmentTypeData`, file.file);
@@ -80,8 +83,7 @@ export const useCustomerStore = defineStore({
         formData.append('CrNumber', customer.cr || '');
         formData.append('VatNumber', customer.vat || '');
         formData.append('Industry', '');
-        formData.append('CreditLimit', customer.creditLimit?.toString() || '0');
-        formData.append('PaymentTerm', customer.paymentTerm?.toString() || '0');
+        //formData.append('CreditLimit', customer.creditLimit?.toString() || '0');
 
         if (customer.location) {
           formData.append('Latitude', customer.location.lat?.toString() || '0');
@@ -104,6 +106,9 @@ export const useCustomerStore = defineStore({
         formData.append('FinanceNotes', customer.financialNotes);
         formData.append('IsBusinessPartner', 'true');
         formData.append('AdditionalNotes', customer.notes);
+        formData.append('PaymentTermId', customer.paymentTerm);
+        formData.append('RegionId', customer.Region);
+        formData.append('BranchId', customer.branchId);
 
         if (customer.attachments && Array.isArray(customer.attachments)) {
           customer.attachments.forEach((file, index) => {

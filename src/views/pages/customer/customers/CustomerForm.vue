@@ -35,21 +35,22 @@ const selectedRegion = ref('');
 // Form data with all fields
 const formData = ref({
   // Basic Information
+  branchId: props.customer?.branchId || '',
   id: props.customer?.id || '',
   name: props.customer?.name || '',
   type: props.customer?.type || 'business',
   mobile: props.customer?.primaryPhone || '',
   email: props.customer?.email || '',
 
-  Region: props.customer?.selectedRegion || '',
+  Region: props.customer?.regionId || '',
 
-  // Business Information
+  // Business Informationa
   cr: props.customer?.crNumber || '',
   vat: props.customer?.vatNumber || '',
 
   // Financial Information
   creditLimit: props.customer?.creditLimit || 0,
-  paymentTerms: props.customer?.paymentTerms || '75',
+  paymentTerm: props.customer?.paymentTerm || '75',
   bankName: props.customer?.bankName || '',
   bankAccount: props.customer?.accountNumber || '',
   iban: props.customer?.iban || '',
@@ -311,15 +312,23 @@ const isLoaded = ref(false);
 
 onMounted(() => {
   isLoaded.value = true;
+  getCustomerLookups();
 });
 
 const Regions = ref([]);
-
+const CustomerLookups = ref({ regions: [], paymentTerms: [], branches: [] });
+const getCustomerLookups = async () => {
+  try {
+    const response = await apiClient.get(`/Customers/GetCustomerLookups`);
+    CustomerLookups.value = response.data.data;
+  } catch (err) {
+    handleError(err);
+  }
+};
 const gitRegions = async () => {
   try {
     const response = await apiClient.get(`/Regions`);
     Regions.value = response.data.data;
-    console.log(Regions.value);
   } catch (err) {
     handleError(err);
   }
@@ -339,6 +348,14 @@ const gitRegions = async () => {
                 <div class="flex-1 overflow-y-auto px-6">
                   <!-- Basic Information -->
                   <div v-show="leftColumnTab === 'basic'" class="flex flex-column gap-4">
+                    <div>
+                      <label class="block text-sm font-medium text-700 mb-1"> {{ $t(`Customer.Branch`) }} </label>
+                      <Dropdown v-model="formData.branchId" :options="CustomerLookups.branches" optionLabel="name" optionValue="id" placeholder="Select a Branch" class="w-full">
+                        <template #option="slotProps">
+                          {{ slotProps.option.name }}
+                        </template>
+                      </Dropdown>
+                    </div>
                     <div>
                       <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Customer_Name`) }}</label>
                       <input v-model="formData.name" type="text" required :disabled="readOnly" class="w-full p-inputtext" />
@@ -376,14 +393,11 @@ const gitRegions = async () => {
                       <input v-model="formData.vat" type="text" :disabled="readOnly" class="w-full p-inputtext" />
                     </div>
 
-                    {{ selectedRegion.regionCode }}
-
-                    <Dropdown @click="gitRegions" v-model="selectedRegion" :options="Regions" optionLabel="name" placeholder="Select a City" class="w-full md:w-14rem">
+                    <!-- <Dropdown @click="gitRegions" v-model="selectedRegion" :options="CustomerLookups.regions" optionLabel="name" placeholder="Select a City" class="w-full">
                       <template #option="slotProps">
                         {{ slotProps.option.name }}
                       </template>
-                    </Dropdown>
-
+                    </Dropdown> -->
                     <!-- <Dropdown @click="gitRegions" v-model="selectedCity" :options="cities" optionLabel="name" placeholder="Select a City" class="w-full md:w-14rem" /> -->
                   </div>
                 </div>
@@ -439,6 +453,14 @@ const gitRegions = async () => {
                   <!-- Address Information -->
                   <div class="flex flex-column gap-6">
                     <!-- Map View -->
+                    <div>
+                      <label class="block text-sm font-medium text-700 mb-1"> {{ $t(`Customer.Region`) }} </label>
+                      <Dropdown v-model="formData.Region" :options="CustomerLookups.regions" optionLabel="name" optionValue="id" placeholder="Select a Region" class="w-full">
+                        <template #option="slotProps">
+                          {{ slotProps.option.name }}
+                        </template>
+                      </Dropdown>
+                    </div>
 
                     <div class="h-300px border-round-lg border-1 surface-border overflow-hidden relative">
                       <!-- <div ref="mapRef" class="w-full h-full"></div> -->
@@ -548,17 +570,17 @@ const gitRegions = async () => {
                 <div class="flex-1 overflow-y-auto px-6">
                   <!-- Credit and Payment Terms -->
                   <div class="grid">
-                    <div class="col-12 md:col-6">
+                    <div v-if="false" class="col-12 md:col-6">
                       <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Credit_Limit`) }} (SAR)</label>
                       <input v-model="formData.creditLimit" type="number" min="0" step="1000" required :disabled="readOnly" class="w-full p-inputtext" />
                     </div>
-                    <div class="col-12 md:col-6">
+                    <div class="col-12">
                       <label class="block text-sm font-medium text-700 mb-1"> {{ $t(`Customer.Payment_Terms`) }} </label>
-                      <select v-model="formData.paymentTerms" required :disabled="readOnly" class="w-full p-inputtext">
-                        <option v-for="term in paymentTermsOptions" :key="term.value" :value="term.value">
-                          {{ term.label }}
-                        </option>
-                      </select>
+                      <Dropdown v-model="formData.paymentTerm" :options="CustomerLookups.paymentTerms" optionValue="id" optionLabel="description" placeholder="Select a Payment Term" class="w-full">
+                        <template #option="slotProps">
+                          {{ slotProps.option.description }}
+                        </template>
+                      </Dropdown>
                     </div>
                   </div>
                   <!-- Financial Notes -->
