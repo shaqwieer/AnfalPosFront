@@ -222,7 +222,7 @@ const getStatusColor = (rate: number) => {
 
           <template #body="slotProps">
             <div class="flex flex-row justify-content-center align-items-center text-red-600">
-              <span class="font-semibold text-md">{{ slotProps.data.collections }}%</span>
+              <span class="font-semibold text-md">{{ slotProps.data.collections }}</span>
             </div>
           </template>
         </Column>

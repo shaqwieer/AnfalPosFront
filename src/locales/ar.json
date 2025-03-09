@@ -376,7 +376,13 @@
     "bankAccountNo": "رقم الحساب البنكي",
     "additionalfields": "حقول إضافية",
     "EnablePriceChange": "تمكين تغيير السعر",
-    "disablePriceChange": "تعطيل تغيير السعر"
+    "disablePriceChange": "تعطيل تغيير السعر",
+    "EnableBulk": "تمكين الجزء الأكبر",
+    "DefaultPaymentTerm": "مصطلح الدفع الافتراضي",
+    "DefaultCreditLimit": "حد الائتمان الافتراضي",
+    "paymentTermPlaceholder": "مدة الدفع",
+    "creditLimitPlaceholder": "حد الائتمان الافتراضي",
+    "paymentTerm": "مدة الدفع"
   },
   "items": {
     "title": "الأصناف",
@@ -448,7 +454,10 @@
     "Business_Information": "معلومات الشركة",
     "Address_Information": "معلومات العنوان",
     "Documents": "المستندات",
-    "Notes": "الملاحظات"
+    "Notes": "الملاحظات",
+    "BulkStorageLocation": "موقع التخزين بالجملة",
+    "BulkOrderType": "نوع الطلب بالجملة",
+    "DefaultCreditLimit": "حد الائتمان الافتراضي"
   },
   "organizationConfig": {
     "basePriceCode": "كود السعر الأساسي",

@@ -376,14 +376,20 @@
     "primaryPhone": "Primary Phone Number",
     "secondaryPhone": "Secondary Phone Number",
     "customerCode": "Customer Code",
-    "cajoNumber": "cajo Number",
-    "bankAccountId": "bank Account Id",
-    "bankName": "bank Name",
-    "bankCode": "bank Code",
-    "bankAccountNo": "bank Account",
-    "additionalfields": "additional fields",
+    "cajoNumber": "Cajo Number",
+    "bankAccountId": "Bank Account ID",
+    "bankName": "Bank Name",
+    "bankCode": "Bank Code",
+    "bankAccountNo": "Bank Account",
+    "additionalfields": "Additional fields",
     "EnablePriceChange": "Enable Price Change",
-    "disablePriceChange": "Disable Price Change"
+    "disablePriceChange": "Disable Price Change",
+    "EnableBulk": "Enable Bulk",
+    "DefaultPaymentTerm": "Default Payment Term",
+    "DefaultCreditLimit": "Default Credit Limit",
+    "paymentTermPlaceholder": "Payment Term",
+    "creditLimitPlaceholder": "Default Credit Limit",
+    "paymentTerm": "Payment Term"
   },
   "items": {
     "title": "items",
@@ -455,7 +461,10 @@
     "Business_Information": "Business Information",
     "Address_Information": "Address Information",
     "Documents": "Documents",
-    "Notes": "Notes"
+    "Notes": "Notes",
+    "BulkStorageLocation": "Bulk Storage Location",
+    "BulkOrderType": "Bulk Order Type",
+    "DefaultCreditLimit": "Default Credit Limit"
   },
   "organizationConfig": {
     "basePriceCode": "Base Price Code",
@@ -540,7 +549,7 @@
     "Actual": "Actual",
     "of_target": "of target",
     "Collections": "Collections",
-    "Cash": "Cash",
+    "cash": "Cash",
     "VISA": "VISA",
     "Bank": "Bank",
     "OpenSessions": "Open Sessions",
@@ -644,7 +653,7 @@
     "empty": "No Sessions Found",
     "SalesRep": "Sales Rep",
     "SessionDate": "Session Date",
-    "CashAmount": "Cash Amount",
+    "CashAmount": "Amount",
     "Start": "Session Start",
     "Close": "Session Close",
     "Bank": "Bank",
@@ -711,7 +720,7 @@
   "Warning": "Warning",
   "AddBranch": "Add Branch",
   "customerCode": "Customer Code",
-  "paymentTerm": "payment Term",
+  "paymentTerm": "Payment Term",
   "Actions": "Actions",
   "Late_Session": "Late Session"
 }

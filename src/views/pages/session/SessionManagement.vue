@@ -203,7 +203,7 @@ const paginatedCustomers = computed(() => {
     <div class="max-w-7xl mx-auto">
       <!-- Filters -->
       <div class="px-3" v-if="showFilter">
-        <div class="row-gap-3 border-round-lg border-1 p-4 grid gap-0 w-full align-items-end justify-content-between" :class="[darkMode ? 'bg-surface-card text-white border-gray-600' : 'bg-white text-gray-700 border-gray-300']">
+        <div class="row-gap-3 border-round-lg border-1 p-2 py-3 grid gap-0 w-full align-items-end justify-content-between" :class="[darkMode ? 'bg-surface-card text-white border-gray-600' : 'bg-white text-gray-700 border-gray-300']">
           <div class="col-12 sm:col-6 lg:col-3 xl:col-3 p-0 sm:px-2 xl:p-2">
             <div class="h-full cursor-pointer">
               <div class="relative">
@@ -241,9 +241,9 @@ const paginatedCustomers = computed(() => {
           </div>
 
           <div class="col-12 xl:col-1 p-0 sm:px-2 xl:p-2">
-            <div class="w-full xl:w-fit surface-card cursor-pointer">
-              <div class="align-self-end w-full xl:w-fit">
-                <Button size="small" icon="pi pi-filter" :label="t('Filter')" class="w-full xl:w-fit h-3rem" @click="applyFilters" />
+            <div class="w-full surface-card cursor-pointer">
+              <div class="align-self-end w-full">
+                <Button size="small" icon="pi pi-filter" :label="t('Filter')" class="w-full flex justify-content-center gap-0 h-3rem" @click="applyFilters" />
               </div>
             </div>
           </div>
@@ -254,36 +254,42 @@ const paginatedCustomers = computed(() => {
       <div class="grid p-2">
         <!-- Open Sessions -->
         <div class="col-12 md:col-12 lg:col-4 xl:col-3 xl:p-2">
-          <div class="dark:surface-900 border-round-lg shadow-1 border-1 pl-4 pt-4 pr-3 pb-3 h-full flex flex-row justify-content-between" :class="[darkMode ? 'bg-blue-900 border-blue-500 text-blue-300' : 'bg-blue-50 border-blue-200 text-blue-500']">
+          <div
+            class="pl-3 pr-3 pt-3 pb-3 gap-2 flex flex-column dark:surface-900 border-round-lg shadow-1 border-1 h-full justify-content-between"
+            :class="[darkMode ? 'bg-blue-900 border-blue-500 text-blue-300' : 'bg-blue-50 border-blue-200 text-blue-500']"
+          >
             <div>
               <div class="text-md font-medium">{{ t('Session.OpenSessions') }}</div>
-              <div class="text-3xl font-bold">
+              <div class="text-xl font-bold">
                 {{ sessionStore.sessionData?.openSession }}
               </div>
             </div>
-            <div class="flex flex-column w-6 justify-content-end">
+
+            <!-- style="min-width: 95px" -->
+
+            <div class="flex flex-column">
               <div className="flex align-items-center justify-content-between">
                 <div className="flex align-items-center gap-2">
-                  <i class="pi pi-check-circle text-green-600 text-lg" />
-                  <span className="text-green-600 font-semibold text-lg">On Track</span>
+                  <i class="pi pi-check-circle text-green-600 text-md" />
+                  <span className="text-green-600 font-semibold text-md">On Track</span>
                 </div>
-                <span className="font-semibold text-green-600 text-lg">{{ sessionStore.sessionData?.openSession - sessionStore.sessionData?.oldSession }}</span>
+                <span className="font-semibold text-green-600 text-md">{{ sessionStore.sessionData?.openSession - sessionStore.sessionData?.oldSession }}</span>
               </div>
               <div className="flex align-items-center justify-content-between">
                 <div className="flex align-items-center gap-2">
                   <i class="pi pi-exclamation-circle text-orange-500 text-lg" />
                   <span className="text-orange-500 text-lg font-semibold">Late</span>
                 </div>
-                <span className="font-semibold text-orange-500 text-lg">{{ sessionStore.sessionData?.oldSession }}</span>
+                <span className="font-semibold text-orange-500 text-md">{{ sessionStore.sessionData?.oldSession }}</span>
               </div>
             </div>
           </div>
         </div>
 
         <div class="col-12 md:col-6 lg:col-4 xl:col-2 xl:p-2">
-          <div class="border-round-lg shadow-1 border-yellow-200 border-1 p-4 h-full" :class="[darkMode ? 'bg-yellow-900 border-yellow-500 text-yellow-400' : 'bg-yellow-50 border-yellow-200 text-yellow-600']">
+          <div class="pl-3 pr-3 pt-3 pb-3 gap-2 border-round-lg shadow-1 border-yellow-200 border-1 p-4 h-full" :class="[darkMode ? 'bg-yellow-900 border-yellow-500 text-yellow-400' : 'bg-yellow-50 border-yellow-200 text-yellow-600']">
             <div class="text-md font-medium">{{ 'Closed Sessions' }}</div>
-            <div class="text-3xl font-bold">
+            <div class="text-2xl font-bold">
               {{ sessionStore.sessionData?.closedSession }}
             </div>
           </div>
@@ -292,9 +298,9 @@ const paginatedCustomers = computed(() => {
         <!-- Pending Sessions -->
 
         <div class="col-12 md:col-6 lg:col-4 xl:col-2 xl:p-2">
-          <div class="border-round-lg shadow-1 border-orange-200 border-1 p-4 h-full" :class="[darkMode ? 'bg-orange-900 border-orange-500 text-orange-400' : 'bg-orange-50 border-orange-200 text-orange-600']">
+          <div class="border-round-lg pl-3 pr-3 pt-3 pb-3 gap-2 shadow-1 border-orange-200 border-1 p-4 h-full" :class="[darkMode ? 'bg-orange-900 border-orange-500 text-orange-400' : 'bg-orange-50 border-orange-200 text-orange-600']">
             <div class="text-md font-medium">{{ t('Session.PendingSessions') }}</div>
-            <div class="text-3xl font-bold">
+            <div class="text-2xl font-bold">
               {{ sessionStore.sessionData?.pendingSession }}
             </div>
           </div>
@@ -303,18 +309,18 @@ const paginatedCustomers = computed(() => {
         <!-- Old Sessions -->
 
         <div class="col-12 md:col-6 lg:col-6 xl:col-2 xl:p-2">
-          <div class="border-round-lg shadow-1 border-green-400 border-1 p-4 h-full" :class="[darkMode ? 'bg-green-900 border-green-500 text-green-400' : 'bg-green-50 border-green-400 text-green-600']">
+          <div class="border-round-lg shadow-1 pl-3 pr-3 pt-3 pb-3 gap-2 border-green-400 border-1 p-4 h-full" :class="[darkMode ? 'bg-green-900 border-green-500 text-green-400' : 'bg-green-50 border-green-400 text-green-600']">
             <div class="text-md font-medium">{{ 'Approved Sessions' }}</div>
-            <div class="text-3xl font-bold">
+            <div class="text-2xl font-bold">
               {{ sessionStore.sessionData?.approvedSession }}
             </div>
           </div>
         </div>
 
         <div class="col-12 md:col-6 lg:col-6 xl:col-3 xl:p-2">
-          <div class="border-round-lg shadow-1 border-1 p-4 h-full" :class="[darkMode ? 'bg-purple-900 border-purple-500 text-purple-300' : 'bg-purple-50 border-purple-200 text-purple-500']">
+          <div class="border-round-lg shadow-1 border-1 pl-3 pr-3 pt-3 pb-3 gap-2 p-4 h-full" :class="[darkMode ? 'bg-purple-900 border-purple-500 text-purple-300' : 'bg-purple-50 border-purple-200 text-purple-500']">
             <div class="text-md font-medium">{{ t('Session.TotalAmount') }}</div>
-            <div class="text-3xl font-bold">{{ formatPrice(Number(sessionStore.sessionData?.totalAmount)) }}</div>
+            <div class="text-2xl font-bold">{{ formatPrice(Number(sessionStore.sessionData?.totalAmount)) }}</div>
           </div>
         </div>
       </div>
@@ -476,6 +482,54 @@ input[type='date'] {
   margin-left: 0rem;
   margin-top: 0rem;
 }
+/* 
+.overflow-scroll {
+  background: red !important;
+}
+
+.overflow-scroll::-webkit-scrollbar {
+  width: 0px !important;
+  height: 0px !important;
+}
+
+.overflow-scroll::-webkit-scrollbar-track {
+  width: 0px !important;
+  height: 0px !important;
+}
+
+.overflow-scroll::-webkit-scrollbar-thumb {
+  width: 0px !important;
+  height: 0px !important;
+}
+
+.overflow-scroll::-webkit-scrollbar-thumb:hover {
+  background: red;
+  width: 0px !important;
+  height: 0px !important;
+} */
+
+/* .overflow-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #e5e7eb transparent;
+}
+
+.overflow-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.overflow-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.overflow-scroll::-webkit-scrollbar-thumb {
+  background-color: #e5e7eb;
+  border-radius: 3px;
+}
+
+.overflow-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: #d1d5db;
+} */
 
 @keyframes fadeIn {
   from {

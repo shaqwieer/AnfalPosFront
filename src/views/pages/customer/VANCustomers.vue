@@ -213,8 +213,9 @@ const filteredCustomers = computed(() => {
 
               <template #body="slotProps">
                 <div class="flex flex-column align-items-start">
+                  <!-- {{ slotProps.data }} -->
                   <div class="font-semibold text-lg">{{ slotProps.data.name }}</div>
-                  <div class="text-sm text-gray-500">CUS-{{ slotProps.data.id }}</div>
+                  <div class="text-sm text-gray-500">{{  }} {{ slotProps.data.sapCustomer.replace("WST", "WST-") }}</div>
                 </div>
               </template>
             </Column>

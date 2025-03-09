@@ -51,6 +51,8 @@ const branchSchema = yup.object({
   secondaryPhone: yup.string().nullable(),
 
   city: yup.mixed().nullable(t('branchDialog.requiredError')),
+  defaultPaymentTermId: yup.mixed().nullable(t('branchDialog.paymentTerm')),
+
   branchType: yup.mixed().nullable(t('branchDialog.requiredError')),
   country: yup.mixed().nullable(t('branchDialog.requiredError')),
 
@@ -63,8 +65,13 @@ const branchSchema = yup.object({
   bankName: yup.mixed().nullable(),
   bankCode: yup.mixed().nullable(),
   bankAccountNo: yup.mixed().nullable(),
+  bulkStorageLocation: yup.mixed().nullable(),
+  defaultCustomerLimit: yup.mixed().nullable(),
+
+  bulkOrderType: yup.mixed().nullable(),
+  enableBulk: yup.mixed().nullable(),
+
   customerCodeId: yup.mixed().nullable(),
-  EnablePriceChange: yup.mixed().nullable(),
 
   bankAccounts: yup.mixed().nullable()
 });
@@ -78,6 +85,8 @@ const informationInitial = ref({
   secondaryPhone: '',
   salesRepCode: '',
   city: null,
+  defaultPaymentTermId: null,
+
   country: null,
   branchType: null,
   sapStorageLocation: '',
@@ -89,11 +98,16 @@ const informationInitial = ref({
   bankName: '',
   bankCode: '',
   bankAccountNo: '',
+  bulkStorageLocation: '',
+  defaultCustomerLimit: '',
+
+  bulkOrderType: '',
+  enablePriceChange: null,
+  enableBulk: null,
 
   bankPosFirst: null,
   bankPosSecond: null,
   customerCodeId: null,
-  EnablePriceChange: null,
 
   bankPosThird: null
 });
@@ -105,6 +119,8 @@ const { handleSubmit, errors, resetForm, setValues, defineField } = useForm({
 
 let countries = [];
 const cities = ref([]);
+const paymentTerms = ref([]);
+
 const filterCities = computed(() => {
   return cities.value.filter((e) => e.countryId === country?.value?.id);
 });
@@ -116,9 +132,13 @@ const [email, emailAttrs] = defineField('email');
 const [address, addressAttrs] = defineField('address');
 const [primaryPhone, primaryPhoneAttrs] = defineField('primaryPhone');
 const [secondaryPhone, secondaryPhoneAttrs] = defineField('secondaryPhone');
-const [EnablePriceChange, EnablePriceChangeAttrs] = defineField('EnablePriceChange');
+const [enablePriceChange, enablePriceChangeAttrs] = defineField('enablePriceChange');
+const [enableBulk, enableBulkAttrs] = defineField('enableBulk');
 
 const [city, cityAttrs] = defineField('city');
+
+const [defaultPaymentTermId, defaultPaymentTermIdAttrs] = defineField('defaultPaymentTermId');
+
 const [branchType, branchTypeAttrs] = defineField('branchType');
 const [country, countryAttrs] = defineField('country');
 
@@ -131,6 +151,11 @@ const [bankAccountId, bankAccountIdAttrs] = defineField('bankAccountId');
 const [bankName, bankNameAttrs] = defineField('bankName');
 const [bankCode, bankCodeAttrs] = defineField('bankCode');
 const [bankAccountNo, bankAccountNoAttrs] = defineField('bankAccountNo');
+const [bulkStorageLocation, bulkStorageLocationAttrs] = defineField('bulkStorageLocation');
+const [defaultCustomerLimit, defaultCustomerLimitAttrs] = defineField('defaultCustomerLimit');
+
+const [bulkOrderType, bulkOrderTypeAttrs] = defineField('bulkOrderType');
+
 const [customerCodeId, customerCodeIdAttrs] = defineField('customerCodeId');
 
 const [bankAccounts, bankAccountsAttrs] = defineField('bankAccounts');
@@ -147,14 +172,20 @@ const createData = handleSubmit(async (validatedInfo) => {
     profitCenter: validatedInfo.profitCenter || null,
     primaryPhone: validatedInfo.primaryPhone,
     OrganizationId: validatedInfo.organizationId || 1, // Provide default value if not present
-    bankAccountId: validatedInfo.bankAccounts || null,
-    EnablePriceChange: validatedInfo.EnablePriceChange || null,
+    bankAccountId: validatedInfo.bankAccountId || null,
+    enablePriceChange: validatedInfo.enablePriceChange || null,
+    enableBulk: validatedInfo.enableBulk || null,
 
     bankName: validatedInfo.bankName || null,
     bankCode: validatedInfo.bankCode || null,
     customerCodeId: validatedInfo.customerCodeId || null,
 
-    bankAccountNo: validatedInfo.bankAccounts || null,
+    bankAccountNo: validatedInfo.bankAccountNo || null,
+    bulkStorageLocation: validatedInfo.bulkStorageLocation || null,
+    defaultCustomerLimit: validatedInfo.defaultCustomerLimit || null,
+
+    bulkOrderType: validatedInfo.bulkOrderType || null,
+
     cajoNumber: validatedInfo.cajoNumber || null,
     bankAccountId: validatedInfo.bankAccountId || null,
 
@@ -168,9 +199,12 @@ const createData = handleSubmit(async (validatedInfo) => {
     BranchTypeId: validatedInfo.branchType?.id || 0,
     CountryId: validatedInfo.country?.id || 0,
     CityId: validatedInfo.city?.id || 0,
+    defaultPaymentTermId: validatedInfo.defaultPaymentTermId || 0,
+
     Email: validatedInfo.email,
     Address: validatedInfo.address
   };
+  console.log('validatedInfo');
   console.log(validatedInfo);
 
   props.createElement(branchDto);
@@ -186,7 +220,8 @@ const updateData = handleSubmit(async (validatedInfo) => {
     OrganizationId: validatedInfo.organizationId, // Provide default value if not present
     bankAccounts: validatedInfo.bankAccounts || null,
     customerCodeId: validatedInfo.customerCodeId || null,
-    EnablePriceChange: validatedInfo.EnablePriceChange || null,
+    enablePriceChange: validatedInfo.enablePriceChange || null,
+    enableBulk: validatedInfo.enableBulk || null,
 
     bankName: validatedInfo.bankName || null,
     bankCode: validatedInfo.bankCode || null,
@@ -194,6 +229,10 @@ const updateData = handleSubmit(async (validatedInfo) => {
     bankAccountId: validatedInfo.bankAccountId || null,
 
     bankAccountNo: validatedInfo.bankAccountNo || null,
+    bulkStorageLocation: validatedInfo.bulkStorageLocation || null,
+    defaultCustomerLimit: validatedInfo.defaultCustomerLimit || null,
+
+    bulkOrderType: validatedInfo.bulkOrderType || null,
 
     bankPosFirst: validatedInfo.bankPosFirst || null,
     bankPosSecond: validatedInfo.bankPosSecond || null,
@@ -205,9 +244,15 @@ const updateData = handleSubmit(async (validatedInfo) => {
     BranchTypeId: validatedInfo.branchType?.id || 0,
     CountryId: validatedInfo.country?.id || 0,
     CityId: validatedInfo.city?.id || 0,
+
+    defaultPaymentTermId: validatedInfo.defaultPaymentTermId?.id || 0,
+
     Email: validatedInfo.email,
     Address: validatedInfo.address
   };
+  console.log('validatedInfo');
+  console.log(validatedInfo);
+
   props.editElement(props.selectedData.id, branchDto);
   resetForm();
 });
@@ -225,7 +270,8 @@ const setFormValues = () => {
     cashCustomer: props.selectedData.cashCustomer,
     profitCenter: props.selectedData.profitCenter,
     bankAccounts: props.selectedData.bankAccounts,
-    EnablePriceChange: props.selectedData.EnablePriceChange,
+    enablePriceChange: props.selectedData.enablePriceChange,
+    enableBulk: props.selectedData.enableBulk,
 
     bankPosFirst: props.selectedData.bankPosFirst,
     bankPosSecond: props.selectedData.bankPosSecond,
@@ -237,10 +283,15 @@ const setFormValues = () => {
     bankName: props.selectedData.bankName,
     bankCode: props.selectedData.bankCode,
     bankAccountNo: props.selectedData.bankAccountNo,
+    bulkStorageLocation: props.selectedData.bulkStorageLocation,
+    defaultCustomerLimit: props.selectedData.defaultCustomerLimit,
+
+    bulkOrderType: props.selectedData.bulkOrderType,
 
     country: countries.find((e) => e.id === props.selectedData.countryId),
     branchType: branchTypes.find((e) => e.id === props.selectedData.branchTypeId),
-    city: cities.value.find((e) => e.id === props.selectedData.cityId)
+    city: cities.value.find((e) => e.id === props.selectedData.cityId),
+    defaultPaymentTermId: cities.value.find((e) => e.id === props.selectedData.defaultPaymentTermId)
   });
   console.log('props.selectedData');
   console.log(props.selectedData);
@@ -265,20 +316,30 @@ const customerCodes = ref([]);
 import apiClient from '@/api/apiClient';
 import { handleError } from '@/utilities/errorHandler';
 
+const getPaymentTerms = async () => {
+  try {
+    const response = await apiClient.get(`/PaymentTerms`);
+    paymentTerms.value = response.data.data;
+  } catch (err) {
+    handleError(err, mainStore.loading);
+  }
+};
+
 onMounted(async () => {
   try {
+    console.log(defaultPaymentTermId.value);
     const response = await apiClient.get(`/CustomerCodes`);
     customerCodes.value = response.data.data;
+    getPaymentTerms();
   } catch (err) {
     handleError(err, mainStore.loading);
   }
 });
-import TriStateCheckbox from 'primevue/tristatecheckbox';
 
-const toggleCheckbox = () => {
-  EnablePriceChange.value = EnablePriceChange.value === true ? false : true;
-  console.log(EnablePriceChange.value);
-};
+// const toggleCheckbox = () => {
+//   EnablePriceChange.value = EnablePriceChange.value === true ? false : true;
+//   console.log(EnablePriceChange.value);
+// };
 </script>
 
 <template>
@@ -299,7 +360,7 @@ const toggleCheckbox = () => {
           </div>
         </div>
       </div>
-
+      <!-- {{ paymentTerm }} -->
       <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
         <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.sapInformation') }}</h3>
         <div class="flex gap-2">
@@ -384,10 +445,6 @@ const toggleCheckbox = () => {
             <small v-if="errors.bankPosThird" class="text-red-600">{{ errors.bankPosThird }}</small>
           </div>
         </div>
-      </div>
-
-      <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
-        <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.additionalfields') }}</h3>
 
         <div class="flex gap-2">
           <div class="field flex flex-column w-4">
@@ -428,29 +485,67 @@ const toggleCheckbox = () => {
             <small v-if="errors.bankAccountNo" class="text-red-600">{{ errors.bankAccountNo }}</small>
           </div>
         </div>
+      </div>
 
-        <div class=" ">
-          <!-- <InputText id="bankAccountNo" v-model="bankAccountNo" v-bind="bankAccountNoAttrs" autofocus :invalid="!!errors.bankAccountNo" /> -->
+      <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
+        <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.additionalfields') }}</h3>
 
-          <div class="">
-            <input type="checkbox" @click.stop id="EnablePriceChange" class="m-0 mr-2 mt-2" v-model="EnablePriceChange" v-bind="EnablePriceChangeAttrs" :invalid="!!errors.EnablePriceChange" />
-
-            <label for="EnablePriceChange" class="m-0" style="position: relative; top: -2px">{{ $t('branchDialog.EnablePriceChange') }}</label>
-            <!-- <TriStateCheckbox  /> -->
-
-            <!-- <Button
-                :label="EnablePriceChange ? `${$t('branchDialog.EnablePriceChange')}` : `${t('branchDialog.disablePriceChange')}`"
-                @click="toggleCheckbox" 
-                
-                :severity="EnablePriceChange ? 'success' : 'danger'"
-                :class="EnablePriceChange ? 'bg-white border-green-500 text-green ' : '   bg-white border-red-500 text-red-500'"
-                class=" p-2 w-full shadow-none"
-                style="height: 40px;"
-                outlined
-              /> -->
+        <div class="flex gap-2">
+          <div class="field flex flex-column w-6">
+            <label class="mb-3">{{ $t(`Customer.BulkStorageLocation`) }} </label>
+            <InputText id="bulkStorageLocation" v-model="bulkStorageLocation" v-bind="bulkStorageLocationAttrs" autofocus :invalid="!!errors.bulkStorageLocation" />
+            <small v-if="errors.bulkStorageLocation" class="text-red-600">{{ errors.bulkStorageLocation }}</small>
           </div>
 
-          <small v-if="errors.EnablePriceChange" class="text-red-600">{{ errors.EnablePriceChange }}</small>
+          <div class="field flex flex-column w-6">
+            <label class="mb-3">{{ $t(`Customer.BulkOrderType`) }} </label>
+            <InputText id="bulkOrderType" v-model="bulkOrderType" v-bind="bulkOrderTypeAttrs" autofocus :invalid="!!errors.bulkOrderType" />
+            <small v-if="errors.bulkOrderType" class="text-red-600">{{ errors.bulkOrderType }}</small>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <div class="field flex flex-column w-6">
+            <label for="paymentTerm" class="mb-3">{{ $t('branchDialog.DefaultPaymentTerm') }}</label>
+            <Dropdown
+              v-model="defaultPaymentTermId"
+              v-bind="defaultPaymentTermIdAttrs"
+              :virtualScrollerOptions="{ itemSize: 38 }"
+              :options="paymentTerms"
+              filter
+              :loading="false"
+              optionLabel="description"
+              :placeholder="t('branchDialog.paymentTermPlaceholder')"
+              class="w-full"
+            >
+              <template #option="slotProps">
+                <div class="flex align-items-center mx-auto gap-3">
+                  <div>{{ slotProps.option.description }}</div>
+                </div>
+              </template>
+            </Dropdown>
+            <small v-if="errors.paymentTerm" class="text-red-600">{{ errors.paymentTerm }}</small>
+          </div>
+
+          <div class="field flex flex-column w-6">
+            <label class="mb-3">{{ $t(`Customer.DefaultCreditLimit`) }} </label>
+            <InputText id="creditLimit" v-model="defaultCustomerLimit" v-bind="defaultCustomerLimitAttrs" autofocus :invalid="!!errors.defaultCustomerLimit" />
+            <small v-if="errors.defaultCustomerLimit" class="text-red-600">{{ errors.defaultCustomerLimit }}</small>
+          </div>
+        </div>
+
+        <div class="">
+          <div class="">
+            <input type="checkbox" @click.stop id="EnablePriceChange" class="m-0 mr-2 mt-2" v-model="enablePriceChange" v-bind="enablePriceChangeAttrs" :invalid="!!errors.enablePriceChange" />
+            <label for="EnablePriceChange" class="m-0" style="position: relative; top: -2px">{{ $t('branchDialog.EnablePriceChange') }}</label>
+          </div>
+
+          <div class="">
+            <input type="checkbox" aria-label="EnableBulk" @click.stop id="EnableBulk" class="m-0 mr-2 mt-2" v-model="enableBulk" v-bind="enableBulkAttrs" :invalid="!!errors.enableBulk" />
+            <label for="EnableBulk" class="m-0" style="position: relative; top: -2px">{{ $t('branchDialog.EnableBulk') }}</label>
+          </div>
+
+          <small v-if="errors.enableBulk" class="text-red-600">{{ errors.enableBulk }}</small>
         </div>
       </div>
 
@@ -496,6 +591,8 @@ const toggleCheckbox = () => {
 
           <div class="field flex flex-column w-6">
             <label for="branchType" class="mb-3">{{ $t('branchDialog.customerCode') }}</label>
+            {{ customerCodeId }}
+
             <Dropdown
               v-model="customerCodeId"
               v-bind="customerCodeIdAttrs"

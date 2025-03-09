@@ -55,6 +55,8 @@ const formData = ref({
   iban: props.customer?.iban || '',
   swiftCode: props.customer?.swiftCode || '',
   financialNotes: props.customer?.financeNotes || '',
+  bulkStorageLocation: props.customer?.bulkStorageLocation || '',
+  bulkOrderType: props.customer?.bulkOrderType || '',
 
   // Address Information
   buildingNumber: props.customer?.buildingNumber || '',
@@ -417,6 +419,7 @@ const gitRegions = async () => {
                           <label class="block text-sm font-medium text-700 mb-1">IBAN</label>
                           <input v-model="formData.iban" type="text" :disabled="readOnly" class="w-full p-inputtext" placeholder="SA..." />
                         </div>
+
                         <div class="col-12 md:col-6">
                           <label class="block text-sm font-medium text-700 mb-1">SWIFT Code</label>
                           <input v-model="formData.swiftCode" type="text" :disabled="readOnly" class="w-full p-inputtext" />
@@ -552,6 +555,7 @@ const gitRegions = async () => {
                       <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Credit_Limit`) }} (SAR)</label>
                       <input v-model="formData.creditLimit" type="number" min="0" step="1000" required :disabled="readOnly" class="w-full p-inputtext" />
                     </div>
+
                     <div class="col-12 md:col-6">
                       <label class="block text-sm font-medium text-700 mb-1"> {{ $t(`Customer.Payment_Terms`) }} </label>
                       <select v-model="formData.paymentTerms" required :disabled="readOnly" class="w-full p-inputtext">
@@ -561,6 +565,7 @@ const gitRegions = async () => {
                       </select>
                     </div>
                   </div>
+
                   <!-- Financial Notes -->
                   <div>
                     <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.FinancialNotes`) }}</label>
