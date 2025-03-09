@@ -199,7 +199,7 @@ const createData = handleSubmit(async (validatedInfo) => {
     BranchTypeId: validatedInfo.branchType?.id || 0,
     CountryId: validatedInfo.country?.id || 0,
     CityId: validatedInfo.city?.id || 0,
-    defaultPaymentTermId: validatedInfo.defaultPaymentTermId || 0,
+    defaultPaymentTermId: validatedInfo.defaultPaymentTermId?.id || 0,
 
     Email: validatedInfo.email,
     Address: validatedInfo.address
@@ -291,7 +291,7 @@ const setFormValues = () => {
     country: countries.find((e) => e.id === props.selectedData.countryId),
     branchType: branchTypes.find((e) => e.id === props.selectedData.branchTypeId),
     city: cities.value.find((e) => e.id === props.selectedData.cityId),
-    defaultPaymentTermId: cities.value.find((e) => e.id === props.selectedData.defaultPaymentTermId)
+    defaultPaymentTermId: paymentTerms.value.find((e) => e.id === props.selectedData.defaultPaymentTermId)
   });
   console.log('props.selectedData');
   console.log(props.selectedData);

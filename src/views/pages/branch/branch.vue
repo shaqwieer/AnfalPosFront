@@ -129,6 +129,7 @@ const addData = async (data) => {
     response.data.data.cityName = cities.value.find((e) => e.id === response.data.data.cityId).name;
     entities.value.push(response.data.data);
     mainStore.loading.setNotificationInfo('success', response.data.message);
+    console.log(data)
   } catch (err) {
     handleError(err, mainStore.loading);
   }
