@@ -395,7 +395,10 @@
     "Group": "المجموعة",
     "price": "السعر",
     "Desc": "الوصف",
-    "empty": "لا توجد أصناف متاحة"
+    "empty": "لا توجد أصناف متاحة",
+    "SapItem": "Sap Item",
+    "sapPlant": "Sap Plant",
+    "baseUnit": "Base Unit"
   },
   "Customer": {
     "empty": "لا يوجد عملاء",

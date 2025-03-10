@@ -395,14 +395,17 @@
     "paymentTerm": "Payment Term"
   },
   "items": {
-    "title": "items",
+    "title": "Sap Items",
     "barcode": "barcode",
     "brand": "brand",
     "id": "id",
-    "Group": "Group",
+    "Group": "Item Group",
     "price": "price",
     "Desc": "Desc",
-    "empty": "No Items"
+    "empty": "No Items",
+    "SapItem": "Sap Item",
+    "sapPlant": "Sap Plant",
+    "baseUnit": "Base Unit"
   },
   "Customer": {
     "empty": "No Customer",

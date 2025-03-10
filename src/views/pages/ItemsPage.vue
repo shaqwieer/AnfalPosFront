@@ -28,37 +28,31 @@
         </div>
       </template>
 
-      <Column field="barcode" :header="t('items.barcode')" class="" :sortable="true">
+      <Column field="sapItem" :header="t('items.SapItem')" class="" :sortable="true">
         <template #body="slotProps">
           <div class="flex flex-row align-items-center">
-            <span class="font-semibold text-md">{{ slotProps.data.barcode }}</span>
+            <span class="font-semibold text-md">{{ slotProps.data.sapItem }}</span>
           </div>
         </template>
       </Column>
 
-      <Column field="brand" :header="t('items.brand')" class="" :sortable="true">
+      <Column field="sapPlant" :header="t('items.sapPlant')" class="" :sortable="true">
         <template #body="slotProps">
           <div class="flex flex-row align-items-center">
-            <span class="font-semibold text-md">{{ slotProps.data.brand }}</span>
+            <span class="font-semibold text-md">{{ slotProps.data.sapPlant }}</span>
           </div>
         </template>
       </Column>
 
-      <Column field="id" :header="t('items.id')" class="" :sortable="true">
+      <Column field="baseUnit" :header="t('items.baseUnit')" class="" :sortable="true">
         <template #body="slotProps">
           <div class="flex flex-row align-items-center">
-            <span class="font-semibold text-md">{{ slotProps.data.id }}</span>
+            <span class="font-semibold text-md">{{ slotProps.data.baseUnit }}</span>
           </div>
         </template>
       </Column>
 
-      <Column field="price" :header="t('items.price')" class="" :sortable="true">
-        <template #body="slotProps">
-          <div class="flex flex-row align-items-center">
-            <span class="font-semibold text-md">{{ slotProps.data.price }}</span>
-          </div>
-        </template>
-      </Column>
+  
 
       <Column field="itemGroup" :header="t('items.Group')" class="" :sortable="true">
         <template #body="slotProps">
@@ -105,9 +99,8 @@ onMounted(async () => {
 const getItems = async () => {
   try {
     console.log('response');
-    const response = await apiClient.get('/Items');
+    const response = await apiClient.get('/Items/GetItemsForCompany');
     ItemsData.value = response.data.data;
-    console.log('ItemsData.value');
   } catch (err) {
     console.log(err);
   }
