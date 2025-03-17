@@ -9,6 +9,11 @@ const router = createRouter({
       component: AppLayout,
       children: [
         {
+          path: 'items-availability',
+          name: 'Inventory',
+          component: () => import('@/views/pages/Inventory/SCInventoryPage.vue')
+        },
+        {
           path: 'invoices/draft',
           name: 'DraftOrders',
           component: () => import('@/views/pages/orders/DraftOrders.vue')
