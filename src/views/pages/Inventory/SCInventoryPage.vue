@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useSessionStore } from '../../../stores/sessionStore'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
+import apiClient from '../../../api/apiClient'
 
 const activeTab = ref('stock')
 const searchQuery = ref('')
-const selectedBranch = ref('all')
+const selectedBranch = ref('-1')
 const showTransferForm = ref(false)
 const selectedProduct = ref(null)
 const dateFrom = ref('')
@@ -11,41 +15,28 @@ const dateTo = ref('')
 const locationFrom = ref('')
 const locationTo = ref('')
 const requestNo = ref('')
+const sessionStore = useSessionStore()
+
+// Pagination state
+const first = ref(0)
+const rows = ref(10)
 
 // Sample data
-const branches = [
-  { id: 'main', name: 'Main Branch' },
-  { id: 'north', name: 'North Branch' },
-  { id: 'south', name: 'South Branch' },
-  { id: 'east', name: 'East Branch' }
-]
+const branches = ref<string[]>([])
+const inventory = ref([])
 
-const inventory = ref([
-  {
-    code: 'TRS-001',
-    name: 'Tire Rotation Service Kit',
-    category: 'Service Kits',
-    mainStock: 45,
-    branchStock: {
-      north: 15,
-      south: 20,
-      east: 10
-    },
-    unit: 'Kit',
-    minStock: 10,
-    maxStock: 50,
-    reorderPoint: 20,
-    batches: [
-      {
-        id: 'b1',
-        batchNumber: 'BATCH-001',
-        quantity: 50,
-        manufactureDate: '2024-01-15',
-        expiryDate: '2025-01-15'
-      }
-    ]
+const getInventoryItems = async () => {
+  try {
+    const response = await apiClient.post('/Items/AvailablityItemsForSpecificBranch', { 
+      branchId: selectedBranch.value,
+      searchTerm: searchQuery.value 
+    })
+    inventory.value = response.data.data
+    console.log('response', response)
+  } catch (err) {
+    console.log(err)
   }
-])
+}
 
 const transferRequests = ref([
   {
@@ -81,11 +72,12 @@ const closedRequests = ref([
 
 const filteredInventory = computed(() => {
   const query = searchQuery.value.toLowerCase()
+  if (query == null || query == '') return inventory.value
+
   return inventory.value.filter(item => 
-    (item.code.toLowerCase().includes(query) ||
-     item.name.toLowerCase().includes(query)) &&
-    (selectedBranch.value === 'all' || selectedBranch.value === 'main' || 
-     item.branchStock[selectedBranch.value] !== undefined)
+    (item.sapItem.toLowerCase().includes(query) ||
+     item.name.toLowerCase().includes(query) ||
+     item.arabicName.toLowerCase().includes(query))
   )
 })
 
@@ -117,7 +109,6 @@ const createTransferRequest = (item: any) => {
 }
 
 const submitTransferRequest = (formData: any) => {
-  // Handle transfer request submission
   console.log('Transfer request submitted:', formData)
   showTransferForm.value = false
   selectedProduct.value = null
@@ -139,6 +130,21 @@ const clearFilters = () => {
 const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString()
 }
+
+const onPage = (event: any) => {
+  first.value = event.first
+  rows.value = event.rows
+}
+
+onMounted(() => {
+  sessionStore.GetSalesReps().then(() => {
+    branches.value = sessionStore.salesReps.map((rep) => rep.id)
+    if (branches.value.length > 0) {
+      selectedBranch.value = branches.value[0]
+    }
+    getInventoryItems()
+  })
+})
 </script>
 
 <template>
@@ -150,20 +156,19 @@ const formatDate = (date: string) => {
 
     <!-- Tabs -->
     <div class="surface-card border-round-lg mb-4 shadow-1 border-1 surface-border">
-          <div class="border-bottom-1 surface-border">
-
-            <div class="flex">
-              <div
-                v-for="tab in ['stock', 'transfers', 'history']"
-                :key="tab"
-                @click="activeTab = tab"
-                class="py-3 px-4 focus:outline-none cursor-pointer border-bottom-2 font-medium transition-colors duration-200 capitalize"
-                :class="activeTab === tab ? 'border-primary text-primary' : 'border-transparent text-700 hover:text-900'"
-              >
-              {{ tab }}
-              </div>
-            </div>
+      <div class="border-bottom-1 surface-border">
+        <div class="flex">
+          <div
+            v-for="tab in ['stock', 'transfers', 'history']"
+            :key="tab"
+            @click="activeTab = tab"
+            class="py-3 px-4 focus:outline-none cursor-pointer border-bottom-2 font-medium transition-colors duration-200 capitalize"
+            :class="activeTab === tab ? 'border-primary text-primary' : 'border-transparent text-700 hover:text-900'"
+          >
+            {{ tab }}
           </div>
+        </div>
+      </div>
 
       <!-- Content Area -->
       <div class="p-4">
@@ -176,13 +181,12 @@ const formatDate = (date: string) => {
               <span class="relative p-input-icon-left w-full">
               <span class="absolute top-50 translate-y-50" style="left: 9px"><i class="pi pi-search"></i></span>
               <input v-model="searchQuery" type="text" class="p-inputtext w-full pl-5" placeholder="Search by code or name..." />
-            </span>
+              </span>
             </div>
             <div class="w-12rem">
-              <select v-model="selectedBranch" class="p-inputtext w-full">
-                <option value="all">All Branches</option>
-                <option value="main">Main Branch</option>
-                <option v-for="branch in branches" :key="branch.id" :value="branch.id">
+              <select v-model="selectedBranch" class="p-inputtext w-full" @change="getInventoryItems()">
+                <option value="-1">Select Branch</option>
+                <option v-for="branch in sessionStore.salesReps" :key="branch.id" :value="branch.id">
                   {{ branch.name }}
                 </option>
               </select>
@@ -190,73 +194,38 @@ const formatDate = (date: string) => {
           </div>
 
           <!-- Inventory Table -->
-          <div class="overflow-x-auto">
-            <table class="w-full">
-              <thead class="surface-100">
-                <tr>
-                  <th class="text-left p-3 font-medium">Material</th>
-                  <th class="text-left p-3 font-medium">Category</th>
-                  <th class="text-left p-3 font-medium">Stock Level</th>
-                  <th class="text-left p-3 font-medium">Branch Stock</th>
-                  <th class="text-left p-3 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody class="surface-ground">
-                <tr v-for="item in filteredInventory" :key="item.code" class="surface-card">
-                  <td class="p-3">
-                    <div class="flex align-items-start">
-                      <div>
-                        <div class="font-medium">{{ item.name }}</div>
-                        <div class="text-500">{{ item.code }}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="p-3">
-                    <span class="border-round-xl px-2 py-1 text-xs font-medium"
-                          :class="{
-                            'bg-purple-100 text-purple-800': item.category === 'Service Kits',
-                            'bg-blue-100 text-blue-800': item.category === 'Tools',
-                            'bg-green-100 text-green-800': item.category === 'Supplies'
-                          }">
-                      {{ item.category }}
-                    </span>
-                  </td>
-                  <td class="p-3">
-                    <div class="flex align-items-center gap-2">
-                      <span class="w-1rem h-1rem border-circle"
-                            :class="{
-                              'bg-red-500': getStockLevel(item.mainStock, item.minStock, item.maxStock) === 'critical',
-                              'bg-yellow-500': getStockLevel(item.mainStock, item.minStock, item.maxStock) === 'low',
-                              'bg-green-500': getStockLevel(item.mainStock, item.minStock, item.maxStock) === 'normal',
-                              'bg-blue-500': getStockLevel(item.mainStock, item.minStock, item.maxStock) === 'high'
-                            }">
-                      </span>
-                      <span>{{ item.mainStock }} {{ item.unit }}s</span>
-                    </div>
-                    <div class="text-500 text-sm">
-                      Min: {{ item.minStock }} | Max: {{ item.maxStock }}
-                    </div>
-                  </td>
-                  <td class="p-3">
-                    <div class="flex flex-column gap-1">
-                      <div v-for="(stock, branch) in item.branchStock" 
-                           :key="branch"
-                           class="flex align-items-center justify-content-between">
-                        <span class="text-500">{{ branches.find(b => b.id === branch)?.name }}:</span>
-                        <span class="font-medium">{{ stock }} {{ item.unit }}s</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="p-3">
-                    <button @click="createTransferRequest(item)"
-                            class="p-button p-button-text p-button-primary">
-                      Request Transfer
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <DataTable
+            :value="filteredInventory"
+            :paginator="true"
+            :rows="rows"
+            :first="first"
+            @page="onPage"
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            :rowsPerPageOptions="[5,10,20,50]"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+            responsiveLayout="scroll"
+            class="p-datatable-sm"
+          >
+            <Column field="sapItem" header="Code" sortable></Column>
+            <Column field="name" header="Material" sortable>
+              <template #body="slotProps">
+                <div>
+                  <div class="font-medium">{{ slotProps.data.arabicName }}</div>
+                  <div class="text-500">{{ slotProps.data.name }}</div>
+                </div>
+              </template>
+            </Column>
+            <Column field="itemGroup" header="Category" sortable></Column>
+            <Column field="stockLevel" header="Stock Level" sortable></Column>
+            <Column field="totalStock" header="Branch Stock" sortable></Column>
+            <Column header="Actions">
+              <template #body="slotProps">
+                <button @click="createTransferRequest(slotProps.data)" class="p-button p-button-text p-button-primary">
+                  Request Transfer
+                </button>
+              </template>
+            </Column>
+          </DataTable>
         </div>
 
         <!-- Transfer Requests Tab -->
@@ -334,13 +303,13 @@ const formatDate = (date: string) => {
               <div class="flex gap-2">
                 <select v-model="locationFrom" class="p-inputtext flex-1">
                   <option value="">From Location</option>
-                  <option v-for="branch in branches" :key="branch.id" :value="branch.name">
+                  <option v-for="branch in sessionStore.salesReps" :key="branch.id" :value="branch.name">
                     {{ branch.name }}
                   </option>
                 </select>
                 <select v-model="locationTo" class="p-inputtext flex-1">
                   <option value="">To Location</option>
-                  <option v-for="branch in branches" :key="branch.id" :value="branch.name">
+                  <option v-for="branch in sessionStore.salesReps" :key="branch.id" :value="branch.name">
                     {{ branch.name }}
                   </option>
                 </select>
@@ -431,7 +400,7 @@ const formatDate = (date: string) => {
               <div>
                 <label class="block font-medium mb-2">From Branch</label>
                 <select class="p-inputtext w-full">
-                  <option v-for="branch in branches" :key="branch.id" :value="branch.id">
+                  <option v-for="branch in sessionStore.salesReps" :key="branch.id" :value="branch.id">
                     {{ branch.name }}
                   </option>
                 </select>
@@ -440,7 +409,7 @@ const formatDate = (date: string) => {
               <div>
                 <label class="block font-medium mb-2">To Branch</label>
                 <select class="p-inputtext w-full">
-                  <option v-for="branch in branches" :key="branch.id" :value="branch.id">
+                  <option v-for="branch in sessionStore.salesReps" :key="branch.id" :value="branch.id">
                     {{ branch.name }}
                   </option>
                 </select>
@@ -484,9 +453,6 @@ const formatDate = (date: string) => {
   </div>
 </template>
 
-<style scoped>
-/* Custom scrollbar styles can be kept or removed as PrimeFlex doesn't provide scrollbar styling */
-.translate-y-50 {
-  transform: translateY(-50%);
-}
+<style>
+@import 'primeflex/primeflex.css';
 </style>
