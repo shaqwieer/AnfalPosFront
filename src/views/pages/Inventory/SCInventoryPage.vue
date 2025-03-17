@@ -156,19 +156,19 @@ onMounted(() => {
 
     <!-- Tabs -->
     <div class="surface-card border-round-lg mb-4 shadow-1 border-1 surface-border">
-      <div class="border-bottom-1 surface-border">
-        <div class="flex">
-          <div
-            v-for="tab in ['stock', 'transfers', 'history']"
-            :key="tab"
-            @click="activeTab = tab"
-            class="py-3 px-4 focus:outline-none cursor-pointer border-bottom-2 font-medium transition-colors duration-200 capitalize"
-            :class="activeTab === tab ? 'border-primary text-primary' : 'border-transparent text-700 hover:text-900'"
-          >
-            {{ tab }}
+          <div class="border-bottom-1 surface-border">
+            <div class="flex">
+              <div
+                v-for="tab in ['stock', 'transfers', 'history']"
+                :key="tab"
+                @click="activeTab = tab"
+                class="py-3 px-4 focus:outline-none cursor-pointer border-bottom-2 font-medium transition-colors duration-200 capitalize"
+                :class="activeTab === tab ? 'border-primary text-primary' : 'border-transparent text-700 hover:text-900'"
+              >
+              {{ tab }}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
       <!-- Content Area -->
       <div class="p-4">
@@ -181,7 +181,7 @@ onMounted(() => {
               <span class="relative p-input-icon-left w-full">
               <span class="absolute top-50 translate-y-50" style="left: 9px"><i class="pi pi-search"></i></span>
               <input v-model="searchQuery" type="text" class="p-inputtext w-full pl-5" placeholder="Search by code or name..." />
-              </span>
+            </span>
             </div>
             <div class="w-12rem">
               <select v-model="selectedBranch" class="p-inputtext w-full" @change="getInventoryItems()">
@@ -194,7 +194,7 @@ onMounted(() => {
           </div>
 
           <!-- Inventory Table -->
-          <DataTable
+            <DataTable
             :value="filteredInventory"
             :paginator="true"
             :rows="rows"
@@ -210,9 +210,9 @@ onMounted(() => {
             <Column field="name" header="Material" sortable>
               <template #body="slotProps">
                 <div>
-                  <div class="font-medium">{{ slotProps.data.arabicName }}</div>
+                        <div class="font-medium">{{ slotProps.data.arabicName }}</div>
                   <div class="text-500">{{ slotProps.data.name }}</div>
-                </div>
+                      </div>
               </template>
             </Column>
             <Column field="itemGroup" header="Category" sortable></Column>
@@ -221,8 +221,8 @@ onMounted(() => {
             <Column header="Actions">
               <template #body="slotProps">
                 <button @click="createTransferRequest(slotProps.data)" class="p-button p-button-text p-button-primary">
-                  Request Transfer
-                </button>
+                      Request Transfer
+                    </button>
               </template>
             </Column>
           </DataTable>
@@ -453,6 +453,9 @@ onMounted(() => {
   </div>
 </template>
 
-<style>
-@import 'primeflex/primeflex.css';
+<style scoped>
+/* Custom scrollbar styles can be kept or removed as PrimeFlex doesn't provide scrollbar styling */
+.translate-y-50 {
+  transform: translateY(-50%);
+}
 </style>
