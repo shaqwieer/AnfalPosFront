@@ -32,7 +32,7 @@ const filters = ref({
 const entities = ref([]);
 // Pagination Options
 const paginatedEntities = computed(() => {
-  return entities.value.slice(first.value, first.value + rows.value);
+  return entities.value.slice(first.value, first.value + rowsPerPage.value);
 });
 
 onMounted(async () => {
@@ -161,6 +161,7 @@ const copyToClipboard = (text) => {
     </div>
 
     <!-- <SmartUplaoder /> -->
+    {{ paginatedEntities.length }}
 
     <div class="grid" style="min-width: 100%">
       <!-- v-for="data in paginatedEntities" :key="data.id" -->
