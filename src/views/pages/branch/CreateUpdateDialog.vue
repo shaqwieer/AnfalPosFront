@@ -67,7 +67,6 @@ const branchSchema = yup.object({
   bankAccountNo: yup.mixed().nullable(),
   bulkStorageLocation: yup.mixed().nullable(),
   salesDistrict: yup.mixed().nullable(),
-  
 
   defaultCustomerLimit: yup.mixed().nullable(),
 
@@ -105,7 +104,6 @@ const informationInitial = ref({
   bankAccountNo: '',
   bulkStorageLocation: '',
   salesDistrict: '',
-  
 
   defaultCustomerLimit: '',
 
@@ -164,7 +162,6 @@ const [bankAccountNo, bankAccountNoAttrs] = defineField('bankAccountNo');
 const [bulkStorageLocation, bulkStorageLocationAttrs] = defineField('bulkStorageLocation');
 const [salesDistrict, salesDistrictAttrs] = defineField('salesDistrict');
 
-
 const [defaultCustomerLimit, defaultCustomerLimitAttrs] = defineField('defaultCustomerLimit');
 
 const [bulkOrderType, bulkOrderTypeAttrs] = defineField('bulkOrderType');
@@ -197,7 +194,6 @@ const createData = handleSubmit(async (validatedInfo) => {
     bankAccountNo: validatedInfo.bankAccountNo || null,
     bulkStorageLocation: validatedInfo.bulkStorageLocation || null,
     salesDistrict: validatedInfo.salesDistrict || null,
-    
 
     defaultCustomerLimit: validatedInfo.defaultCustomerLimit || null,
 
@@ -249,8 +245,7 @@ const updateData = handleSubmit(async (validatedInfo) => {
     bankAccountNo: validatedInfo.bankAccountNo || null,
     bulkStorageLocation: validatedInfo.bulkStorageLocation || null,
     salesDistrict: validatedInfo.salesDistrict || null,
-    
-    
+
     defaultCustomerLimit: validatedInfo.defaultCustomerLimit || null,
 
     bulkOrderType: validatedInfo.bulkOrderType || null,
@@ -307,7 +302,7 @@ const setFormValues = () => {
     bankAccountNo: props.selectedData.bankAccountNo,
     bulkStorageLocation: props.selectedData.bulkStorageLocation,
     salesDistrict: props.selectedData.salesDistrict,
-    
+
     defaultCustomerLimit: props.selectedData.defaultCustomerLimit,
 
     bulkOrderType: props.selectedData.bulkOrderType,
@@ -502,13 +497,11 @@ onMounted(async () => {
         <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.additionalfields') }}</h3>
 
         <div class="flex gap-2">
-
           <div class="field flex flex-column w-6">
             <label class="mb-3">{{ $t(`Customer.salesDistrict`) }} </label>
             <InputText id="salesDistrict" v-model="salesDistrict" v-bind="salesDistrictAttrs" autofocus :invalid="!!errors.salesDistrict" />
             <small v-if="errors.salesDistrict" class="text-red-600">{{ errors.salesDistrict }}</small>
           </div>
-
 
           <div class="field flex flex-column w-6">
             <label class="mb-3">{{ $t(`Customer.BulkStorageLocation`) }} </label>
@@ -548,7 +541,7 @@ onMounted(async () => {
 
           <div class="field flex flex-column w-6">
             <label class="mb-3">{{ $t(`Customer.DefaultCreditLimit`) }} </label>
-            <InputNumber id="creditLimit" v-model="defaultCustomerLimit" v-bind="defaultCustomerLimitAttrs" autofocus :invalid="!!errors.defaultCustomerLimit" />
+            <InputNumber style="height: 44px" id="creditLimit" v-model="defaultCustomerLimit" v-bind="defaultCustomerLimitAttrs" autofocus :invalid="!!errors.defaultCustomerLimit" />
             <small v-if="errors.defaultCustomerLimit" class="text-red-600">{{ errors.defaultCustomerLimit }}</small>
           </div>
         </div>
