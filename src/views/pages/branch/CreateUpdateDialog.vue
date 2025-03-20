@@ -358,7 +358,6 @@ onMounted(async () => {
 
 <template>
   <Dialog v-model:visible="visible" :breakpoints="{ '640px': '25rem' }" :header="$t('branchDialog.header')" :class="containerClass" :style="{ minWidth: '60rem' }" :modal="true" :closable="false">
-    {{ props.selectedData.id }}
     <div class="flex flex-column gap-4 p-4" style="padding-bottom: 50px !important">
       <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
         <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.generalInformation') }}</h3>

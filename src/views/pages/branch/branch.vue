@@ -161,7 +161,6 @@ const copyToClipboard = (text) => {
     </div>
 
     <!-- <SmartUplaoder /> -->
-    {{ paginatedEntities.length }}
 
     <div class="grid" style="min-width: 100%">
       <!-- v-for="data in paginatedEntities" :key="data.id" -->
