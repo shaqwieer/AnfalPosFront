@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useSessionStore } from '../../../stores/sessionStore'
 import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
@@ -70,16 +70,29 @@ const closedRequests = ref([
   }
 ])
 
-const filteredInventory = computed(() => {
-  const query = searchQuery.value.toLowerCase()
-  if (query == null || query == '') return inventory.value
+const IsAvailableCount = ref(false)
 
-  return inventory.value.filter(item => 
+const filteredInventory = computed(() => {
+  debugger;
+ 
+  var data = [...inventory.value];
+  if (IsAvailableCount.value == true) {
+    data = data.filter(item => item.totalStock > 0)
+  }else{
+    data = inventory.value;
+  }
+  const query = searchQuery.value.toLowerCase()
+  if (query == null || query == '') return data
+
+  return data.filter(item => 
     (item.sapItem.toLowerCase().includes(query) ||
      item.name.toLowerCase().includes(query) ||
      item.arabicName.toLowerCase().includes(query))
+   
   )
 })
+
+
 
 const filteredClosedRequests = computed(() => {
   return closedRequests.value.filter(request => {
@@ -145,6 +158,11 @@ onMounted(() => {
     getInventoryItems()
   })
 })
+
+
+
+
+
 </script>
 
 <template>
@@ -177,19 +195,21 @@ onMounted(() => {
           <!-- Filters -->
           <div class="flex flex-column sm:flex-row gap-4">
             
-            <div class="flex-1 relative">
+            <div class="flex-1">
               <span class="relative p-input-icon-left w-full">
               <span class="absolute top-50 translate-y-50" style="left: 9px"><i class="pi pi-search"></i></span>
               <input v-model="searchQuery" type="text" class="p-inputtext w-full pl-5" placeholder="Search by code or name..." />
             </span>
             </div>
-            <div class="w-12rem">
-              <select v-model="selectedBranch" class="p-inputtext w-full" @change="getInventoryItems()">
-                <option value="-1">Select Branch</option>
-                <option v-for="branch in sessionStore.salesReps" :key="branch.id" :value="branch.id">
-                  {{ branch.name }}
-                </option>
-              </select>
+            
+
+            <div class="flex-1">
+              <Dropdown :options="sessionStore.salesReps" v-model="selectedBranch" class="w-full" optionValue="id" optionLabel="name" @change="getInventoryItems"></Dropdown>
+            </div>
+
+            <div class="flex-2">
+              <Checkbox v-model="IsAvailableCount" binary class="mr-2" />
+              <span class="text-sm">Show only available items</span>
             </div>
           </div>
 
