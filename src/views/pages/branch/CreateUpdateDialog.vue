@@ -69,7 +69,9 @@ const branchSchema = yup.object({
   defaultCustomerLimit: yup.mixed().nullable(),
 
   bulkOrderType: yup.mixed().nullable(),
-  enableBulk: yup.mixed().nullable(),
+  enableBulk: yup.boolean().nullable(),
+  selectBatch: yup.boolean().nullable(),
+  canEditPrice: yup.boolean().nullable(),
 
   customerCodeId: yup.mixed().nullable(),
 
@@ -102,8 +104,9 @@ const informationInitial = ref({
   defaultCustomerLimit: '',
 
   bulkOrderType: '',
-  enablePriceChange: null,
+  canEditPrice: null,
   enableBulk: null,
+  selectBatch: null,
 
   bankPosFirst: null,
   bankPosSecond: null,
@@ -132,8 +135,9 @@ const [email, emailAttrs] = defineField('email');
 const [address, addressAttrs] = defineField('address');
 const [primaryPhone, primaryPhoneAttrs] = defineField('primaryPhone');
 const [secondaryPhone, secondaryPhoneAttrs] = defineField('secondaryPhone');
-const [enablePriceChange, enablePriceChangeAttrs] = defineField('enablePriceChange');
+const [canEditPrice, canEditPriceAttrs] = defineField('canEditPrice');
 const [enableBulk, enableBulkAttrs] = defineField('enableBulk');
+const [selectBatch, selectBatchAttrs] = defineField('selectBatch');
 
 const [city, cityAttrs] = defineField('city');
 
@@ -173,8 +177,9 @@ const createData = handleSubmit(async (validatedInfo) => {
     primaryPhone: validatedInfo.primaryPhone,
     OrganizationId: validatedInfo.organizationId || 1, // Provide default value if not present
     bankAccountId: validatedInfo.bankAccountId || null,
-    enablePriceChange: validatedInfo.enablePriceChange || null,
-    enableBulk: validatedInfo.enableBulk || null,
+    canEditPrice: validatedInfo.canEditPrice,
+    enableBulk: validatedInfo.enableBulk ,
+    selectBatch: validatedInfo.selectBatch ,
 
     bankName: validatedInfo.bankName || null,
     bankCode: validatedInfo.bankCode || null,
@@ -220,8 +225,9 @@ const updateData = handleSubmit(async (validatedInfo) => {
     OrganizationId: validatedInfo.organizationId, // Provide default value if not present
     bankAccounts: validatedInfo.bankAccounts || null,
     customerCodeId: validatedInfo.customerCodeId || null,
-    enablePriceChange: validatedInfo.enablePriceChange || null,
-    enableBulk: validatedInfo.enableBulk || null,
+    canEditPrice: validatedInfo.canEditPrice,
+    enableBulk: validatedInfo.enableBulk,
+    selectBatch: validatedInfo.selectBatch ,
 
     bankName: validatedInfo.bankName || null,
     bankCode: validatedInfo.bankCode || null,
@@ -270,8 +276,9 @@ const setFormValues = () => {
     cashCustomer: props.selectedData.cashCustomer,
     profitCenter: props.selectedData.profitCenter,
     bankAccounts: props.selectedData.bankAccounts,
-    enablePriceChange: props.selectedData.enablePriceChange,
+    canEditPrice: props.selectedData.canEditPrice,
     enableBulk: props.selectedData.enableBulk,
+    selectBatch: props.selectedData.selectBatch,
 
     bankPosFirst: props.selectedData.bankPosFirst,
     bankPosSecond: props.selectedData.bankPosSecond,
@@ -335,15 +342,11 @@ onMounted(async () => {
     handleError(err, mainStore.loading);
   }
 });
-
-// const toggleCheckbox = () => {
-//   EnablePriceChange.value = EnablePriceChange.value === true ? false : true;
-//   console.log(EnablePriceChange.value);
-// };
 </script>
 
 <template>
   <Dialog v-model:visible="visible" :breakpoints="{ '640px': '25rem' }" :header="$t('branchDialog.header')" :class="containerClass" :style="{ minWidth: '60rem' }" :modal="true" :closable="false">
+    {{ props.selectedData.id }}
     <div class="flex flex-column gap-4 p-4" style="padding-bottom: 50px !important">
       <div class="flex flex-column w-full gap-2 border-1 border-gray-300 p-4 border-round-lg">
         <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.generalInformation') }}</h3>
@@ -520,23 +523,32 @@ onMounted(async () => {
 
           <div class="field flex flex-column w-6">
             <label class="mb-3">{{ $t(`Customer.DefaultCreditLimit`) }} </label>
-            <InputText id="creditLimit" v-model="defaultCustomerLimit" v-bind="defaultCustomerLimitAttrs" autofocus :invalid="!!errors.defaultCustomerLimit" />
+            <InputNumber id="creditLimit" v-model="defaultCustomerLimit" v-bind="defaultCustomerLimitAttrs" autofocus :invalid="!!errors.defaultCustomerLimit" />
             <small v-if="errors.defaultCustomerLimit" class="text-red-600">{{ errors.defaultCustomerLimit }}</small>
           </div>
         </div>
 
         <div class="">
           <div class="">
-            <input type="checkbox" @click.stop id="EnablePriceChange" class="m-0 mr-2 mt-2" v-model="enablePriceChange" v-bind="enablePriceChangeAttrs" :invalid="!!errors.enablePriceChange" />
-            <label for="EnablePriceChange" class="m-0" style="position: relative; top: -2px">{{ $t('branchDialog.EnablePriceChange') }}</label>
+            <input type="checkbox" @click.stop id="canEditPrice" class="m-0 mr-2 mt-2" v-model="canEditPrice" v-bind="canEditPriceAttrs" :aria-invalid="!!errors.canEditPrice" />
+            <label for="canEditPrice" class="m-0" style="position: relative; top: -2px">{{ $t('branchDialog.canEditPrice') }}</label>
           </div>
 
+          {{ canEditPrice }}
+          {{ selectBatch }}
+          {{ enableBulk }}
+
           <div class="">
-            <input type="checkbox" aria-label="EnableBulk" @click.stop id="EnableBulk" class="m-0 mr-2 mt-2" v-model="enableBulk" v-bind="enableBulkAttrs" :invalid="!!errors.enableBulk" />
+            <input type="checkbox" aria-label="EnableBulk" @click.stop id="EnableBulk" class="m-0 mr-2 mt-2" v-model="enableBulk" v-bind="enableBulkAttrs" :aria-invalid="!!errors.enableBulk" />
             <label for="EnableBulk" class="m-0" style="position: relative; top: -2px">{{ $t('branchDialog.EnableBulk') }}</label>
           </div>
 
-          <small v-if="errors.enableBulk" class="text-red-600">{{ errors.enableBulk }}</small>
+          <div class="">
+            <input type="checkbox" aria-label="SelectBatch" @click.stop id="SelectBatch" class="m-0 mr-2 mt-2" v-model="selectBatch" v-bind="selectBatchAttrs" :aria-invalid="!!errors.selectBatch" />
+            <label for="SelectBatch" class="m-0" style="position: relative; top: -2px">{{ $t('branchDialog.SelectBatch') }}</label>
+          </div>
+
+          <small v-if="errors.selectBatch" class="text-red-600">{{ errors.selectBatch }}</small>
         </div>
       </div>
 
