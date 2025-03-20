@@ -465,7 +465,8 @@
     "Notes": "الملاحظات",
     "BulkStorageLocation": "موقع التخزين بالجملة",
     "BulkOrderType": "نوع الطلب بالجملة",
-    "DefaultCreditLimit": "حد الائتمان الافتراضي"
+    "DefaultCreditLimit": "حد الائتمان الافتراضي",
+    "salesDistrict": "منطقة المبيعات"
   },
   "organizationConfig": {
     "basePriceCode": "كود السعر الأساسي",

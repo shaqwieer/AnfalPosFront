@@ -472,7 +472,8 @@
     "Notes": "Notes",
     "BulkStorageLocation": "Bulk Storage Location",
     "BulkOrderType": "Bulk Order Type",
-    "DefaultCreditLimit": "Default Credit Limit"
+    "DefaultCreditLimit": "Default Credit Limit",
+    "salesDistrict": "Sales District"
   },
   "organizationConfig": {
     "basePriceCode": "Base Price Code",

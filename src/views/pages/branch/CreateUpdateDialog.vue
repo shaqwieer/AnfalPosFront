@@ -66,6 +66,9 @@ const branchSchema = yup.object({
   bankCode: yup.mixed().nullable(),
   bankAccountNo: yup.mixed().nullable(),
   bulkStorageLocation: yup.mixed().nullable(),
+  salesDistrict: yup.mixed().nullable(),
+  
+
   defaultCustomerLimit: yup.mixed().nullable(),
 
   bulkOrderType: yup.mixed().nullable(),
@@ -101,6 +104,9 @@ const informationInitial = ref({
   bankCode: '',
   bankAccountNo: '',
   bulkStorageLocation: '',
+  salesDistrict: '',
+  
+
   defaultCustomerLimit: '',
 
   bulkOrderType: '',
@@ -156,6 +162,9 @@ const [bankName, bankNameAttrs] = defineField('bankName');
 const [bankCode, bankCodeAttrs] = defineField('bankCode');
 const [bankAccountNo, bankAccountNoAttrs] = defineField('bankAccountNo');
 const [bulkStorageLocation, bulkStorageLocationAttrs] = defineField('bulkStorageLocation');
+const [salesDistrict, salesDistrictAttrs] = defineField('salesDistrict');
+
+
 const [defaultCustomerLimit, defaultCustomerLimitAttrs] = defineField('defaultCustomerLimit');
 
 const [bulkOrderType, bulkOrderTypeAttrs] = defineField('bulkOrderType');
@@ -187,6 +196,9 @@ const createData = handleSubmit(async (validatedInfo) => {
 
     bankAccountNo: validatedInfo.bankAccountNo || null,
     bulkStorageLocation: validatedInfo.bulkStorageLocation || null,
+    salesDistrict: validatedInfo.salesDistrict || null,
+    
+
     defaultCustomerLimit: validatedInfo.defaultCustomerLimit || null,
 
     bulkOrderType: validatedInfo.bulkOrderType || null,
@@ -236,6 +248,9 @@ const updateData = handleSubmit(async (validatedInfo) => {
 
     bankAccountNo: validatedInfo.bankAccountNo || null,
     bulkStorageLocation: validatedInfo.bulkStorageLocation || null,
+    salesDistrict: validatedInfo.salesDistrict || null,
+    
+    
     defaultCustomerLimit: validatedInfo.defaultCustomerLimit || null,
 
     bulkOrderType: validatedInfo.bulkOrderType || null,
@@ -291,6 +306,8 @@ const setFormValues = () => {
     bankCode: props.selectedData.bankCode,
     bankAccountNo: props.selectedData.bankAccountNo,
     bulkStorageLocation: props.selectedData.bulkStorageLocation,
+    salesDistrict: props.selectedData.salesDistrict,
+    
     defaultCustomerLimit: props.selectedData.defaultCustomerLimit,
 
     bulkOrderType: props.selectedData.bulkOrderType,
@@ -485,6 +502,14 @@ onMounted(async () => {
         <h3 class="text-primary-600 text-base font-semibold">{{ $t('branchDialog.additionalfields') }}</h3>
 
         <div class="flex gap-2">
+
+          <div class="field flex flex-column w-6">
+            <label class="mb-3">{{ $t(`Customer.salesDistrict`) }} </label>
+            <InputText id="salesDistrict" v-model="salesDistrict" v-bind="salesDistrictAttrs" autofocus :invalid="!!errors.salesDistrict" />
+            <small v-if="errors.salesDistrict" class="text-red-600">{{ errors.salesDistrict }}</small>
+          </div>
+
+
           <div class="field flex flex-column w-6">
             <label class="mb-3">{{ $t(`Customer.BulkStorageLocation`) }} </label>
             <InputText id="bulkStorageLocation" v-model="bulkStorageLocation" v-bind="bulkStorageLocationAttrs" autofocus :invalid="!!errors.bulkStorageLocation" />
@@ -533,7 +558,7 @@ onMounted(async () => {
             <input type="checkbox" @click.stop id="canEditPrice" class="m-0 mr-2 mt-2" v-model="canEditPrice" v-bind="canEditPriceAttrs" :aria-invalid="!!errors.canEditPrice" />
             <label for="canEditPrice" class="m-0" style="position: relative; top: -2px">{{ $t('branchDialog.canEditPrice') }}</label>
           </div>
-          
+
           <div class="">
             <input type="checkbox" aria-label="EnableBulk" @click.stop id="EnableBulk" class="m-0 mr-2 mt-2" v-model="enableBulk" v-bind="enableBulkAttrs" :aria-invalid="!!errors.enableBulk" />
             <label for="EnableBulk" class="m-0" style="position: relative; top: -2px">{{ $t('branchDialog.EnableBulk') }}</label>

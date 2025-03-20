@@ -149,7 +149,7 @@ const copyToClipboard = (text) => {
 </script>
 <template>
   <div :class="['grid px-6', { 'rtl-direction': rtl }]">
-    <div class="flex flex-column row-gap-5 px-3 lg:flex-row justify-content-between">
+    <div class="flex flex-column row-gap-5 px-3 lg:flex-row justify-content-between mb-5 lg:mb-0">
       <div class="lg:col-8 px-0 pt-2">
         <h3 class="text-700 text-3xl font-semibold">{{ t('branch.Header') }}</h3>
         <p class="text-500 text-lg">{{ t('branch.Description') }}</p>
