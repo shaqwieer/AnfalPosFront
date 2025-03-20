@@ -649,7 +649,8 @@
     "Category": "Category",
     "StockLevel": "Stock Level",
     "quantity": "quantity",
-    "Min/Max": "Min/Max"
+    "Min/Max": "Min/Max",
+    "Cash": "Cash"
   },
   "Session": {
     "SessionManagement": "Session Management",
