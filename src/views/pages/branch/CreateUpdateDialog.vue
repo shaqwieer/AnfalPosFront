@@ -178,8 +178,8 @@ const createData = handleSubmit(async (validatedInfo) => {
     OrganizationId: validatedInfo.organizationId || 1, // Provide default value if not present
     bankAccountId: validatedInfo.bankAccountId || null,
     canEditPrice: validatedInfo.canEditPrice,
-    enableBulk: validatedInfo.enableBulk ,
-    selectBatch: validatedInfo.selectBatch ,
+    enableBulk: validatedInfo.enableBulk,
+    selectBatch: validatedInfo.selectBatch,
 
     bankName: validatedInfo.bankName || null,
     bankCode: validatedInfo.bankCode || null,
@@ -227,7 +227,7 @@ const updateData = handleSubmit(async (validatedInfo) => {
     customerCodeId: validatedInfo.customerCodeId || null,
     canEditPrice: validatedInfo.canEditPrice,
     enableBulk: validatedInfo.enableBulk,
-    selectBatch: validatedInfo.selectBatch ,
+    selectBatch: validatedInfo.selectBatch,
 
     bankName: validatedInfo.bankName || null,
     bankCode: validatedInfo.bankCode || null,
@@ -533,11 +533,7 @@ onMounted(async () => {
             <input type="checkbox" @click.stop id="canEditPrice" class="m-0 mr-2 mt-2" v-model="canEditPrice" v-bind="canEditPriceAttrs" :aria-invalid="!!errors.canEditPrice" />
             <label for="canEditPrice" class="m-0" style="position: relative; top: -2px">{{ $t('branchDialog.canEditPrice') }}</label>
           </div>
-
-          {{ canEditPrice }}
-          {{ selectBatch }}
-          {{ enableBulk }}
-
+          
           <div class="">
             <input type="checkbox" aria-label="EnableBulk" @click.stop id="EnableBulk" class="m-0 mr-2 mt-2" v-model="enableBulk" v-bind="enableBulkAttrs" :aria-invalid="!!errors.enableBulk" />
             <label for="EnableBulk" class="m-0" style="position: relative; top: -2px">{{ $t('branchDialog.EnableBulk') }}</label>

@@ -11,7 +11,7 @@ import { handleError } from '@/utilities/errorHandler';
 import placeHolderPhoto from '@/assets/images/placeholder.jpg';
 
 const totalRecords = ref(0);
-const rows = ref(12);
+const rows = ref(6);
 const first = ref(0);
 
 const organizationStore = useOrganizationStore();
@@ -45,6 +45,7 @@ onMounted(async () => {
     handleError(err, mainStore.loading);
   }
 });
+
 const updatePaginatedData = () => {
   paginatedEntities.value = entities.value.slice(first.value, first.value + rows.value);
 };
@@ -55,7 +56,7 @@ const onFirstChange = (newFirst) => {
   first.value = newFirst;
 };
 
-const rowsPerPage = ref(20);
+const rowsPerPage = ref(6);
 const currentPage = ref(0);
 
 const onPageChange = (event) => {
@@ -129,7 +130,7 @@ const addData = async (data) => {
     response.data.data.cityName = cities.value.find((e) => e.id === response.data.data.cityId).name;
     entities.value.push(response.data.data);
     mainStore.loading.setNotificationInfo('success', response.data.message);
-    console.log(data)
+    console.log(data);
   } catch (err) {
     handleError(err, mainStore.loading);
   }
@@ -217,7 +218,7 @@ const copyToClipboard = (text) => {
     </div>
 
     <div class="w-full flex justify-content-center mt-4">
-      <Paginator class="w-full" :first="first" @update:rows="onRowsChange" @page="onPageChange" @update:first="onFirstChange" :totalRecords="totalRecords" :rows="rowsPerPage" :rowsPerPageOptions="[5, 10, 20, 25, 50]" />
+      <Paginator class="w-full" :first="first" @update:rows="onRowsChange" @page="onPageChange" @update:first="onFirstChange" :totalRecords="totalRecords" :rows="rowsPerPage" :rowsPerPageOptions="[6, 12, 18, 24, 30]" />
     </div>
   </div>
   <!-- Add Dialog -->
