@@ -385,7 +385,9 @@
     "DefaultCreditLimit": "حد الائتمان الافتراضي",
     "paymentTermPlaceholder": "مدة الدفع",
     "creditLimitPlaceholder": "حد الائتمان الافتراضي",
-    "paymentTerm": "مدة الدفع"
+    "paymentTerm": "مدة الدفع",
+    "canEditPrice": "تمكين تغيير السعر",
+    "SelectBatch": "حدد دفعة"
   },
   "items": {
     "title": "الأصناف",

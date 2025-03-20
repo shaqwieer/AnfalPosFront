@@ -392,7 +392,9 @@
     "DefaultCreditLimit": "Default Credit Limit",
     "paymentTermPlaceholder": "Payment Term",
     "creditLimitPlaceholder": "Default Credit Limit",
-    "paymentTerm": "Payment Term"
+    "paymentTerm": "Payment Term",
+    "canEditPrice": "Enable Price Change",
+    "SelectBatch": "Select Batch"
   },
   "items": {
     "title": "Sap Items",
