@@ -69,12 +69,14 @@ const branchSchema = yup.object({
   salesDistrict: yup.mixed().nullable(),
 
   defaultCustomerLimit: yup.mixed().nullable(),
+  costCenter: yup.mixed().nullable(),
 
   bulkOrderType: yup.mixed().nullable(),
   enableBulk: yup.boolean().nullable(),
   selectBatch: yup.boolean().nullable(),
   canEditPrice: yup.boolean().nullable(),
-
+  enableCreditLimitSalesRep: yup.boolean().nullable(),
+  enableCreditLimitCustomer: yup.boolean().nullable(),
   customerCodeId: yup.mixed().nullable(),
 
   bankAccounts: yup.mixed().nullable()
@@ -106,12 +108,13 @@ const informationInitial = ref({
   salesDistrict: '',
 
   defaultCustomerLimit: '',
-
+  costCenter: '',
   bulkOrderType: '',
   canEditPrice: null,
   enableBulk: null,
   selectBatch: null,
-
+  enableCreditLimitSalesRep: false,
+  enableCreditLimitCustomer: false,
   bankPosFirst: null,
   bankPosSecond: null,
   customerCodeId: null,
@@ -142,6 +145,10 @@ const [secondaryPhone, secondaryPhoneAttrs] = defineField('secondaryPhone');
 const [canEditPrice, canEditPriceAttrs] = defineField('canEditPrice');
 const [enableBulk, enableBulkAttrs] = defineField('enableBulk');
 const [selectBatch, selectBatchAttrs] = defineField('selectBatch');
+const [enableCreditLimitSalesRep, enableCreditLimitSalesRepAttrs] = defineField('enableCreditLimitSalesRep');
+const [enableCreditLimitCustomer, enableCreditLimitCustomerAttrs] = defineField('enableCreditLimitCustomer');
+
+
 
 const [city, cityAttrs] = defineField('city');
 
@@ -163,7 +170,7 @@ const [bulkStorageLocation, bulkStorageLocationAttrs] = defineField('bulkStorage
 const [salesDistrict, salesDistrictAttrs] = defineField('salesDistrict');
 
 const [defaultCustomerLimit, defaultCustomerLimitAttrs] = defineField('defaultCustomerLimit');
-
+const [costCenter, costCenterAttrs] = defineField('costCenter');
 const [bulkOrderType, bulkOrderTypeAttrs] = defineField('bulkOrderType');
 
 const [customerCodeId, customerCodeIdAttrs] = defineField('customerCodeId');
@@ -186,6 +193,8 @@ const createData = handleSubmit(async (validatedInfo) => {
     canEditPrice: validatedInfo.canEditPrice,
     enableBulk: validatedInfo.enableBulk,
     selectBatch: validatedInfo.selectBatch,
+    enableCreditLimitSalesRep: validatedInfo.enableCreditLimitSalesRep || false,
+    enableCreditLimitCustomer: validatedInfo.enableCreditLimitCustomer || false,
 
     bankName: validatedInfo.bankName || null,
     bankCode: validatedInfo.bankCode || null,
@@ -196,7 +205,8 @@ const createData = handleSubmit(async (validatedInfo) => {
     salesDistrict: validatedInfo.salesDistrict || null,
 
     defaultCustomerLimit: validatedInfo.defaultCustomerLimit || null,
-
+    costCenter : validatedInfo.costCenter || null,
+   
     bulkOrderType: validatedInfo.bulkOrderType || null,
 
     cajoNumber: validatedInfo.cajoNumber || null,
@@ -236,6 +246,8 @@ const updateData = handleSubmit(async (validatedInfo) => {
     canEditPrice: validatedInfo.canEditPrice,
     enableBulk: validatedInfo.enableBulk,
     selectBatch: validatedInfo.selectBatch,
+    enableCreditLimitSalesRep: validatedInfo.enableCreditLimitSalesRep || false,
+    enableCreditLimitCustomer: validatedInfo.enableCreditLimitCustomer || false,
 
     bankName: validatedInfo.bankName || null,
     bankCode: validatedInfo.bankCode || null,
@@ -247,6 +259,7 @@ const updateData = handleSubmit(async (validatedInfo) => {
     salesDistrict: validatedInfo.salesDistrict || null,
 
     defaultCustomerLimit: validatedInfo.defaultCustomerLimit || null,
+    costCenter: validatedInfo.costCenter || null,
 
     bulkOrderType: validatedInfo.bulkOrderType || null,
 
@@ -289,6 +302,8 @@ const setFormValues = () => {
     canEditPrice: props.selectedData.canEditPrice,
     enableBulk: props.selectedData.enableBulk,
     selectBatch: props.selectedData.selectBatch,
+    enableCreditLimitSalesRep: props.selectedData.enableCreditLimitSalesRep,
+    enableCreditLimitCustomer: props.selectedData.enableCreditLimitCustomer,
 
     bankPosFirst: props.selectedData.bankPosFirst,
     bankPosSecond: props.selectedData.bankPosSecond,
@@ -304,6 +319,7 @@ const setFormValues = () => {
     salesDistrict: props.selectedData.salesDistrict,
 
     defaultCustomerLimit: props.selectedData.defaultCustomerLimit,
+    costCenter: props.selectedData.costCenter,
 
     bulkOrderType: props.selectedData.bulkOrderType,
 
@@ -516,7 +532,7 @@ onMounted(async () => {
         </div>
 
         <div class="flex gap-2">
-          <div class="field flex flex-column w-6">
+          <div class="field flex flex-column w-4">
             <label for="paymentTerm" class="mb-3">{{ $t('branchDialog.DefaultPaymentTerm') }}</label>
             <Dropdown
               v-model="defaultPaymentTermId"
@@ -538,11 +554,18 @@ onMounted(async () => {
             <small v-if="errors.paymentTerm" class="text-red-600">{{ errors.paymentTerm }}</small>
           </div>
 
-          <div class="field flex flex-column w-6">
+          <div class="field flex flex-column w-4">
             <label class="mb-3">{{ $t(`Customer.DefaultCreditLimit`) }} </label>
             <InputNumber style="height: 44px" id="creditLimit" v-model="defaultCustomerLimit" v-bind="defaultCustomerLimitAttrs" autofocus :invalid="!!errors.defaultCustomerLimit" />
             <small v-if="errors.defaultCustomerLimit" class="text-red-600">{{ errors.defaultCustomerLimit }}</small>
           </div>
+
+          <div class="field flex flex-column w-4">
+            <label class="mb-3">{{ $t(`Customer.CostCenter`) }} </label>
+            <InputText id="costCenter" v-model="costCenter" v-bind="costCenterAttrs" autofocus :invalid="!!errors.costCenter" />
+            <small v-if="errors.costCenter" class="text-red-600">{{ errors.costCenter }}</small>
+          </div>
+
         </div>
 
         <div class="">
@@ -560,8 +583,17 @@ onMounted(async () => {
             <input type="checkbox" aria-label="SelectBatch" @click.stop id="SelectBatch" class="m-0 mr-2 mt-2" v-model="selectBatch" v-bind="selectBatchAttrs" :aria-invalid="!!errors.selectBatch" />
             <label for="SelectBatch" class="m-0" style="position: relative; top: -2px">{{ $t('branchDialog.SelectBatch') }}</label>
           </div>
-
           <small v-if="errors.selectBatch" class="text-red-600">{{ errors.selectBatch }}</small>
+        
+          <div class="">
+            <input type="checkbox" aria-label="EnableCreditLimitSalesRep" @click.stop id="EnableCreditLimitSalesRep" class="m-0 mr-2 mt-2" v-model="enableCreditLimitSalesRep" v-bind="enableCreditLimitSalesRepAttrs" :aria-invalid="!!errors.enableCreditLimitSalesRep" />
+            <label for="EnableCreditLimitSalesRep" class="m-0" style="position: relative; top: -2px">{{ $t('branchDialog.EnableCreditLimitSalesRep') }}</label>
+          </div>
+          <div class="">
+            <input type="checkbox" aria-label="EnableCreditLimitCustomer" @click.stop id="EnableCreditLimitCustomer" class="m-0 mr-2 mt-2" v-model="enableCreditLimitCustomer" v-bind="enableCreditLimitCustomerAttrs" :aria-invalid="!!errors.enableCreditLimitCustomer" />
+            <label for="EnableCreditLimitCustomer" class="m-0" style="position: relative; top: -2px">{{ $t('branchDialog.EnableCreditLimitCustomer') }}</label>
+          </div>
+
         </div>
       </div>
 

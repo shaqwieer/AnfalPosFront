@@ -394,7 +394,9 @@
     "creditLimitPlaceholder": "Default Credit Limit",
     "paymentTerm": "Payment Term",
     "canEditPrice": "Enable Price Change",
-    "SelectBatch": "Select Batch"
+    "SelectBatch": "Select Batch",
+    "EnableCreditLimitSalesRep": "Enable Credit Limit Sales Rep",
+    "EnableCreditLimitCustomer": "Enable Credit Limit Customer"
   },
   "items": {
     "title": "Sap Items",
@@ -475,6 +477,7 @@
     "BulkStorageLocation": "Bulk Storage Location",
     "BulkOrderType": "Bulk Order Type",
     "DefaultCreditLimit": "Default Credit Limit",
+    "CostCenter": "Cost Center",
     "salesDistrict": "Sales District"
   },
   "organizationConfig": {
