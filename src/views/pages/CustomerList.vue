@@ -107,6 +107,19 @@
                                     }
                                 "
                             />
+                            <Button
+                                icon="pi pi-credit-card"
+                                v-tooltip.top="t('users.updateTooltip')"
+                                text
+                                rounded
+                                aria-label="Update"
+                                severity="success"
+                                @click="
+                                    () => {
+                                        openPaymentTerm(slotProps.data);
+                                    }
+                                "
+                            />
                         </div>
                     </template>
                 </Column>

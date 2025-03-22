@@ -266,7 +266,8 @@
     "Name": "الاسم",
     "prefix": "البادئة",
     "from": "من",
-    "to": "إلى"
+    "to": "إلى",
+    "paymentTerm": "الدفعة"
   },
   "pagination": {
     "currentPageReportTemplate": "عرض {first} إلى {last} من أصل {totalRecords} إدخالات"
@@ -471,7 +472,10 @@
     "BulkStorageLocation": "موقع التخزين بالجملة",
     "BulkOrderType": "نوع الطلب بالجملة",
     "DefaultCreditLimit": "حد الائتمان الافتراضي",
-    "salesDistrict": "منطقة المبيعات"
+    "salesDistrict": "منطقة المبيعات",
+    "editCreditLimit": "تعديل حد الائتمان",
+    "editPaymentTerm": "تعديل شرط الدفع",
+    "paymentTermPlaceholder": "اختر شرط الدفع"
   },
   "organizationConfig": {
     "basePriceCode": "كود السعر الأساسي",

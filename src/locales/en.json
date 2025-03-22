@@ -273,7 +273,8 @@
     "Name": "Name",
     "prefix": "prefix",
     "from": "from",
-    "to": "to"
+    "to": "to",
+    "paymentTerm": "Payment Term"
   },
   "pagination": {
     "currentPageReportTemplate": "Showing {first} to {last} of {totalRecords} entries"
@@ -478,7 +479,10 @@
     "BulkOrderType": "Bulk Order Type",
     "DefaultCreditLimit": "Default Credit Limit",
     "CostCenter": "Cost Center",
-    "salesDistrict": "Sales District"
+    "salesDistrict": "Sales District",
+    "editCreditLimit": "Edit Credit Limit",
+    "editPaymentTerm": "Edit Payment Term",
+    "paymentTermPlaceholder": "Payment Term"
   },
   "organizationConfig": {
     "basePriceCode": "Base Price Code",

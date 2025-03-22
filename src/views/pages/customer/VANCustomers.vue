@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue';
 //import { useVanStore } from '@/stores/vanStore.js';
 import { useCustomerStore } from '../../../stores/customerStore';
-
+import apiClient from '../../../api/apiClient';
 import CustomerList from './customers/CustomerList.vue';
 import CustomerForm from './customers/CustomerForm.vue';
 import { vanCustomers } from './customers/VANCustomerSampleData';
@@ -20,6 +20,7 @@ const viewMode = ref<'cards' | 'list'>('list');
 
 onMounted(async () => {
   await customerStore.GetCustomerBasedOnBranchType();
+  await getPaymentTerms();
 });
 // Initialize customers with sample data
 const customers = computed(() => customerStore.customers);
@@ -86,6 +87,7 @@ const toggleView = () => {
 
 import { useI18n } from 'vue-i18n';
 import { useMainStore } from '../../../stores/mainStore';
+import { C } from '@fullcalendar/core/internal-common';
 
 const mainStore = useMainStore();
 const { t, locale } = useI18n();
@@ -126,6 +128,85 @@ const filteredCustomers = computed(() => {
     return matchesTab && matchesSearch;
   });
 });
+
+const creditLimitDialogVisible = ref(false);
+const creditLimitValue = ref(null);
+const openCreditLimit = (customer) => {
+  var date = {...customer};
+  creditLimitValue.value = date.creditLimit;
+  creditLimitDialogVisible.value = true;
+  selectedCustomer.value = customer;
+};
+
+const paymentTermDialogVisible = ref(false);
+const openPaymentTerm = (customer) => {
+  var date = {...customer};
+  paymentTermId.value = date.paymentTermId;
+  paymentTermDialogVisible.value = true;
+  selectedCustomer.value = customer;
+};
+
+const containerClass = computed(() => ({
+  rtl: mainStore.isRTL,
+  ltr: !mainStore.isRTL
+}));
+
+const submitCreditLimit = async () => {
+  if(selectedCustomer.value == null || selectedCustomer.value == undefined) return;
+  if(!creditLimitValue.value) return;
+  try {
+    const response = await apiClient.put('/Customers/UpdateCustomerPaymentTermCreditLimit', { 
+      creditLimit: creditLimitValue.value,
+      isEditCreditLimit: true,
+      customerId: selectedCustomer.value.id,
+      paymentTermId:0,
+
+    })
+    creditLimitDialogVisible.value = false;
+    selectedCustomer.value.creditLimit = creditLimitValue.value;
+    creditLimitValue.value = null;
+    selectedCustomer.value = null;
+    console.log('response', response)
+  } catch (err) {
+    console.log(err)
+  }
+  
+};
+
+const paymentTermId = ref(null);
+
+const submitPaymentTerm = async () => {
+  if(selectedCustomer.value == null || selectedCustomer.value == undefined) return;
+  if(!paymentTermId.value) return;
+  try {
+    const response = await apiClient.put('/Customers/UpdateCustomerPaymentTermCreditLimit', { 
+      creditLimit: selectedCustomer.value.creditLimit,
+      isEditCreditLimit: false,
+      customerId: selectedCustomer.value.id,
+      paymentTermId: paymentTermId.value,
+
+    })
+    paymentTermDialogVisible.value = false;
+    selectedCustomer.value.paymentTermId = paymentTermId.value;
+    paymentTermId.value = null;
+    selectedCustomer.value = null;
+    console.log('response', response)
+  } catch (err) {
+    console.log(err)
+  }
+  
+};
+
+const paymentTerms = ref([]);
+const getPaymentTerms = async () => {
+  try {
+    const response = await apiClient.get(`/PaymentTerms`);
+    paymentTerms.value = response.data.data;
+  } catch (err) {
+    handleError(err, mainStore.loading);
+  }
+};
+
 </script>
 
 <template>
@@ -310,6 +391,14 @@ const filteredCustomers = computed(() => {
                       <i class="pi pi-times-circle"></i>
                     </div>
                   </template>
+                  <div @click="openCreditLimit(slotProps.data)" class="p-1.5 cursor-pointer text-red-600 hover:bg-red-50 rounded-full">
+                    <i class="pi pi-credit-card"></i>
+                  </div>
+
+                  <div @click="openPaymentTerm(slotProps.data)" class="p-1.5 cursor-pointer text-red-600 hover:bg-red-50 rounded-full">
+                    <i class="pi pi-wallet"></i>
+                  </div>
+
                 </div>
               </template>
             </Column>
@@ -329,6 +418,85 @@ const filteredCustomers = computed(() => {
 
     <!-- Dialogs -->
     <CustomerForm v-if="showNewCustomerForm" :show="showNewCustomerForm" :action="selectType" :readOnly="selectType == 'view'" :customer="selectedCustomer" @close="showNewCustomerForm = false" @submit="handleSubmitCustomer" />
+   
+    <Dialog v-model:visible="creditLimitDialogVisible" :breakpoints="{ '640px': '25rem' }" :header="t('Customer.editCreditLimit')" :class="containerClass" :style="{ width: '35rem' }" :modal="true" :closable="true" @hide="creditLimitDialogVisible = false">
+        <div class="flex flex-column gap-4 p-4">
+
+        
+          <form @submit.prevent="submitCreditLimit">
+            <div class="flex flex-column gap-4">
+              <div>
+                <label class="block font-medium mb-2">{{ t('Customer.name') }}</label>
+                <div>{{ selectedCustomer.name }}</div>
+              </div>
+              
+              <div>
+                <label class="block font-medium mb-2">{{ t('Customer.Credit_Limit') }}</label>
+                <input type="number" class="p-inputtext w-full" min="1" v-model="creditLimitValue">
+              </div>
+
+              <div class="mt-6 flex justify-content-end gap-2">
+              <button type="button" 
+                      @click="creditLimitDialogVisible = false"
+                      class="p-button p-button-outlined">
+                {{ t('deleteDialog.cancel') }}
+              </button>
+              <button type="submit"
+                      class="p-button">
+                {{ t('Customer.editCreditLimit') }}
+              </button>
+            </div>
+            </div>
+
+          
+          </form>
+        </div>
+    </Dialog>
+
+    <Dialog v-model:visible="paymentTermDialogVisible" :breakpoints="{ '640px': '25rem' }" :header="t('Customer.editPaymentTerm')" :class="containerClass" :style="{ width: '35rem' }" :modal="true" :closable="true" @hide="paymentTermDialogVisible = false">
+      <div class="flex flex-column gap-4 p-4">
+        <form @submit.prevent="submitPaymentTerm">
+          <div class="flex flex-column gap-4">
+            <div>
+              <label class="block font-medium mb-2">{{ t('Customer.name') }}</label>
+              <div>{{ selectedCustomer.name }}</div>
+            </div>
+            
+            <label for="paymentTerm" class="mb-3">{{ $t('branchDialog.DefaultPaymentTerm') }}</label>
+            <Dropdown
+              v-model="paymentTermId"
+              :virtualScrollerOptions="{ itemSize: 38 }"
+              :options="paymentTerms"
+              filter
+              :loading="false"
+              optionLabel="description"
+              :optionValue="(option) => option.id"
+              :placeholder="t('branchDialog.paymentTermPlaceholder')"
+              class="w-full"
+            >
+              <template #option="slotProps">
+                <div class="flex align-items-center mx-auto gap-3">
+                  <div>{{ slotProps.option.description }}</div>
+                </div>
+              </template>
+            </Dropdown>
+
+            <div class="mt-6 flex justify-content-end gap-2">
+              <button type="button" 
+                      @click="paymentTermDialogVisible = false"
+                      class="p-button p-button-outlined">
+                {{ t('deleteDialog.cancel') }}
+              </button>
+              <button type="submit"
+                      class="p-button">
+                {{ t('Customer.editPaymentTerm') }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </Dialog>
+
   </div>
 </template>
 
