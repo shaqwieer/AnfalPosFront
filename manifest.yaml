@@ -1,0 +1,9 @@
+applications:
+- name: sales-hub-front          # Application name
+  memory: 8G                # Minimal memory for static assets
+  instances: 1              # Run 1 not 2 copies for high availability
+  buildpack: staticfile_buildpack  # Official Cloud Foundry buildpack
+  path: ./dist                  # Deploy current directory (dist folder)
+  env:
+    FORCE_HTTPS: true       # Redirect HTTP → HTTPS
+    # CACHE_CONTROL: "public, max-age=604800"  # Cache assets for 7 days
