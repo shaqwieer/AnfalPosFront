@@ -66,11 +66,17 @@ const branchSchema = yup.object({
   bankCode: yup.mixed().nullable(),
   bankAccountNo: yup.mixed().nullable(),
   bulkStorageLocation: yup.mixed().nullable(),
+  salesDistrict: yup.mixed().nullable(),
+
   defaultCustomerLimit: yup.mixed().nullable(),
+  costCenter: yup.mixed().nullable(),
 
   bulkOrderType: yup.mixed().nullable(),
-  enableBulk: yup.mixed().nullable(),
-
+  enableBulk: yup.boolean().nullable(),
+  selectBatch: yup.boolean().nullable(),
+  canEditPrice: yup.boolean().nullable(),
+  enableCreditLimitSalesRep: yup.boolean().nullable(),
+  enableCreditLimitCustomer: yup.boolean().nullable(),
   customerCodeId: yup.mixed().nullable(),
 
   bankAccounts: yup.mixed().nullable()
@@ -99,12 +105,16 @@ const informationInitial = ref({
   bankCode: '',
   bankAccountNo: '',
   bulkStorageLocation: '',
+  salesDistrict: '',
+
   defaultCustomerLimit: '',
-
+  costCenter: '',
   bulkOrderType: '',
-  enablePriceChange: null,
+  canEditPrice: null,
   enableBulk: null,
-
+  selectBatch: null,
+  enableCreditLimitSalesRep: false,
+  enableCreditLimitCustomer: false,
   bankPosFirst: null,
   bankPosSecond: null,
   customerCodeId: null,
@@ -132,8 +142,13 @@ const [email, emailAttrs] = defineField('email');
 const [address, addressAttrs] = defineField('address');
 const [primaryPhone, primaryPhoneAttrs] = defineField('primaryPhone');
 const [secondaryPhone, secondaryPhoneAttrs] = defineField('secondaryPhone');
-const [enablePriceChange, enablePriceChangeAttrs] = defineField('enablePriceChange');
+const [canEditPrice, canEditPriceAttrs] = defineField('canEditPrice');
 const [enableBulk, enableBulkAttrs] = defineField('enableBulk');
+const [selectBatch, selectBatchAttrs] = defineField('selectBatch');
+const [enableCreditLimitSalesRep, enableCreditLimitSalesRepAttrs] = defineField('enableCreditLimitSalesRep');
+const [enableCreditLimitCustomer, enableCreditLimitCustomerAttrs] = defineField('enableCreditLimitCustomer');
+
+
 
 const [city, cityAttrs] = defineField('city');
 
@@ -152,8 +167,10 @@ const [bankName, bankNameAttrs] = defineField('bankName');
 const [bankCode, bankCodeAttrs] = defineField('bankCode');
 const [bankAccountNo, bankAccountNoAttrs] = defineField('bankAccountNo');
 const [bulkStorageLocation, bulkStorageLocationAttrs] = defineField('bulkStorageLocation');
-const [defaultCustomerLimit, defaultCustomerLimitAttrs] = defineField('defaultCustomerLimit');
+const [salesDistrict, salesDistrictAttrs] = defineField('salesDistrict');
 
+const [defaultCustomerLimit, defaultCustomerLimitAttrs] = defineField('defaultCustomerLimit');
+const [costCenter, costCenterAttrs] = defineField('costCenter');
 const [bulkOrderType, bulkOrderTypeAttrs] = defineField('bulkOrderType');
 
 const [customerCodeId, customerCodeIdAttrs] = defineField('customerCodeId');
@@ -173,8 +190,11 @@ const createData = handleSubmit(async (validatedInfo) => {
     primaryPhone: validatedInfo.primaryPhone,
     OrganizationId: validatedInfo.organizationId || 1, // Provide default value if not present
     bankAccountId: validatedInfo.bankAccountId || null,
-    enablePriceChange: validatedInfo.enablePriceChange || null,
-    enableBulk: validatedInfo.enableBulk || null,
+    canEditPrice: validatedInfo.canEditPrice,
+    enableBulk: validatedInfo.enableBulk,
+    selectBatch: validatedInfo.selectBatch,
+    enableCreditLimitSalesRep: validatedInfo.enableCreditLimitSalesRep || false,
+    enableCreditLimitCustomer: validatedInfo.enableCreditLimitCustomer || false,
 
     bankName: validatedInfo.bankName || null,
     bankCode: validatedInfo.bankCode || null,
@@ -182,8 +202,11 @@ const createData = handleSubmit(async (validatedInfo) => {
 
     bankAccountNo: validatedInfo.bankAccountNo || null,
     bulkStorageLocation: validatedInfo.bulkStorageLocation || null,
-    defaultCustomerLimit: validatedInfo.defaultCustomerLimit || null,
+    salesDistrict: validatedInfo.salesDistrict || null,
 
+    defaultCustomerLimit: validatedInfo.defaultCustomerLimit || null,
+    costCenter : validatedInfo.costCenter || null,
+   
     bulkOrderType: validatedInfo.bulkOrderType || null,
 
     cajoNumber: validatedInfo.cajoNumber || null,
@@ -220,8 +243,11 @@ const updateData = handleSubmit(async (validatedInfo) => {
     OrganizationId: validatedInfo.organizationId, // Provide default value if not present
     bankAccounts: validatedInfo.bankAccounts || null,
     customerCodeId: validatedInfo.customerCodeId || null,
-    enablePriceChange: validatedInfo.enablePriceChange || null,
-    enableBulk: validatedInfo.enableBulk || null,
+    canEditPrice: validatedInfo.canEditPrice,
+    enableBulk: validatedInfo.enableBulk,
+    selectBatch: validatedInfo.selectBatch,
+    enableCreditLimitSalesRep: validatedInfo.enableCreditLimitSalesRep || false,
+    enableCreditLimitCustomer: validatedInfo.enableCreditLimitCustomer || false,
 
     bankName: validatedInfo.bankName || null,
     bankCode: validatedInfo.bankCode || null,
@@ -230,7 +256,10 @@ const updateData = handleSubmit(async (validatedInfo) => {
 
     bankAccountNo: validatedInfo.bankAccountNo || null,
     bulkStorageLocation: validatedInfo.bulkStorageLocation || null,
+    salesDistrict: validatedInfo.salesDistrict || null,
+
     defaultCustomerLimit: validatedInfo.defaultCustomerLimit || null,
+    costCenter: validatedInfo.costCenter || null,
 
     bulkOrderType: validatedInfo.bulkOrderType || null,
 
@@ -270,8 +299,11 @@ const setFormValues = () => {
     cashCustomer: props.selectedData.cashCustomer,
     profitCenter: props.selectedData.profitCenter,
     bankAccounts: props.selectedData.bankAccounts,
-    enablePriceChange: props.selectedData.enablePriceChange,
+    canEditPrice: props.selectedData.canEditPrice,
     enableBulk: props.selectedData.enableBulk,
+    selectBatch: props.selectedData.selectBatch,
+    enableCreditLimitSalesRep: props.selectedData.enableCreditLimitSalesRep,
+    enableCreditLimitCustomer: props.selectedData.enableCreditLimitCustomer,
 
     bankPosFirst: props.selectedData.bankPosFirst,
     bankPosSecond: props.selectedData.bankPosSecond,
@@ -284,7 +316,10 @@ const setFormValues = () => {
     bankCode: props.selectedData.bankCode,
     bankAccountNo: props.selectedData.bankAccountNo,
     bulkStorageLocation: props.selectedData.bulkStorageLocation,
+    salesDistrict: props.selectedData.salesDistrict,
+
     defaultCustomerLimit: props.selectedData.defaultCustomerLimit,
+    costCenter: props.selectedData.costCenter,
 
     bulkOrderType: props.selectedData.bulkOrderType,
 
@@ -335,11 +370,6 @@ onMounted(async () => {
     handleError(err, mainStore.loading);
   }
 });
-
-// const toggleCheckbox = () => {
-//   EnablePriceChange.value = EnablePriceChange.value === true ? false : true;
-//   console.log(EnablePriceChange.value);
-// };
 </script>
 
 <template>
@@ -483,6 +513,12 @@ onMounted(async () => {
 
         <div class="flex gap-2">
           <div class="field flex flex-column w-6">
+            <label class="mb-3">{{ $t(`Customer.salesDistrict`) }} </label>
+            <InputText id="salesDistrict" v-model="salesDistrict" v-bind="salesDistrictAttrs" autofocus :invalid="!!errors.salesDistrict" />
+            <small v-if="errors.salesDistrict" class="text-red-600">{{ errors.salesDistrict }}</small>
+          </div>
+
+          <div class="field flex flex-column w-6">
             <label class="mb-3">{{ $t(`Customer.BulkStorageLocation`) }} </label>
             <InputText id="bulkStorageLocation" v-model="bulkStorageLocation" v-bind="bulkStorageLocationAttrs" autofocus :invalid="!!errors.bulkStorageLocation" />
             <small v-if="errors.bulkStorageLocation" class="text-red-600">{{ errors.bulkStorageLocation }}</small>
@@ -496,7 +532,7 @@ onMounted(async () => {
         </div>
 
         <div class="flex gap-2">
-          <div class="field flex flex-column w-6">
+          <div class="field flex flex-column w-4">
             <label for="paymentTerm" class="mb-3">{{ $t('branchDialog.DefaultPaymentTerm') }}</label>
             <Dropdown
               v-model="defaultPaymentTermId"
@@ -518,25 +554,46 @@ onMounted(async () => {
             <small v-if="errors.paymentTerm" class="text-red-600">{{ errors.paymentTerm }}</small>
           </div>
 
-          <div class="field flex flex-column w-6">
+          <div class="field flex flex-column w-4">
             <label class="mb-3">{{ $t(`Customer.DefaultCreditLimit`) }} </label>
-            <InputText id="creditLimit" v-model="defaultCustomerLimit" v-bind="defaultCustomerLimitAttrs" autofocus :invalid="!!errors.defaultCustomerLimit" />
+            <InputNumber style="height: 44px" id="creditLimit" v-model="defaultCustomerLimit" v-bind="defaultCustomerLimitAttrs" autofocus :invalid="!!errors.defaultCustomerLimit" />
             <small v-if="errors.defaultCustomerLimit" class="text-red-600">{{ errors.defaultCustomerLimit }}</small>
           </div>
+
+          <div class="field flex flex-column w-4">
+            <label class="mb-3">{{ $t(`Customer.CostCenter`) }} </label>
+            <InputText id="costCenter" v-model="costCenter" v-bind="costCenterAttrs" autofocus :invalid="!!errors.costCenter" />
+            <small v-if="errors.costCenter" class="text-red-600">{{ errors.costCenter }}</small>
+          </div>
+
         </div>
 
         <div class="">
           <div class="">
-            <input type="checkbox" @click.stop id="EnablePriceChange" class="m-0 mr-2 mt-2" v-model="enablePriceChange" v-bind="enablePriceChangeAttrs" :invalid="!!errors.enablePriceChange" />
-            <label for="EnablePriceChange" class="m-0" style="position: relative; top: -2px">{{ $t('branchDialog.EnablePriceChange') }}</label>
+            <input type="checkbox" @click.stop id="canEditPrice" class="m-0 mr-2 mt-2" v-model="canEditPrice" v-bind="canEditPriceAttrs" :aria-invalid="!!errors.canEditPrice" />
+            <label for="canEditPrice" class="m-0" style="position: relative; top: -2px">{{ $t('branchDialog.canEditPrice') }}</label>
           </div>
 
           <div class="">
-            <input type="checkbox" aria-label="EnableBulk" @click.stop id="EnableBulk" class="m-0 mr-2 mt-2" v-model="enableBulk" v-bind="enableBulkAttrs" :invalid="!!errors.enableBulk" />
+            <input type="checkbox" aria-label="EnableBulk" @click.stop id="EnableBulk" class="m-0 mr-2 mt-2" v-model="enableBulk" v-bind="enableBulkAttrs" :aria-invalid="!!errors.enableBulk" />
             <label for="EnableBulk" class="m-0" style="position: relative; top: -2px">{{ $t('branchDialog.EnableBulk') }}</label>
           </div>
 
-          <small v-if="errors.enableBulk" class="text-red-600">{{ errors.enableBulk }}</small>
+          <div class="">
+            <input type="checkbox" aria-label="SelectBatch" @click.stop id="SelectBatch" class="m-0 mr-2 mt-2" v-model="selectBatch" v-bind="selectBatchAttrs" :aria-invalid="!!errors.selectBatch" />
+            <label for="SelectBatch" class="m-0" style="position: relative; top: -2px">{{ $t('branchDialog.SelectBatch') }}</label>
+          </div>
+          <small v-if="errors.selectBatch" class="text-red-600">{{ errors.selectBatch }}</small>
+        
+          <div class="">
+            <input type="checkbox" aria-label="EnableCreditLimitSalesRep" @click.stop id="EnableCreditLimitSalesRep" class="m-0 mr-2 mt-2" v-model="enableCreditLimitSalesRep" v-bind="enableCreditLimitSalesRepAttrs" :aria-invalid="!!errors.enableCreditLimitSalesRep" />
+            <label for="EnableCreditLimitSalesRep" class="m-0" style="position: relative; top: -2px">{{ $t('branchDialog.EnableCreditLimitSalesRep') }}</label>
+          </div>
+          <div class="">
+            <input type="checkbox" aria-label="EnableCreditLimitCustomer" @click.stop id="EnableCreditLimitCustomer" class="m-0 mr-2 mt-2" v-model="enableCreditLimitCustomer" v-bind="enableCreditLimitCustomerAttrs" :aria-invalid="!!errors.enableCreditLimitCustomer" />
+            <label for="EnableCreditLimitCustomer" class="m-0" style="position: relative; top: -2px">{{ $t('branchDialog.EnableCreditLimitCustomer') }}</label>
+          </div>
+
         </div>
       </div>
 

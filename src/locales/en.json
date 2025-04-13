@@ -273,7 +273,8 @@
     "Name": "Name",
     "prefix": "prefix",
     "from": "from",
-    "to": "to"
+    "to": "to",
+    "paymentTerm": "Payment Term"
   },
   "pagination": {
     "currentPageReportTemplate": "Showing {first} to {last} of {totalRecords} entries"
@@ -392,7 +393,11 @@
     "DefaultCreditLimit": "Default Credit Limit",
     "paymentTermPlaceholder": "Payment Term",
     "creditLimitPlaceholder": "Default Credit Limit",
-    "paymentTerm": "Payment Term"
+    "paymentTerm": "Payment Term",
+    "canEditPrice": "Enable Price Change",
+    "SelectBatch": "Select Batch",
+    "EnableCreditLimitSalesRep": "Enable Credit Limit Sales Rep",
+    "EnableCreditLimitCustomer": "Enable Credit Limit Customer"
   },
   "items": {
     "title": "Sap Items",
@@ -472,7 +477,12 @@
     "Notes": "Notes",
     "BulkStorageLocation": "Bulk Storage Location",
     "BulkOrderType": "Bulk Order Type",
-    "DefaultCreditLimit": "Default Credit Limit"
+    "DefaultCreditLimit": "Default Credit Limit",
+    "CostCenter": "Cost Center",
+    "salesDistrict": "Sales District",
+    "editCreditLimit": "Edit Credit Limit",
+    "editPaymentTerm": "Edit Payment Term",
+    "paymentTermPlaceholder": "Payment Term"
   },
   "organizationConfig": {
     "basePriceCode": "Base Price Code",
@@ -646,7 +656,8 @@
     "Category": "Category",
     "StockLevel": "Stock Level",
     "quantity": "quantity",
-    "Min/Max": "Min/Max"
+    "Min/Max": "Min/Max",
+    "Cash": "Cash"
   },
   "Session": {
     "SessionManagement": "Session Management",

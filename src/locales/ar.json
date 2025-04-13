@@ -266,7 +266,8 @@
     "Name": "الاسم",
     "prefix": "البادئة",
     "from": "من",
-    "to": "إلى"
+    "to": "إلى",
+    "paymentTerm": "الدفعة"
   },
   "pagination": {
     "currentPageReportTemplate": "عرض {first} إلى {last} من أصل {totalRecords} إدخالات"
@@ -383,9 +384,14 @@
     "EnableBulk": "تمكين الجزء الأكبر",
     "DefaultPaymentTerm": "مصطلح الدفع الافتراضي",
     "DefaultCreditLimit": "حد الائتمان الافتراضي",
+    "CostCenter": "مركز التكلفة",
     "paymentTermPlaceholder": "مدة الدفع",
     "creditLimitPlaceholder": "حد الائتمان الافتراضي",
-    "paymentTerm": "مدة الدفع"
+    "paymentTerm": "مدة الدفع",
+    "canEditPrice": "تمكين تغيير السعر",
+    "SelectBatch": "حدد دفعة",
+    "EnableCreditLimitSalesRep": "تمكين حد الائتمان للمندوب",
+    "EnableCreditLimitCustomer": "تمكين حد الائتمان للعميل"
   },
   "items": {
     "title": "الأصناف",
@@ -465,7 +471,11 @@
     "Notes": "الملاحظات",
     "BulkStorageLocation": "موقع التخزين بالجملة",
     "BulkOrderType": "نوع الطلب بالجملة",
-    "DefaultCreditLimit": "حد الائتمان الافتراضي"
+    "DefaultCreditLimit": "حد الائتمان الافتراضي",
+    "salesDistrict": "منطقة المبيعات",
+    "editCreditLimit": "تعديل حد الائتمان",
+    "editPaymentTerm": "تعديل شرط الدفع",
+    "paymentTermPlaceholder": "اختر شرط الدفع"
   },
   "organizationConfig": {
     "basePriceCode": "كود السعر الأساسي",
