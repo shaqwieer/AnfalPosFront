@@ -89,7 +89,7 @@ const formatPrice = (price: number | undefined | null): string => {
     }) || '0.00'
   );
 };
-const transactionOptions = ref(['Deposits', 'Transactions']);
+const transactionOptions = ref(['Deposits', 'Transactions', 'Expenses']);
 const transactionType = ref('Deposits');
 onMounted(() => {
   sessionStore.GetSessionDetails(props.session.sessionId);
@@ -237,7 +237,7 @@ onMounted(() => {
             </Column>
           </DataTable>
           <DataTable
-            v-else
+            v-else-if="transactionType === 'Transactions'"
             class="surface-card border-round-lg shadow-1 border-1 surface-border"
             :value="sessionData.transactions"
             :paginator="true"
@@ -296,6 +296,56 @@ onMounted(() => {
                     class="cursor-pointer text-green-500 border-circle border-1 border-green-200 flex align-items-center justify-content-center w-3rem h-3rem hover:bg-green-100"
                   >
                     <i class="pi pi-check-circle"></i>
+                  </div>
+                </div>
+              </template>
+            </Column>
+          </DataTable>
+          <DataTable
+            v-else-if="transactionType === 'Expenses'"
+            class="surface-card border-round-lg shadow-1 border-1 surface-border"
+            :value="sessionData.expensesInSession"
+            :paginator="true"
+            :rows="5"
+            :rowsPerPageOptions="[5, 10, 25]"
+            dataKey="id"
+            :globalFilterFields="['expenseType', 'sapFinancialDoc']"
+            :currentPageReportTemplate="''"
+          >
+            <template #empty>
+              <div class="flex justify-content-center align-items-center font-bold text-lg">
+                {{ 'No Expenses' }}
+              </div>
+            </template>
+            <Column field="expenseType" header="Expense Type" class="" :sortable="true">
+              <template #body="slotProps">
+                <div class="flex text-lg">{{ slotProps.data.expenseType }}</div>
+              </template>
+            </Column>
+            <Column field="sapFinancialDoc" header="SAP Doc" class="" :sortable="true">
+              <template #body="slotProps">
+                <div class="flex text-lg">{{ slotProps.data.sapFinancialDoc }}</div>
+              </template>
+            </Column>
+            <Column field="createdAt" header="Date" class="" :sortable="true">
+              <template #body="slotProps">
+                <div class="flex text-lg">{{ new Date(slotProps.data.createdAt).toLocaleDateString('en-GB') }}</div>
+              </template>
+            </Column>
+            <Column field="depositAmount" header="Amount" class="" :sortable="true">
+              <template #body="slotProps">
+                <div class="flex text-lg">{{ formatPrice(slotProps.data.depositAmount) }}</div>
+              </template>
+            </Column>
+            <Column field="attachmentUrl" header="Attachments" class="w-1rem" :sortable="true">
+              <template #body="slotProps">
+                <div class="flex align-items-center justify-content-center gap-1">
+                  <div
+                    v-if="slotProps.data.attachmentUrl"
+                    @click="selectedDocument = slotProps.data.attachmentUrl"
+                    class="cursor-pointer border-circle border-1 surface-border flex align-items-center justify-content-center w-3rem h-3rem hover:bg-gray-100"
+                  >
+                    <i class="pi pi-file"></i>
                   </div>
                 </div>
               </template>
