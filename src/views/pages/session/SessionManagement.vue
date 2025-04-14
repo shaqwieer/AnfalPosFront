@@ -385,6 +385,14 @@ const paginatedCustomers = computed(() => {
               <span class="text-md flex">{{ slotProps.data.sessionStartDate }}</span>
             </template>
           </Column>
+          <Column field="sessionEndDate" >
+            <template #header>
+              <span class="text-lg font-bold"> {{ t('Session.SessionEndDate') }} </span>
+            </template>
+            <template #body="slotProps">
+              <span class="text-md flex">{{ slotProps.data.sessionEndDate }}</span>
+            </template>
+          </Column>
           <Column field="cashAmount" class="">
             <template #header>
               <span class="text-lg flex font-bold"> {{ t('Session.CashAmount') }} </span>

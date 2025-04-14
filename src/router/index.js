@@ -190,6 +190,14 @@ const router = createRouter({
           component: () => import('@/views/dashboards/VANDashboard.vue')
         },
         {
+          path: '/invoices-excel-upload',
+          name: 'InvoiceExcelUpload',
+          meta: {
+            breadcrumb: ['Invoices', 'Excel Upload']
+          },
+          component: () => import('@/views/pages/invoice/ExcelInvoiceUpload.vue')
+        },
+        {
           path: '/dashboard-banking',
           name: 'dashboard-banking',
           meta: {

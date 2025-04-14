@@ -688,7 +688,8 @@
     "Approve": "Approve",
     "AttachmentsPreview": "Attachments Preview",
     "Selectanattachmenttopreview": "Select an attachment to preview",
-    "Details": "Session Details"
+    "Details": "Session Details",
+    "SessionEndDate": "Session End Date"
   },
   "Visit": {
     "CustomerName": "Customer Name",

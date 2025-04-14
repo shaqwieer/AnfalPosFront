@@ -674,7 +674,8 @@
     "Reject": "رفض",
     "AttachmentsPreview": "معاينة المرفقات",
     "Selectanattachmenttopreview": "حدد مرفقًا للمعاينة",
-    "Details": "تفاصيل الجلسة"
+    "Details": "تفاصيل الجلسة",
+    "SessionEndDate": "تاريخ انتهاء الجلسة"
   },
   "Visit": {
     "VisitManagement": "إدارة الزيارة",
