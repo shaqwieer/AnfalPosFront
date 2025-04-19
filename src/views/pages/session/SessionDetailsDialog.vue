@@ -291,7 +291,7 @@ onMounted(() => {
                   </div>
                   <!-- <div v-else class="flex w-11 justify-content-center align-items-center bg-white text-sm text-red-600">No Attachment</div> -->
                   <div
-                    v-if="slotProps.data.statusId === 1 && props.session.statusId !== 4"
+                    v-if="slotProps.data.statusId === 1 && props.session.statusId !== 4&&slotProps.data.paymentMethodName !== 'Cash'"
                     @click="ApproveSessionTransaction(slotProps.data.id, 'Transactions')"
                     class="cursor-pointer text-green-500 border-circle border-1 border-green-200 flex align-items-center justify-content-center w-3rem h-3rem hover:bg-green-100"
                   >
