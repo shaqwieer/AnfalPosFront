@@ -79,7 +79,8 @@ const branchSchema = yup.object({
   enableCreditLimitCustomer: yup.boolean().nullable(),
   customerCodeId: yup.mixed().nullable(),
 
-  bankAccounts: yup.mixed().nullable()
+  bankAccounts: yup.mixed().nullable(),
+  bankAccountMain: yup.string().nullable() // Add validation for BankAccountMain
 });
 
 const informationInitial = ref({
@@ -119,7 +120,8 @@ const informationInitial = ref({
   bankPosSecond: null,
   customerCodeId: null,
 
-  bankPosThird: null
+  bankPosThird: null,
+  bankAccountMain: '' // Add initial value for BankAccountMain
 });
 
 const { handleSubmit, errors, resetForm, setValues, defineField } = useForm({
@@ -147,8 +149,6 @@ const [enableBulk, enableBulkAttrs] = defineField('enableBulk');
 const [selectBatch, selectBatchAttrs] = defineField('selectBatch');
 const [enableCreditLimitSalesRep, enableCreditLimitSalesRepAttrs] = defineField('enableCreditLimitSalesRep');
 const [enableCreditLimitCustomer, enableCreditLimitCustomerAttrs] = defineField('enableCreditLimitCustomer');
-
-
 
 const [city, cityAttrs] = defineField('city');
 
@@ -180,6 +180,7 @@ const [bankAccounts, bankAccountsAttrs] = defineField('bankAccounts');
 const [bankPosFirst, bankPosFirstAttrs] = defineField('bankPosFirst');
 const [bankPosSecond, bankPosSecondAttrs] = defineField('bankPosSecond');
 const [bankPosThird, bankPosThirdAttrs] = defineField('bankPosThird');
+const [bankAccountMain, bankAccountMainAttrs] = defineField('bankAccountMain'); // Define the field
 
 const createData = handleSubmit(async (validatedInfo) => {
   const branchDto = {
@@ -205,8 +206,8 @@ const createData = handleSubmit(async (validatedInfo) => {
     salesDistrict: validatedInfo.salesDistrict || null,
 
     defaultCustomerLimit: validatedInfo.defaultCustomerLimit || null,
-    costCenter : validatedInfo.costCenter || null,
-   
+    costCenter: validatedInfo.costCenter || null,
+
     bulkOrderType: validatedInfo.bulkOrderType || null,
 
     cajoNumber: validatedInfo.cajoNumber || null,
@@ -215,6 +216,8 @@ const createData = handleSubmit(async (validatedInfo) => {
     bankPosFirst: validatedInfo.bankPosFirst || null,
     bankPosSecond: validatedInfo.bankPosSecond || null,
     bankPosThird: validatedInfo.bankPosThird || null,
+
+    bankAccountMain: validatedInfo.bankAccountMain || null, // Include BankAccountMain
 
     SecondaryPhone: validatedInfo.secondaryPhone || null,
     SalesRepCode: validatedInfo.salesRepCode || null,
@@ -266,6 +269,8 @@ const updateData = handleSubmit(async (validatedInfo) => {
     bankPosFirst: validatedInfo.bankPosFirst || null,
     bankPosSecond: validatedInfo.bankPosSecond || null,
     bankPosThird: validatedInfo.bankPosThird || null,
+
+    bankAccountMain: validatedInfo.bankAccountMain || null, // Include BankAccountMain
 
     SecondaryPhone: validatedInfo.secondaryPhone || null,
     SalesRepCode: validatedInfo.salesRepCode || null,
@@ -326,7 +331,8 @@ const setFormValues = () => {
     country: countries.find((e) => e.id === props.selectedData.countryId),
     branchType: branchTypes.find((e) => e.id === props.selectedData.branchTypeId),
     city: cities.value.find((e) => e.id === props.selectedData.cityId),
-    defaultPaymentTermId: paymentTerms.value.find((e) => e.id === props.selectedData.defaultPaymentTermId)
+    defaultPaymentTermId: paymentTerms.value.find((e) => e.id === props.selectedData.defaultPaymentTermId),
+    bankAccountMain: props.selectedData.bankAccountMain // Set value for BankAccountMain
   });
   console.log('props.selectedData');
   console.log(props.selectedData);
@@ -504,6 +510,14 @@ onMounted(async () => {
             <label for="bankAccountNo" class="mb-3">{{ $t('branchDialog.bankAccountNo') }}</label>
             <InputText id="bankAccountNo" v-model="bankAccountNo" v-bind="bankAccountNoAttrs" autofocus :invalid="!!errors.bankAccountNo" />
             <small v-if="errors.bankAccountNo" class="text-red-600">{{ errors.bankAccountNo }}</small>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <div class="field flex flex-column w-6">
+            <label for="bankAccountMain" class="mb-3">Bank Account Main</label>
+            <InputText id="bankAccountMain" v-model="bankAccountMain" v-bind="bankAccountMainAttrs" :invalid="!!errors.bankAccountMain" />
+            <small v-if="errors.bankAccountMain" class="text-red-600">{{ errors.bankAccountMain }}</small>
           </div>
         </div>
       </div>
