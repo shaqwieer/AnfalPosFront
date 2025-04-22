@@ -201,6 +201,13 @@ const paginatedCustomers = computed(() => {
 <template>
   <div class="">
     <div class="max-w-7xl mx-auto">
+      <div class="mx-3 mb-3">
+        <div class="border-round-lg p-3 flex align-items-center gap-2 border-1"
+          :class="[darkMode ? 'bg-blue-900 border-blue-500 text-blue-100' : 'bg-blue-50 border-blue-200 text-blue-700']">
+          <i class="pi pi-info-circle text-xl"></i>
+          <span class="font-medium">{{ t('Session.NoticeMessage') }}</span>
+        </div>
+      </div>
       <!-- Filters -->
       <div class="px-3" v-if="showFilter">
         <div class="row-gap-3 border-round-lg border-1 p-2 py-3 grid gap-0 w-full align-items-end justify-content-between" :class="[darkMode ? 'bg-surface-card text-white border-gray-600' : 'bg-white text-gray-700 border-gray-300']">

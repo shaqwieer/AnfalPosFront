@@ -272,6 +272,11 @@ onMounted(() => {
                 <div class="flex text-lg">{{ formatPrice(slotProps.data.amount) }}</div>
               </template>
             </Column>
+            <Column field="paymentMethodName" header="PaymentMethodName" class="" :sortable="true">
+              <template #body="slotProps">
+                <div class="flex text-lg">{{slotProps.data.paymentMethodName}}</div>
+              </template>
+            </Column>
             <Column field="statusId" header="Status" class="" :sortable="true">
               <template #body="slotProps">
                 <span class="px-2 py-1 flex w-fit text-sm font-semibold border-round-xl" :class="getStatusColor(slotProps.data.statusId)">

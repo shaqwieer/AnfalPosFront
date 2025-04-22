@@ -334,7 +334,7 @@ const getPaymentTerms = async () => {
               <template #body="slotProps">
                 <div class="flex flex-column justify-content-start align-items-start">
                   <!-- empty -->
-                  <div class="font-semibold text-md">SAR {{ slotProps.data.balance ? slotProps.data.balance : '25,000.00' }}</div>
+                  <div class="font-semibold text-md">SAR {{ slotProps.data.availableBalance ? slotProps.data.availableBalance : '0' }}</div>
                 </div>
               </template>
             </Column>

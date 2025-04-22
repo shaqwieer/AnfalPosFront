@@ -87,7 +87,7 @@ const formatDate = (date: string): string => {
               <div>
                 <div class="text-sm text-green-600">Available Credit</div>
                 <div class="text-2xl font-bold text-green-700">
-                  {{ formatPrice(customer.creditLimit - customer.balance) }}
+                  {{ formatPrice(customer.availableBalance) }}
                 </div>
               </div>
               <i class="pi pi-money-bill text-3xl text-green-600"></i>
@@ -100,7 +100,7 @@ const formatDate = (date: string): string => {
               <div>
                 <div class="text-sm text-purple-600">Current Balance</div>
                 <div class="text-2xl font-bold text-purple-700">
-                  {{ formatPrice(customer.balance) }}
+                  {{ formatPrice(customer.outStandingBalance) }}
                 </div>
               </div>
               <i class="pi pi-credit-card text-3xl text-purple-600"></i>

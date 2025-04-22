@@ -578,7 +578,7 @@ const gitRegions = async () => {
                       <input v-model="formData.creditLimit" type="number" min="0" step="1000" required :disabled="readOnly" class="w-full p-inputtext" />
                     </div>
 
-                    <div class="col-12 md:col-6">
+                    <div class="col-12 md:col-6" v-if="false">
                       <label class="block text-sm font-medium text-700 mb-1"> {{ $t(`Customer.Payment_Terms`) }} </label>
                       <Dropdown v-model="formData.paymentTerm" :options="CustomerLookups.paymentTerms" optionValue="id" optionLabel="description" placeholder="Select a Payment Term" class="w-full">
                         <template #option="slotProps">

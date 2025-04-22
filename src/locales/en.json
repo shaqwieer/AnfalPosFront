@@ -689,7 +689,8 @@
     "AttachmentsPreview": "Attachments Preview",
     "Selectanattachmenttopreview": "Select an attachment to preview",
     "Details": "Session Details",
-    "SessionEndDate": "Session End Date"
+    "SessionEndDate": "Session End Date",
+    "NoticeMessage": "Note: Sessions without transactions, cash deposits, or expenses will not appear in search results."
   },
   "Visit": {
     "CustomerName": "Customer Name",

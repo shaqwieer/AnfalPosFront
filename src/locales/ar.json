@@ -675,7 +675,8 @@
     "AttachmentsPreview": "معاينة المرفقات",
     "Selectanattachmenttopreview": "حدد مرفقًا للمعاينة",
     "Details": "تفاصيل الجلسة",
-    "SessionEndDate": "تاريخ انتهاء الجلسة"
+    "SessionEndDate": "تاريخ انتهاء الجلسة",
+    "NoticeMessage": "ملاحظة: لن تظهر الجلسات التي لا تحتوي على معاملات أو إيداعات نقدية أو نفقات في نتائج البحث"
   },
   "Visit": {
     "VisitManagement": "إدارة الزيارة",

@@ -73,7 +73,7 @@ const { t, locale } = useI18n();
         <div class="text-right">
           <div class="text-sm text-600">{{ t(`Customer.Credit_Limit`) }}</div>
           <div class="font-bold text-primary">SAR {{ formatPrice(customer.creditLimit) }}</div>
-          <div class="text-sm">{{ t('Customer.Balance') }}: SAR {{ customer.balance ? customer.balance : '25,000.00' }}</div>
+          <div class="text-sm">{{ t('Customer.Balance') }}: SAR {{ customer.availableBalance ? customer.availableBalance : '0' }}</div>
         </div>
       </div>
 
