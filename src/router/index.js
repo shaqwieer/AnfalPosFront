@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import AppLayout from '@/layout/AppLayout.vue';
 import { useMainStore } from '@/stores/mainStore';
+
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -8,6 +9,11 @@ const router = createRouter({
       path: '/',
       component: AppLayout,
       children: [
+        {
+          path: '/reports',
+          name: 'reports',
+          component: () => import('@/views/pages/reports/Reports.vue')
+        },
         {
           path: 'items-availability',
           name: 'Inventory',

@@ -729,5 +729,31 @@
   "paymentTerm": "مدة الدفع",
   "Actions": "الإجراءات",
   "Late_Session": "الجلسة المتأخرة",
-  "ExpenseTypes": "أنواع النفقات"
+  "ExpenseTypes": "أنواع النفقات",
+  "reports": {
+    "header": "التقارير",
+    "description": "إنشاء وتنزيل تقارير متنوعة لعملك",
+    "searchReports": "البحث في التقارير...",
+    "addNewReport": "إضافة تقرير جديد",
+    "agingReport": "تقرير الأعمار",
+    "agingReportDescription": "عرض الأرصدة المستحقة مصنفة حسب العمر",
+    "salesReport": "تقرير المبيعات",
+    "salesReportDescription": "تحليل أداء المبيعات خلال فترة محددة",
+    "inventoryReport": "تقرير المخزون",
+    "inventoryReportDescription": "التحقق من مستويات المخزون الحالية وحالتها",
+    "asOfDate": "كما في تاريخ",
+    "branch": "الفرع",
+    "dateRange": "النطاق الزمني",
+    "startDate": "تاريخ البدء",
+    "endDate": "تاريخ الانتهاء",
+    "cancel": "إلغاء",
+    "generate": "إنشاء التقرير",
+    "downloadSuccess": "تم تنزيل التقرير بنجاح",
+    "reportId": "معرف التقرير",
+    "reportName": "اسم التقرير",
+    "reportDescription": "الوصف",
+    "reportEndpoint": "نقطة نهاية API",
+    "requestMethod": "طريقة الطلب",
+    "addReport": "إضافة تقرير"
+  }
 }

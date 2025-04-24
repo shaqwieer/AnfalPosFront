@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useSessionStore } from '../../../stores/sessionStore';
-
 import { useI18n } from 'vue-i18n';
 import { ref, computed, onMounted } from 'vue';
+import * as XLSX from 'xlsx';
 const { t } = useI18n();
 
 const props = defineProps({
@@ -94,6 +94,69 @@ const transactionType = ref('Deposits');
 onMounted(() => {
   sessionStore.GetSessionDetails(props.session.sessionId);
 });
+
+// Excel export functionality
+const exportToExcel = () => {
+  let dataToExport = [];
+  let fileName = `Session_${props.session.sessionId}_${transactionType.value}`;
+  
+  if (transactionType.value === 'Deposits') {
+    dataToExport = sessionData.value.shiftCashDeposits.map(item => ({
+      'Deposit No.': item.depositNo,
+      'SAP Doc': item.sapFinancialDoc,
+      'Date': new Date(item.createdAt).toLocaleDateString('en-GB'),
+      'Amount': formatPriceRaw(item.depositAmount),
+      'Status': statusOptions.find(option => option.value == item.statusId)?.label || ''
+    }));
+  } else if (transactionType.value === 'Transactions') {
+    dataToExport = sessionData.value.transactions.map(item => ({
+      'Transaction ID': item.id,
+      'SAP Doc': item.sapFinancialDoc,
+      'Date': new Date(item.createdAt).toLocaleDateString('en-GB'),
+      'Amount': formatPriceRaw(item.amount),
+      'Payment Method': item.paymentMethodName,
+      'Status': statusOptions.find(option => option.value == item.statusId)?.label || ''
+    }));
+  } else if (transactionType.value === 'Expenses') {
+    dataToExport = sessionData.value.expensesInSession.map(item => ({
+      'Expense Type': item.expenseType,
+      'SAP Doc': item.sapFinancialDoc,
+      'Date': new Date(item.createdAt).toLocaleDateString('en-GB'),
+      'Amount': formatPriceRaw(item.depositAmount)
+    }));
+  }
+  
+  if (dataToExport.length === 0) {
+    alert(`No ${transactionType.value.toLowerCase()} data to export`);
+    return;
+  }
+  
+  const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, transactionType.value);
+  
+  // Add session summary at the top if needed
+  if (sessionData.value) {
+    const summaryWorksheet = XLSX.utils.aoa_to_sheet([
+      [`Session #${sessionData.value.sessionId}`],
+      ['Date', sessionData.value.sessionStartDate + ' - ' + sessionData.value.sessionEndDate],
+      [''],
+      ['Cash', formatPriceRaw(sessionData.value.cashCarriedForward + sessionData.value.cashReceived)],
+      ['Card Payments', formatPriceRaw(sessionData.value.cardPayment)],
+      ['Bank Transfers', formatPriceRaw(sessionData.value.bankTransfers)],
+      [''],
+      ['Session Total', formatPriceRaw(sessionData.value.sessionTotal)]
+    ]);
+    XLSX.utils.book_append_sheet(workbook, summaryWorksheet, 'Summary');
+  }
+  
+  XLSX.writeFile(workbook, `${fileName}.xlsx`);
+};
+
+// Format price for Excel (without currency symbol)
+const formatPriceRaw = (price: number | undefined | null): number => {
+  return price || 0;
+};
 </script>
 
 <template>
@@ -167,8 +230,21 @@ onMounted(() => {
 
         <div class="flex flex-column gap-1 w-full p-3 bg-white shadow-1 border-round-md">
           <div class="flex flex-row w-full justify-content-between align-items-center p-1">
-            <span class="font-semibold text-lg">Financial Records</span>
-            <SelectButton class="flex" v-model="transactionType" :options="transactionOptions" aria-labelledby="basic" />
+            <div class="flex justify-content-between align-items-center w-full">
+              <span class="font-semibold text-lg">Financial Records</span>
+              <div class="flex gap-2">
+                <SelectButton class="flex" v-model="transactionType" :options="transactionOptions" aria-labelledby="basic" />
+                <Button 
+                  icon="pi pi-file-excel" 
+                  class="p-button-success" 
+                  @click="exportToExcel()" 
+                  :disabled="(transactionType === 'Deposits' && !sessionData.shiftCashDeposits?.length) || 
+                            (transactionType === 'Transactions' && !sessionData.transactions?.length) || 
+                            (transactionType === 'Expenses' && !sessionData.expensesInSession?.length)"
+                  tooltip="Export to Excel"
+                />
+              </div>
+            </div>
           </div>
           <DataTable
             v-if="transactionType === 'Deposits'"
@@ -357,10 +433,6 @@ onMounted(() => {
             </Column>
           </DataTable>
         </div>
-        <!-- <div class="flex justify-content-end gap-3">
-          <Button v-if="session.statusId === 4" class="px-4 py-2 bg-red-600 text-white border-0 hover:bg-red-700" @click="RejectSession(sessionData)">{{ t('Session.Reject') }}</Button>
-          <Button v-if="session.statusId === 4" class="px-4 py-2 bg-green-600 text-white border-0 hover:bg-green-700" @click="ApproveSession(sessionData)">{{ t('Session.Approve') }}</Button>
-        </div> -->
       </div>
       <div class="flex flex-column gap-1 w-full p-3 shadow-1 border-round-xl bg-white">
         <span class="font-semibold text-2xl">Attachment Preview</span>

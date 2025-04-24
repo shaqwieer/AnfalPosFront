@@ -744,5 +744,31 @@
   "paymentTerm": "Payment Term",
   "Actions": "Actions",
   "Late_Session": "Late Session",
-  "ExpenseTypes": "Expense Types"
+  "ExpenseTypes": "Expense Types",
+  "reports": {
+    "header": "Reports",
+    "description": "Generate and download various reports for your business",
+    "searchReports": "Search reports...",
+    "addNewReport": "Add New Report",
+    "agingReport": "Aging Report",
+    "agingReportDescription": "View outstanding balances categorized by age",
+    "salesReport": "Sales Report",
+    "salesReportDescription": "Analyze sales performance over a specified period",
+    "inventoryReport": "Inventory Report",
+    "inventoryReportDescription": "Check current inventory levels and status",
+    "asOfDate": "As of Date",
+    "branch": "Branch",
+    "dateRange": "Date Range",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "cancel": "Cancel",
+    "generate": "Generate Report",
+    "downloadSuccess": "Report downloaded successfully",
+    "reportId": "Report ID",
+    "reportName": "Report Name",
+    "reportDescription": "Description",
+    "reportEndpoint": "API Endpoint",
+    "requestMethod": "Request Method",
+    "addReport": "Add Report"
+  }
 }
