@@ -769,6 +769,14 @@
     "reportDescription": "Description",
     "reportEndpoint": "API Endpoint",
     "requestMethod": "Request Method",
-    "addReport": "Add Report"
+    "addReport": "Add Report",
+    "itemAvailabilityReport": "Item Availability Report",
+    "itemAvailabilityReportDescription": "Generate a report showing item availability for sales representatives",
+    "salesRepCashReport": "Sales Rep Cash Report",
+    "salesRepCashReportDescription": "Generate a detailed report showing sales representative transactions with cash records",
+    "branches": "Branches",
+    "selectBranches": "Select Branches",
+    "itemUsabilityReport": "Item Usage Report",
+    "itemUsabilityReportDescription": "Detailed report showing item usage statistics for a selected branch and date range"
   }
 }

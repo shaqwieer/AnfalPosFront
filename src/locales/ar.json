@@ -754,6 +754,14 @@
     "reportDescription": "الوصف",
     "reportEndpoint": "نقطة نهاية API",
     "requestMethod": "طريقة الطلب",
-    "addReport": "إضافة تقرير"
+    "addReport": "إضافة تقرير",
+    "itemAvailabilityReport": "تقرير توفر العناصر",
+    "itemAvailabilityReportDescription": "إنشاء تقرير يوضح توفر العناصر لمندوبي المبيعات",
+    "salesRepCashReport": "تقرير النقدية لمندوب المبيعات",
+    "salesRepCashReportDescription": "إنشاء تقرير مفصل يوضح معاملات مندوب المبيعات مع سجلات النقد",
+    "branches": "الفروع",
+    "selectBranches": "اختر الفروع",
+    "itemUsabilityReport": "تقرير استخدام العناصر",
+    "itemUsabilityReportDescription": "تقرير مفصل يوضح إحصائيات استخدام العناصر لفرع وفترة زمنية محددة"
   }
 }

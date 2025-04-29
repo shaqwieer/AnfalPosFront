@@ -40,68 +40,82 @@ const reports = ref([
       }
     ]
   },
+  {
+    id: 'item-availability-report',
+    name: t('reports.itemAvailabilityReport'),
+    icon: 'pi-box',
+    color: 'bg-green-100',
+    textColor: 'text-green-700',
+    description: t('reports.itemAvailabilityReportDescription'),
+    endpoint: '/Items/GenerateItemAvailabiltyReport',
+    requestMethod: 'POST',
+    filters: [
+      { 
+        type: 'dropdown', 
+        name: 'branchId', 
+        label: t('reports.branch'),
+        required: true,
+        endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
+        optionLabel: 'name',
+        optionValue: 'id'
+      }
+    ]
+  },
+  {
+    id: 'sales-rep-cash-report',
+    name: t('reports.salesRepCashReport'),
+    icon: 'pi-chart-line',
+    color: 'bg-orange-100',
+    textColor: 'text-orange-700',
+    description: t('reports.salesRepCashReportDescription'),
+    endpoint: '/shiftSessions/GenerateSalesRepWithCashReport',
+    requestMethod: 'POST',
+    filters: [
+      { 
+        type: 'multiselect', 
+        name: 'branchIds', 
+        label: t('reports.branches'),
+        required: true,
+        endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
+        optionLabel: 'name',
+        optionValue: 'id'
+      }
+    ]
+  },
+    // New Item Usability Report
+    {
+    id: 'item-usability-report',
+    name: t('reports.itemUsabilityReport'),
+    icon: 'pi-chart-bar',
+    color: 'bg-purple-100',
+    textColor: 'text-purple-700',
+    description: t('reports.itemUsabilityReportDescription'),
+    endpoint: '/Invoices/GenerateItemUsabilityFor',
+    requestMethod: 'POST',
+    filters: [
+      {
+        type: 'daterange',
+        startDate: 'fromDate',
+        endDate: 'toDate',
+        label: t('reports.dateRange'),
+        required: true,
+        default: {
+          startDate: new Date(new Date().setDate(new Date().getDate() - 7)),
+          endDate: new Date()
+        }
+      },
+      { 
+        type: 'dropdown', 
+        name: 'branchId', 
+        label: t('reports.branch'),
+        required: true,
+        endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
+        optionLabel: 'name',
+        optionValue: 'id'
+      }
+    ]
+  }
   // Additional report configurations can be added here
-//   {
-//     id: 'sales-report',
-//     name: t('reports.salesReport'),
-//     icon: 'pi-chart-line',
-//     color: 'bg-green-100',
-//     textColor: 'text-green-700',
-//     description: t('reports.salesReportDescription'),
-//     endpoint: '/Reports/GenerateSalesReport',
-//     requestMethod: 'POST',
-//     filters: [
-//       { 
-//         type: 'daterange', 
-//         name: 'dateRange', 
-//         label: t('reports.dateRange'),
-//         required: true,
-//         startDate: 'startDate',
-//         endDate: 'endDate',
-//         default: { 
-//           startDate: new Date(new Date().setDate(new Date().getDate() - 30)), 
-//           endDate: new Date() 
-//         }
-//       },
-//       { 
-//         type: 'dropdown', 
-//         name: 'branchId', 
-//         label: t('reports.branch'),
-//         required: true,
-//         endpoint: '/Reports/GetUserVanSaleInBranch',
-//         optionLabel: 'name',
-//         optionValue: 'id'
-//       }
-//     ]
-//   },
-//   {
-//     id: 'inventory-report',
-//     name: t('reports.inventoryReport'),
-//     icon: 'pi-box',
-//     color: 'bg-purple-100',
-//     textColor: 'text-purple-700',
-//     description: t('reports.inventoryReportDescription'),
-//     endpoint: '/Reports/GenerateInventoryReport',
-//     requestMethod: 'POST',
-//     filters: [
-//       { 
-//         type: 'date', 
-//         name: 'asOfDate', 
-//         label: t('reports.asOfDate'),
-//         required: true,
-//         default: new Date() 
-//       },
-//       { 
-//         type: 'dropdown', 
-//         name: 'branchId', 
-//         label: t('reports.branch'),
-//         required: true,
-//         endpoint: '/Reports/GetUserVanSaleInBranch',
-//         optionLabel: 'name',
-//         optionValue: 'id'
-//       }
-//     ]
-//   }
 ]);
 
 // Selected report and filter handling
@@ -133,6 +147,9 @@ const resetFilterValues = () => {
     else if (filter.type === 'dropdown') {
       filterValues[filter.name] = null;
     }
+    else if (filter.type === 'multiselect') {
+      filterValues[filter.name] = [];
+    }
     else if (filter.type === 'checkbox') {
       filterValues[filter.name] = filter.default || false;
     }
@@ -152,7 +169,7 @@ const loadFilterOptions = async () => {
   try {
     // Load options for dropdowns and other filters that need data
     for (const filter of selectedReport.value.filters) {
-      if (filter.type === 'dropdown' && filter.endpoint) {
+      if ((filter.type === 'dropdown' || filter.type === 'multiselect') && filter.endpoint) {
         const response = await apiClient.get(filter.endpoint);
         if (response.data.success) {
           filterOptions[filter.name] = response.data.data;
@@ -173,6 +190,10 @@ const isFormValid = computed(() => {
     if (filter.required) {
       if (filter.type === 'daterange') {
         if (!filterValues[filter.startDate] || !filterValues[filter.endDate]) {
+          return false;
+        }
+      } else if (filter.type === 'multiselect') {
+        if (!filterValues[filter.name] || filterValues[filter.name].length === 0) {
           return false;
         }
       } else if (!filterValues[filter.name]) {
@@ -291,14 +312,6 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Search Bar -->
-    <!-- <div class="col-12 mb-4">
-      <span class="p-input-icon-left w-full md:w-6">
-        <i class="pi pi-search" />
-        <InputText v-model="searchQuery" class="w-full" :placeholder="t('reports.searchReports')" />
-      </span>
-    </div> -->
-
     <!-- Reports Grid -->
     <div class="grid" style="min-width: 100%">
       <div v-for="report in reports" :key="report.id" class="col-12 lg:col-6 xl:col-4">
@@ -379,16 +392,26 @@ onMounted(() => {
           class="w-full"
         />
 
+        <!-- MultiSelect -->
+        <MultiSelect 
+          v-else-if="filter.type === 'multiselect'" 
+          v-model="filterValues[filter.name]" 
+          :options="filterOptions[filter.name] || []" 
+          :optionLabel="filter.optionLabel" 
+          :optionValue="filter.optionValue"
+          :placeholder="filter.label"
+          class="w-full"
+          display="chip"
+        />
+
         <!-- Other filter types can be added here -->
       </div>
     </div>
 
-    <!-- <template #footer> -->
-      <div class="flex justify-content-end gap-2">
-        <Button :label="t('reports.cancel')" severity="secondary" outlined @click="reportDialogVisible = false" />
-        <Button :label="t('reports.generate')" :loading="loading" @click="generateReport()" :disabled="!isFormValid" />
-      </div>
-    <!-- </template> -->
+    <div class="flex justify-content-end gap-2">
+      <Button :label="t('reports.cancel')" severity="secondary" outlined @click="reportDialogVisible = false" />
+      <Button :label="t('reports.generate')" :loading="loading" @click="generateReport()" :disabled="!isFormValid" />
+    </div>
   </Dialog>
 
   <!-- New Report Form Dialog (Admin only) -->
