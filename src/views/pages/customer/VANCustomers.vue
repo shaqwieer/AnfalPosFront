@@ -6,6 +6,7 @@ import apiClient from '../../../api/apiClient';
 import CustomerList from './customers/CustomerList.vue';
 import CustomerForm from './customers/CustomerForm.vue';
 import { vanCustomers } from './customers/VANCustomerSampleData';
+import * as XLSX from 'xlsx';
 
 //const vanStore = useVanStore();
 const customerStore = useCustomerStore();
@@ -121,7 +122,7 @@ const filteredCustomers = computed(() => {
     const matchesSearch =
       !searchQuery.value ||
       customer.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      customer.id.toString().toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      customer.sapCustomer.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       customer.primaryPhone.includes(searchQuery.value) ||
       customer.crNumber?.includes(searchQuery.value);
 
@@ -207,6 +208,59 @@ const getPaymentTerms = async () => {
   }
 };
 
+const exportDialogVisible = ref(false);
+const exportFields = ref([
+  { label: 'Name', value: 'name', selected: true },
+  { label: 'SAP Customer', value: 'sapCustomer', selected: true },
+  { label: 'CR Number', value: 'crNumber', selected: true },
+  { label: 'VAT Number', value: 'vatNumber', selected: true },
+  { label: 'Credit Limit', value: 'creditLimit', selected: true },
+  { label: 'Payment Term', value: 'paymentTerm', selected: true },
+  { label: 'Available Balance', value: 'availableBalance', selected: true },
+  { label: 'Primary Phone', value: 'primaryPhone', selected: false },
+  { label: 'Email', value: 'email', selected: false },
+  { label: 'Contact Person Name', value: 'contactPersonName', selected: false },
+  { label: 'Contact Mobile Number', value: 'contactMobileNumber', selected: false },
+  { label: 'City', value: 'city', selected: false },
+  { label: 'District', value: 'district', selected: false },
+  { label: 'Street Name', value: 'streetName', selected: false },
+  { label: 'Building Number', value: 'buildingNumber', selected: false },
+  { label: 'Region Name', value: 'regionName', selected: false },
+  { label: 'Industry', value: 'industry', selected: false },
+  { label: 'Website', value: 'website', selected: false },
+  { label: 'IBAN', value: 'iban', selected: false },
+  { label: 'Swift Code', value: 'swiftCode', selected: false },
+  { label: 'Finance Notes', value: 'financeNotes', selected: false },
+  { label: 'Additional Notes', value: 'additionalNotes', selected: false },
+  { label: 'Created At', value: 'createdAt', selected: false },
+]);
+
+const exportToExcel = () => {
+  const selectedFields = exportFields.value.filter(field => field.selected).map(field => field.value);
+  if (selectedFields.length === 0) {
+    alert('Please select at least one field to export.');
+    return;
+  }
+
+  const dataToExport = customers.value.map(customer => {
+    const row = {};
+    selectedFields.forEach(field => {
+      row[field] = customer[field] || ''; // Handle null values
+    });
+    return row;
+  });
+
+  if (dataToExport.length === 0) {
+    alert('No data to export.');
+    return;
+  }
+
+  const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Customers');
+  XLSX.writeFile(workbook, 'Customers.xlsx');
+  exportDialogVisible.value = false;
+};
 </script>
 
 <template>
@@ -244,6 +298,13 @@ const getPaymentTerms = async () => {
               <i class="pi pi-plus"></i>
               <span> {{ t(`Customer.New`) }}</span>
             </button>
+
+            <Button 
+              label="Export to Excel" 
+              icon="pi pi-file-excel" 
+              class="p-button-success" 
+              @click="exportDialogVisible = true" 
+            />
           </div>
         </div>
 
@@ -329,7 +390,13 @@ const getPaymentTerms = async () => {
                 </div>
               </template>
             </Column>
-
+            <Column field="Payment Term" :header="t('Customer.paymentTerm')" class="" :sortable="true">
+              <template #body="slotProps">
+                <div class="flex flex-column justify-content-start align-items-start">
+                  <div class="font-semibold text-md"> {{ slotProps.data.paymentTerm }} Days</div>
+                </div>
+              </template>
+            </Column>
             <Column field="Balance" :header="t('Customer.Balance')" class="">
               <template #body="slotProps">
                 <div class="flex flex-column justify-content-start align-items-start">
@@ -494,6 +561,20 @@ const getPaymentTerms = async () => {
             </div>
           </div>
         </form>
+      </div>
+    </Dialog>
+
+    <Dialog v-model:visible="exportDialogVisible" :header="t('Export Fields')" :style="{ width: '30rem' }" :modal="true" :closable="true">
+      <div class="flex flex-column gap-3">
+        <h3>Select Fields to Export</h3>
+        <div v-for="field in exportFields" :key="field.value" class="flex align-items-center gap-2">
+          <input type="checkbox" v-model="field.selected" />
+          <label>{{ field.label }}</label>
+        </div>
+        <div class="flex justify-content-end gap-2">
+          <Button label="Cancel" class="p-button-outlined" @click="exportDialogVisible = false" />
+          <Button label="Export" class="p-button-success" @click="exportToExcel" />
+        </div>
       </div>
     </Dialog>
 

@@ -475,7 +475,8 @@
     "salesDistrict": "منطقة المبيعات",
     "editCreditLimit": "تعديل حد الائتمان",
     "editPaymentTerm": "تعديل شرط الدفع",
-    "paymentTermPlaceholder": "اختر شرط الدفع"
+    "paymentTermPlaceholder": "اختر شرط الدفع",
+    "paymentTerm": "مدة الدفع"
   },
   "organizationConfig": {
     "basePriceCode": "كود السعر الأساسي",
@@ -762,6 +763,47 @@
     "branches": "الفروع",
     "selectBranches": "اختر الفروع",
     "itemUsabilityReport": "تقرير استخدام العناصر",
-    "itemUsabilityReportDescription": "تقرير مفصل يوضح إحصائيات استخدام العناصر لفرع وفترة زمنية محددة"
+    "itemUsabilityReportDescription": "تقرير مفصل يوضح إحصائيات استخدام العناصر لفرع وفترة زمنية محددة",
+    "paymentMethod": "طريقة الدفع",
+    "sessionNumber": "رقم الوردية",
+    "collectionReport": "تقرير التحصيل",
+    "collectionReportDescription": "عرض وتحليل تحصيلات المدفوعات حسب الفرع وطريقة الدفع ورقم الجلسة"
+  },
+  "page": {
+    "configHeader": "إعداد الصفحات",
+    "configDescription": "إدارة صفحات التطبيق وهيكل التنقل",
+    "addNew": "إضافة صفحة جديدة",
+    "label": "اسم الصفحة",
+    "route": "المسار",
+    "icon": "الأيقونة",
+    "sortNumber": "ترتيب العرض",
+    "flags": "الخصائص",
+    "actions": "الإجراءات",
+    "noPages": "لا توجد صفحات",
+    "search": "بحث عن الصفحات...",
+    "saveChanges": "حفظ التغييرات",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "confirmDelete": "تأكيد الحذف",
+    "deleteMessage": "هل أنت متأكد أنك تريد حذف هذه الصفحة؟",
+    "yes": "نعم",
+    "no": "لا",
+    "saveChangesMessage": "هل تريد حفظ التغييرات على هيكل الصفحات؟",
+    "addSuccess": "تمت إضافة الصفحة بنجاح.",
+    "updateSuccess": "تم تحديث الصفحة بنجاح.",
+    "deleteSuccess": "تم حذف الصفحة بنجاح.",
+    "reorderSuccess": "تم تحديث هيكل الصفحات بنجاح.",
+    "noParent": "بدون أب",
+    "showInSidebar": "عرض في قائمة التنقل الجانبية",
+    "isSearchable": "قابل للبحث",
+    "isNavigable": "قابل للتنقل",
+    "routeHint": "يجب أن يبدأ بـ '/'",
+    "selectIcon": "اختر أيقونة",
+    "validation": {
+      "required": "حقل {field} مطلوب.",
+      "routeFormat": "يجب أن يبدأ المسار بـ '/'."
+    }
   }
 }

@@ -20,6 +20,11 @@ const sessionStore = useSessionStore();
 const sessionData = computed(() => sessionStore.selectedSession);
 
 const selectedDocument = ref('');
+const showDatePicker = ref(false);
+const selectedDate = ref(new Date());
+const currentTransactionId = ref(null);
+const currentTransactionType = ref('');
+
 const RejectSession = (session) => {
   const payload = {
     shiftSessionId: sessionData.value.sessionId,
@@ -28,6 +33,7 @@ const RejectSession = (session) => {
   sessionStore.ApproveSession(payload);
   closeDialog();
 };
+
 const ApproveSession = (session) => {
   const payload = {
     shiftSessionId: session.sessionId,
@@ -36,19 +42,58 @@ const ApproveSession = (session) => {
   sessionStore.ApproveSession(payload);
   closeDialog();
 };
-const ApproveSessionTransaction = (transationId, transactionType) => {
-  const payload = {
-    approveId: transationId,
-    sessionId: sessionData.value.id,
-    isCashDeposit: transactionType === 'Deposits'
-  };
-  sessionStore.ApproveSessionTransaction(payload);
+
+const openDatePickerDialog = (transactionId, transactionType) => {
+  currentTransactionId.value = transactionId;
+  currentTransactionType.value = transactionType;
+  selectedDate.value = new Date(); // Reset to current date
+  showDatePicker.value = true;
 };
+const maxDate = ref(new Date());
+
+const getIanaTimezone = () => {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone; // Returns IANA timezone like "Europe/Athens"
+};
+const confirmApproveWithDate = () => {
+
+  // Get the IANA timezone identifier
+  const ianaTimezone = getIanaTimezone();
+  
+  const payload = {
+    approveId: currentTransactionId.value,
+    sessionId: sessionData.value.id,
+    isCashDeposit: currentTransactionType.value === 'Deposits',
+    dateTime: selectedDate.value.toISOString(), // Pure UTC date in ISO format (ends with Z)
+    timeZone: ianaTimezone // Separate field for IANA timezone
+  };
+  
+  console.log("Sending date in UTC:", payload.dateTime);
+  console.log("Sending timezone:", payload.timeZone);
+  
+  debugger;
+  // const payload = {
+  //   approveId: currentTransactionId.value,
+  //   sessionId: sessionData.value.id,
+  //   isCashDeposit: currentTransactionType.value === 'Deposits',
+  //   dateTime: selectedDate.value
+  // };
+  // console.log('Payload:', payload); 
+  sessionStore.ApproveSessionTransaction(payload);
+  showDatePicker.value = false;
+};
+
+const cancelDateSelection = () => {
+  showDatePicker.value = false;
+  currentTransactionId.value = null;
+  currentTransactionType.value = '';
+};
+
 const statusOptions = [
   { label: `${t('Pending')}`, value: '1', color: '#BC4819' },
   { label: `${t('Approved')}`, value: '2', color: '#3357FF' },
   { label: 'Reconciled', value: '3', color: '#FA7B00' }
 ];
+
 const getStatusColor = (status) => {
   switch (status) {
     case 1:
@@ -61,6 +106,7 @@ const getStatusColor = (status) => {
       return 'bg-gray-100 text-gray-800';
   }
 };
+
 const getSessionStatusColor = (status) => {
   switch (status) {
     case 4:
@@ -75,10 +121,13 @@ const getSessionStatusColor = (status) => {
       return 'bg-gray-100 text-gray-800';
   }
 };
+
 const closeDialog = () => {
   emit('close');
 };
+
 const Rtl = localStorage.getItem('Rtl') === 'true';
+
 const formatPrice = (price: number | undefined | null): string => {
   return (
     price?.toLocaleString(Rtl ? 'ar-SA' : 'en-US', {
@@ -89,8 +138,10 @@ const formatPrice = (price: number | undefined | null): string => {
     }) || '0.00'
   );
 };
+
 const transactionOptions = ref(['Deposits', 'Transactions', 'Expenses']);
 const transactionType = ref('Deposits');
+
 onMounted(() => {
   sessionStore.GetSessionDetails(props.session.sessionId);
 });
@@ -99,42 +150,42 @@ onMounted(() => {
 const exportToExcel = () => {
   let dataToExport = [];
   let fileName = `Session_${props.session.sessionId}_${transactionType.value}`;
-  
+
   if (transactionType.value === 'Deposits') {
-    dataToExport = sessionData.value.shiftCashDeposits.map(item => ({
+    dataToExport = sessionData.value.shiftCashDeposits.map((item) => ({
       'Deposit No.': item.depositNo,
       'SAP Doc': item.sapFinancialDoc,
-      'Date': new Date(item.createdAt).toLocaleDateString('en-GB'),
-      'Amount': formatPriceRaw(item.depositAmount),
-      'Status': statusOptions.find(option => option.value == item.statusId)?.label || ''
+      Date: new Date(item.createdAt).toLocaleDateString('en-GB'),
+      Amount: formatPriceRaw(item.depositAmount),
+      Status: statusOptions.find((option) => option.value == item.statusId)?.label || ''
     }));
   } else if (transactionType.value === 'Transactions') {
-    dataToExport = sessionData.value.transactions.map(item => ({
+    dataToExport = sessionData.value.transactions.map((item) => ({
       'Transaction ID': item.id,
       'SAP Doc': item.sapFinancialDoc,
-      'Date': new Date(item.createdAt).toLocaleDateString('en-GB'),
-      'Amount': formatPriceRaw(item.amount),
+      Date: new Date(item.createdAt).toLocaleDateString('en-GB'),
+      Amount: formatPriceRaw(item.amount),
       'Payment Method': item.paymentMethodName,
-      'Status': statusOptions.find(option => option.value == item.statusId)?.label || ''
+      Status: statusOptions.find((option) => option.value == item.statusId)?.label || ''
     }));
   } else if (transactionType.value === 'Expenses') {
-    dataToExport = sessionData.value.expensesInSession.map(item => ({
+    dataToExport = sessionData.value.expensesInSession.map((item) => ({
       'Expense Type': item.expenseType,
       'SAP Doc': item.sapFinancialDoc,
-      'Date': new Date(item.createdAt).toLocaleDateString('en-GB'),
-      'Amount': formatPriceRaw(item.depositAmount)
+      Date: new Date(item.createdAt).toLocaleDateString('en-GB'),
+      Amount: formatPriceRaw(item.depositAmount)
     }));
   }
-  
+
   if (dataToExport.length === 0) {
     alert(`No ${transactionType.value.toLowerCase()} data to export`);
     return;
   }
-  
+
   const worksheet = XLSX.utils.json_to_sheet(dataToExport);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, transactionType.value);
-  
+
   // Add session summary at the top if needed
   if (sessionData.value) {
     const summaryWorksheet = XLSX.utils.aoa_to_sheet([
@@ -149,7 +200,7 @@ const exportToExcel = () => {
     ]);
     XLSX.utils.book_append_sheet(workbook, summaryWorksheet, 'Summary');
   }
-  
+
   XLSX.writeFile(workbook, `${fileName}.xlsx`);
 };
 
@@ -234,13 +285,13 @@ const formatPriceRaw = (price: number | undefined | null): number => {
               <span class="font-semibold text-lg">Financial Records</span>
               <div class="flex gap-2">
                 <SelectButton class="flex" v-model="transactionType" :options="transactionOptions" aria-labelledby="basic" />
-                <Button 
-                  icon="pi pi-file-excel" 
-                  class="p-button-success" 
-                  @click="exportToExcel()" 
-                  :disabled="(transactionType === 'Deposits' && !sessionData.shiftCashDeposits?.length) || 
-                            (transactionType === 'Transactions' && !sessionData.transactions?.length) || 
-                            (transactionType === 'Expenses' && !sessionData.expensesInSession?.length)"
+                <Button
+                  icon="pi pi-file-excel"
+                  class="p-button-success"
+                  @click="exportToExcel()"
+                  :disabled="
+                    (transactionType === 'Deposits' && !sessionData.shiftCashDeposits?.length) || (transactionType === 'Transactions' && !sessionData.transactions?.length) || (transactionType === 'Expenses' && !sessionData.expensesInSession?.length)
+                  "
                   tooltip="Export to Excel"
                 />
               </div>
@@ -303,7 +354,7 @@ const formatPriceRaw = (price: number | undefined | null): number => {
                   <!-- <div v-else class="flex w-11 justify-content-center align-items-center bg-white text-sm text-red-600">No Attachment</div> -->
                   <div
                     v-if="slotProps.data.statusId === 1 && props.session.statusId !== 4"
-                    @click="ApproveSessionTransaction(slotProps.data.id, 'Deposits')"
+                    @click="openDatePickerDialog(slotProps.data.id, 'Deposits')"
                     class="cursor-pointer text-green-500 border-circle border-1 border-green-200 flex align-items-center justify-content-center w-3rem h-3rem hover:bg-green-100"
                   >
                     <i class="pi pi-check-circle"></i>
@@ -350,7 +401,7 @@ const formatPriceRaw = (price: number | undefined | null): number => {
             </Column>
             <Column field="paymentMethodName" header="PaymentMethodName" class="" :sortable="true">
               <template #body="slotProps">
-                <div class="flex text-lg">{{slotProps.data.paymentMethodName}}</div>
+                <div class="flex text-lg">{{ slotProps.data.paymentMethodName }}</div>
               </template>
             </Column>
             <Column field="statusId" header="Status" class="" :sortable="true">
@@ -372,8 +423,8 @@ const formatPriceRaw = (price: number | undefined | null): number => {
                   </div>
                   <!-- <div v-else class="flex w-11 justify-content-center align-items-center bg-white text-sm text-red-600">No Attachment</div> -->
                   <div
-                    v-if="slotProps.data.statusId === 1 && props.session.statusId !== 4&&slotProps.data.paymentMethodName !== 'Cash'"
-                    @click="ApproveSessionTransaction(slotProps.data.id, 'Transactions')"
+                    v-if="slotProps.data.statusId === 1 && props.session.statusId !== 4 && slotProps.data.paymentMethodName !== 'Cash'"
+                    @click="openDatePickerDialog(slotProps.data.id, 'Transactions')"
                     class="cursor-pointer text-green-500 border-circle border-1 border-green-200 flex align-items-center justify-content-center w-3rem h-3rem hover:bg-green-100"
                   >
                     <i class="pi pi-check-circle"></i>
@@ -443,6 +494,19 @@ const formatPriceRaw = (price: number | undefined | null): number => {
         </div>
       </div>
     </div>
+    <!-- Date Selection Dialog -->
+    <Dialog v-model:visible="showDatePicker" header="Select Transaction Date" :modal="true" :closable="true" :style="{ width: '450px' }">
+      <div class="flex flex-column gap-3">
+        <div class="text-lg mb-2">Please select a date for this transaction:</div>
+        <Calendar v-model="selectedDate" :showIcon="true" dateFormat="dd/mm/yy" :showTime="true" hourFormat="24" :maxDate="maxDate" />
+      </div>
+      <!-- <template #footer> -->
+        <div class="flex justify-content-end mt-4 gap-2">
+          <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="cancelDateSelection" />
+          <Button label="Confirm" icon="pi pi-check" @click="confirmApproveWithDate" autofocus />
+        </div>
+      <!-- </template> -->
+    </Dialog>
   </Dialog>
 </template>
 

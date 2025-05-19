@@ -14,6 +14,7 @@ export const useSessionStore = defineStore({
     dataSummary: <any>{},
     visitsSummary: <any>[],
     salesSummary: <any>[],
+    sessionSummary: <any>[],
     collectionSummary: <any>[],
     overdueSalesSummary: <any>[],
     dashBoardData: <any>{},
@@ -120,6 +121,15 @@ export const useSessionStore = defineStore({
         console.log(response);
 
         this.overdueSalesSummary = response.data.data;
+      } catch (err) {
+        this.error = handleError(err, this.loading);
+      }
+    },
+    async getSessionSummary(payload) {
+      try {
+        const response = await apiClient.post('/ShiftSessions/GetSessionsManagment', payload);
+        this.sessionSummary = response.data.data;
+        console.log(this.sessionSummary);
       } catch (err) {
         this.error = handleError(err, this.loading);
       }

@@ -106,7 +106,7 @@ const getDataSummary = useDebounceFn(
     });
     formData.append('StartDate', new Date(dateFrom.value).toDateString());
     formData.append('EndDate', new Date(dateTo.value).toDateString());
-
+    
     await sessionStore.getDataSummary(formData);
     changedFilter.value = false;
   },
@@ -117,8 +117,8 @@ const getVisitData = useDebounceFn(async () => {
   var payload = {
     StatusIds: selectedStatus.value,
     SalesRepIds: selectedSalesReps.value,
-    StartDate: new Date(dateFrom.value.setHours(0, 0, 0, 0)),
-    EndDate: new Date(dateTo.value.setHours(new Date().getHours(), new Date().getMinutes() - new Date().getTimezoneOffset(), 0, 0)),
+    StartDate: new Date(dateFrom.value).toISOString(),
+    EndDate: new Date(dateTo.value).toISOString(),
     forSalesRep: false
   };
   await sessionStore.getVisitsSummary(payload);
@@ -128,8 +128,8 @@ const getCollectionData = useDebounceFn(async () => {
   var payload = {
     StatusIds: selectedStatus.value,
     SalesRepIds: selectedSalesReps.value,
-    StartDate: new Date(dateFrom.value.setHours(0, 0, 0, 0)),
-    EndDate: new Date(dateTo.value.setHours(new Date().getHours(), new Date().getMinutes() - new Date().getTimezoneOffset(), 0, 0)),
+    StartDate: new Date(dateFrom.value).toISOString(),
+    EndDate: new Date(dateTo.value).toISOString(),
     forSalesRep: false
   };
   await sessionStore.getCollectionSummary(payload);
@@ -161,6 +161,24 @@ const getSalesData = useDebounceFn(async () => {
   formData.append('EndDate', new Date(dateTo.value).toDateString());
   formData.append('ForSalesRep', 'false');
   await sessionStore.getSalesSummary(formData);
+});
+const getSessionsData = useDebounceFn(async () => {
+  const formData = new FormData();
+  if (selectedSalesReps.value == null || selectedSalesReps.value.length === 0 || selectedStatus.value.length === 0) {
+    toast.add({ severity: 'error', detail: 'برجاء اختيار حالة ومندوب', life: 3000 });
+    changedFilter.value = false;
+    return;
+  }
+  selectedStatus.value.forEach((element, index) => {
+    formData.append(`StatusIds[${index}]`, element);
+  });
+  selectedSalesReps.value.forEach((element, index) => {
+    formData.append(`SalesRepIds[${index}]`, element);
+  });
+  formData.append('StartDate', new Date(dateFrom.value).toDateString());
+  formData.append('EndDate', new Date(dateTo.value).toDateString());
+  formData.append('ForSalesRep', 'false');
+  await sessionStore.getSessionSummary(formData);
 });
 // Available sales reps
 const availableSalesReps = [
@@ -487,6 +505,8 @@ const applyFilters = () => {
     getCollectionData();
   } else if (selectedCard.value == 'overdue') {
     getOverdueData();
+  } else if (selectedCard.value == 'sessions') {
+    getSessionsData();
   }
 };
 watch(selectedCard, () => {
@@ -498,6 +518,8 @@ watch(selectedCard, () => {
     getCollectionData();
   } else if (selectedCard.value == 'overdue') {
     getOverdueData();
+  } else if (selectedCard.value == 'sessions') {
+    getSessionsData();
   }
 });
 </script>
@@ -586,7 +608,7 @@ watch(selectedCard, () => {
         <VisitsDetails v-if="selectedCard === 'visits'" :data="sessionStore.visitsSummary" :cards="sessionStore.dataSummary.visitsSummary" :view-mode="viewMode" class="" />
         <SalesDetails v-if="selectedCard === 'sales'" :cards="sessionStore.dataSummary.salesSummary" :data="sessionStore.salesSummary" :view-mode="viewMode" />
         <CollectionsDetails v-if="selectedCard === 'collections'" :cards="sessionStore.dataSummary.collectionsSummary" :data="sessionStore.collectionSummary" :view-mode="viewMode" />
-        <SessionsDetails v-if="selectedCard === 'sessions'" :data="cardDetails.sessions" :view-mode="viewMode" />
+        <SessionsDetails v-if="selectedCard === 'sessions'" :data="sessionStore.sessionSummary" :view-mode="viewMode" />
         <!-- <SessionManagement v-if="selectedCard === 'sessions'"   :show-filter="false"   /> -->
         <OverdueDetails v-if="selectedCard === 'overdue'" :cards="sessionStore.dataSummary.overdueSummary" :data="sessionStore.overdueSalesSummary" :view-mode="viewMode" v-model="totalSalesReps" />
         <StockDetails v-if="selectedCard === 'stock'" :data="cardDetails.stock" :view-mode="viewMode" />

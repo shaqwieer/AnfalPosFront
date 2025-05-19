@@ -49,12 +49,12 @@ const sessionsData = ref([
 
 // Chart data
 const chartData = computed(() => ({
-  labels: sessionsData.value.map((item) => item.salesRep),
+  labels: props.data?.sessionSales?.filter((s) => s.statusId === 4).map((item) => item.saleName),
   datasets: [
     {
       label: 'Cash Amount',
-      data: sessionsData.value.map((item) => item.cashAmount),
-      backgroundColor: sessionsData.value.map((item) => (item.status === 'open' ? '#ef4444' : '#f59e0b'))
+      data: props.data?.sessionSales?.filter((s) => s.statusId === 4).map((item) => item.allAmount),
+      backgroundColor: props.data?.sessionSales?.filter((s) => s.statusId === 4).map((item) => (item.statusName === '"Opened"' ? '#ef4444' : '#f59e0b'))
     }
   ]
 }));
@@ -80,6 +80,9 @@ const chartOptions = {
 
 const Rtl = localStorage.getItem('Rtl') === 'true';
 const formatPrice = (price: number): string => {
+    if (price === undefined || price === null) {
+    return Rtl ? 'SAR 0.00' : '0.00 SAR'; // Return a default value
+  }
   return price.toLocaleString(Rtl ? 'ar-SA' : 'en-US', {
     style: 'currency',
     currency: 'SAR',
@@ -110,7 +113,7 @@ const summary = computed(() => ({
 }));
 
 const getStatusColor = (status: string) => {
-  return status === 'open' ? 'bg-red-100 text-red-800' : 'bg-orange-100 text-orange-800';
+  return status === 'Opened' ? 'bg-red-100 text-red-800' : 'bg-orange-100 text-orange-800';
 };
 </script>
 
@@ -126,7 +129,7 @@ const getStatusColor = (status: string) => {
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
                 <div class="text-sm text-gray-500">{{ t('dashboard.OpenSessions') }}</div>
                 <div class="text-2xl font-bold text-red-600">
-                  {{ summary.totalOpen }}
+                  {{ data.openSession }}
                 </div>
               </div>
             </div>
@@ -135,7 +138,7 @@ const getStatusColor = (status: string) => {
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
                 <div class="text-sm text-gray-500">{{ t('dashboard.PendingSessions') }}</div>
                 <div class="text-2xl font-bold text-orange-600">
-                  {{ summary.totalPending }}
+                  {{ data.pendingSession }}
                 </div>
               </div>
             </div>
@@ -144,7 +147,7 @@ const getStatusColor = (status: string) => {
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
                 <div class="text-sm text-gray-500">{{ t('dashboard.TotalAmount') }}</div>
                 <div class="text-2xl font-bold text-gray-900">
-                  {{ formatPrice(summary.totalAmount) }}
+                  {{ formatPrice(data.totalAmount) }}
                 </div>
               </div>
             </div>
@@ -153,7 +156,7 @@ const getStatusColor = (status: string) => {
               <div class="border-1 border-round-lg shadow-sm border-1 border-gray-200 p-4">
                 <div class="text-sm text-gray-500">{{ t('dashboard.OldSessions') }}</div>
                 <div class="text-2xl font-bold text-red-600">
-                  {{ summary.oldSessions }}
+                  {{ data.oldSession }}
                 </div>
               </div>
             </div>
@@ -171,7 +174,7 @@ const getStatusColor = (status: string) => {
 
     <!-- Table View -->
     <div v-else class="bg-white border-1 border-gray-200 border-round-lg shadow-sm border overflow-hidden">
-      <DataTable :value="sessionsData" :paginator="sessionsData.length > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" class="">
+      <DataTable :value="data.sessionSales" :paginator="data.sessionSales.length > 10" :rows="10" :rowsPerPageOptions="[5, 10, 25]" class="">
         <template #empty>
           <div class="flex justify-content-center align-items-center font-bold text-lg">{{ t('dashboard.empty') }}</div>
         </template>
@@ -180,12 +183,11 @@ const getStatusColor = (status: string) => {
         <Column field="salesRep" :header="t('dashboard.SalesRep')">
           <template #body="slotProps">
             <div class="flex flex-column align-items-start">
-              <div class="font-semibold text-md">{{ slotProps.data.salesRep }}</div>
+              <div class="font-semibold text-md">{{ slotProps.data.saleName }}</div>
             </div>
           </template>
         </Column>
 
-        <!-- Cash Column -->
         <Column field="sessionDate">
           <template #header="slotProps">
             <div class="w-full">
@@ -195,7 +197,7 @@ const getStatusColor = (status: string) => {
 
           <template #body="slotProps">
             <div class="flex flex-column align-items-center text-md text-right">
-              {{ formatPrice(slotProps.data.sessionDate) }}
+              {{ slotProps.data?.sessionStartDate }}
             </div>
           </template>
         </Column>
@@ -209,7 +211,7 @@ const getStatusColor = (status: string) => {
           </template>
           <template #body="slotProps">
             <div class="flex flex-column align-items-center text-md text-right">
-              {{ formatPrice(slotProps.data.cashAmount) }}
+              {{ formatPrice(slotProps.data.allAmount) }}
             </div>
           </template>
         </Column>
@@ -223,14 +225,13 @@ const getStatusColor = (status: string) => {
           </template>
           <template #body="slotProps">
             <div class="flex flex-column align-items-center">
-              <span :class="getStatusColor(slotProps.data.status)" class="text-xs text-center border-round-3xl px-2 py-1 flex justify-content-center align-content-center">
-                {{ t(`dashboard.${slotProps.data.status}`).toUpperCase() }}
+              <span :class="getStatusColor(slotProps.data.statusName)" class="text-xs text-center border-round-3xl px-2 py-1 flex justify-content-center align-content-center">
+                {{ slotProps.data?.statusName?.toUpperCase() }}
               </span>
             </div>
           </template>
         </Column>
 
-        <!-- Total Column -->
         <Column field="sessionDate">
           <template #header="slotProps">
             <div class="w-full">
@@ -240,7 +241,7 @@ const getStatusColor = (status: string) => {
 
           <template #body="slotProps">
             <div class="flex flex-column align-items-center font-semibold text-md text-right">
-              <span v-if="isSessionOld(slotProps.data.sessionDate)" class="material-icons text-red-500" title="Session is older than 1 day">
+              <span v-if="slotProps.data.isSessionLate" class="material-icons text-red-500" title="Session is older than 1 day">
                 <font-awesome-icon :icon="['fas', 'triangle-exclamation']" class="fa-xl" />
               </span>
             </div>

@@ -114,6 +114,59 @@ const reports = ref([
         optionValue: 'id'
       }
     ]
+  },
+  {
+    id: 'collection-report',
+    name: t('reports.collectionReport'),
+    icon: 'pi-money-bill',
+    color: 'bg-teal-100',
+    textColor: 'text-teal-700',
+    description: t('reports.collectionReportDescription'),
+    endpoint: '/Invoices/GenerateCollectionPdf',
+    requestMethod: 'POST',
+    filters: [
+      {
+        type: 'daterange',
+        startDate: 'fromDate',
+        endDate: 'toDate',
+        label: t('reports.dateRange'),
+        required: false,
+        default: {
+          startDate: null,
+          endDate: null
+        }
+      },
+      { 
+        type: 'dropdown', 
+        name: 'branchId', 
+        label: t('reports.branch'),
+        required: false,
+        endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
+        lookupKey: 'branches',
+        optionLabel: 'name',
+        optionValue: 'id'
+      },
+      { 
+        type: 'dropdown', 
+        name: 'paymentMethodId', 
+        label: t('reports.paymentMethod'),
+        required: false,
+        endpoint: '/PaymentMethods',
+        lookupKey: 'paymentMethods',
+        optionLabel: 'name',
+        optionValue: 'id'
+      },
+      { 
+        type: 'dropdown', 
+        name: 'sessionId', 
+        label: t('reports.sessionNumber'),
+        required: false,
+        endpoint: '/Payments/GenerateCollectionPdfLookup',
+        lookupKey: 'sessionNumbers',
+        optionLabel: 'id',
+        optionValue: 'id'
+      }
+    ]
   }
   // Additional report configurations can be added here
 ]);
@@ -141,8 +194,8 @@ const resetFilterValues = () => {
       filterValues[filter.name] = filter.default || new Date();
     } 
     else if (filter.type === 'daterange') {
-      filterValues[filter.startDate] = filter.default?.startDate || new Date(new Date().setDate(new Date().getDate() - 30));
-      filterValues[filter.endDate] = filter.default?.endDate || new Date();
+      filterValues[filter.startDate] = filter.default?.startDate ;
+      filterValues[filter.endDate] = filter.default?.endDate ;
     }
     else if (filter.type === 'dropdown') {
       filterValues[filter.name] = null;

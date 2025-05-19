@@ -10,6 +10,11 @@ const router = createRouter({
       component: AppLayout,
       children: [
         {
+          path: '/page-configuration',
+          name: 'pageConfiguration',
+          component: () => import('@/views/pages/pageConfiguration/pageConfiguration.vue')
+        },
+        {
           path: '/reports',
           name: 'reports',
           component: () => import('@/views/pages/reports/Reports.vue')

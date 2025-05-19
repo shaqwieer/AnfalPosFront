@@ -482,7 +482,8 @@
     "salesDistrict": "Sales District",
     "editCreditLimit": "Edit Credit Limit",
     "editPaymentTerm": "Edit Payment Term",
-    "paymentTermPlaceholder": "Payment Term"
+    "paymentTermPlaceholder": "Payment Term",
+    "paymentTerm": "Payment Term"
   },
   "organizationConfig": {
     "basePriceCode": "Base Price Code",
@@ -770,13 +771,54 @@
     "reportEndpoint": "API Endpoint",
     "requestMethod": "Request Method",
     "addReport": "Add Report",
-    "itemAvailabilityReport": "Item Availability Report",
+    "itemAvailabilityReport": "Stock Report",
     "itemAvailabilityReportDescription": "Generate a report showing item availability for sales representatives",
-    "salesRepCashReport": "Sales Rep Cash Report",
+    "salesRepCashReport": "Cash Box Report",
     "salesRepCashReportDescription": "Generate a detailed report showing sales representative transactions with cash records",
     "branches": "Branches",
     "selectBranches": "Select Branches",
-    "itemUsabilityReport": "Item Usage Report",
-    "itemUsabilityReportDescription": "Detailed report showing item usage statistics for a selected branch and date range"
+    "itemUsabilityReport": "Sales Report",
+    "itemUsabilityReportDescription": "Detailed report showing item usage statistics for a selected branch and date range",
+    "paymentMethod": "Payment Method",
+    "sessionNumber": "Session Number",
+     "collectionReport": "Collection Report",
+    "collectionReportDescription": "View and analyze payment collections by branch, payment method, and session number"
+  },
+  "page": {
+    "configHeader": "Page Configuration",
+    "configDescription": "Manage your application pages and navigation structure",
+    "addNew": "Add New Page",
+    "label": "Page Name",
+    "route": "Route",
+    "icon": "Icon",
+    "sortNumber": "Sort Order",
+    "flags": "Flags",
+    "actions": "Actions",
+    "noPages": "No pages found",
+    "search": "Search pages...",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "confirmDelete": "Confirm Delete",
+    "deleteMessage": "Are you sure you want to delete this page?",
+    "yes": "Yes",
+    "no": "No",
+    "saveChangesMessage": "Save the changes to the page structure?",
+    "addSuccess": "Page added successfully.",
+    "updateSuccess": "Page updated successfully.",
+    "deleteSuccess": "Page deleted successfully.",
+    "reorderSuccess": "Page structure updated successfully.",
+    "noParent": "No Parent",
+    "showInSidebar": "Show in sidebar menu",
+    "isSearchable": "Searchable",
+    "isNavigable": "Navigable",
+    "routeHint": "Must start with /",
+    "selectIcon": "Select an icon",
+    "validation": {
+      "required": "The {field} field is required.",
+      "routeFormat": "The route must start with '/'."
+    }
   }
 }

@@ -67,7 +67,7 @@ const { t, locale } = useI18n();
               {{ customer.statusName }}
             </span>
           </div>
-          <div class="mt-1 text-sm text-600">CUS-{{ customer.id }}</div>
+          <div class="mt-1 text-sm text-600">{{customer.sapCustomer}}</div>
         </div>
 
         <div class="text-right">
@@ -90,6 +90,8 @@ const { t, locale } = useI18n();
           <div class="text-600 w-full">{{ t('Customer.Business_Info') }}</div>
           <div class="font-medium">CR: {{ customer.crNumber }}</div>
           <div class="text-sm text-600">VAT: {{ customer.vatNumber }}</div>
+          <div class="text-sm text-600">Payment Term: {{ customer.paymentTerm }} Days</div>
+
         </div>
       </div>
 
@@ -117,10 +119,10 @@ const { t, locale } = useI18n();
           </button>
 
           <!-- Visit Button -->
-          <div @click="handleVisit" class="p-button p-button-text p-button-success flex align-items-center gap-1">
+          <!-- <div @click="handleVisit" class="p-button p-button-text p-button-success flex align-items-center gap-1">
             <i class="pi pi-home"></i>
             <span>{{ t(`Customer.Visit`) }}</span>
-          </div>
+          </div> -->
 
           <!-- Slot for additional actions (like Dashboard) -->
           <slot name="actions"></slot>

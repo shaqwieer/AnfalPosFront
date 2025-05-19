@@ -63,12 +63,12 @@ const handleReject = (customer: any) => {
       @reject="handleReject"
     >
       <!-- Add Dashboard Button -->
-      <template #actions>
+      <!-- <template #actions>
         <div @click="(e) => handleDashboard(customer, e)" class="p-button p-button-text p-button-primary flex align-items-center gap-1">
           <i class="pi pi-chart-line"></i>
           <span>{{ $t(`Dashboard`) }}</span>
         </div>
-      </template>
+      </template> -->
     </CustomerCard>
 
 
