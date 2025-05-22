@@ -21,6 +21,8 @@
     "@fullcalendar/interaction": "^6.1.8",
     "@fullcalendar/timegrid": "^6.1.8",
     "@fullcalendar/vue3": "^6.1.8",
+    "@headlessui/vue": "^1.7.23",
+    "@heroicons/vue": "^2.2.0",
     "@vue-leaflet/vue-leaflet": "^0.10.1",
     "@vueuse/core": "^12.2.0",
     "apollo-vue": "file:",

@@ -197,7 +197,7 @@ const totalSalesReps = defineModel();
       </div>
     </div>
 
-    <div style="height: 255px" class="col-12 md:col-6 lg:col-4 xl:col-2 xl:p-2">
+    <div style="height: 255px" class="col-12 md:col-6 lg:col-4 xl:col-2 xl:p-2" >
       <!-- Stock in Vans Card -->
       <div
         class="h-full surface-card border-round-xl border-1 border-gray-200 p-4 cursor-pointer transition-all transition-duration-200 hover:shadow-2"
@@ -210,11 +210,11 @@ const totalSalesReps = defineModel();
           </div>
           <div>
             <h3 class="text-base text-900 m-0">{{ t('dashboard.StockinVans') }}</h3>
-            <p class="text-md text-500 m-0">{{ t('dashboard.InventoryStatus') }}</p>
+            <!-- <p class="text-md text-500 m-0">{{ t('dashboard.InventoryStatus') }}</p> -->
           </div>
         </div>
-        <div class="text-2xl font-bold text-900">5 {{ t('dashboard.VANs') }}</div>
-        <div class="text-md text-500">1500 {{ t('dashboard.Items') }}</div>
+        <div class="text-2xl font-bold text-900">{{ dataSummary.itemsCount }} {{ t('dashboard.Items') }}</div>
+        <!-- <div class="text-md text-500">1500 {{ t('dashboard.Items') }}</div> -->
       </div>
     </div>
   </div>

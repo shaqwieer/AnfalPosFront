@@ -37,7 +37,7 @@ const anchor = () => {
     <div :class="['layout-sidebar', { rtl: rtl }]" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
         <div class="sidebar-header">
             <router-link :to="{ name: 'e-commerce' }" class="app-logo">
-                <h5 v-if="layoutConfig.menuMode.value==='static'" class="text-xl font-bold text-gray-700 dark:text-gray-300 bg-primary border-round-lg p-2">Anfal POS</h5>
+                <h5 v-if="layoutConfig.menuMode.value==='static'" class="text-xl font-bold text-gray-700 dark:text-gray-300 bg-primary border-round-lg p-2">Sales Hub</h5>
                 <!-- <svg viewBox="0 0 124 22" fill="none" xmlns="http://www.w3.org/2000/svg" class="app-logo-normal">
                     <path d="M10.4851 0L0 20.9465H3.53702L10.4856 6.07843L17.2944 20.9465H20.9715L10.4851 0Z" fill="var(--logo-color)" />
                     <path d="M13.84 15.7927L16.2077 21.0016H11.7682L13.84 15.7927Z" fill="var(--logo-color)" />

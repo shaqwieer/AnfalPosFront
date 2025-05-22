@@ -86,12 +86,12 @@ const router = createRouter({
           component: () => import('@/views/pages/visits/VisitManagement.vue')
         },
         {
-          path: '/invoices/quick-invoice',
+          path: '/quick-invoice-pos',
           name: 'Quickinvoice',
           meta: {
             breadcrumb: ['Quickinvoice']
           },
-          component: () => import('@/views/pages/invoice/QuickInvoice.vue')
+          component: () => import('@/views/pages/quick-invoice/ServiceCenter.vue')
         },
         {
           path: '/invoices/payments',

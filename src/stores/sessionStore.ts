@@ -117,7 +117,7 @@ export const useSessionStore = defineStore({
     },
     async getOverdueSalesSummary(payload) {
       try {
-        const response = await apiClient.post('/Invoices/GetOverdueSalesDashboard', payload);
+        const response = await apiClient.post('/Invoices/GetOverdueInvoicesForDashboard', payload);
         console.log(response);
 
         this.overdueSalesSummary = response.data.data;

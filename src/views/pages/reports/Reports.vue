@@ -437,6 +437,7 @@ onMounted(() => {
         <!-- Dropdown -->
         <Dropdown 
           v-else-if="filter.type === 'dropdown'" 
+          filter 
           v-model="filterValues[filter.name]" 
           :options="filterOptions[filter.name] || []" 
           :optionLabel="filter.optionLabel" 

@@ -576,7 +576,7 @@
     "Rep": "Rep",
     "Overdue": "Overdue",
     "AgingBuckets": "Aging Buckets",
-    "StockinVans": "Stock in Vans",
+    "StockinVans": "Items Count",
     "InventoryStatus": "Inventory Status",
     "VANs": "VANs",
     "Items": "Items",
@@ -658,7 +658,11 @@
     "StockLevel": "Stock Level",
     "quantity": "quantity",
     "Min/Max": "Min/Max",
-    "Cash": "Cash"
+    "Cash": "Cash",
+    "31-60Days": "31-60 Days",
+    "61-90Days": "61-90 Days",
+    "91-120Days": "91-120 Days",
+    "120Days": "+120 Days"
   },
   "Session": {
     "SessionManagement": "Session Management",
@@ -781,7 +785,7 @@
     "itemUsabilityReportDescription": "Detailed report showing item usage statistics for a selected branch and date range",
     "paymentMethod": "Payment Method",
     "sessionNumber": "Session Number",
-     "collectionReport": "Collection Report",
+    "collectionReport": "Collection Report",
     "collectionReportDescription": "View and analyze payment collections by branch, payment method, and session number"
   },
   "page": {

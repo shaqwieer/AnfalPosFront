@@ -567,7 +567,7 @@
     "Rep": "مندوب",
     "Overdue": "متأخر",
     "AgingBuckets": "فترات الاستحقاق",
-    "StockinVans": "المخزون في الشاحنات",
+    "StockinVans": "عدد الاصناف ",
     "InventoryStatus": "حالة المخزون في الشاحنات",
     "VANs": "الشاحنات",
     "Items": "المنتجات",
@@ -644,7 +644,12 @@
     "Category": "فئة",
     "StockLevel": "مستوى الأسهم",
     "quantity": "كمية",
-    "Min/Max": "أقل\\أعلى"
+    "Min/Max": "أقل\\أعلى",
+    "0-30Days": "0 -30 Days",
+    "31-60Days": "31-60 Days",
+    "61-90Days": "61-90 Days",
+    "91-120Days": "91-120 Days",
+    "120Days": "+120 Days"
   },
   "Session": {
     "SessionManagement": "إدارة الجلسة",

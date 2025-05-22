@@ -14,69 +14,34 @@ const props = defineProps<{
   viewMode: 'chart' | 'table';
 }>();
 
-// Sample overdue data
-const overdueData = ref([
-  {
-    salesRep: 'Mohammed Al-Saud',
-    customer: 'Al-Futtaim Auto Services',
-    invoice: 'INV-001',
-    date: '2024-02-15',
-    amount: 25000,
-    days: 35,
-    category: '30-60'
-  },
-  {
-    salesRep: 'Abdullah Al-Qahtani',
-    customer: 'Quick Service Center',
-    invoice: 'INV-002',
-    date: '2024-01-20',
-    amount: 18000,
-    days: 62,
-    category: '60-90'
-  },
-  {
-    salesRep: 'Khalid Al-Otaibi',
-    customer: 'Premium Auto Care',
-    invoice: 'INV-003',
-    date: '2023-12-15',
-    amount: 22000,
-    days: 95,
-    category: '90+'
-  },
-  {
-    salesRep: 'Mohammed Al-Saud',
-    customer: 'Auto Zone Services',
-    invoice: 'INV-004',
-    date: '2024-02-20',
-    amount: 15000,
-    days: 30,
-    category: '30-60'
-  },
-  {
-    salesRep: 'Abdullah Al-Qahtani',
-    customer: 'Car Care Center',
-    invoice: 'INV-005',
-    date: '2023-12-10',
-    amount: 20000,
-    days: 100,
-    category: '90+'
-  }
-]);
+// Overdue data from props
+const overdueData = computed(() => props.data || []);
 
 // Chart data
 const chartData = computed(() => {
   const salesRepData = {};
-  props.data.overdueSalesDashboardDtos?.forEach((item) => {
-    if (!salesRepData[item.name]) {
-      salesRepData[item.name] = {
+
+  // Initialize data structure
+  overdueData.value.forEach((item) => {
+    if (!salesRepData[item.salesRep]) {
+      salesRepData[item.salesRep] = {
         '0-30 Days': 0,
-        '30-60 Days': 0,
-        '60-90 Days': 0,
-        '90+ Days': 0
+        '31-60 Days': 0,
+        '61-90 Days': 0,
+        '91-120 Days': 0,
+        '120+ Days': 0
       };
     }
-    salesRepData[item.name][item.aging] += item.amount;
+
+    // Map aging categories to chart categories
+    const agingCategory = item.aging + ' Days';
+    // For the 120+ category, we need to handle it specially
+    const chartCategory = item.aging === '120+' ? '120+ Days' : agingCategory;
+
+    // Add amount to the appropriate category
+    salesRepData[item.salesRep][chartCategory] += item.amount;
   });
+
   console.log(salesRepData);
 
   return {
@@ -88,18 +53,23 @@ const chartData = computed(() => {
         backgroundColor: '#199e0b'
       },
       {
-        label: t('dashboard.30-60Days'),
-        data: Object.values(salesRepData).map((data) => data['30-60 Days']),
+        label: t('dashboard.31-60Days'),
+        data: Object.values(salesRepData).map((data) => data['31-60 Days']),
         backgroundColor: '#f59e0b'
       },
       {
-        label: t('dashboard.60-90Days'),
-        data: Object.values(salesRepData).map((data) => data['60-90 Days']),
+        label: t('dashboard.61-90Days'),
+        data: Object.values(salesRepData).map((data) => data['61-90 Days']),
         backgroundColor: '#f97316'
       },
       {
-        label: t('dashboard.90+Days'),
-        data: Object.values(salesRepData).map((data) => data['90+ Days']),
+        label: t('dashboard.91-120Days'),
+        data: Object.values(salesRepData).map((data) => data['91-120 Days']),
+        backgroundColor: '#dc2626'
+      },
+      {
+        label: t('dashboard.120Days'),
+        data: Object.values(salesRepData).map((data) => data['120+ Days']),
         backgroundColor: '#ef4444'
       }
     ]
@@ -145,36 +115,41 @@ const formatDate = (date: string): string => {
 
 // Summary calculations
 const summary = computed(() => {
-  const total30_60 = overdueData.value.filter((item) => item.category === '30-60').reduce((sum, item) => sum + item.amount, 0);
+  const total0_30 = overdueData.value.filter((item) => item.aging === '0-30').reduce((sum, item) => sum + item.amount, 0);
 
-  const total60_90 = overdueData.value.filter((item) => item.category === '60-90').reduce((sum, item) => sum + item.amount, 0);
+  const total31_60 = overdueData.value.filter((item) => item.aging === '31-60').reduce((sum, item) => sum + item.amount, 0);
 
-  const total90Plus = overdueData.value.filter((item) => item.category === '90+').reduce((sum, item) => sum + item.amount, 0);
+  const total61_90 = overdueData.value.filter((item) => item.aging === '61-90').reduce((sum, item) => sum + item.amount, 0);
+
+  const total91_120 = overdueData.value.filter((item) => item.aging === '91-120').reduce((sum, item) => sum + item.amount, 0);
+
+  const total120Plus = overdueData.value.filter((item) => item.aging === '120+').reduce((sum, item) => sum + item.amount, 0);
 
   return {
-    total30_60,
-    total60_90,
-    total90Plus,
-    totalOverdue: total30_60 + total60_90 + total90Plus,
+    total0_30,
+    total31_60,
+    total61_90,
+    total91_120,
+    total120Plus,
+    totalOverdue: total0_30 + total31_60 + total61_90 + total91_120 + total120Plus,
     totalInvoices: overdueData.value.length,
     totalCustomers: new Set(overdueData.value.map((item) => item.customer)).size,
     totalSalesReps: new Set(overdueData.value.map((item) => item.salesRep)).size
   };
 });
 
-// const totalSalesReps = defineModel();
-// totalSalesReps.value = overdueData.value.length;
-
 const getAgingColor = (category: string) => {
   switch (category) {
-    case '0-30 Days':
+    case '0-30':
       return 'bg-green-100 text-green-800';
-    case '30-60 Days':
+    case '31-60':
       return 'bg-yellow-100 text-yellow-800';
-    case '60-90 Days':
+    case '61-90':
       return 'bg-orange-100 text-orange-800';
-    case '90+ Days':
+    case '91-120':
       return 'bg-red-100 text-red-800';
+    case '120+':
+      return 'bg-red-200 text-red-900';
     default:
       return 'bg-gray-100 text-gray-800';
   }
@@ -235,91 +210,65 @@ const getAgingColor = (category: string) => {
 
     <!-- Table View -->
     <div v-else class="bg-white border-1 border-gray-200 border-round-lg shadow-sm border overflow-hidden">
-      <DataTable :value="data.overdueSalesDashboardDtos" :paginator="data.overdueSalesDashboardDtos.length > 10" :rows="5" :rowsPerPageOptions="[5, 10, 25]" class="">
+      <DataTable :value="props.data" :paginator="props.data.length > 10" :rows="5" :rowsPerPageOptions="[5, 10, 25]" class="">
         <template #empty>
           <div class="flex justify-content-center align-items-center font-bold text-lg">No Data Available</div>
         </template>
 
         <!-- Sales Rep Column -->
-        <Column field="name" :header="t('dashboard.SalesRep')">
+        <Column field="salesRep" :header="t('dashboard.SalesRep')">
           <template #body="slotProps">
             <div class="flex flex-column align-items-start">
-              <div class="font-semibold text-md">{{ slotProps.data.name }}</div>
+              <div class="font-semibold text-md">{{ slotProps.data.salesRep }}</div>
             </div>
           </template>
         </Column>
 
-        <Column field="customerName">
-          <template #header="slotProps">
-            <div class="w-full">
-              <span class="text-md flex justify-content-start font-normal"> {{ t('dashboard.customer') }} </span>
-            </div>
-          </template>
-
+        <Column field="customer" :header="t('dashboard.customer')">
           <template #body="slotProps">
             <div class="flex flex-column align-items-start text-md">
-              {{ slotProps.data.customerName }}
+              {{ slotProps.data.customer }}
             </div>
           </template>
         </Column>
 
-        <Column field="invoiceNumber">
-          <template #header="slotProps">
-            <div class="w-full">
-              <span class="text-md flex justify-content-start font-normal"> {{ t('dashboard.invoice') }}</span>
-            </div>
-          </template>
+        <Column field="invoice" :header="t('dashboard.invoice')">
           <template #body="slotProps">
             <div class="flex flex-column align-items-start text-md">
-              {{ slotProps.data.invoiceNumber }}
+              {{ slotProps.data.invoice }}
             </div>
           </template>
 
-          <template #footer="slotProps">
+          <template #footer>
             <div class="flex flex-column align-items-start">
-              <div class="font-semibold text-md">{{ data.overdueAging[0].incoiceCount }} {{ t('dashboard.invoices') }}</div>
+              <div class="font-semibold text-md">{{ overdueData.length }} {{ t('dashboard.invoices') }}</div>
             </div>
           </template>
         </Column>
 
-        <Column field="invoiceDate">
-          <template #header="slotProps">
-            <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.date') }}</span>
-            </div>
-          </template>
+        <Column field="date" :header="t('dashboard.date')">
           <template #body="slotProps">
             <div class="flex flex-column align-items-center text-md">
-              {{ new Date(slotProps.data.invoiceDate).toLocaleDateString('en-GB') }}
+              {{ formatDate(slotProps.data.date) }}
             </div>
           </template>
         </Column>
 
-        <Column field="amount">
-          <template #header="slotProps">
-            <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Amount') }}</span>
-            </div>
-          </template>
+        <Column field="amount" :header="t('dashboard.Amount')">
           <template #body="slotProps">
             <div class="flex flex-column align-items-center font-semibold text-md">
-              {{ slotProps.data.amount }}
+              {{ formatPrice(slotProps.data.amount) }}
             </div>
           </template>
 
-          <template #footer="slotProps">
+          <template #footer>
             <div class="flex flex-column align-items-center">
-              <div class="font-semibold text-md">{{ formatPrice(data.overdueAging[0].amount) }}</div>
+              <div class="font-semibold text-md">{{ formatPrice(summary.totalOverdue) }}</div>
             </div>
           </template>
         </Column>
 
-        <Column field="days">
-          <template #header="slotProps">
-            <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Days') }}</span>
-            </div>
-          </template>
+        <Column field="days" :header="t('dashboard.Days')">
           <template #body="slotProps">
             <div class="flex flex-column align-items-center text-md">
               {{ slotProps.data.days }}
@@ -327,15 +276,12 @@ const getAgingColor = (category: string) => {
           </template>
         </Column>
 
-        <Column>
-          <template #header="slotProps">
-            <div class="w-full">
-              <span class="text-md flex justify-content-center font-normal"> {{ t('dashboard.Aging') }}</span>
-            </div>
-          </template>
+        <Column field="aging" :header="t('dashboard.Aging')">
           <template #body="slotProps">
             <div class="flex flex-column align-items-center text-md">
-              <span class="px-2 py-1 text-xs border-round-xl" :class="getAgingColor(slotProps.data.aging)"> {{ slotProps.data.aging.split(' ')[0] }} {{ t('dashboard.Days') }} </span>
+              <span class="px-2 py-1 text-xs border-round-xl" :class="getAgingColor(slotProps.data.aging)">
+                {{ slotProps.data.aging }}
+              </span>
             </div>
           </template>
         </Column>
