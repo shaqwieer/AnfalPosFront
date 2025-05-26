@@ -9,10 +9,27 @@ const isLoading = computed(() => loaderStore.isDataLoading);
 
 <template>
   <div v-if="isLoading" class="loader-overlay">
-    <div class="loader"></div>
+    <div class="loader-container">
+      <img 
+        src="/pos.gif" 
+        alt="Loading..." 
+        class="loader-gif"
+        @error="onImageError"
+      />
+    </div>
     <p class="loader-text">Loading, please wait...</p>
   </div>
 </template>
+
+<script>
+export default {
+  methods: {
+    onImageError() {
+      console.warn('Failed to load pos.gif, check if file exists in public folder');
+    }
+  }
+}
+</script>
 
 <style scoped>
 .loader-overlay {
@@ -29,13 +46,20 @@ const isLoading = computed(() => loaderStore.isDataLoading);
   z-index: 10000;
 }
 
-.loader {
-  border: 8px solid rgba(255, 255, 255, 0.3);
-  border-top: 8px solid #3498db;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
+.loader-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.loader-gif {
+  max-width: 80px;
+  max-height: 80px;
+  width: auto;
+  height: auto;
+  /* Optional: Add a subtle drop shadow */
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
 .loader-text {
@@ -43,6 +67,25 @@ const isLoading = computed(() => loaderStore.isDataLoading);
   font-size: 1.2rem;
   color: #fff;
   font-family: Arial, sans-serif;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Fallback CSS spinner in case GIF fails to load */
+.loader-gif:not([src]),
+.loader-gif[src=""] {
+  display: none;
+}
+
+.loader-gif:not([src])::after,
+.loader-gif[src=""]::after {
+  content: '';
+  display: block;
+  border: 8px solid rgba(255, 255, 255, 0.3);
+  border-top: 8px solid #3498db;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {

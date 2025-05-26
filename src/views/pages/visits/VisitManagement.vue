@@ -161,9 +161,10 @@ const getVisits = useDebounceFn(
     var payload = {
       StatusIds: selectedStatus.value,
       SalesRepIds: selectedSalesReps.value,
-      StartDate: new Date(dateFrom.value.toDateString()),
-      EndDate: new Date(new Date(dateTo.value).toDateString()),
-      forSalesRep: false
+      StartDate: new Date(dateFrom.value.toISOString()),
+      EndDate: new Date(new Date(dateTo.value).toISOString()),
+      forSalesRep: false,
+      ianaZone: Intl.DateTimeFormat().resolvedOptions().timeZone
     };
     await visitStore.GetVisits(payload);
     changedFilter.value = false;

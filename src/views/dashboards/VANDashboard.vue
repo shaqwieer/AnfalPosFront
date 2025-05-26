@@ -104,8 +104,9 @@ const getDataSummary = useDebounceFn(
     selectedSalesReps.value.forEach((element, index) => {
       formData.append(`SalesRepIds[${index}]`, element);
     });
-    formData.append('StartDate', new Date(dateFrom.value).toDateString());
-    formData.append('EndDate', new Date(dateTo.value).toDateString());
+    formData.append('StartDate', new Date(dateFrom.value).toISOString());
+    formData.append('EndDate', new Date(dateTo.value).toISOString());
+    formData.append("IanaZone", Intl.DateTimeFormat().resolvedOptions().timeZone);
     
     await sessionStore.getDataSummary(formData);
     changedFilter.value = false;
@@ -119,6 +120,7 @@ const getVisitData = useDebounceFn(async () => {
     SalesRepIds: selectedSalesReps.value,
     StartDate: new Date(dateFrom.value).toISOString(),
     EndDate: new Date(dateTo.value).toISOString(),
+    IanaZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     forSalesRep: false
   };
   await sessionStore.getVisitsSummary(payload);
@@ -130,6 +132,7 @@ const getCollectionData = useDebounceFn(async () => {
     SalesRepIds: selectedSalesReps.value,
     StartDate: new Date(dateFrom.value).toISOString(),
     EndDate: new Date(dateTo.value).toISOString(),
+    IanaZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     forSalesRep: false
   };
   await sessionStore.getCollectionSummary(payload);
@@ -157,8 +160,9 @@ const getSalesData = useDebounceFn(async () => {
   selectedSalesReps.value.forEach((element, index) => {
     formData.append(`SalesRepIds[${index}]`, element);
   });
-  formData.append('StartDate', new Date(dateFrom.value).toDateString());
-  formData.append('EndDate', new Date(dateTo.value).toDateString());
+  formData.append('StartDate', new Date(dateFrom.value).toISOString());
+  formData.append('EndDate', new Date(dateTo.value).toISOString());
+  formData.append('IanaZone', Intl.DateTimeFormat().resolvedOptions().timeZone);
   formData.append('ForSalesRep', 'false');
   await sessionStore.getSalesSummary(formData);
 });
@@ -175,8 +179,9 @@ const getSessionsData = useDebounceFn(async () => {
   selectedSalesReps.value.forEach((element, index) => {
     formData.append(`SalesRepIds[${index}]`, element);
   });
-  formData.append('StartDate', new Date(dateFrom.value).toDateString());
-  formData.append('EndDate', new Date(dateTo.value).toDateString());
+  formData.append('StartDate', new Date(dateFrom.value).toISOString());
+  formData.append('EndDate', new Date(dateTo.value).toISOString());
+  formData.append('IanaZone', Intl.DateTimeFormat().resolvedOptions().timeZone);
   formData.append('ForSalesRep', 'false');
   await sessionStore.getSessionSummary(formData);
 });

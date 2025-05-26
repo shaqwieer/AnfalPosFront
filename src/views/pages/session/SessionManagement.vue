@@ -140,8 +140,10 @@ const getSessions = useDebounceFn(
     selectedSalesReps.value.forEach((element, index) => {
       formData.append(`SalesRepIds[${index}]`, element);
     });
-    formData.append('StartDate', new Date(dateFrom.value).toDateString());
-    formData.append('EndDate', new Date(dateTo.value).toDateString());
+    formData.append('StartDate', new Date(dateFrom.value).toISOString());
+    formData.append('EndDate', new Date(dateTo.value).toISOString());
+    formData.append('IanaZone', Intl.DateTimeFormat().resolvedOptions().timeZone);
+
 
     await sessionStore.GetSessions(formData);
     changedFilter.value = false;

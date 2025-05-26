@@ -260,12 +260,12 @@ const removeAllDiscounts = () => {
     <div v-if="showPromoDialog" class="fixed promo-dialog-overlay">
       <div class="bg-white promo-dialog">
         <div class="p-4 border-bottom flex align-items-center justify-content-between">
-          <h3 class="text-lg font-semibold">Apply Promotion</h3>
+          <h3 class="text-xl font-semibold">Apply Promotion</h3>
           <div class="flex align-items-center dialog-header-actions">
             <button v-if="orderStore.currentOrder.items.some((item) => item.discount)" @click="removeAllDiscounts" class="px-3 remove-discounts-btn">Remove All Discounts</button>
-            <button @click="showPromoDialog = false" class="p-2 dialog-close-btn">
+            <Button text @click="showPromoDialog = false" class="p-2 dialog-close-btn">
               <span class="material-icons">close</span>
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -275,18 +275,18 @@ const removeAllDiscounts = () => {
             <div>
               <label class="block text-sm font-medium mb-2">Enter Promo Code</label>
               <div class="flex promo-input-row">
-                <input v-model="selectedPromoCode" type="text" class="sap-input flex-1 promo-input" placeholder="Enter promo code" @keyup.enter="handlePromoCodeSubmit" />
+                <InputText v-model="selectedPromoCode" type="text" class="sap-input flex-1 promo-input" placeholder="Enter promo code" @keyup.enter="handlePromoCodeSubmit" />
                 <button @click="handlePromoCodeSubmit" class="px-4 py-2 apply-btn">Apply</button>
               </div>
             </div>
 
             <!-- Available Promotions -->
-            <div>
+            <div class="mt-2">
               <div class="flex align-items-center justify-content-between mb-4">
                 <label class="block text-sm font-medium">Available Promotions</label>
                 <div class="flex align-items-center search-section">
                   <div class="relative">
-                    <input v-model="searchQuery" type="text" class="sap-input search-input" placeholder="Search promotions..." />
+                    <InputText v-model="searchQuery" type="text" class="sap-input search-input" placeholder="Search promotions..." />
                     <button v-if="searchQuery" @click="clearFilters" class="absolute search-clear-btn">
                       <span class="material-icons text-sm">clear</span>
                     </button>
@@ -294,8 +294,8 @@ const removeAllDiscounts = () => {
                 </div>
               </div>
 
-              <div class="promotions-list">
-                <div v-for="promo in filteredPromotions" :key="promo.id" class="border promo-card" @click="applyPromotion(promo)">
+              <div class="promotions-list flex-column">
+                <div v-for="promo in filteredPromotions" :key="promo.id" class="border-1 my-2 border-300 promo-card" @click="applyPromotion(promo)">
                   <div class="flex align-items-start justify-content-between">
                     <div>
                       <h4 class="font-medium">{{ promo.name }}</h4>
@@ -307,7 +307,7 @@ const removeAllDiscounts = () => {
                   </div>
 
                   <!-- Promotion Details -->
-                  <div class="mt-3 grid promo-details-grid gap-4 text-sm">
+                  <div class="mt-3 flex justify-content-between  gap-4 text-sm">
                     <div class="flex align-items-center promo-detail">
                       <span class="material-icons promo-icon text-sm">event</span>
                       <span class="promo-detail-text"> Valid until {{ new Date(promo.endDate).toLocaleDateString() }} </span>

@@ -146,7 +146,7 @@ const formatPrice = (price: number): string => {
                 {{ category }}
               </button>
             </div>
-            <button @click="toggleView" class="sap-button-secondary p-2 view-toggle ml-3">
+            <button @click="toggleView" class="sap-button-secondary p-2 view-toggle ml-3 cursor-pointer">
               <span class="material-icons">{{ isCardView ? 'view_list' : 'grid_view' }}</span>
             </button>
           </div>
@@ -255,23 +255,23 @@ const formatPrice = (price: number): string => {
         <!-- Dialog Header -->
         <div class="p-4 border-bottom flex align-items-center justify-content-between">
           <div>
-            <h2 class="text-xl font-semibold" style="color: var(--sap-text)">
+            <h2 class="text-xl font-bold" style="color: var(--sap-text)">
               {{ selectedProduct.name }}
             </h2>
-            <p class="text-sm dialog-subtitle mt-1">{{ selectedProduct.sku }}</p>
+            <p class="text-md text-gray-600">{{ selectedProduct.sku }}</p>
           </div>
-          <button @click="closeBatchDialog" class="p-2 dialog-close-btn">
+          <Button text @click="closeBatchDialog" class="p-2 dialog-close-btn">
             <span class="material-icons">close</span>
-          </button>
+          </Button>
         </div>
 
         <!-- Dialog Content -->
         <div class="flex dialog-content" style="border-color: var(--sap-border)">
           <!-- Left Side: Batch Selection -->
           <div class="dialog-left p-6">
-            <h3 class="text-lg font-medium mb-4">Available Batches</h3>
-            <div class="batch-list">
-              <div v-for="batch in selectedProduct.batches" :key="batch.id" class="p-4 border batch-item" :class="{ 'batch-selected': selectedBatch?.id === batch.id }" @click="selectBatch(batch)">
+            <h3 class="text-lg font-semibold mb-2">Available Batches</h3>
+            <div class="flex flex-column gap-2 overflow-y-auto">
+              <div v-for="batch in selectedProduct.batches" :key="batch.id" class="p-4 border-1 border-gray-200 hover:border-blue-400 batch-item" :class="{ 'batch-selected': selectedBatch?.id === batch.id }" @click="selectBatch(batch)">
                 <!-- Batch Header -->
                 <div class="flex align-items-center justify-content-between mb-2">
                   <div class="flex align-items-center gap-2">
@@ -281,7 +281,7 @@ const formatPrice = (price: number): string => {
                     </span>
                   </div>
                   <span
-                    class="sap-tag"
+                    class="sap-tag border-round p-1"
                     :class="{
                       'bg-green-100 text-green-800': batch.quantity > 20,
                       'bg-yellow-100 text-yellow-800': batch.quantity <= 20 && batch.quantity > 5,
@@ -293,7 +293,7 @@ const formatPrice = (price: number): string => {
                 </div>
 
                 <!-- Batch Details -->
-                <div class="grid batch-details-grid gap-2 text-sm mt-3" style="color: var(--sap-text-secondary)">
+                <div class="flex justify-content-between gap-2 text-sm mt-3" style="color: var(--sap-text-secondary)">
                   <div class="flex align-items-center gap-2">
                     <span class="material-icons text-sm">event</span>
                     <span>Mfg: {{ formatDate(batch.manufactureDate) }}</span>
@@ -309,36 +309,33 @@ const formatPrice = (price: number): string => {
 
           <!-- Right Side: Pricing -->
           <div class="dialog-right p-6">
-            <h3 class="text-lg font-medium mb-4">Pricing Details</h3>
+            <h3 class="text-lg font-semibold mb-4">Pricing Details</h3>
 
             <!-- Base Price -->
-            <div class="pricing-base-container p-4 mb-6">
+            <div class="pricing-base-container bg-gray-200 p-4 mb-6">
               <div class="flex align-items-center justify-content-between">
-                <label class="text-sm font-medium pricing-label">Base Price</label>
+                <label class="text-md font-medium pricing-label">Base Price</label>
                 <span class="font-bold text-lg">${{ formatPrice(selectedProduct.price) }}</span>
               </div>
             </div>
 
             <!-- Selling Price -->
             <div class="mb-6">
-              <label class="block text-sm font-medium pricing-label mb-2">Selling Price</label>
-              <div class="relative">
-                <span class="absolute pricing-currency-symbol">$</span>
-                <input type="number" v-model="batchForm.sellingPrice" class="sap-input pricing-input" step="0.01" min="0" />
-              </div>
+              <label class="block text-md font-semibold pricing-label mb-2">Selling Price</label>
+              <InputNumber mode="currency" currency="SAR" v-model="batchForm.sellingPrice" class="w-full" min="0" />
             </div>
 
             <!-- Discount Section -->
-            <div class="mb-6">
-              <label class="block text-sm font-medium pricing-label mb-2">Apply Discount</label>
-              <div class="grid discount-grid gap-3">
-                <select v-model="batchForm.discountType" class="sap-input">
+            <div class="mb-6 flex flex-column gap-2">
+              <label class="block text-md font-medium pricing-label mb-2">Apply Discount</label>
+              <div class="flex gap-2">
+                <select v-model="batchForm.discountType" class="w-full border-gray-200 border-round p-1">
                   <option value="none">No Discount</option>
                   <option value="amount">Fixed Amount</option>
                   <option value="percentage">Percentage</option>
                 </select>
                 <div v-if="batchForm.discountType !== 'none'" class="relative">
-                  <input v-model="batchForm.discountValue" type="number" class="sap-input discount-input" :placeholder="batchForm.discountType === 'percentage' ? 'Enter %' : 'Enter amount'" step="0.01" min="0" />
+                  <InputNumber v-model="batchForm.discountValue" class="w-full" :placeholder="batchForm.discountType === 'percentage' ? 'Enter %' : 'Enter amount'" step="0.01" min="0" />
                   <span class="absolute discount-symbol">
                     {{ batchForm.discountType === 'percentage' ? '%' : '$' }}
                   </span>
@@ -350,25 +347,25 @@ const formatPrice = (price: number): string => {
             <div v-if="batchForm.discountType !== 'none'" class="pricing-summary p-4 mb-6">
               <div class="pricing-summary-content">
                 <div class="flex justify-content-between text-sm">
-                  <span class="pricing-summary-label">Original Price</span>
-                  <span>${{ formatPrice(batchForm.sellingPrice) }}</span>
+                  <span class="pricing-summary-label text-md">Original Price</span>
+                  <span class="text-md">${{ formatPrice(batchForm.sellingPrice) }}</span>
                 </div>
                 <div class="flex justify-content-between text-sm">
-                  <span class="pricing-summary-label">Discount</span>
-                  <span class="pricing-discount"> -${{ formatPrice(batchForm.sellingPrice - calculateFinalPrice) }} </span>
+                  <span class="pricing-summary-label text-md">Discount</span>
+                  <span class="pricing-discount text-md"> -${{ formatPrice(batchForm.sellingPrice - calculateFinalPrice) }} </span>
                 </div>
                 <div class="flex justify-content-between font-bold pricing-total">
-                  <span>Final Price</span>
-                  <span>${{ formatPrice(calculateFinalPrice) }}</span>
+                  <span class="text-md">Final Price</span>
+                  <span class="text-md">${{ formatPrice(calculateFinalPrice) }}</span>
                 </div>
               </div>
             </div>
 
             <!-- Add to Cart Button -->
-            <button @click="addToCart" :disabled="!selectedBatch" class="w-full py-3 add-to-cart-btn flex align-items-center justify-content-center gap-2">
+            <Button @click="addToCart" :disabled="!selectedBatch" class="w-full py-3 add-to-cart-btn flex align-items-center justify-content-center gap-2">
               <span class="material-icons">shopping_cart</span>
               <span>Add to Cart</span>
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -378,7 +375,7 @@ const formatPrice = (price: number): string => {
     <div v-if="showProductInfo && selectedProduct" class="fixed dialog-overlay">
       <div class="bg-white product-info-dialog flex flex-column">
         <!-- Dialog Header -->
-        <div class="p-4 border-bottom flex align-items-center justify-content-between">
+        <div class="p-4 pb-2 border-bottom flex align-items-center justify-content-between">
           <h2 class="text-xl font-semibold" style="color: var(--sap-text)">
             {{ selectedProduct.name }}
           </h2>
@@ -388,22 +385,22 @@ const formatPrice = (price: number): string => {
         </div>
 
         <!-- Product Details -->
-        <div class="p-6 overflow-y-auto">
+        <div class="p-3 overflow-y-auto">
           <!-- Product Image -->
           <div class="relative product-image-container mb-6">
             <img :src="selectedProduct.image" :alt="selectedProduct.name" class="w-full h-full product-detail-image" />
           </div>
 
           <!-- Basic Info -->
-          <div class="grid product-basic-grid gap-4 mb-6">
-            <div class="flex align-items-center gap-2">
+          <div class="flex gap-4 mb-6">
+            <div class="flex align-items-center gap-2 w-6">
               <span class="material-icons text-blue-600">qr_code</span>
               <div>
                 <div class="text-sm product-label">SKU</div>
                 <div class="font-medium">{{ selectedProduct.sku }}</div>
               </div>
             </div>
-            <div class="flex align-items-center gap-2">
+            <div class="flex align-items-center gap-2 w-6">
               <span class="material-icons text-blue-600">payments</span>
               <div>
                 <div class="text-sm product-label">Price</div>
@@ -414,28 +411,28 @@ const formatPrice = (price: number): string => {
 
           <!-- Description -->
           <div class="mb-6">
-            <h3 class="text-lg font-medium mb-2">Description</h3>
+            <h3 class="text-lg font-semibold mb-2">Description</h3>
             <p class="product-description">{{ selectedProduct.description }}</p>
           </div>
 
           <!-- Features -->
           <div class="mb-6">
             <h3 class="text-lg font-medium mb-2">Features</h3>
-            <ul class="feature-list">
-              <li v-for="feature in selectedProduct.features" :key="feature" class="flex align-items-center gap-2">
-                <span class="material-icons text-green-600 text-sm">check_circle</span>
+            <ul class="feature-list flex flex-column align-items-start gap-2 pl-0">
+              <div v-for="feature in selectedProduct.features" :key="feature" class="flex gap-1">
+                <span class="material-icons text-green-600 text-sm pt-1">check_circle</span>
                 <span class="product-description">{{ feature }}</span>
-              </li>
+              </div>
             </ul>
           </div>
 
           <!-- Specifications -->
           <div class="mb-6">
-            <h3 class="text-lg font-medium mb-2">Specifications</h3>
-            <div class="grid product-specs-grid gap-4">
-              <div v-for="(value, key) in selectedProduct.specifications" :key="key" class="flex align-items-start gap-2">
+            <h3 class="text-lg font-semibold mb-2">Specifications</h3>
+            <div class="grid">
+              <div v-for="(value, key) in selectedProduct.specifications" :key="key" class="flex align-items-start gap-2 col-6 mb-3">
                 <span class="material-icons text-blue-600 text-sm">info</span>
-                <div>
+                <div class="flex-1">
                   <div class="text-sm product-label">{{ key }}</div>
                   <div class="font-medium">{{ value }}</div>
                 </div>
@@ -446,12 +443,18 @@ const formatPrice = (price: number): string => {
           <!-- Batch Information (if applicable) -->
           <div v-if="selectedProduct.batchManaged" class="mb-6">
             <h3 class="text-lg font-medium mb-2">Batch Information</h3>
-            <div class="batch-info-list">
-              <div v-for="batch in selectedProduct.batches" :key="batch.id" class="p-3 border batch-info-item">
+            <div class="flex flex-column gap-2 overflow-y-auto">
+              <div v-for="batch in selectedProduct.batches" :key="batch.id" class="p-4 border-1 border-gray-200 hover:border-blue-400 batch-item" :class="{ 'batch-selected': selectedBatch?.id === batch.id }" @click="selectBatch(batch)">
+                <!-- Batch Header -->
                 <div class="flex align-items-center justify-content-between mb-2">
-                  <span class="font-medium">Batch: {{ batch.batchNumber }}</span>
+                  <div class="flex align-items-center gap-2">
+                    <span class="material-icons text-blue-600">inventory</span>
+                    <span class="font-medium" style="color: var(--sap-text)">
+                      {{ batch.batchNumber }}
+                    </span>
+                  </div>
                   <span
-                    class="sap-tag"
+                    class="sap-tag border-round p-1"
                     :class="{
                       'bg-green-100 text-green-800': batch.quantity > 20,
                       'bg-yellow-100 text-yellow-800': batch.quantity <= 20 && batch.quantity > 5,
@@ -461,9 +464,17 @@ const formatPrice = (price: number): string => {
                     {{ batch.quantity }} available
                   </span>
                 </div>
-                <div class="grid batch-info-details gap-2 text-sm product-description">
-                  <div>Mfg: {{ formatDate(batch.manufactureDate) }}</div>
-                  <div>Exp: {{ formatDate(batch.expiryDate) }}</div>
+
+                <!-- Batch Details -->
+                <div class="flex justify-content-between gap-2 text-sm mt-3" style="color: var(--sap-text-secondary)">
+                  <div class="flex align-items-center gap-2">
+                    <span class="material-icons text-sm">event</span>
+                    <span>Mfg: {{ formatDate(batch.manufactureDate) }}</span>
+                  </div>
+                  <div class="flex align-items-center gap-2">
+                    <span class="material-icons text-sm">event_busy</span>
+                    <span>Exp: {{ formatDate(batch.expiryDate) }}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -472,13 +483,13 @@ const formatPrice = (price: number): string => {
 
         <!-- Dialog Footer -->
         <div class="p-4 border-top flex justify-content-end gap-3">
-          <Button @click="closeProductInfo" class="px-4 bg-white py-2 border dialog-footer-btn"> Close </Button>
+          <Button outlined @click="closeProductInfo" class="px-4 bg-white py-2 border border-gray-300 dialog-footer-btn"> <p class="text-gray-900 m-0">Close</p> </Button>
           <Button
             @click="
               handleProductClick(selectedProduct);
               closeProductInfo();
             "
-            class="px-4 py-2 dialog-footer-primary"
+            class="px-4 py-2"
           >
             Add to Cart
           </Button>
@@ -730,7 +741,7 @@ const formatPrice = (price: number): string => {
 }
 
 .pricing-base-container {
-  background-color: #f9fafb;
+  /* background-color: #f9fafb; */
   border-radius: 0.5rem;
 }
 
@@ -787,7 +798,7 @@ const formatPrice = (price: number): string => {
 }
 
 .add-to-cart-btn {
-  background-color: #2563eb;
+  /* background-color: #2563eb; */
   color: white;
   border-radius: 0.5rem;
   border: none;

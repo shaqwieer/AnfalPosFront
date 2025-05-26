@@ -47,16 +47,16 @@ const formatPrice = (price: number | string | undefined): string => {
       <!-- Dialog Header -->
       <div class="p-4 border-bottom flex align-items-center justify-content-between">
         <h2 class="text-xl font-semibold" style="color: var(--sap-text)">Invoice Preview</h2>
-        <button @click="$emit('close')" class="p-2 dialog-close-btn">
+        <Button text @click="$emit('close')" class="p-2 dialog-close-btn">
           <span class="material-icons">close</span>
-        </button>
+        </Button>
       </div>
 
       <!-- Invoice Content -->
-      <div class="p-8 flex-1 overflow-y-auto">
+      <div class="p-2 flex-1 overflow-y-auto">
         <div class="invoice-content">
           <!-- Company Header -->
-          <div class="flex justify-content-between align-items-start mb-8">
+          <div class="flex justify-content-between align-items-start mb-6">
             <div>
               <div class="flex align-items-center company-header">
                 <span class="material-icons text-blue-600">store</span>
@@ -66,7 +66,7 @@ const formatPrice = (price: number | string | undefined): string => {
               <p class="company-address">City, State 12345</p>
               <p class="company-address">+1 (234) 567-8900</p>
             </div>
-            <div class="text-right">
+            <div class="text-right pt-4">
               <h2 class="text-2xl font-bold invoice-title">INVOICE</h2>
               <p class="invoice-details mt-2">{{ invoiceNumber }}</p>
               <p class="invoice-details">Issue Date: {{ currentDate }}</p>
@@ -75,7 +75,7 @@ const formatPrice = (price: number | string | undefined): string => {
           </div>
 
           <!-- Customer Info -->
-          <div class="grid customer-info-grid gap-8 mb-8">
+          <div class="grid customer-info-grid gap-8 mb-3">
             <div>
               <h3 class="font-bold customer-section-title mb-2">Bill To:</h3>
               <p class="customer-info-text">{{ orderStore.currentOrder.customer?.name || 'Walk-in Customer' }}</p>
@@ -92,8 +92,8 @@ const formatPrice = (price: number | string | undefined): string => {
 
           <!-- Items Table -->
           <table class="w-full mb-8 invoice-table">
-            <thead>
-              <tr class="border-bottom table-header">
+            <thead class="border-bottom-1 border-300">
+              <tr >
                 <th class="py-3 text-left table-header-cell">Item</th>
                 <th class="py-3 text-center table-header-cell">Qty</th>
                 <th class="py-3 text-right table-header-cell">Price</th>
@@ -101,7 +101,7 @@ const formatPrice = (price: number | string | undefined): string => {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in orderStore.currentOrder.items" :key="item.id" class="border-bottom table-row">
+              <tr v-for="item in orderStore.currentOrder.items" :key="item.id" class="border-bottom-1 border-300">
                 <td class="py-3 table-cell">{{ item.service.name }}</td>
                 <td class="py-3 text-center table-cell">{{ item.quantity }}</td>
                 <td class="py-3 text-right table-cell">${{ formatPrice(item.price) }}</td>
@@ -146,7 +146,7 @@ const formatPrice = (price: number | string | undefined): string => {
             Cancel
           </button>
         </div>
-        <div class="footer-actions">
+        <div class="footer-actions flex gap-3">
           <button class="px-4 py-2 action-btn">
             <span class="material-icons button-icon">edit</span>
             Edit
@@ -180,7 +180,7 @@ const formatPrice = (price: number | string | undefined): string => {
   border-radius: 0.75rem;
   width: 100%;
   max-width: 64rem;
-  max-height: 90vh;
+  max-height: 95vh;
 }
 
 .dialog-close-btn {

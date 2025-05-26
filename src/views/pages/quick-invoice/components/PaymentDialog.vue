@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useOrderStore } from '@/stores/orderStore.ts'
+import { ref, computed, watch } from 'vue';
+import { useOrderStore } from '@/stores/orderStore.ts';
 
 const props = defineProps<{
-  show: boolean,
-  order?: any
-}>()
+  show: boolean;
+  order?: any;
+}>();
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close']);
 
-const orderStore = useOrderStore()
+const orderStore = useOrderStore();
 const selectedMethods = ref<{
   method: string;
   amount: number;
@@ -18,33 +18,35 @@ const selectedMethods = ref<{
   approvedAmount?: number;
   approvedInstallments?: number;
   mobileNo?: string;
-}>([])
-const remainingAmount = ref(0)
-const isRequestingApproval = ref(false)
-const editingMobileNo = ref(false)
-const tempMobileNo = ref('')
+}>([]);
+const remainingAmount = ref(0);
+const isRequestingApproval = ref(false);
+const editingMobileNo = ref(false);
+const tempMobileNo = ref('');
 
 const paymentMethods = [
   { id: 'cash', name: 'Cash', icon: 'payments' },
   { id: 'visa', name: 'VISA', icon: 'credit_card' },
   { id: 'mastercard', name: 'Mastercard', icon: 'credit_card' },
   { id: 'tamara', name: 'Tamara', icon: 'calendar_month', installments: true }
-]
+];
 
 const totalAmount = computed(() => {
-  return props.order?.total || Number(orderStore.total) || 0
-})
+  return props.order?.total || Number(orderStore.total) || 0;
+});
 
 // Watch for changes in totalAmount and update remainingAmount
-watch(totalAmount, (newTotal) => {
-  remainingAmount.value = newTotal
-}, { immediate: true })
+watch(
+  totalAmount,
+  (newTotal) => {
+    remainingAmount.value = newTotal;
+  },
+  { immediate: true }
+);
 
 const addPaymentMethod = (method: string) => {
-  if (!selectedMethods.value.some(m => m.method === method)) {
-    const mobileNo = method === 'tamara' && props.order?.customer?.mobile 
-      ? props.order.customer.mobile 
-      : undefined
+  if (!selectedMethods.value.some((m) => m.method === method)) {
+    const mobileNo = method === 'tamara' && props.order?.customer?.mobile ? props.order.customer.mobile : undefined;
 
     selectedMethods.value.push({
       method,
@@ -52,103 +54,108 @@ const addPaymentMethod = (method: string) => {
       installments: method === 'tamara' ? 3 : undefined,
       approvalStatus: method === 'tamara' ? 'pending' : undefined,
       mobileNo
-    })
-    updateRemainingAmount()
+    });
+    updateRemainingAmount();
   }
-}
+};
 
 const removePaymentMethod = (index: number) => {
-  selectedMethods.value.splice(index, 1)
-  updateRemainingAmount()
-}
+  selectedMethods.value.splice(index, 1);
+  updateRemainingAmount();
+};
 
 const updateRemainingAmount = () => {
-  const paidAmount = selectedMethods.value.reduce((sum, method) => sum + Number(method.amount || 0), 0)
-  remainingAmount.value = Math.max(0, totalAmount.value - paidAmount)
-}
+  const paidAmount = selectedMethods.value.reduce((sum, method) => sum + Number(method.amount || 0), 0);
+  remainingAmount.value = Math.max(0, totalAmount.value - paidAmount);
+};
 
 const formatPrice = (price: number): string => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'decimal',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(price) + ' SAR'
-}
+  return (
+    new Intl.NumberFormat('en-US', {
+      style: 'decimal',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(price) + ' SAR'
+  );
+};
 
 const handleClose = () => {
-  selectedMethods.value = []
-  remainingAmount.value = totalAmount.value
-  editingMobileNo.value = false
-  tempMobileNo.value = ''
-  emit('close')
-}
+  selectedMethods.value = [];
+  remainingAmount.value = totalAmount.value;
+  editingMobileNo.value = false;
+  tempMobileNo.value = '';
+  emit('close');
+};
 
 const startEditMobileNo = (method: any) => {
-  tempMobileNo.value = method.mobileNo || ''
-  editingMobileNo.value = true
-}
+  tempMobileNo.value = method.mobileNo || '';
+  editingMobileNo.value = true;
+};
 
 const saveMobileNo = (method: any) => {
   if (tempMobileNo.value) {
-    method.mobileNo = tempMobileNo.value
-    method.approvalStatus = 'pending' // Reset approval status when mobile number changes
+    method.mobileNo = tempMobileNo.value;
+    method.approvalStatus = 'pending'; // Reset approval status when mobile number changes
   }
-  editingMobileNo.value = false
-  tempMobileNo.value = ''
-}
+  editingMobileNo.value = false;
+  tempMobileNo.value = '';
+};
 
 const requestTamaraApproval = async (method: any) => {
   if (!method.mobileNo) {
-    alert('Please provide a mobile number for Tamara verification')
-    return
+    alert('Please provide a mobile number for Tamara verification');
+    return;
   }
 
-  isRequestingApproval.value = true
-  
+  isRequestingApproval.value = true;
+
   try {
     // Simulate API call to Tamara with mobile number verification
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
     // Simulate approval response
-    const approved = Math.random() > 0.3 // 70% approval rate
-    const approvedAmount = approved ? method.amount : 0
-    const approvedInstallments = approved ? method.installments : 0
-    
-    method.approvalStatus = approved ? 'approved' : 'rejected'
-    method.approvedAmount = approvedAmount
-    method.approvedInstallments = approvedInstallments
-    
+    const approved = Math.random() > 0.3; // 70% approval rate
+    const approvedAmount = approved ? method.amount : 0;
+    const approvedInstallments = approved ? method.installments : 0;
+
+    method.approvalStatus = approved ? 'approved' : 'rejected';
+    method.approvedAmount = approvedAmount;
+    method.approvedInstallments = approvedInstallments;
+
     if (approved) {
-      method.amount = approvedAmount
-      method.installments = approvedInstallments
-      updateRemainingAmount()
+      method.amount = approvedAmount;
+      method.installments = approvedInstallments;
+      updateRemainingAmount();
     }
   } catch (error) {
-    console.error('Error requesting Tamara approval:', error)
-    method.approvalStatus = 'rejected'
+    console.error('Error requesting Tamara approval:', error);
+    method.approvalStatus = 'rejected';
   } finally {
-    isRequestingApproval.value = false
+    isRequestingApproval.value = false;
   }
-}
+};
 
 const processPayment = () => {
   // Handle payment processing here
-  console.log('Processing payment:', selectedMethods.value)
-  handleClose()
-}
+  console.log('Processing payment:', selectedMethods.value);
+  handleClose();
+};
 
 const getApprovalStatusColor = (status?: string) => {
   switch (status) {
-    case 'approved': return 'text-green-600'
-    case 'rejected': return 'text-red-600'
-    default: return 'text-gray-600'
+    case 'approved':
+      return 'text-green-600';
+    case 'rejected':
+      return 'text-red-600';
+    default:
+      return 'text-gray-600';
   }
-}
+};
 
 const validateMobileNo = (value: string) => {
   // Saudi mobile number validation
-  return /^\+966 5[0-9] [0-9]{3} [0-9]{4}$/.test(value)
-}
+  return /^\+966 5[0-9] [0-9]{3} [0-9]{4}$/.test(value);
+};
 </script>
 
 <template>
@@ -157,85 +164,64 @@ const validateMobileNo = (value: string) => {
       <!-- Dialog Header -->
       <div class="p-4 border-bottom flex align-items-center justify-content-between">
         <h2 class="text-xl font-semibold" style="color: var(--sap-text)">Payment</h2>
-        <button @click="handleClose" class="p-2 dialog-close-btn">
+        <Button text @click="handleClose" class="p-2 dialog-close-btn">
           <span class="material-icons">close</span>
-        </button>
+        </Button>
       </div>
 
       <!-- Dialog Content -->
       <div class="p-6 flex-1 overflow-y-auto">
         <!-- Total Amount -->
         <div class="text-center mb-6">
-          <p class="text-sm total-label">Total Amount Due</p>
-          <p class="text-3xl font-bold text-blue-600">${{ formatPrice(totalAmount) }}</p>
-          <p v-if="remainingAmount > 0" class="text-sm remaining-amount mt-1">
-            Remaining: ${{ formatPrice(remainingAmount) }}
-          </p>
+          <p class="text-xl font-semibold text-gray-700">Total Amount Due</p>
+          <p class="text-2xl font-bold text-blue-500">{{ formatPrice(totalAmount) }}</p>
+          <p v-if="remainingAmount > 0" class="text-md text-gray-500">Remaining: {{ formatPrice(remainingAmount) }}</p>
         </div>
 
         <!-- Payment Methods Grid -->
-        <div class="grid payment-methods-grid gap-4 mb-6">
-          <button v-for="method in paymentMethods" 
-                  :key="method.id"
-                  @click="addPaymentMethod(method.id)"
-                  :disabled="selectedMethods.some(m => m.method === method.id)"
-                  class="p-4 border payment-method-btn">
-            <div class="flex align-items-center payment-method-content">
+        <div class="flex flex-wrap gap-5 mb-6">
+          <Button outlined v-for="method in paymentMethods" :key="method.id" @click="addPaymentMethod(method.id)" :disabled="selectedMethods.some((m) => m.method === method.id)" class="p-4 w-16rem border-gray-400 hover:border-blue-400">
+            <div class="flex justify-content-center align-items-center text-center payment-method-content text-center">
               <span class="material-icons text-blue-600">{{ method.icon }}</span>
               <span class="font-medium">{{ method.name }}</span>
             </div>
-          </button>
+          </Button>
         </div>
 
         <!-- Selected Payment Methods -->
-        <div class="selected-methods">
-          <div v-for="(method, index) in selectedMethods" 
-               :key="index"
-               class="p-4 border selected-method-card">
+        <div class="selected-methods flex flex-column gap-3">
+          <div v-for="(method, index) in selectedMethods" :key="index" class="p-4 border selected-method-card border-round-lg border-1 border-300">
             <div class="flex align-items-center justify-content-between mb-3">
               <div class="flex align-items-center method-header">
                 <span class="material-icons text-blue-600">
-                  {{ paymentMethods.find(m => m.id === method.method)?.icon }}
+                  {{ paymentMethods.find((m) => m.id === method.method)?.icon }}
                 </span>
                 <span class="font-medium">
-                  {{ paymentMethods.find(m => m.id === method.method)?.name }}
+                  {{ paymentMethods.find((m) => m.id === method.method)?.name }}
                 </span>
               </div>
-              <button @click="removePaymentMethod(index)" 
-                      class="remove-method-btn">
+              <Button text @click="removePaymentMethod(index)" class="remove-method-btn">
                 <span class="material-icons">delete</span>
-              </button>
+              </Button>
             </div>
 
             <div class="method-fields">
               <!-- Regular Payment Fields -->
               <div v-if="method.method !== 'tamara'">
                 <label class="block text-sm field-label mb-1">Amount</label>
-                <input type="number" 
-                       v-model="method.amount"
-                       @input="updateRemainingAmount"
-                       class="sap-input"
-                       :max="totalAmount"
-                       step="0.01">
+                <InputNumber v-model="method.amount" @input="updateRemainingAmount" class="sap-input w-full" :min="0" :max="totalAmount" />
               </div>
 
               <!-- Tamara Payment Fields -->
               <template v-else>
                 <div class="grid tamara-grid gap-4">
                   <div>
-                    <label class="block text-sm field-label mb-1">Requested Amount</label>
-                    <input type="number" 
-                           v-model="method.amount"
-                           :disabled="method.approvalStatus === 'approved'"
-                           class="sap-input"
-                           :max="totalAmount"
-                           step="0.01">
+                    <label class="block text-md field-label mb-1">Requested Amount</label>
+                    <InputNumber mode="currency" currency="SAR" v-model="method.amount" :disabled="method.approvalStatus === 'approved'" class="sap-input" :min="0" :max="totalAmount" />
                   </div>
                   <div>
-                    <label class="block text-sm field-label mb-1">Installments</label>
-                    <select v-model="method.installments" 
-                            :disabled="method.approvalStatus === 'approved'"
-                            class="sap-input">
+                    <label class="block text-md field-label mb-1">Installments</label>
+                    <select v-model="method.installments" :disabled="method.approvalStatus === 'approved'" class="sap-input w-9rem p-2 border-1 border-gray-300 hover:border-blue-300 border-round-lg">
                       <option value="3">3 Months</option>
                       <option value="6">6 Months</option>
                       <option value="12">12 Months</option>
@@ -247,64 +233,43 @@ const validateMobileNo = (value: string) => {
                 <div class="mt-4">
                   <div class="flex align-items-center justify-content-between mb-1">
                     <label class="block text-sm field-label">Mobile Number</label>
-                    <button v-if="!editingMobileNo && method.mobileNo"
-                            @click="startEditMobileNo(method)"
-                            class="text-sm change-mobile-btn">
-                      Change
-                    </button>
+                    <Button outlined severity="warning"  v-if="!editingMobileNo && method.mobileNo" @click="startEditMobileNo(method)" class="text-sm change-mobile-btn border-yellow-300 hover:border-300">Change</Button>
                   </div>
-                  
+
                   <div v-if="editingMobileNo" class="flex align-items-center mobile-edit-row">
-                    <input type="tel"
-                           v-model="tempMobileNo"
-                           class="sap-input flex-1"
-                           placeholder="Enter mobile number"
-                           pattern="[+]?\d{10,15}"
-                           required>
-                    <button @click="saveMobileNo(method)"
-                            :disabled="!validateMobileNo(tempMobileNo)"
-                            class="px-3 py-2 save-mobile-btn">
-                      Save
-                    </button>
+                    <input type="tel" v-model="tempMobileNo" class="sap-input flex-1 p-2 w-9rem border-300 hover:border-blue-300 border-round-lg" placeholder="Enter mobile number" pattern="[+]?\d{10,15}" required />
+                    <button @click="saveMobileNo(method)" :disabled="!validateMobileNo(tempMobileNo)" class="px-3 py-2 save-mobile-btn">Save</button>
                   </div>
                   <div v-else-if="method.mobileNo" class="mobile-display">
                     {{ method.mobileNo }}
                   </div>
-                  <button v-else
-                          @click="startEditMobileNo(method)"
-                          class="w-full px-3 py-2 border add-mobile-btn">
-                    Add Mobile Number
-                  </button>
+                  <button v-else @click="startEditMobileNo(method)" class="w-full px-3 py-2 border add-mobile-btn">Add Mobile Number</button>
                 </div>
 
                 <!-- Approval Status -->
-                <div v-if="method.approvalStatus" 
-                     class="flex align-items-center justify-content-between p-3 approval-status mt-4">
+                <div v-if="method.approvalStatus" class="flex align-items-center justify-content-between p-3 approval-status mt-4">
                   <div class="flex align-items-center approval-status-content">
-                    <span class="material-icons text-sm" 
-                          :class="getApprovalStatusColor(method.approvalStatus)">
-                      {{ method.approvalStatus === 'approved' ? 'check_circle' : 
-                         method.approvalStatus === 'rejected' ? 'cancel' : 'pending' }}
+                    <span class="material-icons text-sm" :class="getApprovalStatusColor(method.approvalStatus)">
+                      {{ method.approvalStatus === 'approved' ? 'check_circle' : method.approvalStatus === 'rejected' ? 'cancel' : 'pending' }}
                     </span>
                     <span :class="getApprovalStatusColor(method.approvalStatus)">
-                      {{ method.approvalStatus === 'approved' ? 'Approved' :
-                         method.approvalStatus === 'rejected' ? 'Rejected' : 'Pending Approval' }}
+                      {{ method.approvalStatus === 'approved' ? 'Approved' : method.approvalStatus === 'rejected' ? 'Rejected' : 'Pending Approval' }}
                     </span>
                   </div>
-                  <div v-if="method.approvalStatus === 'approved'" class="text-sm installment-details">
-                    {{ method.approvedInstallments }} months × ${{ formatPrice(method.approvedAmount / method.approvedInstallments) }}
-                  </div>
+                  <div v-if="method.approvalStatus === 'approved'" class="text-sm installment-details">{{ method.approvedInstallments }} months × ${{ formatPrice(method.approvedAmount / method.approvedInstallments) }}</div>
                 </div>
 
                 <!-- Approval Request Button -->
-                <button v-if="method.approvalStatus !== 'approved'"
-                        @click="requestTamaraApproval(method)"
-                        :disabled="isRequestingApproval || !method.amount || !method.installments || !method.mobileNo"
-                        class="w-full py-2 px-4 approval-request-btn mt-4">
+                <Button
+                  v-if="method.approvalStatus !== 'approved'"
+                  @click="requestTamaraApproval(method)"
+                  :disabled="isRequestingApproval || !method.amount || !method.installments || !method.mobileNo"
+                  class="w-full py-2 px-4 approval-request-btn mt-4 flex align-items-center justify-content-center"
+                >
                   <span v-if="isRequestingApproval" class="material-icons approval-spinner mr-2">refresh</span>
                   <span v-else class="material-icons mr-2">send</span>
                   {{ isRequestingApproval ? 'Requesting Approval...' : 'Request Approval' }}
-                </button>
+                </Button>
               </template>
             </div>
           </div>
@@ -313,17 +278,17 @@ const validateMobileNo = (value: string) => {
 
       <!-- Dialog Footer -->
       <div class="p-4 border-top flex justify-content-end footer-actions">
-        <button @click="handleClose"
-                class="px-4 py-2 border cancel-btn">
-          Cancel
-        </button>
-        <button @click="processPayment"
-                :disabled="remainingAmount > 0 || selectedMethods.length === 0 || 
-                          selectedMethods.some(m => m.method === 'tamara' && m.approvalStatus !== 'approved')"
-                class="px-4 py-2 process-payment-btn">
+        <Button outlined @click="handleClose" class="px-4 py-2 border cancel-btn border-gray-400 hover:border-blue-400">
+          <p class="text-gray-600 mb-0">Cancel</p>
+        </Button>
+        <Button
+          @click="processPayment"
+          :disabled="remainingAmount > 0 || selectedMethods.length === 0 || selectedMethods.some((m) => m.method === 'tamara' && m.approvalStatus !== 'approved')"
+          class="px-4 py-2 process-payment-btn bg-green-600 hover:bg-green-700 text-white"
+        >
           <span class="material-icons process-icon">payments</span>
           Process Payment
-        </button>
+        </Button>
       </div>
     </div>
   </div>
@@ -425,7 +390,6 @@ const validateMobileNo = (value: string) => {
 }
 
 .change-mobile-btn {
-  color: #2563eb;
   transition: all 0.2s;
 }
 
@@ -506,8 +470,12 @@ const validateMobileNo = (value: string) => {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Footer */
@@ -525,7 +493,6 @@ const validateMobileNo = (value: string) => {
 }
 
 .process-payment-btn {
-  background-color: #059669;
   color: white;
   border-radius: 0.5rem;
   border: none;

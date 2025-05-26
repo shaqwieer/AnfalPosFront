@@ -1,27 +1,28 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
-import { useOrderStore } from '@/stores/orderStore.ts'
-import { useCompanyStore } from '@/stores/companyStore.ts'
+import { ref, computed, watch, onMounted } from 'vue';
+import { useOrderStore } from '@/stores/orderStore.ts';
+import { useCompanyStore } from '@/stores/companyStore.ts';
+import { Calendar } from 'lucide-vue-next';
 
 const props = defineProps<{
-  show: boolean
-}>()
+  show: boolean;
+}>();
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close']);
 
-const orderStore = useOrderStore()
-const companyStore = useCompanyStore()
-const customerType = ref('individual') // 'individual' or 'business'
-const searchQuery = ref('')
-const showNewCustomerForm = ref(false)
-const showVehicleForm = ref(false)
-const editingVehicleIndex = ref<number | null>(null)
-const selectedVehicleIndex = ref<number | null>(null)
+const orderStore = useOrderStore();
+const companyStore = useCompanyStore();
+const customerType = ref('individual'); // 'individual' or 'business'
+const searchQuery = ref('');
+const showNewCustomerForm = ref(false);
+const showVehicleForm = ref(false);
+const editingVehicleIndex = ref<number | null>(null);
+const selectedVehicleIndex = ref<number | null>(null);
 
 // Form data
 const formData = ref<Record<string, any>>({
   vehicles: []
-})
+});
 
 // Vehicle form data
 const vehicleForm = ref({
@@ -31,28 +32,28 @@ const vehicleForm = ref({
   year: '',
   vin: '',
   notes: ''
-})
+});
 
 // Initialize form data based on customer fields
 const initializeFormData = () => {
   formData.value = {
     vehicles: []
-  }
-  const fields = companyStore.getCustomerFields(customerType.value as 'individual' | 'business')
-  fields.forEach(field => {
-    formData.value[field.id] = ''
-  })
-}
+  };
+  const fields = companyStore.getCustomerFields(customerType.value as 'individual' | 'business');
+  fields.forEach((field) => {
+    formData.value[field.id] = '';
+  });
+};
 
 // Watch for customer type changes
 watch(customerType, () => {
-  initializeFormData()
-})
+  initializeFormData();
+});
 
 // Get visible fields based on customer type
 const visibleFields = computed(() => {
-  return companyStore.getCustomerFields(customerType.value as 'individual' | 'business')
-})
+  return companyStore.getCustomerFields(customerType.value as 'individual' | 'business');
+});
 
 const customers = ref([
   // TireShop Customers
@@ -177,51 +178,52 @@ const customers = ref([
     sector: 'Pharmacy',
     purchaseLimit: 75000
   }
-])
+]);
 
 // Filter customers based on search query, type, and company
 const filteredCustomers = computed(() => {
-  const query = searchQuery.value.toLowerCase()
-  return customers.value.filter(customer => 
-    customer.companyId === companyStore.selectedCompanyId &&
-    customer.type === customerType.value &&
-    (customer.name.toLowerCase().includes(query) ||
-     customer.mobile.includes(query) ||
-     (customer.email && customer.email.toLowerCase().includes(query)) ||
-     (customer.cr && customer.cr.includes(query)) ||
-     (customer.vehicles?.some(v => v.plateNo.toLowerCase().includes(query))))
-  )
-})
+  const query = searchQuery.value.toLowerCase();
+  return customers.value.filter(
+    (customer) =>
+      customer.companyId === companyStore.selectedCompanyId &&
+      customer.type === customerType.value &&
+      (customer.name.toLowerCase().includes(query) ||
+        customer.mobile.includes(query) ||
+        (customer.email && customer.email.toLowerCase().includes(query)) ||
+        (customer.cr && customer.cr.includes(query)) ||
+        customer.vehicles?.some((v) => v.plateNo.toLowerCase().includes(query)))
+  );
+});
 
 const validateForm = () => {
-  const fields = visibleFields.value
-  const hasRequiredFields = fields.every(field => !field.required || formData.value[field.id])
-  const hasVehicle = formData.value.vehicles.length > 0
-  return hasRequiredFields && hasVehicle
-}
+  const fields = visibleFields.value;
+  const hasRequiredFields = fields.every((field) => !field.required || formData.value[field.id]);
+  const hasVehicle = formData.value.vehicles.length > 0;
+  return hasRequiredFields && hasVehicle;
+};
 
 const addVehicle = () => {
   if (editingVehicleIndex.value !== null) {
-    formData.value.vehicles[editingVehicleIndex.value] = { ...vehicleForm.value }
+    formData.value.vehicles[editingVehicleIndex.value] = { ...vehicleForm.value };
   } else {
-    formData.value.vehicles.push({ ...vehicleForm.value })
+    formData.value.vehicles.push({ ...vehicleForm.value });
   }
-  closeVehicleForm()
-}
+  closeVehicleForm();
+};
 
 const editVehicle = (index: number) => {
-  editingVehicleIndex.value = index
-  vehicleForm.value = { ...formData.value.vehicles[index] }
-  showVehicleForm.value = true
-}
+  editingVehicleIndex.value = index;
+  vehicleForm.value = { ...formData.value.vehicles[index] };
+  showVehicleForm.value = true;
+};
 
 const removeVehicle = (index: number) => {
-  formData.value.vehicles.splice(index, 1)
-}
+  formData.value.vehicles.splice(index, 1);
+};
 
 const closeVehicleForm = () => {
-  showVehicleForm.value = false
-  editingVehicleIndex.value = null
+  showVehicleForm.value = false;
+  editingVehicleIndex.value = null;
   vehicleForm.value = {
     plateNo: '',
     make: '',
@@ -229,13 +231,13 @@ const closeVehicleForm = () => {
     year: '',
     vin: '',
     notes: ''
-  }
-}
+  };
+};
 
 const handleSubmit = () => {
   if (!validateForm()) {
-    alert('Please fill in all required fields and add at least one vehicle')
-    return
+    alert('Please fill in all required fields and add at least one vehicle');
+    return;
   }
 
   // Create customer object
@@ -244,43 +246,43 @@ const handleSubmit = () => {
     companyId: companyStore.selectedCompanyId,
     ...formData.value,
     type: customerType.value
-  }
+  };
 
   // Add to customers list
-  customers.value.push(customer)
+  customers.value.push(customer);
 
   // Set customer in order store with selected vehicle
   orderStore.setCustomer({
     ...customer,
     selectedVehicle: customer.vehicles[0]
-  })
-  
+  });
+
   // Reset and close
-  resetForm()
-  emit('close')
-}
+  resetForm();
+  emit('close');
+};
 
 const selectCustomer = (customer: any, vehicleIndex: number = 0) => {
-  selectedVehicleIndex.value = vehicleIndex
+  selectedVehicleIndex.value = vehicleIndex;
   orderStore.setCustomer({
     ...customer,
     selectedVehicle: customer.vehicles[vehicleIndex]
-  })
-  emit('close')
-}
+  });
+  emit('close');
+};
 
 const resetForm = () => {
-  customerType.value = 'individual'
-  searchQuery.value = ''
-  showNewCustomerForm.value = false
-  selectedVehicleIndex.value = null
-  initializeFormData()
-}
+  customerType.value = 'individual';
+  searchQuery.value = '';
+  showNewCustomerForm.value = false;
+  selectedVehicleIndex.value = null;
+  initializeFormData();
+};
 
 // Initialize form data on component mount
 onMounted(() => {
-  initializeFormData()
-})
+  initializeFormData();
+});
 </script>
 
 <template>
@@ -289,9 +291,9 @@ onMounted(() => {
       <!-- Dialog Header -->
       <div class="p-4 border-bottom flex align-items-center justify-content-between">
         <h2 class="text-xl font-semibold">{{ showNewCustomerForm ? 'New Customer' : 'Customer Search' }}</h2>
-        <button @click="emit('close')" class="p-2 dialog-close-btn">
+        <Button text @click="emit('close')" class="p-2 dialog-close-btn">
           <span class="material-icons">close</span>
-        </button>
+        </Button>
       </div>
 
       <!-- Dialog Content -->
@@ -299,18 +301,12 @@ onMounted(() => {
         <!-- Customer Type Selection -->
         <div class="flex customer-type-selection mb-6">
           <label class="flex align-items-center customer-type-option">
-            <input type="radio" 
-                   v-model="customerType"
-                   value="individual" 
-                   class="form-radio text-blue-600">
-            <span>Individual Customer</span>
+            <input type="radio" v-model="customerType" value="individual" class="form-radio text-blue-600" />
+            <span class="font-medium pt-1">Individual Customer</span>
           </label>
           <label class="flex align-items-center customer-type-option">
-            <input type="radio" 
-                   v-model="customerType"
-                   value="business" 
-                   class="form-radio text-blue-600">
-            <span>Business Customer</span>
+            <input type="radio" v-model="customerType" value="business" class="form-radio text-blue-600" />
+            <span class="font-medium pt-1">Business Customer</span>
           </label>
         </div>
 
@@ -318,51 +314,37 @@ onMounted(() => {
         <div v-if="!showNewCustomerForm" class="search-section">
           <!-- Search Input -->
           <div class="relative">
-            <input
-              v-model="searchQuery"
-              type="text"
-              class="sap-input w-full search-input"
-              :placeholder="`Search ${customerType} customers...`"
-            />
-            <span class="material-icons absolute search-icon">
-              search
-            </span>
+            <InputText v-model="searchQuery" type="text" class="sap-input w-full mb-2" :placeholder="`Search ${customerType} customers...`" />
           </div>
 
           <!-- Search Results -->
-          <div class="customer-results">
-            <div v-for="customer in filteredCustomers" 
-                 :key="customer.id"
-                 class="p-4 border customer-card">
+          <div class="customer-results flex flex-column">
+            <div v-for="customer in filteredCustomers" :key="customer.id" class="p-4 border-1 border-400 hover:border-blue-400 customer-card cursor-pointer">
               <div class="flex align-items-center justify-content-between">
                 <div>
-                  <h3 class="font-medium">{{ customer.name }}</h3>
-                  <p class="text-sm customer-mobile">{{ customer.mobile }}</p>
+                  <h3 class="font-medium text-xl p-1 m-0">{{ customer.name }}</h3>
+                  <p class="text-md customer-mobile">{{ customer.mobile }}</p>
                 </div>
                 <div class="text-right">
-                  <span class="px-2 py-1 text-xs customer-type-badge" 
-                        :class="customer.type === 'business' ? 'business-badge' : 'individual-badge'">
+                  <span class="px-2 py-1 text-xs customer-type-badge font-semibold" :class="customer.type === 'business' ? 'business-badge' : 'individual-badge'">
                     {{ customer.type }}
                   </span>
                 </div>
               </div>
-              
+
               <!-- Additional Details -->
-              <div class="mt-2 grid customer-details-grid gap-2 text-sm customer-details">
+              <div class="mt-2 flex gap-2 text-sm customer-details">
                 <!-- Business Details -->
                 <template v-if="customer.type === 'business'">
-                  <div v-if="customer.cr">CR: {{ customer.cr }}</div>
-                  <div v-if="customer.vat">VAT: {{ customer.vat }}</div>
-                  <div v-if="customer.fleet">Fleet Size: {{ customer.fleet }}</div>
+                  <div class="w-16rem" v-if="customer.cr">CR: {{ customer.cr }}</div>
+                  <div class="w-16rem" v-if="customer.vat">VAT: {{ customer.vat }}</div>
+                  <div class="w-16rem" v-if="customer.fleet">Fleet Size: {{ customer.fleet }}</div>
                 </template>
               </div>
 
               <!-- Vehicles Grid -->
               <div v-if="customer.vehicles?.length" class="mt-4 grid vehicles-grid gap-3">
-                <div v-for="(vehicle, index) in customer.vehicles"
-                     :key="vehicle.plateNo"
-                     class="p-3 vehicle-card"
-                     @click="selectCustomer(customer, index)">
+                <div v-for="(vehicle, index) in customer.vehicles" :key="vehicle.plateNo" class="p-3 vehicle-card" @click="selectCustomer(customer, index)">
                   <div class="flex align-items-center justify-content-between mb-1">
                     <span class="font-medium text-blue-600">{{ vehicle.plateNo }}</span>
                     <span class="text-xs vehicle-year">{{ vehicle.year }}</span>
@@ -374,14 +356,10 @@ onMounted(() => {
             </div>
 
             <!-- No Results -->
-            <div v-if="searchQuery && !filteredCustomers.length" 
-                 class="text-center no-results">
-              No customers found
-            </div>
+            <div v-if="searchQuery && !filteredCustomers.length" class="text-center no-results">No customers found</div>
 
             <!-- Create New Customer Button -->
-            <button @click="showNewCustomerForm = true"
-                    class="w-full py-3 border-2 create-customer-btn">
+            <button @click="showNewCustomerForm = true" class="w-full py-3 border-1 border-dashed border-400 text-gray-600 border-round-lg hover:border-blue-600 hover:text-blue-700">
               <span class="material-icons create-icon">add_circle</span>
               Create New Customer
             </button>
@@ -392,35 +370,20 @@ onMounted(() => {
         <form v-else @submit.prevent="handleSubmit" class="customer-form">
           <div class="grid form-grid gap-6">
             <template v-for="field in visibleFields" :key="field.id">
-              <div v-if="!field.id.startsWith('vehicle')"
-                   :class="{ 'form-field-full': field.type === 'multiselect' }">
+              <div v-if="!field.id.startsWith('vehicle')" :class="{ 'form-field-full': field.type === 'multiselect' }">
                 <label :for="field.id" class="block text-sm font-medium form-label mb-1">
                   {{ field.label }}
                   <span v-if="field.required" class="required-asterisk">*</span>
                 </label>
 
                 <!-- Text Input -->
-                <input v-if="field.type === 'text' || field.type === 'email' || field.type === 'tel' || field.type === 'number'"
-                       v-model="formData[field.id]"
-                       :type="field.type"
-                       :id="field.id"
-                       :required="field.required"
-                       class="sap-input">
+                <InputText v-if="field.type === 'text' || field.type === 'email' || field.type === 'tel' || field.type === 'number'" v-model="formData[field.id]" :type="field.type" :id="field.id" :required="field.required" class="sap-input" />
 
                 <!-- Date Input -->
-                <input v-else-if="field.type === 'date'"
-                       v-model="formData[field.id]"
-                       type="date"
-                       :id="field.id"
-                       :required="field.required"
-                       class="sap-input">
+                <Calendar v-else-if="field.type === 'date'" showIcon :showOnFocus="false" v-model="formData[field.id]" :id="field.id" :required="field.required" class="sap-input w-10rem" />
 
                 <!-- Select Input -->
-                <select v-else-if="field.type === 'select'"
-                        v-model="formData[field.id]"
-                        :id="field.id"
-                        :required="field.required"
-                        class="sap-input">
+                <select v-else-if="field.type === 'select'" v-model="formData[field.id]" :id="field.id" :required="field.required" class="sap-input p-2 border-1 border-300 border-round-lg">
                   <option value="">Select {{ field.label }}</option>
                   <!-- Add options based on field -->
                 </select>
@@ -432,9 +395,7 @@ onMounted(() => {
           <div class="border-top pt-4 vehicles-section">
             <div class="flex align-items-center justify-content-between mb-4">
               <h3 class="text-lg font-medium">Vehicles</h3>
-              <button type="button"
-                      @click="showVehicleForm = true"
-                      class="px-3 add-vehicle-btn">
+              <button type="button" @click="showVehicleForm = true" class="px-3 add-vehicle-btn cursor-pointer">
                 <span class="material-icons add-vehicle-icon">add</span>
                 Add Vehicle
               </button>
@@ -442,20 +403,14 @@ onMounted(() => {
 
             <!-- Vehicles List -->
             <div class="vehicles-list">
-              <div v-for="(vehicle, index) in formData.vehicles"
-                   :key="index"
-                   class="p-3 border vehicle-item">
+              <div v-for="(vehicle, index) in formData.vehicles" :key="index" class="p-3 border vehicle-item">
                 <div class="flex align-items-center justify-content-between mb-2">
                   <span class="font-medium text-blue-600">{{ vehicle.plateNo }}</span>
                   <div class="flex align-items-center vehicle-actions">
-                    <button type="button"
-                            @click="editVehicle(index)"
-                            class="vehicle-edit-btn">
+                    <button type="button" @click="editVehicle(index)" class="vehicle-edit-btn">
                       <span class="material-icons text-sm">edit</span>
                     </button>
-                    <button type="button"
-                            @click="removeVehicle(index)"
-                            class="vehicle-delete-btn">
+                    <button type="button" @click="removeVehicle(index)" class="vehicle-delete-btn">
                       <span class="material-icons text-sm">delete</span>
                     </button>
                   </div>
@@ -468,73 +423,58 @@ onMounted(() => {
 
           <!-- Form Actions -->
           <div class="flex justify-content-end form-actions pt-6">
-            <button type="button"
-                    @click="showNewCustomerForm = false"
-                    class="px-4 py-2 border form-back-btn">
-              Back to Search
-            </button>
-            <button type="submit"
-                    class="px-4 py-2 form-submit-btn">
-              Save Customer
-            </button>
+            <button type="button" @click="showNewCustomerForm = false" class="px-4 py-2 border-200 cursor-pointer form-back-btn">Back to Search</button>
+            <button type="submit" class="px-4 py-2 cursor-pointer form-submit-btn">Save Customer</button>
           </div>
         </form>
       </div>
     </div>
 
     <!-- Vehicle Form Dialog -->
-    <div v-if="showVehicleForm" 
-         class="fixed vehicle-dialog-overlay">
+    <div v-if="showVehicleForm" class="fixed vehicle-dialog-overlay">
       <div class="bg-white vehicle-dialog p-6">
         <div class="flex align-items-center justify-content-between mb-6">
-          <h3 class="text-xl font-semibold">
-            {{ editingVehicleIndex !== null ? 'Edit' : 'Add' }} Vehicle
-          </h3>
-          <button @click="closeVehicleForm" class="p-2 dialog-close-btn">
+          <h3 class="text-xl font-semibold">{{ editingVehicleIndex !== null ? 'Edit' : 'Add' }} Vehicle</h3>
+          <Button text @click="closeVehicleForm" class="p-2 dialog-close-btn">
             <span class="material-icons">close</span>
-          </button>
+          </Button>
         </div>
 
-        <form @submit.prevent="addVehicle" class="vehicle-form">
-          <div class="grid vehicle-form-grid gap-4">
+        <form @submit.prevent="addVehicle" class="flex flex-column gap-4">
+          <div class="flex gap-4">
             <div>
               <label class="block text-sm font-medium mb-1">Plate Number</label>
-              <input v-model="vehicleForm.plateNo" required type="text" class="sap-input">
+              <InputText v-model="vehicleForm.plateNo" required type="text" class="sap-input" />
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">Year</label>
-              <input v-model="vehicleForm.year" required type="text" class="sap-input">
+              <InputText v-model="vehicleForm.year" required type="text" class="sap-input" />
             </div>
           </div>
-          <div class="grid vehicle-form-grid gap-4">
+          <div class="flex gap-4">
             <div>
               <label class="block text-sm font-medium mb-1">Make</label>
-              <input v-model="vehicleForm.make" required type="text" class="sap-input">
+              <InputText v-model="vehicleForm.make" required type="text" class="sap-input" />
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">Model</label>
-              <input v-model="vehicleForm.model" required type="text" class="sap-input">
+              <InputText v-model="vehicleForm.model" required type="text" class="sap-input" />
             </div>
           </div>
-          <div>
-            <label class="block text-sm font-medium mb-1">VIN</label>
-            <input v-model="vehicleForm.vin" required type="text" class="sap-input">
-          </div>
-          <div>
-            <label class="block text-sm font-medium mb-1">Notes</label>
-            <textarea v-model="vehicleForm.notes" rows="2" class="sap-input"></textarea>
+          <div class="flex gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-1">VIN</label>
+              <InputText v-model="vehicleForm.vin" required type="text" class="sap-input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Notes</label>
+              <textarea v-model="vehicleForm.notes" rows="2" class="sap-input"></textarea>
+            </div>
           </div>
 
           <div class="flex justify-content-end vehicle-form-actions pt-4">
-            <button type="button"
-                    @click="closeVehicleForm"
-                    class="px-4 py-2 border vehicle-cancel-btn">
-              Cancel
-            </button>
-            <button type="submit"
-                    class="px-4 py-2 vehicle-save-btn">
-              {{ editingVehicleIndex !== null ? 'Update' : 'Add' }} Vehicle
-            </button>
+            <button type="button" @click="closeVehicleForm" class="px-4 py-2 border vehicle-cancel-btn">Cancel</button>
+            <button type="submit" class="px-4 py-2 vehicle-save-btn">{{ editingVehicleIndex !== null ? 'Update' : 'Add' }} Vehicle</button>
           </div>
         </form>
       </div>
@@ -807,7 +747,7 @@ onMounted(() => {
 .vehicle-dialog {
   border-radius: 0.75rem;
   width: 100%;
-  max-width: 32rem;
+  max-width: 40rem;
 }
 
 .vehicle-form {
