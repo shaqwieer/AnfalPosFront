@@ -11,7 +11,7 @@ const terminalInfo = {
   }
 }
 </script>
-
+ 
 <template>
   <div class="terminal-bar text-white flex align-items-center px-4 text-sm">
     <!-- Mobile View (Stacked) -->
@@ -48,7 +48,7 @@ const terminalInfo = {
 <style scoped>
 .terminal-bar {
   background-color: #1f2937;
-  height: 2rem;
+  height: 2.5rem;
   border-top: 1px solid #374151;
 }
 

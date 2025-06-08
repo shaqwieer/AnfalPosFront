@@ -10,5 +10,23 @@ export default defineConfig({
         alias: {
             '@': fileURLToPath(new URL('./src', import.meta.url))
         }
-    }    
+    },
+    build: {
+        chunkSizeWarningLimit: 1600,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    'vendor': ['vue', 'vue-router', 'pinia'],
+                }
+            }
+        }
+    },
+    optimizeDeps: {
+        exclude: ['@fullcalendar/core']
+    },
+    server: {
+        hmr: {
+            overlay: false
+        }
+    }
 });
