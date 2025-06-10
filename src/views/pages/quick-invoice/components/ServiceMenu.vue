@@ -120,7 +120,7 @@ const formatPrice = (price: number): string => {
 </script>
 
 <template>
-  <div class="h-full">
+  <div class="h-full mt-3">
     <div class="sap-card h-full border-round">
       <!-- Search Bar -->
       <div class="p-4 border-bottom" style="border-color: var(--sap-border)">
@@ -130,7 +130,7 @@ const formatPrice = (price: number): string => {
         </div>
 
         <!-- Categories with View Toggle -->
-        <div class="bg-gray-100 border-round mt-6">
+        <div class="bg-gray-100 border-round mt-3">
           <div class="flex align-items-center justify-content-between p-2">
             <div class="flex flex-nowrap category-pills overflow-x-auto">
               <button
