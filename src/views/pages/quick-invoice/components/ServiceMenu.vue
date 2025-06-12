@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useOrderStore } from '@/stores/orderStore.ts';
-import { useCompanyStore } from '@/stores/companyStore.ts';
+import { useOrderStore } from '../../../../stores/orderStore.ts';
+import { useCompanyStore } from '../../../../stores/companyStore.ts';
 
 const searchQuery = ref('');
 const isCardView = ref(true);
