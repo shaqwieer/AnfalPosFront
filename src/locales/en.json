@@ -793,7 +793,10 @@
     "excelReportsDescription": "Export Excel Reports",
     "reports": "Reports",
     "salesExcelReportDescription": "Complete invoice line items with customer and branch details",
-    "salesExcelReport": "Invoice Details Report"
+    "salesExcelReport": "Invoice Details Report",
+    "allReports": "All",
+    "totalReports": "Total Reports ",
+    "report": "Report"
   },
   "page": {
     "configHeader": "Page Configuration",
@@ -832,7 +835,7 @@
       "routeFormat": "The route must start with '/'."
     }
   },
-    "transactions": {
+  "transactions": {
     "header": "POS Transactions",
     "description": "View and manage customer transactions including invoices, payments, and expenses",
     "invoices": "Invoices",
@@ -900,6 +903,4 @@
     "invoiceStatusApproved": "Approved",
     "invoiceStatusRejected": "Rejected"
   }
-  
-  
 }

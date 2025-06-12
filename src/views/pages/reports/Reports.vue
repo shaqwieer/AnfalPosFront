@@ -10,256 +10,264 @@ const mainStore = useMainStore();
 const loading = ref(false);
 const rtl = computed(() => mainStore.isRTL);
 
-// Report categories
-const reportCategories = ref([
+// Available reports configuration with format-specific styling
+const reports = ref([
+  // PDF Reports
   {
-    id: 'pdf-reports',
-    name: t('reports.pdfReports'),
+    id: 'aging-report',
+    name: t('reports.agingReport'),
     icon: 'pi-file-pdf',
-    color: 'bg-red-100',
-    textColor: 'text-red-700',
-    description: t('reports.pdfReportsDescription')
+    format: 'PDF',
+    formatColor: 'bg-red-100',
+    formatTextColor: 'text-red-700',
+    cardColor: 'bg-blue-50',
+    cardTextColor: 'text-blue-700',
+    cardBorder: 'border-blue-200',
+    description: t('reports.agingReportDescription'),
+    endpoint: '/Invoices/GenerateAgingReport',
+    requestMethod: 'POST',
+    responseType: 'blob',
+    fileExtension: 'pdf',
+    contentType: 'application/pdf',
+    filters: [
+      { 
+        type: 'date', 
+        name: 'asOfDate', 
+        label: t('reports.asOfDate'),
+        required: true,
+        default: new Date() 
+      },
+      { 
+        type: 'dropdown', 
+        name: 'branchId', 
+        label: t('reports.branch'),
+        required: true,
+        endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
+        optionLabel: 'name',
+        optionValue: 'id'
+      }
+    ]
   },
   {
-    id: 'excel-reports',
-    name: t('reports.excelReports'),
+    id: 'item-availability-report',
+    name: t('reports.itemAvailabilityReport'),
+    icon: 'pi-file-pdf',
+    format: 'PDF',
+    formatColor: 'bg-red-100',
+    formatTextColor: 'text-red-700',
+    cardColor: 'bg-green-50',
+    cardTextColor: 'text-green-700',
+    cardBorder: 'border-green-200',
+    description: t('reports.itemAvailabilityReportDescription'),
+    endpoint: '/Items/GenerateItemAvailabiltyReport',
+    requestMethod: 'POST',
+    responseType: 'blob',
+    fileExtension: 'pdf',
+    contentType: 'application/pdf',
+    filters: [
+      { 
+        type: 'dropdown', 
+        name: 'branchId', 
+        label: t('reports.branch'),
+        required: true,
+        endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
+        optionLabel: 'name',
+        optionValue: 'id'
+      }
+    ]
+  },
+  {
+    id: 'sales-rep-cash-report',
+    name: t('reports.salesRepCashReport'),
+    icon: 'pi-file-pdf',
+    format: 'PDF',
+    formatColor: 'bg-red-100',
+    formatTextColor: 'text-red-700',
+    cardColor: 'bg-orange-50',
+    cardTextColor: 'text-orange-700',
+    cardBorder: 'border-orange-200',
+    description: t('reports.salesRepCashReportDescription'),
+    endpoint: '/shiftSessions/GenerateSalesRepWithCashReport',
+    requestMethod: 'POST',
+    responseType: 'blob',
+    fileExtension: 'pdf',
+    contentType: 'application/pdf',
+    filters: [
+      { 
+        type: 'multiselect', 
+        name: 'branchIds', 
+        label: t('reports.branches'),
+        required: true,
+        endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
+        optionLabel: 'name',
+        optionValue: 'id'
+      }
+    ]
+  },
+  {
+    id: 'item-usability-report',
+    name: t('reports.itemUsabilityReport'),
+    icon: 'pi-file-pdf',
+    format: 'PDF',
+    formatColor: 'bg-red-100',
+    formatTextColor: 'text-red-700',
+    cardColor: 'bg-purple-50',
+    cardTextColor: 'text-purple-700',
+    cardBorder: 'border-purple-200',
+    description: t('reports.itemUsabilityReportDescription'),
+    endpoint: '/Invoices/GenerateItemUsabilityFor',
+    requestMethod: 'POST',
+    responseType: 'blob',
+    fileExtension: 'pdf',
+    contentType: 'application/pdf',
+    filters: [
+      {
+        type: 'daterange',
+        startDate: 'fromDate',
+        endDate: 'toDate',
+        label: t('reports.dateRange'),
+        required: true,
+        default: {
+          startDate: new Date(new Date().setDate(new Date().getDate() - 7)),
+          endDate: new Date()
+        }
+      },
+      { 
+        type: 'dropdown', 
+        name: 'branchId', 
+        label: t('reports.branch'),
+        required: true,
+        endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
+        optionLabel: 'name',
+        optionValue: 'id'
+      }
+    ]
+  },
+  {
+    id: 'collection-report',
+    name: t('reports.collectionReport'),
+    icon: 'pi-file-pdf',
+    format: 'PDF',
+    formatColor: 'bg-red-100',
+    formatTextColor: 'text-red-700',
+    cardColor: 'bg-teal-50',
+    cardTextColor: 'text-teal-700',
+    cardBorder: 'border-teal-200',
+    description: t('reports.collectionReportDescription'),
+    endpoint: '/Invoices/GenerateCollectionPdf',
+    requestMethod: 'POST',
+    responseType: 'blob',
+    fileExtension: 'pdf',
+    contentType: 'application/pdf',
+    filters: [
+      {
+        type: 'daterange',
+        startDate: 'fromDate',
+        endDate: 'toDate',
+        label: t('reports.dateRange'),
+        required: false,
+        default: {
+          startDate: null,
+          endDate: null
+        }
+      },
+      { 
+        type: 'dropdown', 
+        name: 'branchId', 
+        label: t('reports.branch'),
+        required: false,
+        endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
+        lookupKey: 'branches',
+        optionLabel: 'name',
+        optionValue: 'id'
+      },
+      { 
+        type: 'dropdown', 
+        name: 'paymentMethodId', 
+        label: t('reports.paymentMethod'),
+        required: false,
+        endpoint: '/PaymentMethods',
+        lookupKey: 'paymentMethods',
+        optionLabel: 'name',
+        optionValue: 'id'
+      },
+      { 
+        type: 'dropdown', 
+        name: 'sessionId', 
+        label: t('reports.sessionNumber'),
+        required: false,
+        endpoint: '/Payments/GenerateCollectionPdfLookup',
+        lookupKey: 'sessionNumbers',
+        optionLabel: 'id',
+        optionValue: 'id'
+      }
+    ]
+  },
+  // Excel Reports
+  {
+    id: 'sales-excel-report',
+    name: t('reports.salesExcelReport'),
     icon: 'pi-file-excel',
-    color: 'bg-green-100',
-    textColor: 'text-green-700',
-    description: t('reports.excelReportsDescription')
+    format: 'Excel',
+    formatColor: 'bg-green-100',
+    formatTextColor: 'text-green-700',
+    cardColor: 'bg-emerald-50',
+    cardTextColor: 'text-emerald-700',
+    cardBorder: 'border-emerald-200',
+    description: t('reports.salesExcelReportDescription'),
+    endpoint: '/Invoices/GetSalesAsExcel',
+    requestMethod: 'POST',
+    responseType: 'blob',
+    fileExtension: 'xlsx',
+    contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    filters: [
+      {
+        type: 'daterange',
+        startDate: 'fromDate',
+        endDate: 'toDate',
+        label: t('reports.dateRange'),
+        required: true,
+        default: {
+          startDate: new Date(new Date().setDate(new Date().getDate() - 30)),
+          endDate: new Date()
+        }
+      },
+      { 
+        type: 'multiselect', 
+        name: 'branchIds', 
+        label: t('reports.branches'),
+        required: true,
+        endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
+        optionLabel: 'name',
+        optionValue: 'id'
+      }
+    ]
   }
 ]);
 
-// Available reports configuration
-const reports = ref({
-  'pdf-reports': [
-    {
-      id: 'aging-report',
-      name: t('reports.agingReport'),
-      icon: 'pi-file-pdf',
-      color: 'bg-blue-100',
-      textColor: 'text-blue-700',
-      description: t('reports.agingReportDescription'),
-      endpoint: '/Invoices/GenerateAgingReport',
-      requestMethod: 'POST',
-      responseType: 'blob',
-      fileExtension: 'pdf',
-      contentType: 'application/pdf',
-      filters: [
-        { 
-          type: 'date', 
-          name: 'asOfDate', 
-          label: t('reports.asOfDate'),
-          required: true,
-          default: new Date() 
-        },
-        { 
-          type: 'dropdown', 
-          name: 'branchId', 
-          label: t('reports.branch'),
-          required: true,
-          endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
-          optionLabel: 'name',
-          optionValue: 'id'
-        }
-      ]
-    },
-    {
-      id: 'item-availability-report',
-      name: t('reports.itemAvailabilityReport'),
-      icon: 'pi-box',
-      color: 'bg-green-100',
-      textColor: 'text-green-700',
-      description: t('reports.itemAvailabilityReportDescription'),
-      endpoint: '/Items/GenerateItemAvailabiltyReport',
-      requestMethod: 'POST',
-      responseType: 'blob',
-      fileExtension: 'pdf',
-      contentType: 'application/pdf',
-      filters: [
-        { 
-          type: 'dropdown', 
-          name: 'branchId', 
-          label: t('reports.branch'),
-          required: true,
-          endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
-          optionLabel: 'name',
-          optionValue: 'id'
-        }
-      ]
-    },
-    {
-      id: 'sales-rep-cash-report',
-      name: t('reports.salesRepCashReport'),
-      icon: 'pi-chart-line',
-      color: 'bg-orange-100',
-      textColor: 'text-orange-700',
-      description: t('reports.salesRepCashReportDescription'),
-      endpoint: '/shiftSessions/GenerateSalesRepWithCashReport',
-      requestMethod: 'POST',
-      responseType: 'blob',
-      fileExtension: 'pdf',
-      contentType: 'application/pdf',
-      filters: [
-        { 
-          type: 'multiselect', 
-          name: 'branchIds', 
-          label: t('reports.branches'),
-          required: true,
-          endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
-          optionLabel: 'name',
-          optionValue: 'id'
-        }
-      ]
-    },
-    {
-      id: 'item-usability-report',
-      name: t('reports.itemUsabilityReport'),
-      icon: 'pi-chart-bar',
-      color: 'bg-purple-100',
-      textColor: 'text-purple-700',
-      description: t('reports.itemUsabilityReportDescription'),
-      endpoint: '/Invoices/GenerateItemUsabilityFor',
-      requestMethod: 'POST',
-      responseType: 'blob',
-      fileExtension: 'pdf',
-      contentType: 'application/pdf',
-      filters: [
-        {
-          type: 'daterange',
-          startDate: 'fromDate',
-          endDate: 'toDate',
-          label: t('reports.dateRange'),
-          required: true,
-          default: {
-            startDate: new Date(new Date().setDate(new Date().getDate() - 7)),
-            endDate: new Date()
-          }
-        },
-        { 
-          type: 'dropdown', 
-          name: 'branchId', 
-          label: t('reports.branch'),
-          required: true,
-          endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
-          optionLabel: 'name',
-          optionValue: 'id'
-        }
-      ]
-    },
-    {
-      id: 'collection-report',
-      name: t('reports.collectionReport'),
-      icon: 'pi-money-bill',
-      color: 'bg-teal-100',
-      textColor: 'text-teal-700',
-      description: t('reports.collectionReportDescription'),
-      endpoint: '/Invoices/GenerateCollectionPdf',
-      requestMethod: 'POST',
-      responseType: 'blob',
-      fileExtension: 'pdf',
-      contentType: 'application/pdf',
-      filters: [
-        {
-          type: 'daterange',
-          startDate: 'fromDate',
-          endDate: 'toDate',
-          label: t('reports.dateRange'),
-          required: false,
-          default: {
-            startDate: null,
-            endDate: null
-          }
-        },
-        { 
-          type: 'dropdown', 
-          name: 'branchId', 
-          label: t('reports.branch'),
-          required: false,
-          endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
-          lookupKey: 'branches',
-          optionLabel: 'name',
-          optionValue: 'id'
-        },
-        { 
-          type: 'dropdown', 
-          name: 'paymentMethodId', 
-          label: t('reports.paymentMethod'),
-          required: false,
-          endpoint: '/PaymentMethods',
-          lookupKey: 'paymentMethods',
-          optionLabel: 'name',
-          optionValue: 'id'
-        },
-        { 
-          type: 'dropdown', 
-          name: 'sessionId', 
-          label: t('reports.sessionNumber'),
-          required: false,
-          endpoint: '/Payments/GenerateCollectionPdfLookup',
-          lookupKey: 'sessionNumbers',
-          optionLabel: 'id',
-          optionValue: 'id'
-        }
-      ]
-    }
-  ],
-  'excel-reports': [
-    {
-      id: 'sales-excel-report',
-      name: t('reports.salesExcelReport'),
-      icon: 'pi-chart-line',
-      color: 'bg-green-100',
-      textColor: 'text-green-700',
-      description: t('reports.salesExcelReportDescription'),
-      endpoint: '/Invoices/GetSalesAsExcel',
-      requestMethod: 'POST',
-      responseType: 'blob',
-      fileExtension: 'xlsx',
-      contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      filters: [
-        {
-          type: 'daterange',
-          startDate: 'fromDate',
-          endDate: 'toDate',
-          label: t('reports.dateRange'),
-          required: true,
-          default: {
-            startDate: new Date(new Date().setDate(new Date().getDate() - 30)),
-            endDate: new Date()
-          }
-        },
-        { 
-          type: 'multiselect', 
-          name: 'branchIds', 
-          label: t('reports.branches'),
-          required: true,
-          endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
-          optionLabel: 'name',
-          optionValue: 'id'
-        }
-      ]
-    }
-  ]
+// Filter state
+const formatFilter = ref('all'); // 'all', 'pdf', 'excel'
+
+// Computed filtered reports
+const filteredReports = computed(() => {
+  if (formatFilter.value === 'all') return reports.value;
+  return reports.value.filter(report => 
+    formatFilter.value === 'pdf' ? report.format === 'PDF' : report.format === 'Excel'
+  );
 });
 
-// Current view state
-const currentCategory = ref(null);
+// Report stats
+const reportStats = computed(() => ({
+  total: reports.value.length,
+  pdf: reports.value.filter(r => r.format === 'PDF').length,
+  excel: reports.value.filter(r => r.format === 'Excel').length
+}));
+
+// Dialog state
 const selectedReport = ref(null);
 const filterValues = reactive({});
 const filterOptions = reactive({});
 const reportDialogVisible = ref(false);
-
-// Navigation
-const selectCategory = (category) => {
-  currentCategory.value = category;
-};
-
-const goBack = () => {
-  currentCategory.value = null;
-  selectedReport.value = null;
-  reportDialogVisible.value = false;
-};
 
 const selectReport = (report) => {
   selectedReport.value = report;
@@ -427,69 +435,132 @@ onMounted(() => {
     <!-- Header Section -->
     <div class="flex flex-column row-gap-5 px-3 lg:flex-row justify-content-between mb-5 lg:mb-0 w-full">
       <div class="lg:col-8 px-0 pt-2">
-        <div class="flex align-items-center gap-3 mb-3" v-if="currentCategory">
-          <Button icon="pi pi-arrow-left" severity="secondary" text @click="goBack" />
-          <h3 class="text-700 text-3xl font-semibold m-0">{{ currentCategory.name }}</h3>
-        </div>
-        <h3 v-else class="text-700 text-3xl font-semibold">{{ t('reports.header') }}</h3>
-        <p class="text-500 text-lg">
-          {{ currentCategory ? currentCategory.description : t('reports.description') }}
-        </p>
+        <h3 class="text-700 text-3xl font-semibold">{{ t('reports.header') }}</h3>
+        <p class="text-500 text-lg">{{ t('reports.description') }}</p>
       </div>
-    </div>
-
-    <!-- Category Selection -->
-    <div v-if="!currentCategory" class="grid" style="min-width: 100%">
-      <div v-for="category in reportCategories" :key="category.id" class="col-12 lg:col-6">
-        <div class="card mb-4 cursor-pointer shadow-2 hover:shadow-5 transition-duration-200" @click="selectCategory(category)">
-          <div class="flex flex-column p-6 h-full">
-            <div class="flex align-items-center mb-4">
-              <div :class="[category.color, 'w-4rem h-4rem border-circle flex align-items-center justify-content-center mr-4']">
-                <i :class="['pi', category.icon, category.textColor, 'text-2xl']"></i>
-              </div>
-              <h3 :class="['font-semibold text-2xl m-0', category.textColor]">{{ category.name }}</h3>
+      
+      <!-- Report Stats & Filter -->
+      <div class="lg:col-4 px-0 pt-2">
+        <div class="flex flex-column gap-3">
+          <!-- Stats -->
+          <div class="flex gap-2 justify-content-end">
+            <div class="flex align-items-center gap-2 px-3 py-2 bg-gray-100 border-round">
+              <i class="pi pi-chart-bar text-primary"></i>
+              <span class="text-sm font-medium">{{ reportStats.total }} {{ t('reports.totalReports') }}</span>
             </div>
-            
-            <p class="line-height-3 text-500 my-3 text-lg">{{ category.description }}</p>
-            
-            <div class="flex justify-content-between mt-auto align-items-center">
-              <Tag :class="[category.color, category.textColor, 'font-semibold text-sm']">
-                {{ reports[category.id].length }} {{ t('reports.reports') }}
-              </Tag>
-              <Button icon="pi pi-arrow-right" :class="[category.textColor, 'p-button-rounded p-button-text']" />
+          </div>
+          
+          <!-- Format Filter -->
+          <div class="flex justify-content-end">
+            <div class="filter-button-group flex border-round-lg overflow-hidden border-1 border-gray-300">
+              <button 
+                @click="formatFilter = 'all'"
+                :class="[
+                  'filter-btn px-3 py-2 border-none cursor-pointer transition-all transition-duration-200 text-sm font-medium',
+                  formatFilter === 'all' ? 'bg-primary text-white' : 'bg-white text-gray-700 hover:bg-gray-50'
+                ]"
+              >
+                <i class="pi pi-list mr-2"></i>
+                {{ t('reports.allReports') }} ({{ reportStats.total }})
+              </button>
+              
+              <button 
+                @click="formatFilter = 'pdf'"
+                :class="[
+                  'filter-btn px-3 py-2 border-none cursor-pointer transition-all transition-duration-200 text-sm font-medium border-left-1 border-gray-300',
+                  formatFilter === 'pdf' ? 'bg-red-500 text-white' : 'bg-white text-gray-700 hover:bg-red-50'
+                ]"
+              >
+                <i class="pi pi-file-pdf mr-2 text-red-600"></i>
+                PDF ({{ reportStats.pdf }})
+              </button>
+              
+              <button 
+                @click="formatFilter = 'excel'"
+                :class="[
+                  'filter-btn px-3 py-2 border-none cursor-pointer transition-all transition-duration-200 text-sm font-medium border-left-1 border-gray-300',
+                  formatFilter === 'excel' ? 'bg-green-500 text-white' : 'bg-white text-gray-700 hover:bg-green-50'
+                ]"
+              >
+                <i class="pi pi-file-excel mr-2 text-green-600"></i>
+                Excel ({{ reportStats.excel }})
+              </button>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Reports Grid (when category is selected) -->
-    <div v-else class="grid" style="min-width: 100%">
-      <div v-for="report in reports[currentCategory.id]" :key="report.id" class="col-12 lg:col-6 xl:col-4">
-        <div class="card mb-4 cursor-pointer shadow-2 hover:shadow-5 transition-duration-200" @click="selectReport(report)">
+    <!-- Reports Grid -->
+    <div class="grid" style="min-width: 100%">
+      <div v-for="report in filteredReports" :key="report.id" class="col-12 lg:col-6 xl:col-4">
+        <div 
+          :class="[
+            'card mb-4 cursor-pointer shadow-2 hover:shadow-5 transition-duration-200 border-2',
+            report.cardColor,
+            report.cardBorder
+          ]" 
+          @click="selectReport(report)"
+        >
           <div class="flex flex-column p-4 h-full">
-            <div class="flex align-items-center mb-4">
-              <div :class="[report.color, 'w-3rem h-3rem border-circle flex align-items-center justify-content-center mr-3']">
-                <i :class="['pi', report.icon, report.textColor, 'text-xl']"></i>
+            <!-- Header with Format Badge -->
+            <div class="flex justify-content-between align-items-start mb-3">
+              <div class="flex align-items-center">
+                <div :class="[report.cardColor, 'w-3rem h-3rem border-circle flex align-items-center justify-content-center mr-3 border-2', report.cardBorder]">
+                  <i :class="['pi', report.icon, report.cardTextColor, 'text-xl']"></i>
+                </div>
+                <div>
+                  <h3 :class="['font-semibold text-lg m-0', report.cardTextColor]">{{ report.name }}</h3>
+                </div>
               </div>
-              <h3 :class="['font-semibold text-xl m-0', report.textColor]">{{ report.name }}</h3>
+              
+              <!-- Format Badge -->
+              <Tag 
+                :class="[report.formatColor, report.formatTextColor, 'font-bold text-xs']"
+                :icon="`pi ${report.icon}`"
+              >
+                {{ report.format }}
+              </Tag>
             </div>
             
-            <p class="line-height-3 text-500 my-3">{{ report.description }}</p>
+            <!-- Description -->
+            <p class="line-height-3 text-600 my-3 text-sm flex-1">{{ report.description }}</p>
             
-            <div class="flex justify-content-between mt-auto">
-              <div class="flex gap-2">
-                <Tag v-for="(filter, index) in report.filters.slice(0, 2)" :key="index" :class="[report.color, report.textColor, 'font-semibold']">
+            <!-- Footer with Filter Tags -->
+            <div class="flex justify-content-between align-items-end mt-auto">
+              <div class="flex gap-1 flex-wrap">
+                <Tag 
+                  v-for="(filter, index) in report.filters.slice(0, 2)" 
+                  :key="index" 
+                  class="bg-white text-gray-700 font-medium text-xs border-1 border-gray-300"
+                >
                   {{ filter.label }}
                 </Tag>
-                <Tag v-if="report.filters.length > 2" :class="[report.color, report.textColor, 'font-semibold']">
+                <Tag 
+                  v-if="report.filters.length > 2" 
+                  class="bg-white text-gray-700 font-medium text-xs border-1 border-gray-300"
+                >
                   +{{ report.filters.length - 2 }}
                 </Tag>
               </div>
-              <Button icon="pi pi-download" :class="[report.textColor, 'p-button-rounded p-button-text']" />
+              
+              <Button 
+                icon="pi pi-download" 
+                :class="[report.cardTextColor, 'p-button-rounded p-button-text']" 
+                size="small"
+              />
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div v-if="filteredReports.length === 0" class="col-12">
+      <div class="text-center py-8">
+        <i class="pi pi-search text-4xl text-gray-400 mb-3"></i>
+        <p class="text-gray-500 text-xl mb-2">{{ t('reports.noReportsFound') }}</p>
+        <p class="text-gray-400">{{ t('reports.tryDifferentFilter') }}</p>
       </div>
     </div>
   </div>
@@ -497,6 +568,14 @@ onMounted(() => {
   <!-- Report Parameter Dialog -->
   <Dialog v-model:visible="reportDialogVisible" :modal="true" :closable="true" :style="{width: '500px'}" :header="selectedReport?.name">
     <div v-if="selectedReport" class="flex flex-column gap-3 p-3">
+      <!-- Format Indicator in Dialog -->
+      <div class="flex align-items-center gap-2 mb-3 p-3 border-round" :class="selectedReport.formatColor">
+        <i :class="['pi', selectedReport.icon, selectedReport.formatTextColor, 'text-lg']"></i>
+        <span :class="['font-semibold', selectedReport.formatTextColor]">
+          {{ selectedReport.format }} {{ t('reports.report') }}
+        </span>
+      </div>
+      
       <div v-for="filter in selectedReport.filters" :key="filter.name" class="field w-full">
         <label :for="filter.name" class="block font-medium mb-2" :class="{ 'required': filter.required }">
           {{ filter.label }}
@@ -579,12 +658,10 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- <template #footer> -->
       <div class="flex justify-content-end gap-2">
         <Button :label="t('reports.cancel')" severity="secondary" outlined @click="reportDialogVisible = false" />
         <Button :label="t('reports.generate')" :loading="loading" @click="generateReport()" :disabled="!isFormValid" />
       </div>
-    <!-- </template> -->
   </Dialog>
 </template>
 
@@ -618,5 +695,32 @@ onMounted(() => {
 
 :deep(.p-calendar .p-inputtext) {
   width: 100%;
+}
+
+.filter-button-group {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.filter-btn {
+  white-space: nowrap;
+  min-width: fit-content;
+}
+
+.filter-btn:first-child {
+  border-top-left-radius: 0.5rem;
+  border-bottom-left-radius: 0.5rem;
+}
+
+.filter-btn:last-child {
+  border-top-right-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+}
+
+.filter-btn:hover {
+  transform: translateY(-1px);
+}
+
+:deep(.p-tag) {
+  font-size: 0.75rem;
 }
 </style>

@@ -779,7 +779,10 @@
     "excelReportsDescription": "استخراج تقارير Excel",
     "reports": "تقارير",
     "salesExcelReport": "تقرير المبيعات",
-    "salesExcelReportDescription": "استخراج الاصناف بالاضافة لبيانات العميل والمندوب "
+    "salesExcelReportDescription": "استخراج الاصناف بالاضافة لبيانات العميل والمندوب ",
+    "allReports": "الكل",
+    "totalReports": "مجموع التقارير ",
+    "report": "تقرير"
   },
   "page": {
     "configHeader": "إعداد الصفحات",
@@ -818,7 +821,7 @@
       "routeFormat": "يجب أن يبدأ المسار بـ '/'."
     }
   },
-   "transactions": {
+  "transactions": {
     "header": "معاملات نقاط البيع",
     "description": "عرض وإدارة معاملات العملاء بما في ذلك الفواتير والمدفوعات والمصروفات",
     "invoices": "الفواتير",
