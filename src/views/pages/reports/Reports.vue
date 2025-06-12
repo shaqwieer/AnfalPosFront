@@ -10,172 +10,256 @@ const mainStore = useMainStore();
 const loading = ref(false);
 const rtl = computed(() => mainStore.isRTL);
 
-// Available reports configuration
-const reports = ref([
+// Report categories
+const reportCategories = ref([
   {
-    id: 'aging-report',
-    name: t('reports.agingReport'),
+    id: 'pdf-reports',
+    name: t('reports.pdfReports'),
     icon: 'pi-file-pdf',
-    color: 'bg-blue-100',
-    textColor: 'text-blue-700',
-    description: t('reports.agingReportDescription'),
-    endpoint: '/Invoices/GenerateAgingReport',
-    requestMethod: 'POST',
-    filters: [
-      { 
-        type: 'date', 
-        name: 'asOfDate', 
-        label: t('reports.asOfDate'),
-        required: true,
-        default: new Date() 
-      },
-      { 
-        type: 'dropdown', 
-        name: 'branchId', 
-        label: t('reports.branch'),
-        required: true,
-        endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
-        optionLabel: 'name',
-        optionValue: 'id'
-      }
-    ]
+    color: 'bg-red-100',
+    textColor: 'text-red-700',
+    description: t('reports.pdfReportsDescription')
   },
   {
-    id: 'item-availability-report',
-    name: t('reports.itemAvailabilityReport'),
-    icon: 'pi-box',
+    id: 'excel-reports',
+    name: t('reports.excelReports'),
+    icon: 'pi-file-excel',
     color: 'bg-green-100',
     textColor: 'text-green-700',
-    description: t('reports.itemAvailabilityReportDescription'),
-    endpoint: '/Items/GenerateItemAvailabiltyReport',
-    requestMethod: 'POST',
-    filters: [
-      { 
-        type: 'dropdown', 
-        name: 'branchId', 
-        label: t('reports.branch'),
-        required: true,
-        endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
-        optionLabel: 'name',
-        optionValue: 'id'
-      }
-    ]
-  },
-  {
-    id: 'sales-rep-cash-report',
-    name: t('reports.salesRepCashReport'),
-    icon: 'pi-chart-line',
-    color: 'bg-orange-100',
-    textColor: 'text-orange-700',
-    description: t('reports.salesRepCashReportDescription'),
-    endpoint: '/shiftSessions/GenerateSalesRepWithCashReport',
-    requestMethod: 'POST',
-    filters: [
-      { 
-        type: 'multiselect', 
-        name: 'branchIds', 
-        label: t('reports.branches'),
-        required: true,
-        endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
-        optionLabel: 'name',
-        optionValue: 'id'
-      }
-    ]
-  },
-    // New Item Usability Report
-    {
-    id: 'item-usability-report',
-    name: t('reports.itemUsabilityReport'),
-    icon: 'pi-chart-bar',
-    color: 'bg-purple-100',
-    textColor: 'text-purple-700',
-    description: t('reports.itemUsabilityReportDescription'),
-    endpoint: '/Invoices/GenerateItemUsabilityFor',
-    requestMethod: 'POST',
-    filters: [
-      {
-        type: 'daterange',
-        startDate: 'fromDate',
-        endDate: 'toDate',
-        label: t('reports.dateRange'),
-        required: true,
-        default: {
-          startDate: new Date(new Date().setDate(new Date().getDate() - 7)),
-          endDate: new Date()
-        }
-      },
-      { 
-        type: 'dropdown', 
-        name: 'branchId', 
-        label: t('reports.branch'),
-        required: true,
-        endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
-        optionLabel: 'name',
-        optionValue: 'id'
-      }
-    ]
-  },
-  {
-    id: 'collection-report',
-    name: t('reports.collectionReport'),
-    icon: 'pi-money-bill',
-    color: 'bg-teal-100',
-    textColor: 'text-teal-700',
-    description: t('reports.collectionReportDescription'),
-    endpoint: '/Invoices/GenerateCollectionPdf',
-    requestMethod: 'POST',
-    filters: [
-      {
-        type: 'daterange',
-        startDate: 'fromDate',
-        endDate: 'toDate',
-        label: t('reports.dateRange'),
-        required: false,
-        default: {
-          startDate: null,
-          endDate: null
-        }
-      },
-      { 
-        type: 'dropdown', 
-        name: 'branchId', 
-        label: t('reports.branch'),
-        required: false,
-        endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
-        lookupKey: 'branches',
-        optionLabel: 'name',
-        optionValue: 'id'
-      },
-      { 
-        type: 'dropdown', 
-        name: 'paymentMethodId', 
-        label: t('reports.paymentMethod'),
-        required: false,
-        endpoint: '/PaymentMethods',
-        lookupKey: 'paymentMethods',
-        optionLabel: 'name',
-        optionValue: 'id'
-      },
-      { 
-        type: 'dropdown', 
-        name: 'sessionId', 
-        label: t('reports.sessionNumber'),
-        required: false,
-        endpoint: '/Payments/GenerateCollectionPdfLookup',
-        lookupKey: 'sessionNumbers',
-        optionLabel: 'id',
-        optionValue: 'id'
-      }
-    ]
+    description: t('reports.excelReportsDescription')
   }
-  // Additional report configurations can be added here
 ]);
 
-// Selected report and filter handling
+// Available reports configuration
+const reports = ref({
+  'pdf-reports': [
+    {
+      id: 'aging-report',
+      name: t('reports.agingReport'),
+      icon: 'pi-file-pdf',
+      color: 'bg-blue-100',
+      textColor: 'text-blue-700',
+      description: t('reports.agingReportDescription'),
+      endpoint: '/Invoices/GenerateAgingReport',
+      requestMethod: 'POST',
+      responseType: 'blob',
+      fileExtension: 'pdf',
+      contentType: 'application/pdf',
+      filters: [
+        { 
+          type: 'date', 
+          name: 'asOfDate', 
+          label: t('reports.asOfDate'),
+          required: true,
+          default: new Date() 
+        },
+        { 
+          type: 'dropdown', 
+          name: 'branchId', 
+          label: t('reports.branch'),
+          required: true,
+          endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
+          optionLabel: 'name',
+          optionValue: 'id'
+        }
+      ]
+    },
+    {
+      id: 'item-availability-report',
+      name: t('reports.itemAvailabilityReport'),
+      icon: 'pi-box',
+      color: 'bg-green-100',
+      textColor: 'text-green-700',
+      description: t('reports.itemAvailabilityReportDescription'),
+      endpoint: '/Items/GenerateItemAvailabiltyReport',
+      requestMethod: 'POST',
+      responseType: 'blob',
+      fileExtension: 'pdf',
+      contentType: 'application/pdf',
+      filters: [
+        { 
+          type: 'dropdown', 
+          name: 'branchId', 
+          label: t('reports.branch'),
+          required: true,
+          endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
+          optionLabel: 'name',
+          optionValue: 'id'
+        }
+      ]
+    },
+    {
+      id: 'sales-rep-cash-report',
+      name: t('reports.salesRepCashReport'),
+      icon: 'pi-chart-line',
+      color: 'bg-orange-100',
+      textColor: 'text-orange-700',
+      description: t('reports.salesRepCashReportDescription'),
+      endpoint: '/shiftSessions/GenerateSalesRepWithCashReport',
+      requestMethod: 'POST',
+      responseType: 'blob',
+      fileExtension: 'pdf',
+      contentType: 'application/pdf',
+      filters: [
+        { 
+          type: 'multiselect', 
+          name: 'branchIds', 
+          label: t('reports.branches'),
+          required: true,
+          endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
+          optionLabel: 'name',
+          optionValue: 'id'
+        }
+      ]
+    },
+    {
+      id: 'item-usability-report',
+      name: t('reports.itemUsabilityReport'),
+      icon: 'pi-chart-bar',
+      color: 'bg-purple-100',
+      textColor: 'text-purple-700',
+      description: t('reports.itemUsabilityReportDescription'),
+      endpoint: '/Invoices/GenerateItemUsabilityFor',
+      requestMethod: 'POST',
+      responseType: 'blob',
+      fileExtension: 'pdf',
+      contentType: 'application/pdf',
+      filters: [
+        {
+          type: 'daterange',
+          startDate: 'fromDate',
+          endDate: 'toDate',
+          label: t('reports.dateRange'),
+          required: true,
+          default: {
+            startDate: new Date(new Date().setDate(new Date().getDate() - 7)),
+            endDate: new Date()
+          }
+        },
+        { 
+          type: 'dropdown', 
+          name: 'branchId', 
+          label: t('reports.branch'),
+          required: true,
+          endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
+          optionLabel: 'name',
+          optionValue: 'id'
+        }
+      ]
+    },
+    {
+      id: 'collection-report',
+      name: t('reports.collectionReport'),
+      icon: 'pi-money-bill',
+      color: 'bg-teal-100',
+      textColor: 'text-teal-700',
+      description: t('reports.collectionReportDescription'),
+      endpoint: '/Invoices/GenerateCollectionPdf',
+      requestMethod: 'POST',
+      responseType: 'blob',
+      fileExtension: 'pdf',
+      contentType: 'application/pdf',
+      filters: [
+        {
+          type: 'daterange',
+          startDate: 'fromDate',
+          endDate: 'toDate',
+          label: t('reports.dateRange'),
+          required: false,
+          default: {
+            startDate: null,
+            endDate: null
+          }
+        },
+        { 
+          type: 'dropdown', 
+          name: 'branchId', 
+          label: t('reports.branch'),
+          required: false,
+          endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
+          lookupKey: 'branches',
+          optionLabel: 'name',
+          optionValue: 'id'
+        },
+        { 
+          type: 'dropdown', 
+          name: 'paymentMethodId', 
+          label: t('reports.paymentMethod'),
+          required: false,
+          endpoint: '/PaymentMethods',
+          lookupKey: 'paymentMethods',
+          optionLabel: 'name',
+          optionValue: 'id'
+        },
+        { 
+          type: 'dropdown', 
+          name: 'sessionId', 
+          label: t('reports.sessionNumber'),
+          required: false,
+          endpoint: '/Payments/GenerateCollectionPdfLookup',
+          lookupKey: 'sessionNumbers',
+          optionLabel: 'id',
+          optionValue: 'id'
+        }
+      ]
+    }
+  ],
+  'excel-reports': [
+    {
+      id: 'sales-excel-report',
+      name: t('reports.salesExcelReport'),
+      icon: 'pi-chart-line',
+      color: 'bg-green-100',
+      textColor: 'text-green-700',
+      description: t('reports.salesExcelReportDescription'),
+      endpoint: '/Invoices/GetSalesAsExcel',
+      requestMethod: 'POST',
+      responseType: 'blob',
+      fileExtension: 'xlsx',
+      contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      filters: [
+        {
+          type: 'daterange',
+          startDate: 'fromDate',
+          endDate: 'toDate',
+          label: t('reports.dateRange'),
+          required: true,
+          default: {
+            startDate: new Date(new Date().setDate(new Date().getDate() - 30)),
+            endDate: new Date()
+          }
+        },
+        { 
+          type: 'multiselect', 
+          name: 'branchIds', 
+          label: t('reports.branches'),
+          required: true,
+          endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
+          optionLabel: 'name',
+          optionValue: 'id'
+        }
+      ]
+    }
+  ]
+});
+
+// Current view state
+const currentCategory = ref(null);
 const selectedReport = ref(null);
 const filterValues = reactive({});
 const filterOptions = reactive({});
 const reportDialogVisible = ref(false);
+
+// Navigation
+const selectCategory = (category) => {
+  currentCategory.value = category;
+};
+
+const goBack = () => {
+  currentCategory.value = null;
+  selectedReport.value = null;
+  reportDialogVisible.value = false;
+};
 
 const selectReport = (report) => {
   selectedReport.value = report;
@@ -194,8 +278,8 @@ const resetFilterValues = () => {
       filterValues[filter.name] = filter.default || new Date();
     } 
     else if (filter.type === 'daterange') {
-      filterValues[filter.startDate] = filter.default?.startDate ;
-      filterValues[filter.endDate] = filter.default?.endDate ;
+      filterValues[filter.startDate] = filter.default?.startDate;
+      filterValues[filter.endDate] = filter.default?.endDate;
     }
     else if (filter.type === 'dropdown') {
       filterValues[filter.name] = null;
@@ -262,34 +346,60 @@ const generateReport = async () => {
 
   loading.value = true;
   try {
-    // Prepare payload from filter values
+    // Prepare payload/params from filter values
     const payload = {};
+    const params = {};
+    
     selectedReport.value.filters.forEach(filter => {
       if (filter.type === 'daterange') {
-        payload[filter.startDate] = filterValues[filter.startDate];
-        payload[filter.endDate] = filterValues[filter.endDate];
+        const startValue = filterValues[filter.startDate];
+        const endValue = filterValues[filter.endDate];
+        
+        if (selectedReport.value.requestMethod === 'GET') {
+          if (startValue) params[filter.startDate] = startValue.toISOString();
+          if (endValue) params[filter.endDate] = endValue.toISOString();
+        } else {
+          if (startValue) payload[filter.startDate] = startValue.toISOString();
+          if (endValue) payload[filter.endDate] = endValue.toISOString();
+        }
       } else {
-        payload[filter.name] = filterValues[filter.name];
+        const value = filterValues[filter.name];
+        if (value !== null && value !== undefined && value !== '') {
+          if (selectedReport.value.requestMethod === 'GET') {
+            params[filter.name] = value;
+          } else {
+            payload[filter.name] = value;
+          }
+        }
       }
     });
 
-    // Get report from API
-    const response = await apiClient({
+    // Prepare request configuration
+    const requestConfig = {
       url: selectedReport.value.endpoint,
       method: selectedReport.value.requestMethod,
-      data: payload,
-      responseType: 'blob'
-    });
+      responseType: selectedReport.value.responseType || 'blob'
+    };
 
-    // Handle PDF response
-    const contentType = response.headers['content-type'];
+    if (selectedReport.value.requestMethod === 'GET') {
+      requestConfig.params = params;
+    } else {
+      requestConfig.data = payload;
+    }
+
+    // Get report from API
+    const response = await apiClient(requestConfig);
+
+    // Handle file response
+    const contentType = selectedReport.value.contentType || response.headers['content-type'];
     const blob = new Blob([response.data], { type: contentType });
     const url = window.URL.createObjectURL(blob);
     
     // Create a link to download the file
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `${selectedReport.value.id}-${new Date().toISOString().split('T')[0]}.pdf`);
+    const timestamp = new Date().toISOString().split('T')[0];
+    link.setAttribute('download', `${selectedReport.value.id}-${timestamp}.${selectedReport.value.fileExtension}`);
     document.body.appendChild(link);
     link.click();
     
@@ -306,44 +416,6 @@ const generateReport = async () => {
   }
 };
 
-// For new report form (admin functionality)
-const newReportFormVisible = ref(false);
-const newReport = reactive({
-  id: '',
-  name: '',
-  icon: 'pi-file',
-  color: 'bg-blue-100',
-  textColor: 'text-blue-700',
-  description: '',
-  endpoint: '',
-  requestMethod: 'POST',
-  filters: []
-});
-
-const showNewReportForm = () => {
-  newReportFormVisible.value = true;
-};
-
-const addNewReport = () => {
-  // This would typically save to backend, but for now just adds to local array
-  reports.value.push({...newReport});
-  newReportFormVisible.value = false;
-  // Reset form
-  Object.keys(newReport).forEach(key => {
-    if (Array.isArray(newReport[key])) {
-      newReport[key] = [];
-    } else if (typeof newReport[key] === 'object') {
-      newReport[key] = {};
-    } else {
-      newReport[key] = '';
-    }
-  });
-  newReport.requestMethod = 'POST';
-  newReport.icon = 'pi-file';
-  newReport.color = 'bg-blue-100';
-  newReport.textColor = 'text-blue-700';
-};
-
 // Initialize
 onMounted(() => {
   // Any initialization needed
@@ -355,19 +427,45 @@ onMounted(() => {
     <!-- Header Section -->
     <div class="flex flex-column row-gap-5 px-3 lg:flex-row justify-content-between mb-5 lg:mb-0 w-full">
       <div class="lg:col-8 px-0 pt-2">
-        <h3 class="text-700 text-3xl font-semibold">{{ t('reports.header') }}</h3>
-        <p class="text-500 text-lg">{{ t('reports.description') }}</p>
-      </div>
-      
-      <div v-if="false" class="flex cursor-pointer flex-row justify-content-center gap-2 align-items-center bg-primary text-white border-round h-3rem w-full lg:w-14rem" @click="showNewReportForm">
-        <div class="">+</div>
-        <div class="">{{ t('reports.addNewReport') }}</div>
+        <div class="flex align-items-center gap-3 mb-3" v-if="currentCategory">
+          <Button icon="pi pi-arrow-left" severity="secondary" text @click="goBack" />
+          <h3 class="text-700 text-3xl font-semibold m-0">{{ currentCategory.name }}</h3>
+        </div>
+        <h3 v-else class="text-700 text-3xl font-semibold">{{ t('reports.header') }}</h3>
+        <p class="text-500 text-lg">
+          {{ currentCategory ? currentCategory.description : t('reports.description') }}
+        </p>
       </div>
     </div>
 
-    <!-- Reports Grid -->
-    <div class="grid" style="min-width: 100%">
-      <div v-for="report in reports" :key="report.id" class="col-12 lg:col-6 xl:col-4">
+    <!-- Category Selection -->
+    <div v-if="!currentCategory" class="grid" style="min-width: 100%">
+      <div v-for="category in reportCategories" :key="category.id" class="col-12 lg:col-6">
+        <div class="card mb-4 cursor-pointer shadow-2 hover:shadow-5 transition-duration-200" @click="selectCategory(category)">
+          <div class="flex flex-column p-6 h-full">
+            <div class="flex align-items-center mb-4">
+              <div :class="[category.color, 'w-4rem h-4rem border-circle flex align-items-center justify-content-center mr-4']">
+                <i :class="['pi', category.icon, category.textColor, 'text-2xl']"></i>
+              </div>
+              <h3 :class="['font-semibold text-2xl m-0', category.textColor]">{{ category.name }}</h3>
+            </div>
+            
+            <p class="line-height-3 text-500 my-3 text-lg">{{ category.description }}</p>
+            
+            <div class="flex justify-content-between mt-auto align-items-center">
+              <Tag :class="[category.color, category.textColor, 'font-semibold text-sm']">
+                {{ reports[category.id].length }} {{ t('reports.reports') }}
+              </Tag>
+              <Button icon="pi pi-arrow-right" :class="[category.textColor, 'p-button-rounded p-button-text']" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reports Grid (when category is selected) -->
+    <div v-else class="grid" style="min-width: 100%">
+      <div v-for="report in reports[currentCategory.id]" :key="report.id" class="col-12 lg:col-6 xl:col-4">
         <div class="card mb-4 cursor-pointer shadow-2 hover:shadow-5 transition-duration-200" @click="selectReport(report)">
           <div class="flex flex-column p-4 h-full">
             <div class="flex align-items-center mb-4">
@@ -458,54 +556,35 @@ onMounted(() => {
           display="chip"
         />
 
+        <!-- Text Input -->
+        <InputText 
+          v-else-if="filter.type === 'text'" 
+          v-model="filterValues[filter.name]" 
+          :id="filter.name"
+          :placeholder="filter.label"
+          class="w-full"
+        />
+
+        <!-- Checkbox -->
+        <div v-else-if="filter.type === 'checkbox'" class="flex align-items-center">
+          <Checkbox 
+            v-model="filterValues[filter.name]" 
+            :inputId="filter.name"
+            :binary="true"
+          />
+          <label :for="filter.name" class="ml-2">{{ filter.label }}</label>
+        </div>
+
         <!-- Other filter types can be added here -->
       </div>
     </div>
 
-    <div class="flex justify-content-end gap-2">
-      <Button :label="t('reports.cancel')" severity="secondary" outlined @click="reportDialogVisible = false" />
-      <Button :label="t('reports.generate')" :loading="loading" @click="generateReport()" :disabled="!isFormValid" />
-    </div>
-  </Dialog>
-
-  <!-- New Report Form Dialog (Admin only) -->
-  <Dialog v-model:visible="newReportFormVisible" :modal="true" :closable="true" :style="{width: '600px'}" :header="t('reports.addNewReport')">
-    <div class="flex flex-column gap-3 p-3">
-      <!-- Report Form Fields -->
-      <div class="field w-full">
-        <label for="report-id" class="block font-medium mb-2 required">{{ t('reports.reportId') }}</label>
-        <InputText id="report-id" v-model="newReport.id" class="w-full" />
-      </div>
-      
-      <div class="field w-full">
-        <label for="report-name" class="block font-medium mb-2 required">{{ t('reports.reportName') }}</label>
-        <InputText id="report-name" v-model="newReport.name" class="w-full" />
-      </div>
-      
-      <div class="field w-full">
-        <label for="report-description" class="block font-medium mb-2">{{ t('reports.reportDescription') }}</label>
-        <Textarea id="report-description" v-model="newReport.description" class="w-full" rows="3" />
-      </div>
-      
-      <div class="field w-full">
-        <label for="report-endpoint" class="block font-medium mb-2 required">{{ t('reports.reportEndpoint') }}</label>
-        <InputText id="report-endpoint" v-model="newReport.endpoint" class="w-full" />
-      </div>
-      
-      <div class="field w-full">
-        <label for="report-method" class="block font-medium mb-2 required">{{ t('reports.requestMethod') }}</label>
-        <Dropdown id="report-method" v-model="newReport.requestMethod" :options="['GET', 'POST']" class="w-full" />
-      </div>
-      
-      <!-- For simplicity, we're not implementing the full filter configuration UI -->
-    </div>
-
-    <template #footer>
+    <!-- <template #footer> -->
       <div class="flex justify-content-end gap-2">
-        <Button :label="t('reports.cancel')" severity="secondary" outlined @click="newReportFormVisible = false" />
-        <Button :label="t('reports.addReport')" @click="addNewReport()" />
+        <Button :label="t('reports.cancel')" severity="secondary" outlined @click="reportDialogVisible = false" />
+        <Button :label="t('reports.generate')" :loading="loading" @click="generateReport()" :disabled="!isFormValid" />
       </div>
-    </template>
+    <!-- </template> -->
   </Dialog>
 </template>
 
@@ -521,7 +600,7 @@ onMounted(() => {
 
 .card {
   border-radius: 12px;
-  transition: box-shadow 0.3s ease;
+  transition: all 0.3s ease;
   height: 100%;
   display: flex;
   flex-direction: column;

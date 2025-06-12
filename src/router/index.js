@@ -10,6 +10,11 @@ const router = createRouter({
       component: AppLayout,
       children: [
         {
+          path: '/pos-orders',
+          name: 'Pos Orders',
+          component: () => import('@/views/pages/posTransaction/posTransaction.vue')
+        },
+        {
           path: '/page-configuration',
           name: 'pageConfiguration',
           component: () => import('@/views/pages/pageConfiguration/pageConfiguration.vue')
