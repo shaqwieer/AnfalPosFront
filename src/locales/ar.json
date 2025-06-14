@@ -521,14 +521,18 @@
     "requestedBillingDocumentType": "نوع مستند الفواتير المطلوب"
   },
   "availableBranch": {
-    "title": "الفروع المتاحة"
+    "title": "الفروع المتاحة",
+    "subtitle": "قم بأختيار الفرع لكى تتكمن من الدخول ",
+    "select": "أختار الفرع "
   },
   "profileBar": {
     "welcome": "مرحبا",
     "logout": "تسجيل الخروج",
     "logoutDesc": "هل تريد تسجيل الخروج ؟",
     "branches": "الفروع المتاحة",
-    "branchesDesc": "اذهب الى الفروع المتاحة للمستخدم الحالى"
+    "branchesDesc": "اذهب الى الفروع المتاحة للمستخدم الحالى",
+    "organizations": "المؤسسات المتاحة",
+    "organizationsDesc": "اذهب الى المؤسسات المتاحة للمستخدم الحالى"
   },
   "POS": {
     "name": "الاسم",
@@ -888,5 +892,13 @@
     "invoiceStatusViewed": "تم العرض",
     "invoiceStatusApproved": "موافق عليه",
     "invoiceStatusRejected": "مرفوض"
+  },
+  "availableOrganization": {
+    "title": "اختر مؤسستك",
+    "subtitle": "حدد المؤسسة التي ترغب في العمل معها اليوم",
+    "select": "اختر المؤسسة",
+    "loading": "جاري تجهيز مؤسستك",
+    "loadingDesc": "يتم إعداد مساحة العمل الخاصة بمؤسستك...",
+    "selectionSuccess": "تم اختيار المؤسسة بنجاح"
   }
 }

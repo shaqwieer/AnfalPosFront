@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import AppLayout from '@/layout/AppLayout.vue';
 import { useMainStore } from '@/stores/mainStore';
+import { getFromLocalStorage } from '@/utilities/localStorage';
+import { jwtDecode } from 'jwt-decode';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -606,9 +608,14 @@ const router = createRouter({
       ]
     },
     {
-      path: '/available-branches',
+      path: '/auth/branch-selectable',
       name: 'available-branches',
       component: () => import('@/views/pages/availableBranch/availableBranch.vue')
+    },
+    {
+      path: '/auth/organization-selectable',
+      name: 'available-organization',
+      component: () => import('@/views/pages/availableOrganization/availableOrganization.vue')
     },
     {
       path: '/landing',
@@ -677,21 +684,56 @@ router.beforeEach(async (to, from, next) => {
   const mainStore = useMainStore();
   const token = sessionStorage.getItem('Token') || localStorage.getItem('token');
 
+  // Get personal data from localStorage
+  let personalData = {};
+  try {
+    personalData = getFromLocalStorage('userInfo');
+  } catch (e) {
+    personalData = {};
+  }
+  const branchSelectable = personalData?.branchSelectable;
+  const organizationSelectable = personalData?.organizationSelectable;
+
+  // Decode JWT token to check for BranchId and OrganizationId
+  let hasBranchId = false;
+  let hasOrganizationId = false;
+  if (token) {
+    try {
+      const payload = jwtDecode(token);
+      hasBranchId = !!payload.BranchId;
+      hasOrganizationId = !!payload.OrganizationId;
+    } catch (e) {
+      hasBranchId = false;
+      hasOrganizationId = false;
+    }
+  }
+
   if (token && mainStore.pageTree.length == 0) {
     await mainStore.getMenu();
   }
-  const hasBranchIdKey = true;
   const isAllowed = mainStore.accessAllowed(to.path);
   console.log(`Navigating to: ${to.path}, Allowed: ${isAllowed}`);
-
+  console.log(`Branch Selectable: ${branchSelectable}, Organization Selectable: ${organizationSelectable}`);
   if (!token && to.name !== 'login') {
     next({ name: 'login' });
   } else if (token && to.name === 'login') {
     next({ name: 'e-commerce' });
   } else if (token && !isAllowed) {
     next({ name: 'notfound' });
-  } else if (token && !hasBranchIdKey && to.name !== 'van-dashboard') {
-    next({ name: 'van-dashboard' });
+  } else if (
+    token &&
+    organizationSelectable &&
+    !hasOrganizationId &&
+    to.path !== '/auth/organization-selectable'
+  ) {
+    next({ path: '/auth/organization-selectable' });
+  } else if (
+    token &&
+    branchSelectable &&
+    !hasBranchId &&
+    to.path !== '/auth/branch-selectable'
+  ) {
+    next({ path: '/auth/branch-selectable' });
   } else {
     next();
   }

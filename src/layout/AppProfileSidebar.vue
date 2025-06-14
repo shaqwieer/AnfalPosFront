@@ -3,14 +3,13 @@ import { useLayout } from '@/layout/composables/layout';
 const { onProfileSidebarToggle } = useLayout();
 
 import { useMainStore } from '@/stores/mainStore';
+import { getFromLocalStorage } from '@/utilities/localStorage';
 
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n'; // Import useI18n hook
 import { useRouter } from 'vue-router';
 const router = useRouter();
-const goToPage = () => {
-  router.push({ name: 'available-branches' }); // Navigate to a named route
-};
+
 const { t } = useI18n();
 
 const mainStore = useMainStore();
@@ -21,14 +20,40 @@ const logOut = () => {
 };
 const { layoutState } = useLayout();
 
-const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+const userInfo = getFromLocalStorage('userInfo');
+
+const goToPage = () => {
+  if (userInfo?.organizationSelectable) {
+    router.push({ path: '/auth/organization-selectable' });
+  } else if (userInfo?.branchSelectable) {
+    router.push({ path: '/auth/branch-selectable' });
+  }
+};
+
+const getBranchOrgTitle = computed(() => {
+  if (userInfo?.organizationSelectable) {
+    return t('profileBar.organizations');
+  } else if (userInfo?.branchSelectable) {
+    return t('profileBar.branches');
+  }
+  return '';
+});
+
+const getBranchOrgDesc = computed(() => {
+  if (userInfo?.organizationSelectable) {
+    return t('profileBar.organizationsDesc');
+  } else if (userInfo?.branchSelectable) {
+    return t('profileBar.branchesDesc');
+  }
+  return '';
+});
 </script>
 
 <template>
   <Sidebar v-model:visible="layoutState.profileSidebarVisible.value" :position="'right'" class="layout-profile-sidebar w-full sm:w-25rem">
     <div class="flex flex-column mx-auto md:mx-0" :dir="rtlValueText">
       <span class="mb-2 font-semibold">{{ t('profileBar.welcome') }}</span>
-      <span class="text-color-secondary font-medium mb-5"> {{ userInfo.personalInfo.name }}</span>
+      <span class="text-color-secondary font-medium mb-5"> {{ userInfo.name }}</span>
 
       <ul class="list-none m-0 p-0">
         <li>
@@ -37,8 +62,8 @@ const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
               <i class="pi pi-table text-xl text-primary"></i>
             </span>
             <div class="mx-3" @click="goToPage()">
-              <span class="mb-2 font-semibold">{{ t('profileBar.branches') }}</span>
-              <p class="text-color-secondary m-0">{{ t('profileBar.branchesDesc') }}</p>
+              <span class="mb-2 font-semibold">{{ getBranchOrgTitle }}</span>
+              <p class="text-color-secondary m-0">{{ getBranchOrgDesc }}</p>
             </div>
           </a>
         </li>

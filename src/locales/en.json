@@ -528,14 +528,18 @@
     "requestedBillingDocumentType": "Requested Billing Document Type"
   },
   "availableBranch": {
-    "title": "Available Branches"
+    "title": "Available Branches",
+    "subtitle": "Select your branch to continue with your work session",
+    "select": "Select Branch"
   },
   "profileBar": {
     "welcome": "Welcome",
     "logout": "Sign Out",
     "logoutDesc": "Do You Want To Sign Out ?",
     "branches": "Available Branches",
-    "branchesDesc": "Go To Available Branch For The Cuurent user"
+    "branchesDesc": "Go To Available Branch For The Cuurent user",
+    "organizations": "Available Organization",
+    "organizationsDesc": "Go To Available Organizations For The Cuurent user"
   },
   "POS": {
     "BusinessEntityName": "Business Entity Name",
@@ -902,5 +906,13 @@
     "invoiceStatusViewed": "Viewed",
     "invoiceStatusApproved": "Approved",
     "invoiceStatusRejected": "Rejected"
+  },
+  "availableOrganization": {
+    "title": "Choose Your Organization",
+    "subtitle": "Select the organization you want to work with today",
+    "select": "Select Organization",
+    "loading": "Preparing your organization",
+    "loadingDesc": "Setting up your organizational workspace...",
+    "selectionSuccess": "Organization selected successfully"
   }
 }

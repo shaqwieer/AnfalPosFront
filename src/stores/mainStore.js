@@ -15,7 +15,7 @@ export const useMainStore = defineStore({
     loading: useLoadingStore(),
     error: '',
     pageTree: [],
-    pathsList: ['/pages/notfound', '/auth/login', '/', '/auth/access'],
+    pathsList: ['/pages/notfound', '/auth/login', '/', '/auth/access', '/auth/organization-selectable', '/auth/branch-selectable'],
     routeList: [],
     userInfo: []
   }),
@@ -75,7 +75,8 @@ export const useMainStore = defineStore({
         const token = response.data.token;
 
         // this.userInfo = response.data;
-        sessionStorage.setItem('userInfo', JSON.stringify(response.data));
+        // sessionStorage.setItem('userInfo', JSON.stringify(response.data.personalInfo));
+        saveToLocalStorage('userInfo', response.data.personalInfo);
 
         if (userPayload.rememberMe) {
           saveToLocalStorage('token', token);
@@ -97,24 +98,41 @@ export const useMainStore = defineStore({
         this.error = handleError(err, this.loading);
       }
     },
-    // async chooseBranch(userPayload) {
-    //   try {
-    //     const response = await apiClient.post('/UserBranches/ChooseBranchFromAvailableBranches', userPayload);
-    //     const token = response.data.data;
-    //     var rememberMe = localStorage.getItem('rememberMe');
-    //     if (rememberMe == true) {
-    //       saveToLocalStorage('token', token);
-    //       localStorage.removeItem('refreshToken');
-    //     } else {
-    //       sessionStorage.setItem('Token', token);
-    //     }
-    //     router.push({ name: 'userRoles' });
-    //   } catch (err) {
-    //     this.error = handleError(err, this.loading);
-    //   }
-    // },
+    async chooseBranch(userPayload) {
+      try {
+        const response = await apiClient.post('/UserBranches/ChooseBranchFromAvailableBranches', userPayload);
+        const token = response.data.data;
+        var rememberMe = localStorage.getItem('rememberMe');
+        if (rememberMe == true) {
+          saveToLocalStorage('token', token);
+          localStorage.removeItem('refreshToken');
+        } else {
+          sessionStorage.setItem('Token', token);
+        }
+        router.push({ name: 'van-dashboard' });
+      } catch (err) {
+        this.error = handleError(err, this.loading);
+      }
+    },
+    async chooseOrganization(userPayload) {
+      try {
+        const response = await apiClient.post('/UserBranches/ChooseOrganizationFromAvailableOrganization', userPayload);
+        const token = response.data.data;
+        var rememberMe = localStorage.getItem('rememberMe');
+        if (rememberMe == true) {
+          saveToLocalStorage('token', token);
+          localStorage.removeItem('refreshToken');
+        } else {
+          sessionStorage.setItem('Token', token);
+        }
+        router.push({ name: 'van-dashboard' });
+      } catch (err) {
+        this.error = handleError(err, this.loading);
+      }
+    },
     logout() {
       const rememberMe = localStorage.getItem('rememberMe');
+      localStorage.removeItem('userInfo');
       if (rememberMe == true) {
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
@@ -123,7 +141,7 @@ export const useMainStore = defineStore({
         sessionStorage.removeItem('Token');
       }
       localStorage.removeItem('rememberMe');
-      this.pathsList = ['/pages/notfound', '/auth/login', '/auth/access', '/'];
+      this.pathsList = ['/pages/notfound', '/auth/login', '/auth/access', '/', '/auth/organization-selectable', '/auth/branch-selectable'];
       this.pageTree = [];
       router.push({ name: 'login' });
     },
