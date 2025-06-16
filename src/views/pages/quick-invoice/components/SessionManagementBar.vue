@@ -20,6 +20,14 @@
               {{ sessionDuration }}
             </span>
           </div>
+
+          <!-- Cash Journal Info -->
+          <div class="flex align-items-center gap-2">
+            <span class="material-icons text-green-600 text-sm">account_balance_wallet</span>
+            <span class="text-sm" style="color: var(--sap-text-secondary)">
+              {{ cashJournal || 'N/A' }} | Balance: ${{ currentCash.toFixed(2) }}
+            </span>
+          </div>
         </div>
 
         <!-- Right Side: Action Buttons -->
@@ -41,10 +49,10 @@
             </div>
           </Button>
 
-          <Button v-else severity="warning" size="small" @click="showCloseSessionDialog = true" class="session-btn">
+          <Button v-else severity="warning" size="small" @click="prepareCloseSession" :loading="terminalStore.sessionLoading" class="session-btn">
             <div class="flex align-items-center gap-2">
-              <span class="material-icons text-sm">stop</span>
-              <span>Close Session</span>
+              <span v-if="!terminalStore.sessionLoading" class="material-icons text-sm">stop</span>
+              <span>{{ terminalStore.sessionLoading ? 'Loading...' : 'Close Session' }}</span>
             </div>
           </Button>
         </div>
@@ -89,55 +97,96 @@
           </Button>
         </div>
 
-        <div class="p-6">
+        <div class="p-6 session-close-content">
           <!-- Session Summary -->
           <div class="bg-gray-50 p-4 border-round mb-4">
             <h4 class="font-medium mb-3">Session Summary</h4>
             <div class="grid grid-nogutter gap-3">
-              <div class="col-6">
+              <div class="col-12 md:col-6 lg:col-3">
                 <div class="text-sm text-gray-600">Started</div>
                 <div class="font-medium">{{ formatTime(sessionStartTime!) }}</div>
               </div>
-              <div class="col-6">
+              <div class="col-12 md:col-6 lg:col-3">
                 <div class="text-sm text-gray-600">Duration</div>
                 <div class="font-medium">{{ sessionDuration }}</div>
               </div>
-              <div class="col-6">
+              <div class="col-12 md:col-6 lg:col-3">
                 <div class="text-sm text-gray-600">Opening Cash</div>
-                <div class="font-medium">${{ formatPrice(openingCash) }}</div>
+                <div class="font-medium">${{ formatPrice(currentCash) }}</div>
+              </div>
+              <div class="col-12 md:col-6 lg:col-3">
+                <div class="text-sm text-gray-600">Expected Cash End</div>
+                <div class="font-medium">${{ formatPrice(expectedCashEndAmount) }}</div>
+              </div>
+              <div class="col-12 md:col-6 lg:col-3">
+                <div class="text-sm text-gray-600">Discrepancy Amount</div>
+                <div class="font-medium" :class="{ 'text-red-600': discrepancyAmount !== 0, 'text-green-600': discrepancyAmount === 0 }">
+                  ${{ formatPrice(discrepancyAmount) }}
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Closing Cash -->
-          <div class="mb-4">
-            <label class="block text-sm font-medium mb-2">Closing Cash Amount</label>
-            <div class="relative">
-              <span class="absolute cash-symbol">$</span>
-              <InputNumber v-model="closingCash" mode="currency" currency="USD" class="w-full cash-input" placeholder="0.00" :min="0" :step="0.01" />
+          <!-- Form Fields Grid -->
+          <div class="grid grid-nogutter gap-4 mb-4">
+            <!-- Closing Cash -->
+            <div class="col-12 md:col-6">
+              <label class="block text-sm font-medium mb-2">Closing Cash Amount</label>
+              <div class="relative">
+                <span class="absolute cash-symbol">$</span>
+                <InputNumber v-model="closingCash" mode="currency" currency="USD" class="w-full cash-input" placeholder="0.00" :min="0" :step="0.01" />
+              </div>
+              <small class="text-gray-500">Count the cash in the register and enter the total amount</small>
             </div>
-            <small class="text-gray-500">Count the cash in the register and enter the total amount</small>
+
+            <!-- Deposit Number -->
+            <div class="col-12 md:col-6">
+              <label class="block text-sm font-medium mb-2">Deposit Number</label>
+              <InputText v-model="depositNo" class="w-full" placeholder="Enter deposit number" />
+              <small class="text-gray-500">Enter a unique deposit number for this session</small>
+            </div>
+
+            <!-- Session Notes -->
+            <div class="col-12">
+              <label class="block text-sm font-medium mb-2">Session Notes</label>
+              <textarea v-model="sessionNotes" rows="3" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Enter any notes about this session..."></textarea>
+            </div>
+
+            <!-- Attachment -->
+            <div class="col-12">
+              <label class="block text-sm font-medium mb-2">Attachment (Optional)</label>
+              <input type="file" @change="handleFileUpload" class="w-full p-2 border border-gray-300 rounded-lg" accept="image/*,.pdf,.doc,.docx" />
+              <small class="text-gray-500">Upload any supporting documents</small>
+            </div>
           </div>
 
           <!-- Cash Difference -->
-          <div v-if="closingCash > 0" class="bg-blue-50 p-3 border-round mb-4">
-            <div class="flex justify-content-between align-items-center">
-              <span class="font-medium">Cash Difference:</span>
-              <span
-                class="font-bold text-lg"
-                :class="{
-                  'text-green-600': closingCash >= openingCash,
-                  'text-red-600': closingCash < openingCash
-                }"
-              >
-                {{ closingCash >= openingCash ? '+' : '' }}${{ formatPrice(closingCash - openingCash) }}
-              </span>
+          <div v-if="closingCash > 0" class="bg-blue-50 p-4 border-round mb-4">
+            <div class="grid grid-nogutter align-items-center">
+              <div class="col-12 md:col-6">
+                <span class="font-medium text-lg">Cash Difference:</span>
+              </div>
+              <div class="col-12 md:col-6 text-right">
+                <span
+                  class="font-bold text-xl"
+                  :class="{
+                    'text-green-600': closingCash >= expectedCashEndAmount,
+                    'text-red-600': closingCash < expectedCashEndAmount
+                  }"
+                >
+                  {{ closingCash >= expectedCashEndAmount ? '+' : '' }}${{ formatPrice(closingCash - expectedCashEndAmount) }}
+                </span>
+              </div>
             </div>
           </div>
 
-          <div class="flex gap-3 justify-content-end">
-            <Button outlined @click="cancelCloseSession" class="px-4 py-2"> Cancel </Button>
-            <Button @click="closeSession" severity="warning" class="px-4 py-2"> Close Session </Button>
+          <!-- Action Buttons -->
+          <div class="flex gap-3 justify-content-end pt-3 border-top">
+            <Button outlined @click="cancelCloseSession" class="px-6 py-3" size="large"> Cancel </Button>
+            <Button @click="closeSession" severity="warning" class="px-6 py-3" size="large" :loading="terminalStore.sessionLoading">
+              <span v-if="!terminalStore.sessionLoading">Close Session</span>
+              <span v-else>Closing...</span>
+            </Button>
           </div>
         </div>
       </div>
@@ -197,14 +246,35 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { BaseButton } from '@/components/shared';
+import { useTerminalStore } from '@/stores/terminalStore.js';
+
+// Terminal store
+const terminalStore = useTerminalStore();
 
 // Session management
-const isSessionOpen = ref(false);
-const sessionStartTime = ref<Date | null>(null);
 const openingCash = ref(0);
 const closingCash = ref(0);
 const showOpenSessionDialog = ref(false);
 const showCloseSessionDialog = ref(false);
+const sessionNotes = ref('');
+const depositNo = ref('');
+const attachmentFile = ref(null);
+
+// Session details for closing
+const expectedCashEndAmount = ref(0);
+const discrepancyAmount = ref(0);
+const sessionId = ref(null);
+
+// Use API data for session status
+const isSessionOpen = computed(() => terminalStore.isSessionOpened);
+const sessionStartTime = computed(() => {
+  if (terminalStore.sessionOpenDate) {
+    return new Date(terminalStore.sessionOpenDate);
+  }
+  return null;
+});
+const currentCash = computed(() => terminalStore.currentCash);
+const cashJournal = computed(() => terminalStore.cashJournal);
 
 // Timer management
 const currentTime = ref(new Date());
@@ -249,13 +319,17 @@ const sessionDuration = computed(() => {
 });
 
 // Start the timer when component mounts
-onMounted(() => {
+onMounted(async () => {
   startTimer();
+  // Initialize terminal information
+  await terminalStore.initializeTerminal();
 });
 
 // Clean up timer when component unmounts
 onUnmounted(() => {
   stopTimer();
+  // Cleanup terminal store
+  terminalStore.cleanup();
 });
 
 const startTimer = () => {
@@ -287,43 +361,102 @@ const formatTime = (date: Date) => {
   });
 };
 
-const openSession = () => {
+const openSession = async () => {
   if (openingCash.value < 0) {
     alert('Opening cash amount cannot be negative');
     return;
   }
 
-  isSessionOpen.value = true;
-  sessionStartTime.value = new Date();
-  showOpenSessionDialog.value = false;
-
-  // Here you would typically save to your store/backend
-  console.log('Session opened with:', openingCash.value);
+  try {
+    await terminalStore.openSession();
+    showOpenSessionDialog.value = false;
+    openingCash.value = 0;
+    console.log('Session opened successfully');
+  } catch (error) {
+    console.error('Failed to open session:', error);
+    alert('Failed to open session. Please try again.');
+  }
 };
 
-const closeSession = () => {
+const prepareCloseSession = async () => {
+  try {
+    // Show loading state
+    console.log('Fetching session details...');
+
+    // Get session details before showing close dialog
+    const details = await terminalStore.getSessionDetailsForClosing();
+
+    console.log('Session details received:', details);
+
+    expectedCashEndAmount.value = details.expectedCashEndAmount || 0;
+    discrepancyAmount.value = details.discrepancyAmount || 0;
+    sessionId.value = details.sessionId || details.id; // Use sessionId if available, fallback to id
+
+    // Generate default deposit number
+    depositNo.value = `DEP-${new Date().getTime()}`;
+
+    showCloseSessionDialog.value = true;
+  } catch (error) {
+    console.error('Failed to get session details:', error);
+
+    // Show more specific error messages
+    let errorMessage = 'Failed to get session details. ';
+    if (error.message.includes('No active session found')) {
+      errorMessage += 'Please ensure a session is open before trying to close it.';
+    } else if (error.message.includes('Network Error')) {
+      errorMessage += 'Please check your internet connection and try again.';
+    } else {
+      errorMessage += `Error: ${error.message}`;
+    }
+
+    alert(errorMessage);
+  }
+};
+
+const closeSession = async () => {
   if (closingCash.value < 0) {
     alert('Closing cash amount cannot be negative');
     return;
   }
 
-  const difference = closingCash.value - openingCash.value;
+  if (!sessionId.value) {
+    alert('Session ID not found. Please try again.');
+    return;
+  }
 
-  // Here you would typically save session data to your store/backend
-  console.log('Session closed:', {
-    openingCash: openingCash.value,
-    closingCash: closingCash.value,
-    difference,
-    duration: sessionDuration.value
-  });
+  try {
+    const closeParams = {
+      shiftSessionId: sessionId.value,
+      shiftCashDeposits: {
+        depositAmount: closingCash.value,
+        depositNo: depositNo.value,
+        attachment: attachmentFile.value ? attachmentFile.value.name : ''
+      },
+      Notes: sessionNotes.value,
+      attachment: attachmentFile.value
+    };
 
-  isSessionOpen.value = false;
-  sessionStartTime.value = null;
-  showCloseSessionDialog.value = false;
+    await terminalStore.closeSession(closeParams);
+    showCloseSessionDialog.value = false;
 
-  // Reset values
-  openingCash.value = 0;
+    // Reset values
+    resetCloseSessionForm();
+
+    console.log('Session closed successfully');
+  } catch (error) {
+    console.error('Failed to close session:', error);
+    alert('Failed to close session. Please try again.');
+  }
+};
+
+const resetCloseSessionForm = () => {
   closingCash.value = 0;
+  sessionNotes.value = '';
+  depositNo.value = '';
+  attachmentFile.value = null;
+  expectedCashEndAmount.value = 0;
+  discrepancyAmount.value = 0;
+  sessionId.value = null;
 };
 
 const loadDraftInvoice = (draft: any) => {
@@ -351,9 +484,16 @@ const cancelOpenSession = () => {
   openingCash.value = 0;
 };
 
+const handleFileUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    attachmentFile.value = file;
+  }
+};
+
 const cancelCloseSession = () => {
   showCloseSessionDialog.value = false;
-  closingCash.value = 0;
+  resetCloseSessionForm();
 };
 </script>
 
@@ -426,7 +566,9 @@ const cancelCloseSession = () => {
 .session-dialog {
   border-radius: 0.75rem;
   width: 100%;
-  max-width: 28rem;
+  max-width: 50rem;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .draft-dialog {
@@ -458,6 +600,38 @@ const cancelCloseSession = () => {
 
 .cash-input {
   padding-left: 2rem;
+}
+
+.session-close-content {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.session-close-content .grid {
+  margin-bottom: 0;
+}
+
+.session-close-content .col-12,
+.session-close-content .col-6 {
+  padding: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .session-dialog {
+    max-width: 95vw;
+    margin: 1rem;
+  }
+
+  .session-close-content {
+    padding: 1rem !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  .session-dialog {
+    max-width: 60rem;
+  }
 }
 
 .draft-list {

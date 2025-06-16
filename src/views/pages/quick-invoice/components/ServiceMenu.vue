@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useOrderStore } from '../../../../stores/orderStore.ts';
 import { useCompanyStore } from '../../../../stores/companyStore.ts';
+import { useCategoryStore } from '../../../../stores/categoryStore.js';
 
 const searchQuery = ref('');
 const isCardView = ref(true);
@@ -11,8 +12,29 @@ const selectedProduct = ref<any>(null);
 const selectedBatch = ref<any>(null);
 
 const companyStore = useCompanyStore();
-const categories = computed(() => companyStore.getCategories());
-const selectedCategory = ref(categories.value[0]);
+const categoryStore = useCategoryStore();
+
+const categories = computed(() => categoryStore.getCategories);
+const selectedCategory = ref('');
+
+// Initialize categories from API and set default selection
+onMounted(async () => {
+  await categoryStore.initializeCategories();
+  // Set the first category as selected by default after categories are loaded
+  if (categories.value.length > 0) {
+    selectedCategory.value = categories.value[0];
+    // Fetch items for the default category
+    await categoryStore.fetchItemsByCategory(selectedCategory.value);
+  }
+});
+
+// Watch for category changes to fetch items
+const watchSelectedCategory = computed(() => {
+  if (selectedCategory.value && selectedCategory.value !== categoryStore.getCurrentCategory) {
+    categoryStore.fetchItemsByCategory(selectedCategory.value);
+  }
+  return selectedCategory.value;
+});
 
 const orderStore = useOrderStore();
 
@@ -23,11 +45,20 @@ const batchForm = ref({
   discountValue: 0
 });
 
-const services = computed(() => companyStore.getServices());
+// Use API-fetched items instead of hardcoded services
+const services = computed(() => categoryStore.getItems);
 
 const filteredServices = computed(() => {
   const query = searchQuery.value.toLowerCase();
-  return services.value.filter((service) => (service.name.toLowerCase().includes(query) || service.nameAr?.toLowerCase().includes(query) || service.sku.toLowerCase().includes(query)) && service.category === selectedCategory.value);
+  return services.value.filter((service) => {
+    const matchesSearch = service.name.toLowerCase().includes(query) ||
+                         service.nameAr?.toLowerCase().includes(query) ||
+                         service.sku.toLowerCase().includes(query);
+
+    // Since items are already filtered by category from the API,
+    // we only need to filter by search query
+    return matchesSearch;
+  });
 });
 
 const calculateFinalPrice = computed(() => {
@@ -155,7 +186,24 @@ const formatPrice = (price: number): string => {
 
       <!-- Products/Services View -->
       <div class="p-3 pb-8 overflow-y-auto products-container" :class="isCardView ? 'grid' : 'flex-column gap-2'">
-        <div v-for="service in filteredServices" :key="service.name" :class="isCardView ? 'col-12 lg:col-6 xl:col-4' : 'flex-1'">
+        <!-- Loading indicator -->
+        <div v-if="categoryStore.isItemsLoading" class="flex align-items-center justify-content-center p-8">
+          <div class="flex flex-column align-items-center gap-3">
+            <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: var(--sap-primary)"></i>
+            <p class="text-lg" style="color: var(--sap-text-secondary)">Loading products...</p>
+          </div>
+        </div>
+
+        <!-- No items message -->
+        <div v-else-if="!categoryStore.isItemsLoading && filteredServices.length === 0" class="flex align-items-center justify-content-center p-8">
+          <div class="flex flex-column align-items-center gap-3">
+            <span class="material-icons" style="font-size: 3rem; color: var(--sap-text-secondary)">inventory_2</span>
+            <p class="text-lg" style="color: var(--sap-text-secondary)">No products found for this category</p>
+          </div>
+        </div>
+
+        <!-- Products list -->
+        <div v-else v-for="service in filteredServices" :key="service.id" :class="isCardView ? 'col-12 lg:col-6 xl:col-4' : 'flex-1'">
           <!-- Card View -->
           <div v-if="isCardView" class="service-card cursor-pointer" @click="handleProductClick(service)">
             <div class="flex flex-column">

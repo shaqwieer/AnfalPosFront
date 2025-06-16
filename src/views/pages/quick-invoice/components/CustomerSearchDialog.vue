@@ -2,6 +2,7 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { useOrderStore } from '@/stores/orderStore.ts';
 import { useCompanyStore } from '@/stores/companyStore.ts';
+import { useCustomerSearchStore } from '@/stores/customerSearchStore.js';
 import { Calendar } from 'lucide-vue-next';
 
 const props = defineProps<{
@@ -12,12 +13,14 @@ const emit = defineEmits(['close']);
 
 const orderStore = useOrderStore();
 const companyStore = useCompanyStore();
+const customerSearchStore = useCustomerSearchStore();
 const customerType = ref('individual'); // 'individual' or 'business'
 const searchQuery = ref('');
 const showNewCustomerForm = ref(false);
 const showVehicleForm = ref(false);
 const editingVehicleIndex = ref<number | null>(null);
 const selectedVehicleIndex = ref<number | null>(null);
+const searchTimeout = ref<NodeJS.Timeout | null>(null);
 
 // Form data
 const formData = ref<Record<string, any>>({
@@ -46,8 +49,24 @@ const initializeFormData = () => {
 };
 
 // Watch for customer type changes
-watch(customerType, () => {
+watch(customerType, async (newType) => {
   initializeFormData();
+  // Update search store and trigger new search
+  // Switch the flag: individual = true, business = false for isNotBusinessPartner
+  customerSearchStore.setCustomerType(newType === 'individual');
+  await performSearch();
+});
+
+// Watch for search query changes with debounce
+watch(searchQuery, (newQuery) => {
+  if (searchTimeout.value) {
+    clearTimeout(searchTimeout.value);
+  }
+
+  searchTimeout.value = setTimeout(async () => {
+    customerSearchStore.setSearchKey(newQuery);
+    await performSearch();
+  }, 500); // 500ms debounce
 });
 
 // Get visible fields based on customer type
@@ -55,144 +74,40 @@ const visibleFields = computed(() => {
   return companyStore.getCustomerFields(customerType.value as 'individual' | 'business');
 });
 
-const customers = ref([
-  // TireShop Customers
-  {
-    id: 1,
-    companyId: 'tireshop',
-    name: 'Abdullah Mohammed',
-    type: 'individual',
-    mobile: '+966 50 123 4567',
-    email: 'abdullah@example.com',
-    plateNo: '123 RYD',
-    make: 'Toyota',
-    model: 'Camry',
-    year: '2023',
-    vin: '1HGCM82633A123456'
-  },
-  {
-    id: 2,
-    companyId: 'tireshop',
-    name: 'Fahad Ahmed',
-    type: 'individual',
-    mobile: '+966 55 234 5678',
-    email: 'fahad@example.com',
-    plateNo: '456 RYD',
-    make: 'Lexus',
-    model: 'ES',
-    year: '2024',
-    vin: '2HXKM72839B234567'
-  },
-  {
-    id: 3,
-    companyId: 'tireshop',
-    name: 'Mutlaq Trading Est.',
-    type: 'business',
-    mobile: '+966 56 345 6789',
-    email: 'info@mutlaq.com',
-    cr: '1010234567',
-    vat: '300000012',
-    fleet: 5,
-    vehicles: [
-      {
-        plateNo: '789 RYD',
-        make: 'Ford',
-        model: 'Transit',
-        year: '2023',
-        vin: '3FTYR82633C345678'
-      },
-      {
-        plateNo: '790 RYD',
-        make: 'Toyota',
-        model: 'Hiace',
-        year: '2023',
-        vin: '4TGHR82633D456789'
-      }
-    ]
-  },
-  {
-    id: 4,
-    companyId: 'tireshop',
-    name: 'Othaim Transport Co.',
-    type: 'business',
-    mobile: '+966 58 456 7890',
-    email: 'fleet@othaim.com',
-    cr: '1010345678',
-    vat: '300000034',
-    fleet: 12,
-    vehicles: [
-      {
-        plateNo: '234 RYD',
-        make: 'Mercedes',
-        model: 'Actros',
-        year: '2023',
-        vin: '5MBTR82633E567890'
-      }
-    ]
-  },
+// Get customers from API store
+const apiCustomers = computed(() => customerSearchStore.getCustomers);
+const isLoadingCustomers = computed(() => customerSearchStore.isLoading);
+const paginationInfo = computed(() => customerSearchStore.getPaginationInfo);
 
-  // Al Athar Customers
-  {
-    id: 5,
-    companyId: 'alathar',
-    name: 'Nasser Ibrahim',
-    type: 'individual',
-    mobile: '+966 50 567 8901',
-    email: 'nasser@example.com',
-    membershipNo: 'MEM001',
-    birthDate: '1990-05-15',
-    preferences: ['Oud', 'Amber']
-  },
-  {
-    id: 6,
-    companyId: 'alathar',
-    name: 'Sara Khalid',
-    type: 'individual',
-    mobile: '+966 55 678 9012',
-    email: 'sara@example.com',
-    membershipNo: 'MEM002',
-    birthDate: '1992-08-20',
-    preferences: ['Musk', 'Rose']
-  },
-  {
-    id: 7,
-    companyId: 'alathar',
-    name: 'Jarir Trading Co.',
-    type: 'business',
-    mobile: '+966 56 789 0123',
-    email: 'wholesale@jarir.com',
-    cr: '1010456789',
-    vat: '300000056',
-    sector: 'Retail',
-    purchaseLimit: 100000
-  },
-  {
-    id: 8,
-    companyId: 'alathar',
-    name: 'Nahdi Stores',
-    type: 'business',
-    mobile: '+966 58 890 1234',
-    email: 'orders@nahdi.com',
-    cr: '1010567890',
-    vat: '300000078',
-    sector: 'Pharmacy',
-    purchaseLimit: 75000
-  }
-]);
+// Search functionality
+const performSearch = async () => {
+  await customerSearchStore.searchCustomers({
+    searchKey: searchQuery.value,
+    isNotBusinessPartner: customerType.value === 'individual',
+    pageNumber: 1 // Reset to first page on new search
+  });
+};
 
-// Filter customers based on search query, type, and company
+// Pagination handlers
+const handleNextPage = async () => {
+  await customerSearchStore.nextPage();
+};
+
+const handlePreviousPage = async () => {
+  await customerSearchStore.previousPage();
+};
+
+const handlePageChange = async (page: number) => {
+  await customerSearchStore.goToPage(page);
+};
+
+// Empty customers array - all data now comes from API
+const customers = ref([]);
+
+// Use API customers only
 const filteredCustomers = computed(() => {
-  const query = searchQuery.value.toLowerCase();
-  return customers.value.filter(
-    (customer) =>
-      customer.companyId === companyStore.selectedCompanyId &&
-      customer.type === customerType.value &&
-      (customer.name.toLowerCase().includes(query) ||
-        customer.mobile.includes(query) ||
-        (customer.email && customer.email.toLowerCase().includes(query)) ||
-        (customer.cr && customer.cr.includes(query)) ||
-        customer.vehicles?.some((v) => v.plateNo.toLowerCase().includes(query)))
-  );
+  // Return API customers filtered by type
+  return apiCustomers.value.filter(customer => customer.type === customerType.value);
 });
 
 const validateForm = () => {
@@ -279,9 +194,19 @@ const resetForm = () => {
   initializeFormData();
 };
 
-// Initialize form data on component mount
-onMounted(() => {
+// Initialize form data and load initial customers on component mount
+onMounted(async () => {
   initializeFormData();
+  // Load initial customers
+  await performSearch();
+});
+
+// Watch for dialog show/hide to reset search
+watch(() => props.show, (newShow) => {
+  if (newShow) {
+    customerSearchStore.resetSearch();
+    searchQuery.value = '';
+  }
 });
 </script>
 
@@ -317,9 +242,17 @@ onMounted(() => {
             <InputText v-model="searchQuery" type="text" class="sap-input w-full mb-2" :placeholder="`Search ${customerType} customers...`" />
           </div>
 
+          <!-- Loading Indicator -->
+          <div v-if="isLoadingCustomers" class="flex align-items-center justify-content-center p-8">
+            <div class="flex flex-column align-items-center gap-3">
+              <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: var(--sap-primary)"></i>
+              <p class="text-lg" style="color: var(--sap-text-secondary)">Loading customers...</p>
+            </div>
+          </div>
+
           <!-- Search Results -->
-          <div class="customer-results flex flex-column">
-            <div v-for="customer in filteredCustomers" :key="customer.id" class="p-4 border-1 border-400 hover:border-blue-400 customer-card cursor-pointer">
+          <div v-else class="customer-results flex flex-column">
+            <div v-for="customer in filteredCustomers" :key="customer.id" class="p-4 border-1 border-400 hover:border-blue-400 customer-card cursor-pointer" @click="selectCustomer(customer, index)">
               <div class="flex align-items-center justify-content-between">
                 <div>
                   <h3 class="font-medium text-xl p-1 m-0">{{ customer.name }}</h3>
@@ -336,14 +269,19 @@ onMounted(() => {
               <div class="mt-2 flex gap-2 text-sm customer-details">
                 <!-- Business Details -->
                 <template v-if="customer.type === 'business'">
+                  <v-col>
                   <div class="w-16rem" v-if="customer.cr">CR: {{ customer.cr }}</div>
                   <div class="w-16rem" v-if="customer.vat">VAT: {{ customer.vat }}</div>
                   <div class="w-16rem" v-if="customer.fleet">Fleet Size: {{ customer.fleet }}</div>
+                  <div class="w-16rem" v-if="customer.sapCustomer">Sap Customer: {{ customer.sapCustomer }}</div>
+                  <div class="w-16rem" v-if="customer.city">City: {{ customer.city }}</div>
+                  <div class="w-16rem" v-if="customer.regionName">Region: {{ customer.regionName }}</div>
+                </v-col>
                 </template>
               </div>
 
               <!-- Vehicles Grid -->
-              <div v-if="customer.vehicles?.length" class="mt-4 grid vehicles-grid gap-3">
+              <!-- <div v-if="customer.vehicles?.length" class="mt-4 grid vehicles-grid gap-3">
                 <div v-for="(vehicle, index) in customer.vehicles" :key="vehicle.plateNo" class="p-3 vehicle-card" @click="selectCustomer(customer, index)">
                   <div class="flex align-items-center justify-content-between mb-1">
                     <span class="font-medium text-blue-600">{{ vehicle.plateNo }}</span>
@@ -352,11 +290,41 @@ onMounted(() => {
                   <div class="text-sm vehicle-details">{{ vehicle.make }} {{ vehicle.model }}</div>
                   <div class="text-xs vehicle-vin mt-1">VIN: {{ vehicle.vin }}</div>
                 </div>
-              </div>
+              </div> -->
             </div>
 
             <!-- No Results -->
-            <div v-if="searchQuery && !filteredCustomers.length" class="text-center no-results">No customers found</div>
+            <div v-if="!isLoadingCustomers && searchQuery && !filteredCustomers.length" class="text-center no-results">No customers found</div>
+
+            <!-- Pagination Controls -->
+            <div v-if="!isLoadingCustomers && paginationInfo.totalPages > 1" class="flex align-items-center justify-content-between p-3 border-1 border-300 border-round-lg pagination-controls">
+              <div class="flex align-items-center gap-2">
+                <span class="text-sm text-gray-600">
+                  Page {{ paginationInfo.currentPage }} of {{ paginationInfo.totalPages }}
+                  ({{ paginationInfo.totalCount }} total customers)
+                </span>
+              </div>
+              <div class="flex align-items-center gap-2">
+                <Button
+                  :disabled="!paginationInfo.hasPreviousPage"
+                  @click="handlePreviousPage"
+                  size="small"
+                  outlined
+                  class="pagination-btn"
+                >
+                  <span class="material-icons">chevron_left</span>
+                </Button>
+                <Button
+                  :disabled="!paginationInfo.hasNextPage"
+                  @click="handleNextPage"
+                  size="small"
+                  outlined
+                  class="pagination-btn"
+                >
+                  <span class="material-icons">chevron_right</span>
+                </Button>
+              </div>
+            </div>
 
             <!-- Create New Customer Button -->
             <button @click="showNewCustomerForm = true" class="w-full py-3 border-1 border-dashed border-400 text-gray-600 border-round-lg hover:border-blue-600 hover:text-blue-700">
@@ -607,6 +575,20 @@ onMounted(() => {
 .no-results {
   padding: 2rem 0;
   color: #6b7280;
+}
+
+/* Pagination Controls */
+.pagination-controls {
+  background-color: #f9fafb;
+  margin-top: 1rem;
+}
+
+.pagination-btn {
+  min-width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Create Customer Button */
