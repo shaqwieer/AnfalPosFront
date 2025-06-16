@@ -19,19 +19,19 @@ export const useTerminalStore = defineStore('terminal', () => {
   const getTerminalInfo = computed(() => terminalInfo.value);
   const isLoading = computed(() => loading.value);
   const hasError = computed(() => error.value !== null);
-  
+
   // Session-related getters
   const isSessionOpened = computed(() => terminalInfo.value.isSessionOpened || false);
   const sessionOpenDate = computed(() => terminalInfo.value.openSessionDate || null);
   const currentCash = computed(() => terminalInfo.value.currentCash || 0);
   const cashJournal = computed(() => terminalInfo.value.cashJournal || '');
   const cashCustomer = computed(() => terminalInfo.value.cashCustomer || '');
-  
+
   // Branch-related getters
   const branchId = computed(() => terminalInfo.value.branchId || null);
   const branchName = computed(() => terminalInfo.value.branchName || '');
   const salesRepCode = computed(() => terminalInfo.value.salesRepCode || '');
-  
+
   // Business settings getters
   const isBusinessToBusiness = computed(() => terminalInfo.value.isBusinessToBusiness || false);
   const canEditPrice = computed(() => terminalInfo.value.canEditPrice || false);
@@ -51,7 +51,7 @@ export const useTerminalStore = defineStore('terminal', () => {
   const fetchTerminalInfo = async (timezone = null) => {
     loading.value = true;
     error.value = null;
-    
+
     try {
       const ianaZone = timezone || getUserTimezone();
       const data = await terminalService.getTerminalInformationForPos(ianaZone);
@@ -67,11 +67,12 @@ export const useTerminalStore = defineStore('terminal', () => {
   };
 
   // Start automatic refresh
-  const startAutoRefresh = (intervalMs = 30000) => { // Default 30 seconds
+  const startAutoRefresh = (intervalMs = 30000) => {
+    // Default 30 seconds
     if (refreshInterval.value) {
       clearInterval(refreshInterval.value);
     }
-    
+
     refreshInterval.value = setInterval(() => {
       fetchTerminalInfo();
     }, intervalMs);
@@ -88,13 +89,13 @@ export const useTerminalStore = defineStore('terminal', () => {
   // Initialize terminal info
   const initializeTerminal = async () => {
     await fetchTerminalInfo();
-    startAutoRefresh();
+    // startAutoRefresh();
   };
 
   // Format session date for display
   const getFormattedSessionDate = computed(() => {
     if (!sessionOpenDate.value) return '';
-    
+
     try {
       const date = new Date(sessionOpenDate.value);
       return date.toLocaleString();
@@ -106,15 +107,15 @@ export const useTerminalStore = defineStore('terminal', () => {
   // Get session duration
   const getSessionDuration = computed(() => {
     if (!sessionOpenDate.value) return '';
-    
+
     try {
       const startDate = new Date(sessionOpenDate.value);
       const now = new Date();
       const diffMs = now - startDate;
-      
+
       const hours = Math.floor(diffMs / (1000 * 60 * 60));
       const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-      
+
       return `${hours}h ${minutes}m`;
     } catch (error) {
       return '';

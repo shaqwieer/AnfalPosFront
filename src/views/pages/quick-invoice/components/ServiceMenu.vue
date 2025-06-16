@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useOrderStore } from '../../../../stores/orderStore.ts';
-import { useCompanyStore } from '../../../../stores/companyStore.ts';
-import { useCategoryStore } from '../../../../stores/categoryStore.js';
+import { useOrderStore } from '@/stores/orderStore.ts';
+import { useCompanyStore } from '@/stores/companyStore.ts';
+import { useCategoryStore } from '@/stores/categoryStore.js';
 
 const searchQuery = ref('');
 const isCardView = ref(true);
@@ -186,11 +186,86 @@ const formatPrice = (price: number): string => {
 
       <!-- Products/Services View -->
       <div class="p-3 pb-8 overflow-y-auto products-container" :class="isCardView ? 'grid' : 'flex-column gap-2'">
-        <!-- Loading indicator -->
-        <div v-if="categoryStore.isItemsLoading" class="flex align-items-center justify-content-center p-8">
-          <div class="flex flex-column align-items-center gap-3">
-            <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: var(--sap-primary)"></i>
-            <p class="text-lg" style="color: var(--sap-text-secondary)">Loading products...</p>
+        <!-- Skeleton Loading -->
+        <div v-if="categoryStore.isItemsLoading" class="skeleton-container" :class="isCardView ? 'grid' : 'flex-column gap-2'">
+          <!-- Card View Skeletons -->
+          <div v-if="isCardView" v-for="n in 6" :key="`card-skeleton-${n}`" :class="'col-12 lg:col-6 xl:col-4'">
+            <div class="skeleton-card">
+              <div class="flex flex-column">
+                <!-- Image skeleton -->
+                <div class="skeleton-image mb-4"></div>
+                
+                <!-- SKU and Unit row -->
+                <div class="flex justify-content-between mb-3">
+                  <div class="flex align-items-center gap-2">
+                    <div class="skeleton-icon"></div>
+                    <div class="skeleton-text skeleton-text-sm"></div>
+                  </div>
+                  <div class="flex align-items-center gap-2">
+                    <div class="skeleton-icon"></div>
+                    <div class="skeleton-text skeleton-text-sm"></div>
+                  </div>
+                </div>
+
+                <!-- Product name -->
+                <div class="flex align-items-center gap-2 mb-3">
+                  <div class="skeleton-icon"></div>
+                  <div class="skeleton-text skeleton-text-lg flex-1"></div>
+                </div>
+
+                <!-- Size and Price row -->
+                <div class="flex justify-content-between">
+                  <div class="flex align-items-center gap-2">
+                    <div class="skeleton-icon"></div>
+                    <div class="skeleton-text skeleton-text-sm"></div>
+                  </div>
+                  <div class="flex align-items-center gap-2">
+                    <div class="skeleton-icon"></div>
+                    <div class="skeleton-text skeleton-text-md"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- List View Skeletons -->
+          <div v-else v-for="n in 8" :key="`list-skeleton-${n}`" class="skeleton-list-item">
+            <div class="flex align-items-center gap-1">
+              <!-- Image skeleton -->
+              <div class="skeleton-list-image mr-4"></div>
+              
+              <!-- Content skeleton -->
+              <div class="flex flex-column list-content py-2">
+                <div class="flex align-items-center gap-1 mb-2">
+                  <div class="skeleton-icon"></div>
+                  <div class="skeleton-text skeleton-text-md"></div>
+                </div>
+                <div class="flex align-items-center gap-1">
+                  <div class="skeleton-icon"></div>
+                  <div class="skeleton-text skeleton-text-lg"></div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="flex justify-content-between align-items-center gap-3">
+              <!-- Unit and Size -->
+              <div class="flex align-items-center gap-2">
+                <div class="skeleton-icon"></div>
+                <div class="skeleton-text skeleton-text-sm"></div>
+              </div>
+              <div class="flex align-items-center gap-2">
+                <div class="skeleton-icon"></div>
+                <div class="skeleton-text skeleton-text-sm"></div>
+              </div>
+
+              <!-- Info Button, Batch Tag, Price -->
+              <div class="skeleton-button"></div>
+              <div class="skeleton-tag"></div>
+              <div class="flex align-items-center gap-1">
+                <div class="skeleton-icon"></div>
+                <div class="skeleton-text skeleton-text-md"></div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -208,7 +283,7 @@ const formatPrice = (price: number): string => {
           <div v-if="isCardView" class="service-card cursor-pointer" @click="handleProductClick(service)">
             <div class="flex flex-column">
               <div class="relative mb-4 card-image-container">
-                <img :src="service.image" :alt="service.name" class="w-full card-image" />
+                <img src="/favicon.png" :alt="service.name" class="w-full card-image" />
                 <!-- Moved info button to top left and batch tag to top right -->
                 <div class="absolute card-info-btn">
                   <Button text @click="showProductDetails(service, $event)" class="p-1 bg-white rounded-full">
@@ -258,7 +333,7 @@ const formatPrice = (price: number): string => {
           <div v-else class="bg-white py-2 px-2 list-item flex align-items-center justify-content-between" @click="handleProductClick(service)">
             <div class="flex align-items-center gap-1">
               <!-- Image -->
-              <img :src="service.image" :alt="service.name" class="list-image mr-4" />
+              <img src="/favicon.png" :alt="service.name" class="list-image mr-4" />
               <!-- SKU and Name -->
               <div class="flex flex-column list-content py-2">
                 <div class="flex align-items-center gap-1">
@@ -436,7 +511,7 @@ const formatPrice = (price: number): string => {
         <div class="p-3 overflow-y-auto">
           <!-- Product Image -->
           <div class="relative product-image-container mb-6">
-            <img :src="selectedProduct.image" :alt="selectedProduct.name" class="w-full h-full product-detail-image" />
+            <img src="/favicon.png" :alt="selectedProduct.name" class="w-full h-full product-detail-image" />
           </div>
 
           <!-- Basic Info -->
@@ -622,6 +697,107 @@ const formatPrice = (price: number): string => {
   gap: 0.5rem;
 }
 
+/* Skeleton Loading Styles */
+.skeleton-container {
+  padding: 0.75rem;
+  padding-bottom: 2rem;
+  overflow-y: auto;
+  height: calc(100% - 140px);
+}
+
+/* Base skeleton animation */
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.skeleton-image,
+.skeleton-icon,
+.skeleton-text,
+.skeleton-list-image,
+.skeleton-button,
+.skeleton-tag {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+/* Card skeleton styles */
+.skeleton-card {
+  padding: 1.5rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+}
+
+.skeleton-image {
+  height: 8rem;
+  width: 100%;
+  border-radius: 0.75rem;
+}
+
+.skeleton-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.skeleton-text {
+  height: 1rem;
+  border-radius: 4px;
+}
+
+.skeleton-text-sm {
+  width: 60px;
+  height: 0.875rem;
+}
+
+.skeleton-text-md {
+  width: 80px;
+  height: 1rem;
+}
+
+.skeleton-text-lg {
+  width: 140px;
+  height: 1.125rem;
+}
+
+/* List skeleton styles */
+.skeleton-list-item {
+  background: white;
+  padding: 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.skeleton-list-image {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.5rem;
+}
+
+.skeleton-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
+
+.skeleton-tag {
+  width: 80px;
+  height: 24px;
+  border-radius: 12px;
+}
+
 /* Service Cards */
 .service-card {
   padding: 1.5rem;
@@ -643,8 +819,8 @@ const formatPrice = (price: number): string => {
 
 .card-image {
   height: 8rem;
-  object-fit: cover;
-  transform: scale(1);
+  object-fit: contain ;
+  transform: scale(0.8);
   transition: transform 0.3s;
 }
 
@@ -698,7 +874,7 @@ const formatPrice = (price: number): string => {
   width: 3rem;
   height: 3rem;
   border-radius: 0.5rem;
-  object-fit: cover;
+  object-fit: contain ;
 }
 
 .list-content {
@@ -789,7 +965,6 @@ const formatPrice = (price: number): string => {
 }
 
 .pricing-base-container {
-  /* background-color: #f9fafb; */
   border-radius: 0.5rem;
 }
 
@@ -846,7 +1021,6 @@ const formatPrice = (price: number): string => {
 }
 
 .add-to-cart-btn {
-  /* background-color: #2563eb; */
   color: white;
   border-radius: 0.5rem;
   border: none;
@@ -878,7 +1052,7 @@ const formatPrice = (price: number): string => {
 }
 
 .product-detail-image {
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .product-basic-grid {
