@@ -205,6 +205,41 @@ const reports = ref([
   },
   // Excel Reports
   {
+    id: 'aging-excel-report',
+    name: t('reports.agingExcelReport'),
+    icon: 'pi-file-excel',
+    format: 'Excel',
+    formatColor: 'bg-green-100',
+    formatTextColor: 'text-green-700',
+    cardColor: 'bg-indigo-50',
+    cardTextColor: 'text-indigo-700',
+    cardBorder: 'border-indigo-200',
+    description: t('reports.agingExcelReportDescription'),
+    endpoint: '/Invoices/GenerateAgingReportForExcel',
+    requestMethod: 'POST',
+    responseType: 'blob',
+    fileExtension: 'xlsx',
+    contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    filters: [
+      { 
+        type: 'date', 
+        name: 'asOfDate', 
+        label: t('reports.asOfDate'),
+        required: true,
+        default: new Date() 
+      },
+      { 
+        type: 'multiselect', 
+        name: 'branchIds', 
+        label: t('reports.branches'),
+        required: true,
+        endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
+        optionLabel: 'name',
+        optionValue: 'id'
+      }
+    ]
+  },
+  {
     id: 'sales-excel-report',
     name: t('reports.salesExcelReport'),
     icon: 'pi-file-excel',

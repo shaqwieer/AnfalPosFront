@@ -800,7 +800,9 @@
     "salesExcelReport": "Invoice Details Report",
     "allReports": "All",
     "totalReports": "Total Reports ",
-    "report": "Report"
+    "report": "Report",
+    "agingExcelReport": "Aging Report (Excel)",
+    "agingExcelReportDescription": "Generate aging report in Excel format with data from multiple branches"
   },
   "page": {
     "configHeader": "Page Configuration",

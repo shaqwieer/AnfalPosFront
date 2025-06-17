@@ -24,6 +24,7 @@ const showDatePicker = ref(false);
 const selectedDate = ref(new Date());
 const currentTransactionId = ref(null);
 const currentTransactionType = ref('');
+const assignmentNumber = ref(''); // New field for assignment number
 
 const RejectSession = (session) => {
   const payload = {
@@ -58,34 +59,30 @@ const confirmApproveWithDate = () => {
 
   // Get the IANA timezone identifier
   const ianaTimezone = getIanaTimezone();
-  
+
   const payload = {
     approveId: currentTransactionId.value,
     sessionId: sessionData.value.id,
     isCashDeposit: currentTransactionType.value === 'Deposits',
     dateTime: selectedDate.value.toISOString(), // Pure UTC date in ISO format (ends with Z)
-    timeZone: ianaTimezone // Separate field for IANA timezone
+    timeZone: ianaTimezone, // Separate field for IANA timezone
+    assignmentNumber: assignmentNumber.value // Add assignment number to payload
   };
-  
+
   console.log("Sending date in UTC:", payload.dateTime);
   console.log("Sending timezone:", payload.timeZone);
-  
-  debugger;
-  // const payload = {
-  //   approveId: currentTransactionId.value,
-  //   sessionId: sessionData.value.id,
-  //   isCashDeposit: currentTransactionType.value === 'Deposits',
-  //   dateTime: selectedDate.value
-  // };
-  // console.log('Payload:', payload); 
+  console.log("Assignment Number:", payload.assignmentNumber);
+
   sessionStore.ApproveSessionTransaction(payload);
   showDatePicker.value = false;
+  assignmentNumber.value = ''; // Reset after use
 };
 
 const cancelDateSelection = () => {
   showDatePicker.value = false;
   currentTransactionId.value = null;
   currentTransactionType.value = '';
+  assignmentNumber.value = ''; // Reset on cancel
 };
 
 const statusOptions = [
@@ -498,14 +495,16 @@ const formatPriceRaw = (price: number | undefined | null): number => {
     <Dialog v-model:visible="showDatePicker" header="Select Transaction Date" :modal="true" :closable="true" :style="{ width: '450px' }">
       <div class="flex flex-column gap-3">
         <div class="text-lg mb-2">Please select a date for this transaction:</div>
-        <Calendar v-model="selectedDate" :showIcon="true" dateFormat="dd/mm/yy" :showTime="true" hourFormat="24" :maxDate="maxDate" />
-      </div>
-      <!-- <template #footer> -->
-        <div class="flex justify-content-end mt-4 gap-2">
-          <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="cancelDateSelection" />
-          <Button label="Confirm" icon="pi pi-check" @click="confirmApproveWithDate" autofocus />
+        <Calendar v-model="selectedDate"  dateFormat="dd/mm/yy" :showTime="true" hourFormat="24" :maxDate="maxDate" />
+        <div class="flex flex-column gap-2">
+          <label class="block mb-1 font-semibold">Assignment Number (Bank Ref)</label>
+          <InputText class="w-16rem" v-model="assignmentNumber" placeholder="Enter Assignment Number" />
         </div>
-      <!-- </template> -->
+      </div>
+      <div class="flex justify-content-end mt-4 gap-2">
+        <Button label="Cancel" icon="pi pi-times" severity="danger" outlined @click="cancelDateSelection" />
+        <Button label="Confirm" icon="pi pi-check" @click="confirmApproveWithDate" autofocus />
+      </div>
     </Dialog>
   </Dialog>
 </template>

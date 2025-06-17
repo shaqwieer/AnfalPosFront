@@ -786,7 +786,9 @@
     "salesExcelReportDescription": "استخراج الاصناف بالاضافة لبيانات العميل والمندوب ",
     "allReports": "الكل",
     "totalReports": "مجموع التقارير ",
-    "report": "تقرير"
+    "report": "تقرير",
+    "agingExcelReport": "تقرير الأعمار (Excel)",
+    "agingExcelReportDescription": "إنشاء تقرير أعمار في صيغة Excel يحتوي على بيانات من فروع متعددة"
   },
   "page": {
     "configHeader": "إعداد الصفحات",
