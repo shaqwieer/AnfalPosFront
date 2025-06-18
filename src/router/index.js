@@ -12,6 +12,11 @@ const router = createRouter({
       component: AppLayout,
       children: [
         {
+          path: '/application-logs',
+          name: 'Application Logs',
+          component: () => import('@/views/pages/applicationLogs/ApplicationLogs.vue')
+        },
+        {
           path: '/pos-orders',
           name: 'Pos Orders',
           component: () => import('@/views/pages/posTransaction/posTransaction.vue')
@@ -720,19 +725,9 @@ router.beforeEach(async (to, from, next) => {
     next({ name: 'e-commerce' });
   } else if (token && !isAllowed) {
     next({ name: 'notfound' });
-  } else if (
-    token &&
-    organizationSelectable &&
-    !hasOrganizationId &&
-    to.path !== '/auth/organization-selectable'
-  ) {
+  } else if (token && organizationSelectable && !hasOrganizationId && to.path !== '/auth/organization-selectable') {
     next({ path: '/auth/organization-selectable' });
-  } else if (
-    token &&
-    branchSelectable &&
-    !hasBranchId &&
-    to.path !== '/auth/branch-selectable'
-  ) {
+  } else if (token && branchSelectable && !hasBranchId && to.path !== '/auth/branch-selectable') {
     next({ path: '/auth/branch-selectable' });
   } else {
     next();
