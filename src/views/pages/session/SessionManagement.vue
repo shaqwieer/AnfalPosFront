@@ -402,13 +402,68 @@ const paginatedCustomers = computed(() => {
               <span class="text-md flex">{{ slotProps.data.sessionEndDate }}</span>
             </template>
           </Column>
-          <Column field="cashAmount" class="">
+          <!-- Remove Amount column -->
+          <!-- Add Cash column -->
+          <Column field="cash" class="">
             <template #header>
-              <span class="text-lg flex font-bold"> {{ t('Session.CashAmount') }} </span>
+              <span class="text-lg flex font-bold"> {{ t('Session.Cash') }} </span>
             </template>
-
             <template #body="slotProps">
-              <div class="text-md font-semibold flex">{{ formatPrice(slotProps.data.allAmount) }}</div>
+              <div class="text-md font-semibold flex">{{ formatPrice(slotProps.data.cash) }}</div>
+            </template>
+          </Column>
+          <!-- Add Card column -->
+          <Column field="card" class="">
+            <template #header>
+              <span class="text-lg flex font-bold"> {{ t('Session.Card') }} </span>
+            </template>
+            <template #body="slotProps">
+              <div class="text-md font-semibold flex">{{ formatPrice(slotProps.data.card) }}</div>
+            </template>
+          </Column>
+          <!-- Add Bank column -->
+          <Column field="bank" class="">
+            <template #header>
+              <span class="text-lg flex font-bold"> {{ t('Session.Bank') }} </span>
+            </template>
+            <template #body="slotProps">
+              <div class="text-md font-semibold flex">{{ formatPrice(slotProps.data.bank) }}</div>
+            </template>
+          </Column>
+          <!-- Add Cash Carried Forward column -->
+          <Column field="cashCarriedForward" class="">
+            <template #header>
+              <span class="text-lg flex font-bold"> {{ t('Session.CashCarriedForward') }} </span>
+            </template>
+            <template #body="slotProps">
+              <div class="text-md font-semibold flex">{{ formatPrice(slotProps.data.cashCarriedForward) }}</div>
+            </template>
+          </Column>
+          <!-- Add Total Expenses column -->
+          <Column field="totalExpenses" class="">
+            <template #header>
+              <span class="text-lg flex font-bold"> {{ t('Session.TotalExpenses') }} </span>
+            </template>
+            <template #body="slotProps">
+              <div class="text-md font-semibold flex">{{ formatPrice(slotProps.data.totalExpenses) }}</div>
+            </template>
+          </Column>
+          <!-- Add Discrepancy column -->
+          <Column field="discrepancy" class="">
+            <template #header>
+              <span class="text-lg flex font-bold"> {{ t('Session.Discrepancy') }} </span>
+            </template>
+            <template #body="slotProps">
+              <div class="text-md font-semibold flex">
+                {{
+                  formatPrice(
+                    (slotProps.data.cash || 0) +
+                    (slotProps.data.cashCarriedForward || 0) -
+                    (slotProps.data.totalExpenses || 0) -
+                    (slotProps.data.depositAmount || 0)
+                  )
+                }}
+              </div>
             </template>
           </Column>
           <Column field="Credit Limit" class="" :sortable="true">

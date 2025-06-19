@@ -30,16 +30,16 @@ const reports = ref([
     fileExtension: 'pdf',
     contentType: 'application/pdf',
     filters: [
-      { 
-        type: 'date', 
-        name: 'asOfDate', 
+      {
+        type: 'date',
+        name: 'asOfDate',
         label: t('reports.asOfDate'),
         required: true,
-        default: new Date() 
+        default: new Date()
       },
-      { 
-        type: 'dropdown', 
-        name: 'branchId', 
+      {
+        type: 'dropdown',
+        name: 'branchId',
         label: t('reports.branch'),
         required: true,
         endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
@@ -65,9 +65,9 @@ const reports = ref([
     fileExtension: 'pdf',
     contentType: 'application/pdf',
     filters: [
-      { 
-        type: 'dropdown', 
-        name: 'branchId', 
+      {
+        type: 'dropdown',
+        name: 'branchId',
         label: t('reports.branch'),
         required: true,
         endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
@@ -93,9 +93,9 @@ const reports = ref([
     fileExtension: 'pdf',
     contentType: 'application/pdf',
     filters: [
-      { 
-        type: 'multiselect', 
-        name: 'branchIds', 
+      {
+        type: 'multiselect',
+        name: 'branchIds',
         label: t('reports.branches'),
         required: true,
         endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
@@ -132,9 +132,9 @@ const reports = ref([
           endDate: new Date()
         }
       },
-      { 
-        type: 'dropdown', 
-        name: 'branchId', 
+      {
+        type: 'dropdown',
+        name: 'branchId',
         label: t('reports.branch'),
         required: true,
         endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
@@ -171,9 +171,9 @@ const reports = ref([
           endDate: null
         }
       },
-      { 
-        type: 'dropdown', 
-        name: 'branchId', 
+      {
+        type: 'dropdown',
+        name: 'branchId',
         label: t('reports.branch'),
         required: false,
         endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
@@ -181,9 +181,9 @@ const reports = ref([
         optionLabel: 'name',
         optionValue: 'id'
       },
-      { 
-        type: 'dropdown', 
-        name: 'paymentMethodId', 
+      {
+        type: 'dropdown',
+        name: 'paymentMethodId',
         label: t('reports.paymentMethod'),
         required: false,
         endpoint: '/PaymentMethods',
@@ -191,9 +191,9 @@ const reports = ref([
         optionLabel: 'name',
         optionValue: 'id'
       },
-      { 
-        type: 'dropdown', 
-        name: 'sessionId', 
+      {
+        type: 'dropdown',
+        name: 'sessionId',
         label: t('reports.sessionNumber'),
         required: false,
         endpoint: '/Payments/GenerateCollectionPdfLookup',
@@ -221,16 +221,16 @@ const reports = ref([
     fileExtension: 'xlsx',
     contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     filters: [
-      { 
-        type: 'date', 
-        name: 'asOfDate', 
+      {
+        type: 'date',
+        name: 'asOfDate',
         label: t('reports.asOfDate'),
         required: true,
-        default: new Date() 
+        default: new Date()
       },
-      { 
-        type: 'multiselect', 
-        name: 'branchIds', 
+      {
+        type: 'multiselect',
+        name: 'branchIds',
         label: t('reports.branches'),
         required: true,
         endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
@@ -267,9 +267,48 @@ const reports = ref([
           endDate: new Date()
         }
       },
-      { 
-        type: 'multiselect', 
-        name: 'branchIds', 
+      {
+        type: 'multiselect',
+        name: 'branchIds',
+        label: t('reports.branches'),
+        required: true,
+        endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
+        optionLabel: 'name',
+        optionValue: 'id'
+      }
+    ]
+  },
+  {
+    id: 'payments-approval-excel-report',
+    name: t('reports.paymentsApprovalExcelReport'),
+    icon: 'pi-file-excel',
+    format: 'Excel',
+    formatColor: 'bg-green-100',
+    formatTextColor: 'text-green-700',
+    cardColor: 'bg-cyan-50',
+    cardTextColor: 'text-cyan-700',
+    cardBorder: 'border-cyan-200',
+    description: t('reports.paymentsApprovalExcelReportDescription'),
+    endpoint: '/Invoices/GetPaymentsApprovelExcelReport',
+    requestMethod: 'POST',
+    responseType: 'blob',
+    fileExtension: 'xlsx',
+    contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    filters: [
+      {
+        type: 'daterange',
+        startDate: 'fromDate',
+        endDate: 'toDate',
+        label: t('reports.dateRange'),
+        required: true,
+        default: {
+          startDate: new Date(new Date().setDate(new Date().getDate() - 30)),
+          endDate: new Date()
+        }
+      },
+      {
+        type: 'multiselect',
+        name: 'branchIds',
         label: t('reports.branches'),
         required: true,
         endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
@@ -286,16 +325,14 @@ const formatFilter = ref('all'); // 'all', 'pdf', 'excel'
 // Computed filtered reports
 const filteredReports = computed(() => {
   if (formatFilter.value === 'all') return reports.value;
-  return reports.value.filter(report => 
-    formatFilter.value === 'pdf' ? report.format === 'PDF' : report.format === 'Excel'
-  );
+  return reports.value.filter((report) => (formatFilter.value === 'pdf' ? report.format === 'PDF' : report.format === 'Excel'));
 });
 
 // Report stats
 const reportStats = computed(() => ({
   total: reports.value.length,
-  pdf: reports.value.filter(r => r.format === 'PDF').length,
-  excel: reports.value.filter(r => r.format === 'Excel').length
+  pdf: reports.value.filter((r) => r.format === 'PDF').length,
+  excel: reports.value.filter((r) => r.format === 'Excel').length
 }));
 
 // Dialog state
@@ -313,30 +350,24 @@ const selectReport = (report) => {
 
 const resetFilterValues = () => {
   if (!selectedReport.value) return;
-  
+
   // Initialize filter values with defaults
   filterValues.value = {};
-  selectedReport.value.filters.forEach(filter => {
+  selectedReport.value.filters.forEach((filter) => {
     if (filter.type === 'date' || filter.type === 'datetime') {
       filterValues[filter.name] = filter.default || new Date();
-    } 
-    else if (filter.type === 'daterange') {
+    } else if (filter.type === 'daterange') {
       filterValues[filter.startDate] = filter.default?.startDate;
       filterValues[filter.endDate] = filter.default?.endDate;
-    }
-    else if (filter.type === 'dropdown') {
+    } else if (filter.type === 'dropdown') {
       filterValues[filter.name] = null;
-    }
-    else if (filter.type === 'multiselect') {
+    } else if (filter.type === 'multiselect') {
       filterValues[filter.name] = [];
-    }
-    else if (filter.type === 'checkbox') {
+    } else if (filter.type === 'checkbox') {
       filterValues[filter.name] = filter.default || false;
-    }
-    else if (filter.type === 'radio') {
+    } else if (filter.type === 'radio') {
       filterValues[filter.name] = filter.default || filter.options?.[0]?.value;
-    }
-    else {
+    } else {
       filterValues[filter.name] = filter.default || null;
     }
   });
@@ -365,7 +396,7 @@ const loadFilterOptions = async () => {
 
 const isFormValid = computed(() => {
   if (!selectedReport.value) return false;
-  
+
   for (const filter of selectedReport.value.filters) {
     if (filter.required) {
       if (filter.type === 'daterange') {
@@ -392,12 +423,12 @@ const generateReport = async () => {
     // Prepare payload/params from filter values
     const payload = {};
     const params = {};
-    
-    selectedReport.value.filters.forEach(filter => {
+
+    selectedReport.value.filters.forEach((filter) => {
       if (filter.type === 'daterange') {
         const startValue = filterValues[filter.startDate];
         const endValue = filterValues[filter.endDate];
-        
+
         if (selectedReport.value.requestMethod === 'GET') {
           if (startValue) params[filter.startDate] = startValue.toISOString();
           if (endValue) params[filter.endDate] = endValue.toISOString();
@@ -437,7 +468,7 @@ const generateReport = async () => {
     const contentType = selectedReport.value.contentType || response.headers['content-type'];
     const blob = new Blob([response.data], { type: contentType });
     const url = window.URL.createObjectURL(blob);
-    
+
     // Create a link to download the file
     const link = document.createElement('a');
     link.href = url;
@@ -445,11 +476,11 @@ const generateReport = async () => {
     link.setAttribute('download', `${selectedReport.value.id}-${timestamp}.${selectedReport.value.fileExtension}`);
     document.body.appendChild(link);
     link.click();
-    
+
     // Clean up
     window.URL.revokeObjectURL(url);
     document.body.removeChild(link);
-    
+
     mainStore.loading.setNotificationInfo('success', t('reports.downloadSuccess'));
     reportDialogVisible.value = false;
   } catch (err) {
@@ -473,7 +504,7 @@ onMounted(() => {
         <h3 class="text-700 text-3xl font-semibold">{{ t('reports.header') }}</h3>
         <p class="text-500 text-lg">{{ t('reports.description') }}</p>
       </div>
-      
+
       <!-- Report Stats & Filter -->
       <div class="lg:col-4 px-0 pt-2">
         <div class="flex flex-column gap-3">
@@ -484,22 +515,19 @@ onMounted(() => {
               <span class="text-sm font-medium">{{ reportStats.total }} {{ t('reports.totalReports') }}</span>
             </div>
           </div>
-          
+
           <!-- Format Filter -->
           <div class="flex justify-content-end">
             <div class="filter-button-group flex border-round-lg overflow-hidden border-1 border-gray-300">
-              <button 
+              <button
                 @click="formatFilter = 'all'"
-                :class="[
-                  'filter-btn px-3 py-2 border-none cursor-pointer transition-all transition-duration-200 text-sm font-medium',
-                  formatFilter === 'all' ? 'bg-primary text-white' : 'bg-white text-gray-700 hover:bg-gray-50'
-                ]"
+                :class="['filter-btn px-3 py-2 border-none cursor-pointer transition-all transition-duration-200 text-sm font-medium', formatFilter === 'all' ? 'bg-primary text-white' : 'bg-white text-gray-700 hover:bg-gray-50']"
               >
                 <i class="pi pi-list mr-2"></i>
                 {{ t('reports.allReports') }} ({{ reportStats.total }})
               </button>
-              
-              <button 
+
+              <button
                 @click="formatFilter = 'pdf'"
                 :class="[
                   'filter-btn px-3 py-2 border-none cursor-pointer transition-all transition-duration-200 text-sm font-medium border-left-1 border-gray-300',
@@ -509,8 +537,8 @@ onMounted(() => {
                 <i class="pi pi-file-pdf mr-2 text-red-600"></i>
                 PDF ({{ reportStats.pdf }})
               </button>
-              
-              <button 
+
+              <button
                 @click="formatFilter = 'excel'"
                 :class="[
                   'filter-btn px-3 py-2 border-none cursor-pointer transition-all transition-duration-200 text-sm font-medium border-left-1 border-gray-300',
@@ -529,14 +557,7 @@ onMounted(() => {
     <!-- Reports Grid -->
     <div class="grid" style="min-width: 100%">
       <div v-for="report in filteredReports" :key="report.id" class="col-12 lg:col-6 xl:col-4">
-        <div 
-          :class="[
-            'card mb-4 cursor-pointer shadow-2 hover:shadow-5 transition-duration-200 border-2',
-            report.cardColor,
-            report.cardBorder
-          ]" 
-          @click="selectReport(report)"
-        >
+        <div :class="['card mb-4 cursor-pointer shadow-2 hover:shadow-5 transition-duration-200 border-2', report.cardColor, report.cardBorder]" @click="selectReport(report)">
           <div class="flex flex-column p-4 h-full">
             <!-- Header with Format Badge -->
             <div class="flex justify-content-between align-items-start mb-3">
@@ -548,42 +569,26 @@ onMounted(() => {
                   <h3 :class="['font-semibold text-lg m-0', report.cardTextColor]">{{ report.name }}</h3>
                 </div>
               </div>
-              
+
               <!-- Format Badge -->
-              <Tag 
-                :class="[report.formatColor, report.formatTextColor, 'font-bold text-xs']"
-                :icon="`pi ${report.icon}`"
-              >
+              <Tag :class="[report.formatColor, report.formatTextColor, 'font-bold text-xs']" :icon="`pi ${report.icon}`">
                 {{ report.format }}
               </Tag>
             </div>
-            
+
             <!-- Description -->
             <p class="line-height-3 text-600 my-3 text-sm flex-1">{{ report.description }}</p>
-            
+
             <!-- Footer with Filter Tags -->
             <div class="flex justify-content-between align-items-end mt-auto">
               <div class="flex gap-1 flex-wrap">
-                <Tag 
-                  v-for="(filter, index) in report.filters.slice(0, 2)" 
-                  :key="index" 
-                  class="bg-white text-gray-700 font-medium text-xs border-1 border-gray-300"
-                >
+                <Tag v-for="(filter, index) in report.filters.slice(0, 2)" :key="index" class="bg-white text-gray-700 font-medium text-xs border-1 border-gray-300">
                   {{ filter.label }}
                 </Tag>
-                <Tag 
-                  v-if="report.filters.length > 2" 
-                  class="bg-white text-gray-700 font-medium text-xs border-1 border-gray-300"
-                >
-                  +{{ report.filters.length - 2 }}
-                </Tag>
+                <Tag v-if="report.filters.length > 2" class="bg-white text-gray-700 font-medium text-xs border-1 border-gray-300"> +{{ report.filters.length - 2 }} </Tag>
               </div>
-              
-              <Button 
-                icon="pi pi-download" 
-                :class="[report.cardTextColor, 'p-button-rounded p-button-text']" 
-                size="small"
-              />
+
+              <Button icon="pi pi-download" :class="[report.cardTextColor, 'p-button-rounded p-button-text']" size="small" />
             </div>
           </div>
         </div>
@@ -601,69 +606,46 @@ onMounted(() => {
   </div>
 
   <!-- Report Parameter Dialog -->
-  <Dialog v-model:visible="reportDialogVisible" :modal="true" :closable="true" :style="{width: '500px'}" :header="selectedReport?.name">
+  <Dialog v-model:visible="reportDialogVisible" :modal="true" :closable="true" :style="{ width: '500px' }" :header="selectedReport?.name">
     <div v-if="selectedReport" class="flex flex-column gap-3 p-3">
       <!-- Format Indicator in Dialog -->
       <div class="flex align-items-center gap-2 mb-3 p-3 border-round" :class="selectedReport.formatColor">
         <i :class="['pi', selectedReport.icon, selectedReport.formatTextColor, 'text-lg']"></i>
-        <span :class="['font-semibold', selectedReport.formatTextColor]">
-          {{ selectedReport.format }} {{ t('reports.report') }}
-        </span>
+        <span :class="['font-semibold', selectedReport.formatTextColor]"> {{ selectedReport.format }} {{ t('reports.report') }} </span>
       </div>
-      
+
       <div v-for="filter in selectedReport.filters" :key="filter.name" class="field w-full">
-        <label :for="filter.name" class="block font-medium mb-2" :class="{ 'required': filter.required }">
+        <label :for="filter.name" class="block font-medium mb-2" :class="{ required: filter.required }">
           {{ filter.label }}
         </label>
 
         <!-- Date Picker -->
-        <Calendar 
-          v-if="filter.type === 'date'" 
-          v-model="filterValues[filter.name]" 
-          :showIcon="true" 
-          :id="filter.name"
-          dateFormat="yy-mm-dd"
-          class="w-full"
-        />
-        
+        <Calendar v-if="filter.type === 'date'" v-model="filterValues[filter.name]" :showIcon="true" :id="filter.name" dateFormat="yy-mm-dd" class="w-full" />
+
         <!-- Date Range Picker -->
         <div v-else-if="filter.type === 'daterange'" class="flex gap-2">
-          <Calendar 
-            v-model="filterValues[filter.startDate]" 
-            :showIcon="true" 
-            :id="filter.startDate"
-            dateFormat="yy-mm-dd"
-            class="w-full"
-            :placeholder="t('reports.startDate')"
-          />
-          <Calendar 
-            v-model="filterValues[filter.endDate]" 
-            :showIcon="true" 
-            :id="filter.endDate"
-            dateFormat="yy-mm-dd"
-            class="w-full"
-            :placeholder="t('reports.endDate')"
-          />
+          <Calendar v-model="filterValues[filter.startDate]" :showIcon="true" :id="filter.startDate" dateFormat="yy-mm-dd" class="w-full" :placeholder="t('reports.startDate')" />
+          <Calendar v-model="filterValues[filter.endDate]" :showIcon="true" :id="filter.endDate" dateFormat="yy-mm-dd" class="w-full" :placeholder="t('reports.endDate')" />
         </div>
-        
+
         <!-- Dropdown -->
-        <Dropdown 
-          v-else-if="filter.type === 'dropdown'" 
-          filter 
-          v-model="filterValues[filter.name]" 
-          :options="filterOptions[filter.name] || []" 
-          :optionLabel="filter.optionLabel" 
+        <Dropdown
+          v-else-if="filter.type === 'dropdown'"
+          filter
+          v-model="filterValues[filter.name]"
+          :options="filterOptions[filter.name] || []"
+          :optionLabel="filter.optionLabel"
           :optionValue="filter.optionValue"
           :placeholder="filter.label"
           class="w-full"
         />
 
         <!-- MultiSelect -->
-        <MultiSelect 
-          v-else-if="filter.type === 'multiselect'" 
-          v-model="filterValues[filter.name]" 
-          :options="filterOptions[filter.name] || []" 
-          :optionLabel="filter.optionLabel" 
+        <MultiSelect
+          v-else-if="filter.type === 'multiselect'"
+          v-model="filterValues[filter.name]"
+          :options="filterOptions[filter.name] || []"
+          :optionLabel="filter.optionLabel"
           :optionValue="filter.optionValue"
           :placeholder="filter.label"
           class="w-full"
@@ -671,21 +653,11 @@ onMounted(() => {
         />
 
         <!-- Text Input -->
-        <InputText 
-          v-else-if="filter.type === 'text'" 
-          v-model="filterValues[filter.name]" 
-          :id="filter.name"
-          :placeholder="filter.label"
-          class="w-full"
-        />
+        <InputText v-else-if="filter.type === 'text'" v-model="filterValues[filter.name]" :id="filter.name" :placeholder="filter.label" class="w-full" />
 
         <!-- Checkbox -->
         <div v-else-if="filter.type === 'checkbox'" class="flex align-items-center">
-          <Checkbox 
-            v-model="filterValues[filter.name]" 
-            :inputId="filter.name"
-            :binary="true"
-          />
+          <Checkbox v-model="filterValues[filter.name]" :inputId="filter.name" :binary="true" />
           <label :for="filter.name" class="ml-2">{{ filter.label }}</label>
         </div>
 
@@ -693,10 +665,10 @@ onMounted(() => {
       </div>
     </div>
 
-      <div class="flex justify-content-end gap-2">
-        <Button :label="t('reports.cancel')" severity="secondary" outlined @click="reportDialogVisible = false" />
-        <Button :label="t('reports.generate')" :loading="loading" @click="generateReport()" :disabled="!isFormValid" />
-      </div>
+    <div class="flex justify-content-end gap-2">
+      <Button :label="t('reports.cancel')" severity="secondary" outlined @click="reportDialogVisible = false" />
+      <Button :label="t('reports.generate')" :loading="loading" @click="generateReport()" :disabled="!isFormValid" />
+    </div>
   </Dialog>
 </template>
 
@@ -706,7 +678,7 @@ onMounted(() => {
 }
 
 .field .required:after {
-  content: " *";
+  content: ' *';
   color: red;
 }
 

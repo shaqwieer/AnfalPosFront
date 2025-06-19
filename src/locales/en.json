@@ -699,7 +699,9 @@
     "Selectanattachmenttopreview": "Select an attachment to preview",
     "Details": "Session Details",
     "SessionEndDate": "Session End Date",
-    "NoticeMessage": "Note: Sessions without transactions, cash deposits, or expenses will not appear in search results."
+    "NoticeMessage": "Note: Sessions without transactions, cash deposits, or expenses will not appear in search results.",
+    "TotalExpenses": "Total Expense",
+    "CashCarriedForward": "Cash Carry Forward"
   },
   "Visit": {
     "CustomerName": "Customer Name",
@@ -802,7 +804,9 @@
     "totalReports": "Total Reports ",
     "report": "Report",
     "agingExcelReport": "Aging Report (Excel)",
-    "agingExcelReportDescription": "Generate aging report in Excel format with data from multiple branches"
+    "agingExcelReportDescription": "Generate aging report in Excel format with data from multiple branches",
+    "paymentsApprovalExcelReport": "Payments Approval Report (Excel)",
+    "paymentsApprovalExcelReportDescription": "Generate payments approval report in Excel format with data from selected branches and date range"
   },
   "page": {
     "configHeader": "Page Configuration",
@@ -917,7 +921,7 @@
     "loadingDesc": "Setting up your organizational workspace...",
     "selectionSuccess": "Organization selected successfully"
   },
-    "applicationLogs": {
+  "applicationLogs": {
     "header": "Application Logs",
     "description": "Search and view application logs with detailed information and properties",
     "level": "Log Level",

@@ -686,7 +686,9 @@
     "Selectanattachmenttopreview": "حدد مرفقًا للمعاينة",
     "Details": "تفاصيل الجلسة",
     "SessionEndDate": "تاريخ انتهاء الجلسة",
-    "NoticeMessage": "ملاحظة: لن تظهر الجلسات التي لا تحتوي على معاملات أو إيداعات نقدية أو نفقات في نتائج البحث"
+    "NoticeMessage": "ملاحظة: لن تظهر الجلسات التي لا تحتوي على معاملات أو إيداعات نقدية أو نفقات في نتائج البحث",
+    "TotalExpenses": "أجمالى المصاريف",
+    "CashCarriedForward": "الرصيد الافتتاحى"
   },
   "Visit": {
     "VisitManagement": "إدارة الزيارة",
@@ -788,7 +790,9 @@
     "totalReports": "مجموع التقارير ",
     "report": "تقرير",
     "agingExcelReport": "تقرير الأعمار (Excel)",
-    "agingExcelReportDescription": "إنشاء تقرير أعمار في صيغة Excel يحتوي على بيانات من فروع متعددة"
+    "agingExcelReportDescription": "إنشاء تقرير أعمار في صيغة Excel يحتوي على بيانات من فروع متعددة",
+    "paymentsApprovalExcelReport": "تقرير الموافقات على الدفعات (إكسل)",
+    "paymentsApprovalExcelReportDescription": "توليد تقرير الموافقات على الدفعات بصيغة Excel باستخدام بيانات الفروع المختارة ونطاق التاريخ"
   },
   "page": {
     "configHeader": "إعداد الصفحات",
