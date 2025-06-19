@@ -1,6 +1,6 @@
 <template>
   <div class="col-12">
-    <div class="card">
+    <div class="card ">
       <div class="flex justify-content-between align-items-center p-4 border-bottom-1 surface-border">
         <h4 class="text-xl font-semibold m-0">{{ t('applicationLogs.logsList') }}</h4>
         <Button icon="pi pi-refresh" severity="secondary" @click="$emit('refresh')" :loading="loading" />
@@ -178,6 +178,8 @@ const formatPropertyValue = (value) => {
 <style scoped>
 .card {
   border-radius: 12px;
+  height: 600px;
+  overflow-y: scroll;
 }
 
 .hover:surface-hover:hover {

@@ -688,7 +688,8 @@
     "SessionEndDate": "تاريخ انتهاء الجلسة",
     "NoticeMessage": "ملاحظة: لن تظهر الجلسات التي لا تحتوي على معاملات أو إيداعات نقدية أو نفقات في نتائج البحث",
     "TotalExpenses": "أجمالى المصاريف",
-    "CashCarriedForward": "الرصيد الافتتاحى"
+    "CashCarriedForward": "الرصيد الافتتاحى",
+    "depositAmount": "المبلغ المودع"
   },
   "Visit": {
     "VisitManagement": "إدارة الزيارة",

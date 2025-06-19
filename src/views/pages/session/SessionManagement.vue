@@ -144,7 +144,6 @@ const getSessions = useDebounceFn(
     formData.append('EndDate', new Date(dateTo.value).toISOString());
     formData.append('IanaZone', Intl.DateTimeFormat().resolvedOptions().timeZone);
 
-
     await sessionStore.GetSessions(formData);
     changedFilter.value = false;
   },
@@ -204,8 +203,7 @@ const paginatedCustomers = computed(() => {
   <div class="">
     <div class="max-w-7xl mx-auto">
       <div class="mx-3 mb-3">
-        <div class="border-round-lg p-3 flex align-items-center gap-2 border-1"
-          :class="[darkMode ? 'bg-blue-900 border-blue-500 text-blue-100' : 'bg-blue-50 border-blue-200 text-blue-700']">
+        <div class="border-round-lg p-3 flex align-items-center gap-2 border-1" :class="[darkMode ? 'bg-blue-900 border-blue-500 text-blue-100' : 'bg-blue-50 border-blue-200 text-blue-700']">
           <i class="pi pi-info-circle text-xl"></i>
           <span class="font-medium">{{ t('Session.NoticeMessage') }}</span>
         </div>
@@ -377,6 +375,15 @@ const paginatedCustomers = computed(() => {
               {{ t('Session.empty') }}
             </div>
           </template>
+          <Column field="sessionId" class="">
+            <template #header>
+              <span class="text-lg font-bold">#</span>
+            </template>
+
+            <template #body="slotProps">
+              <div class="flex text-lg">{{ slotProps.data.sessionId }}</div>
+            </template>
+          </Column>
           <Column field="salesRep" class="" :sortable="true">
             <template #header>
               <span class="text-lg font-bold"> {{ t('Session.SalesRep') }}</span>
@@ -394,7 +401,7 @@ const paginatedCustomers = computed(() => {
               <span class="text-md flex">{{ slotProps.data.sessionStartDate }}</span>
             </template>
           </Column>
-          <Column field="sessionEndDate" >
+          <Column field="sessionEndDate">
             <template #header>
               <span class="text-lg font-bold"> {{ t('Session.SessionEndDate') }} </span>
             </template>
@@ -448,6 +455,14 @@ const paginatedCustomers = computed(() => {
               <div class="text-md font-semibold flex">{{ formatPrice(slotProps.data.totalExpenses) }}</div>
             </template>
           </Column>
+          <Column field="depositAmount" class="">
+            <template #header>
+              <span class="text-lg flex font-bold"> {{ t('Session.depositAmount') }} </span>
+            </template>
+            <template #body="slotProps">
+              <div class="text-md font-semibold flex">{{ formatPrice(slotProps.data.depositAmount) }}</div>
+            </template>
+          </Column>
           <!-- Add Discrepancy column -->
           <Column field="discrepancy" class="">
             <template #header>
@@ -455,14 +470,7 @@ const paginatedCustomers = computed(() => {
             </template>
             <template #body="slotProps">
               <div class="text-md font-semibold flex">
-                {{
-                  formatPrice(
-                    (slotProps.data.cash || 0) +
-                    (slotProps.data.cashCarriedForward || 0) -
-                    (slotProps.data.totalExpenses || 0) -
-                    (slotProps.data.depositAmount || 0)
-                  )
-                }}
+                {{ formatPrice((slotProps.data.cash || 0) + (slotProps.data.cashCarriedForward || 0) - (slotProps.data.totalExpenses || 0) - (slotProps.data.depositAmount || 0)) }}
               </div>
             </template>
           </Column>

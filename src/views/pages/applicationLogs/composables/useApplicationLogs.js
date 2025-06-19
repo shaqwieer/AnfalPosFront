@@ -64,7 +64,8 @@ export function useApplicationLogs() {
         searchTerm: filters.searchTerm || undefined,
         fromDate: filters.fromDate?.toISOString(),
         toDate: filters.toDate?.toISOString(),
-        requestPath: filters.requestPath || undefined
+        requestPath: filters.requestPath || undefined,
+        ianaZone: Intl.DateTimeFormat().resolvedOptions().timeZone
       };
 
       // Remove undefined values

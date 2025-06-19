@@ -701,7 +701,8 @@
     "SessionEndDate": "Session End Date",
     "NoticeMessage": "Note: Sessions without transactions, cash deposits, or expenses will not appear in search results.",
     "TotalExpenses": "Total Expense",
-    "CashCarriedForward": "Cash Carry Forward"
+    "CashCarriedForward": "Cash Carry Forward",
+    "depositAmount": "Deposit Amount"
   },
   "Visit": {
     "CustomerName": "Customer Name",
