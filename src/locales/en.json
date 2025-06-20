@@ -806,8 +806,13 @@
     "report": "Report",
     "agingExcelReport": "Aging Report (Excel)",
     "agingExcelReportDescription": "Generate aging report in Excel format with data from multiple branches",
-    "paymentsApprovalExcelReport": "Payments Approval Report (Excel)",
-    "paymentsApprovalExcelReportDescription": "Generate payments approval report in Excel format with data from selected branches and date range"
+    "paymentsApprovalExcelReport": "Payments Approval Report ",
+    "paymentsApprovalExcelReportDescription": "Generate payments approval report in Excel format with data from selected branches and date range",
+    "title": "Reports",
+    "exportExcel": "Export Excel",
+    "exportPdf": "Export Pdf",
+    "selectReport": "Select Report",
+    "pleaseFillRequiredFields": "Please Fill Required Fields"
   },
   "page": {
     "configHeader": "Page Configuration",
