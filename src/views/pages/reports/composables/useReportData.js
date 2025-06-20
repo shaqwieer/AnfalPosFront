@@ -3,17 +3,24 @@ import { useMainStore } from '@/stores/mainStore';
 import apiClient from '@/api/apiClient';
 import { handleError } from '@/utilities/errorHandler';
 import { useReportFilters } from './useReportFilters';
+import { buildChartData, buildMultipleCharts } from '../utils/chartBuilder';
+import { buildSummaryData, buildFormattedSummaryCards } from '../utils/summaryBuilder';
+import { buildTableConfig } from '../utils/tableBuilder';
+import { useDebounceFn } from '@vueuse/core';
 
 export function useReportData(report) {
   const mainStore = useMainStore();
-  
+
   // Get filter composable
   const { filterValues, isFormValid, prepareFilterPayload } = useReportFilters(report);
-  
+
   // Reactive state
   const reportData = ref([]);
   const reportSummary = ref({});
   const chartData = ref({});
+  const multipleCharts = ref([]);
+  const formattedSummaryCards = ref([]);
+  const tableConfig = ref({});
   const loading = ref(false);
   const error = ref(null);
   const lastFetchTime = ref(null);
@@ -31,9 +38,13 @@ export function useReportData(report) {
     return chartData.value && chartData.value.labels && chartData.value.labels.length > 0;
   });
 
+  const hasMultipleCharts = computed(() => {
+    return multipleCharts.value && multipleCharts.value.length > 0;
+  });
+
   const dataStats = computed(() => {
     if (!hasData.value) return {};
-    
+
     return {
       totalRows: reportData.value.length,
       lastUpdated: lastFetchTime.value,
@@ -63,17 +74,18 @@ export function useReportData(report) {
 
     try {
       const payload = prepareFilterPayload('data');
-      
+
       const response = await apiClient({
         url: report.value.dataEndpoint,
         method: report.value.dataMethod || 'POST',
         data: payload,
         timeout: 30000 // 30 seconds timeout
       });
+      debugger;
 
       if (response.data.success) {
         const responseData = response.data.data;
-        
+
         // Handle different response structures
         if (responseData.items && Array.isArray(responseData.items)) {
           reportData.value = responseData.items;
@@ -89,14 +101,11 @@ export function useReportData(report) {
           reportSummary.value = responseData || {};
         }
 
-        // Generate chart data
-        await prepareChartData();
-        
+        // Process data with dynamic builders
+        await processReportData();
+
         lastFetchTime.value = new Date();
-        
-        // Track successful data load
-        trackDataLoad('success', reportData.value.length);
-        
+
       } else {
         throw new Error(response.data.message || 'Failed to load report data');
       }
@@ -104,11 +113,8 @@ export function useReportData(report) {
       error.value = err.message || 'Failed to load report data';
       reportData.value = [];
       reportSummary.value = {};
-      chartData.value = {};
-      
-      // Track failed data load
-      trackDataLoad('error', 0, err.message);
-      
+      clearProcessedData();
+
       // Don't show error toast for user-initiated actions
       if (!forceRefresh) {
         handleError(err, mainStore.loading);
@@ -118,159 +124,123 @@ export function useReportData(report) {
     }
   };
 
-  const prepareChartData = async () => {
-    if (!report.value?.chartConfig || !hasData.value) {
-      chartData.value = {};
+  /**
+   * Process report data using dynamic builders
+   */
+  const processReportData = async () => {
+    if (!hasData.value || !report.value) {
+      clearProcessedData();
       return;
     }
 
-    const config = report.value.chartConfig;
-    
     try {
-      if (config.type === 'bar' || config.type === 'line') {
-        await prepareBarLineChartData(config);
-      } else if (config.type === 'doughnut' || config.type === 'pie') {
-        await prepareDoughnutPieChartData(config);
-      } else if (config.type === 'radar') {
-        await prepareRadarChartData(config);
-      } else if (config.type === 'polarArea') {
-        await preparePolarAreaChartData(config);
+      // Build summary data using dynamic summary builder
+      if (report.value.summaryCards && report.value.summaryCards.length > 0) {
+        const summaryData = buildSummaryData(reportData.value, report.value.summaryCards, {
+          includeMetadata: true,
+          filters: filterValues
+        });
+
+        reportSummary.value = { ...reportSummary.value, ...summaryData };
+
+        // Build formatted summary cards for display
+        formattedSummaryCards.value = buildFormattedSummaryCards(summaryData, report.value.summaryCards);
+      }
+
+      // Build chart data using dynamic chart builder
+      if (report.value.chartConfig) {
+        chartData.value = buildChartData(reportData.value, report.value.chartConfig);
+      }
+
+      // Build multiple charts if configured
+      if (report.value.chartConfigs && report.value.chartConfigs.length > 0) {
+        multipleCharts.value = buildMultipleCharts(reportData.value, report.value.chartConfigs);
+      }
+
+      // Build table configuration using dynamic table builder
+      if (report.value.columns && report.value.columns.length > 0) {
+        tableConfig.value = buildTableConfig(reportData.value, report.value.columns, {
+          enablePagination: true,
+          defaultPageSize: 25,
+          enableSorting: true,
+          enableFiltering: true,
+          enableExport: true
+        });
       }
     } catch (error) {
-      console.error('Failed to prepare chart data:', error);
-      chartData.value = {};
+      console.error('Error processing report data:', error);
+      clearProcessedData();
     }
   };
 
-  const prepareBarLineChartData = async (config) => {
-    const labels = [...new Set(reportData.value.map(item => item[config.xField]))];
-    const data = labels.map(label => {
-      const items = reportData.value.filter(item => item[config.xField] === label);
-      return items.reduce((sum, item) => sum + (parseFloat(item[config.yField]) || 0), 0);
-    });
-    
-    chartData.value = {
-      labels,
-      datasets: [{
-        label: config.title,
-        data,
-        backgroundColor: config.type === 'bar' 
-          ? 'rgba(54, 162, 235, 0.8)' 
-          : 'rgba(75, 192, 192, 0.2)',
-        borderColor: config.type === 'bar' 
-          ? 'rgba(54, 162, 235, 1)' 
-          : 'rgba(75, 192, 192, 1)',
-        borderWidth: 2,
-        fill: config.type === 'line',
-        tension: config.type === 'line' ? 0.4 : 0
-      }]
-    };
+  /**
+   * Clear all processed data
+   */
+  const clearProcessedData = () => {
+    chartData.value = {};
+    multipleCharts.value = [];
+    formattedSummaryCards.value = [];
+    tableConfig.value = {};
   };
 
-  const prepareDoughnutPieChartData = async (config) => {
-    const groupedData = reportData.value.reduce((acc, item) => {
-      const key = item[config.labelField];
-      const value = parseFloat(item[config.valueField]) || 0;
-      acc[key] = (acc[key] || 0) + value;
-      return acc;
-    }, {});
-    
-    chartData.value = {
-      labels: Object.keys(groupedData),
-      datasets: [{
-        data: Object.values(groupedData),
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.8)',
-          'rgba(54, 162, 235, 0.8)',
-          'rgba(255, 205, 86, 0.8)',
-          'rgba(75, 192, 192, 0.8)',
-          'rgba(153, 102, 255, 0.8)',
-          'rgba(255, 159, 64, 0.8)',
-          'rgba(199, 199, 199, 0.8)',
-          'rgba(83, 102, 255, 0.8)'
-        ],
-        borderColor: [
-          'rgba(255, 99, 132, 1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 205, 86, 1)',
-          'rgba(75, 192, 192, 1)',
-          'rgba(153, 102, 255, 1)',
-          'rgba(255, 159, 64, 1)',
-          'rgba(199, 199, 199, 1)',
-          'rgba(83, 102, 255, 1)'
-        ],
-        borderWidth: 2
-      }]
-    };
+  /**
+   * Switch between multiple chart configurations
+   */
+  const switchChart = (chartId) => {
+    if (!report.value?.chartConfigs) return;
+
+    const chartConfig = report.value.chartConfigs.find((config) => config.id === chartId);
+    if (chartConfig) {
+      chartData.value = buildChartData(reportData.value, chartConfig);
+    }
   };
 
-  const prepareRadarChartData = async (config) => {
-    // Radar chart implementation
-    const labels = [...new Set(reportData.value.map(item => item[config.labelField]))];
-    const data = labels.map(label => {
-      const items = reportData.value.filter(item => item[config.labelField] === label);
-      return items.reduce((sum, item) => sum + (parseFloat(item[config.valueField]) || 0), 0);
-    });
-    
-    chartData.value = {
-      labels,
-      datasets: [{
-        label: config.title,
-        data,
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-        borderColor: 'rgba(54, 162, 235, 1)',
-        borderWidth: 2
-      }]
-    };
-  };
-
-  const preparePolarAreaChartData = async (config) => {
-    // Similar to doughnut but for polar area
-    await prepareDoughnutPieChartData(config);
-  };
-
+  /**
+   * Refresh data with current filters
+   */
   const refreshData = () => {
     return loadReportData(true);
   };
 
+  /**
+   * Clear all data
+   */
   const clearData = () => {
     reportData.value = [];
     reportSummary.value = {};
-    chartData.value = {};
+    clearProcessedData();
     error.value = null;
     lastFetchTime.value = null;
   };
 
-  const trackDataLoad = (status, recordCount, errorMessage = null) => {
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'report_data_load', {
-        report_id: report.value?.id,
-        status,
-        record_count: recordCount,
-        error_message: errorMessage
-      });
-    }
+  /**
+   * Update summary with custom aggregations
+   */
+  const updateSummaryWithCustomAggregations = (customAggregators) => {
+    if (!hasData.value || !report.value?.summaryCards) return;
+
+    const summaryData = buildSummaryData(reportData.value, report.value.summaryCards, {
+      includeMetadata: true,
+      customAggregators,
+      filters: filterValues
+    });
+
+    reportSummary.value = { ...reportSummary.value, ...summaryData };
+    formattedSummaryCards.value = buildFormattedSummaryCards(summaryData, report.value.summaryCards);
   };
 
-  const exportDataAsJSON = () => {
-    if (!hasData.value) return null;
-    
-    const exportData = {
-      report: {
-        id: report.value.id,
-        name: report.value.name,
-        generated: new Date().toISOString()
-      },
-      summary: reportSummary.value,
-      data: reportData.value,
-      metadata: {
-        totalRows: reportData.value.length,
-        columns: report.value.columns?.map(col => col.field) || []
-      }
-    };
-    
-    return JSON.stringify(exportData, null, 2);
+  /**
+   * Get nested value from object using dot notation
+   */
+  const getNestedValue = (obj, path) => {
+    if (!obj || !path) return null;
+
+    return path.split('.').reduce((current, key) => {
+      return current && current[key] !== undefined ? current[key] : null;
+    }, obj);
   };
+
+
 
   // Watch for filter changes and auto-reload data
   watch(
@@ -279,8 +249,7 @@ export function useReportData(report) {
       // Only reload if form is valid and filters have actually changed
       if (newIsValid && report.value?.dataEndpoint) {
         // Add debounce to avoid too many requests
-        clearTimeout(loadReportData.debounceTimer);
-        loadReportData.debounceTimer = setTimeout(() => {
+        useDebounceFn(() => {
           loadReportData();
         }, 500);
       }
@@ -300,20 +269,26 @@ export function useReportData(report) {
     reportData,
     reportSummary,
     chartData,
+    multipleCharts,
+    formattedSummaryCards,
+    tableConfig,
     loading,
     error,
     lastFetchTime,
-    
+
     // Computed
     hasData,
     hasSummary,
     hasChartData,
+    hasMultipleCharts,
     dataStats,
-    
+
     // Methods
     loadReportData,
     refreshData,
     clearData,
-    exportDataAsJSON
+    switchChart,
+    updateSummaryWithCustomAggregations,
+    processReportData
   };
 }

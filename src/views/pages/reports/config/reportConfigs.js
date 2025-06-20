@@ -311,34 +311,139 @@ export const reportConfigs = [
     name: 'reports.salesExcelReport',
     icon: 'pi-file-excel',
     category: 'sales',
-    description: 'Comprehensive sales data export and analysis',
+    description: 'Comprehensive invoice detail export and analysis',
     
-    dataEndpoint: '/Invoices/GetSalesData',
+    // Updated endpoint
+    dataEndpoint: '/Invoices/GetInvoiceDetailAsPreview',
     dataMethod: 'POST',
     excelEndpoint: '/Invoices/GetSalesAsExcel',
     excelMethod: 'POST',
     
-    chartConfig: {
-      type: 'line',
-      xField: 'date',
-      yField: 'amount',
-      title: 'Sales Performance'
-    },
-    
-    summaryCards: [
-      { key: 'totalSales', label: 'Total Sales', format: 'currency', color: 'primary' },
-      { key: 'totalInvoices', label: 'Total Invoices', format: 'number', color: 'success' },
-      { key: 'avgInvoiceValue', label: 'Avg Invoice', format: 'currency', color: 'info' },
-      { key: 'activeBranches', label: 'Active Branches', format: 'number', color: 'warning' }
+    // Dynamic chart configurations
+    chartConfigs: [
+      {
+        id: 'salesByBranch',
+        type: 'bar',
+        title: 'Sales by Branch',
+        groupBy: 'branchEnglishName',
+        aggregate: { field: 'finalAmount', operation: 'sum' },
+        options: { responsive: true }
+      },
+      {
+        id: 'salesByCustomer',
+        type: 'doughnut',
+        title: 'Top 10 Customers by Sales',
+        groupBy: 'customerName',
+        aggregate: { field: 'finalAmount', operation: 'sum' },
+        limit: 10,
+        sortBy: 'desc'
+      },
+      {
+        id: 'quantityByProduct',
+        type: 'bar',
+        title: 'Quantity by Product',
+        groupBy: 'sapDesc',
+        aggregate: { field: 'quantity', operation: 'sum' },
+        limit: 15
+      },
+      {
+        id: 'salesTrend',
+        type: 'line',
+        title: 'Sales Trend Over Time',
+        groupBy: 'invoiceCreation',
+        groupByFormat: 'date',
+        aggregate: { field: 'finalAmount', operation: 'sum' },
+        options: { tension: 0.4 }
+      }
     ],
     
+    // Default chart (first one)
+    chartConfig: {
+      type: 'bar',
+      groupBy: 'branchEnglishName',
+      aggregate: { field: 'finalAmount', operation: 'sum' },
+      title: 'Sales by Branch'
+    },
+    
+    // Dynamic summary cards
+    summaryCards: [
+      { 
+        key: 'totalSales', 
+        label: 'Total Sales', 
+        format: 'currency', 
+        color: 'primary',
+        aggregate: { field: 'finalAmount', operation: 'sum' }
+      },
+      { 
+        key: 'totalInvoices', 
+        label: 'Total Invoices', 
+        format: 'number', 
+        color: 'success',
+        aggregate: { field: 'billingDocId', operation: 'countUnique' }
+      },
+      { 
+        key: 'totalQuantity', 
+        label: 'Total Quantity', 
+        format: 'number', 
+        color: 'info',
+        aggregate: { field: 'quantity', operation: 'sum' }
+      },
+      { 
+        key: 'avgOrderValue', 
+        label: 'Avg Order Value', 
+        format: 'currency', 
+        color: 'warning',
+        aggregate: { field: 'finalAmount', operation: 'average' }
+      },
+      { 
+        key: 'totalCustomers', 
+        label: 'Unique Customers', 
+        format: 'number', 
+        color: 'secondary',
+        aggregate: { field: 'customerSapCode', operation: 'countUnique' }
+      },
+      { 
+        key: 'freeProducts', 
+        label: 'Free Products', 
+        format: 'number', 
+        color: 'success',
+        aggregate: { field: 'isFreeProduct', operation: 'countTrue' }
+      }
+    ],
+    
+    // Updated columns for InvoiceDetailExcelReportDto
     columns: [
-      { field: 'invoiceNumber', header: 'Invoice #', sortable: true, filterable: true },
-      { field: 'customerName', header: 'Customer', sortable: true, filterable: true },
-      { field: 'branchName', header: 'Branch', sortable: true, filterable: true },
-      { field: 'invoiceDate', header: 'Date', sortable: true, type: 'date' },
-      { field: 'amount', header: 'Amount', sortable: true, type: 'currency' },
-      { field: 'status', header: 'Status', sortable: true, filterable: true, type: 'status' }
+      // Invoice Information
+      { field: 'billingDocId', header: 'Invoice #', sortable: true, filterable: true, width: '120px' },
+      { field: 'salesOrderId', header: 'Sales Order #', sortable: true, filterable: true, width: '120px' },
+      { field: 'invoiceCreation', header: 'Invoice Date', sortable: true, type: 'date', width: '110px' },
+      
+      // Customer Information
+      { field: 'customerName', header: 'Customer', sortable: true, filterable: true, width: '200px' },
+      { field: 'customerSapCode', header: 'Customer Code', sortable: true, filterable: true, width: '120px' },
+      
+      // Product Information
+      { field: 'sapItem', header: 'Item Code', sortable: true, filterable: true, width: '120px' },
+      { field: 'sapDesc', header: 'Product Description', sortable: true, filterable: true, width: '250px' },
+      { field: 'batch', header: 'Batch', sortable: true, filterable: true, width: '100px' },
+      
+      // Quantity & Pricing
+      { field: 'quantity', header: 'Quantity', sortable: true, type: 'number', width: '100px' },
+      { field: 'unit', header: 'Unit', sortable: true, filterable: true, width: '80px' },
+      { field: 'price', header: 'Unit Price', sortable: true, type: 'currency', width: '110px' },
+      
+      // Financial Details
+      { field: 'taxTotal', header: 'Tax', sortable: true, type: 'currency', width: '100px' },
+      { field: 'finalAmount', header: 'Final Amount', sortable: true, type: 'currency', width: '120px' },
+      { field: 'totalAmount', header: 'Total Amount', sortable: true, type: 'currency', width: '120px' },
+      
+      // Branch Information
+      { field: 'branchEnglishName', header: 'Branch', sortable: true, filterable: true, width: '150px' },
+      { field: 'sapStorageLocation', header: 'Storage Location', sortable: true, filterable: true, width: '130px' },
+      
+      // Flags
+      { field: 'isFreeProduct', header: 'Free Product', sortable: true, type: 'boolean', width: '100px' },
+      { field: 'isSpecificPrice', header: 'Special Price', sortable: true, type: 'boolean', width: '100px' }
     ],
     
     filters: [
@@ -427,38 +532,7 @@ export const reportConfigs = [
   }
 ];
 
-// Helper functions for report configuration
-export const getReportById = (id) => {
-  return reportConfigs.find(report => report.id === id);
-};
 
-export const getReportsByCategory = (category) => {
-  if (!category || category === 'all') {
-    return reportConfigs;
-  }
-  return reportConfigs.filter(report => report.category === category);
-};
 
-export const getAvailableCategories = () => {
-  const categories = [...new Set(reportConfigs.map(r => r.category))];
-  return categories.map(cat => ({
-    label: cat.charAt(0).toUpperCase() + cat.slice(1),
-    value: cat
-  }));
-};
 
-// Validation helper
-export const validateReportConfig = (config) => {
-  const errors = [];
-  
-  if (!config.id) errors.push('Report ID is required');
-  if (!config.name) errors.push('Report name is required');
-  if (!config.dataEndpoint && !config.pdfEndpoint && !config.excelEndpoint) {
-    errors.push('At least one endpoint is required');
-  }
-  
-  return {
-    isValid: errors.length === 0,
-    errors
-  };
-};
+

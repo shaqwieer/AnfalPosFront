@@ -6,7 +6,7 @@ import { validateFilters } from '../utils/validators';
 
 export function useReportFilters(report) {
   const mainStore = useMainStore();
-  
+
   // Reactive state
   const filterValues = reactive({});
   const filterOptions = reactive({});
@@ -16,23 +16,15 @@ export function useReportFilters(report) {
   // Computed properties
   const isFormValid = computed(() => {
     if (!report.value) return false;
-    
+
     const validation = validateFilters(report.value.filters, filterValues);
     validationErrors.value = validation.errors;
-    
+
     return validation.isValid;
   });
 
   const hasRequiredFields = computed(() => {
-    return report.value?.filters?.some(filter => filter.required) || false;
-  });
-
-  const appliedFiltersCount = computed(() => {
-    return Object.keys(filterValues).filter(key => {
-      const value = filterValues[key];
-      return value !== null && value !== undefined && value !== '' && 
-             (Array.isArray(value) ? value.length > 0 : true);
-    }).length;
+    return report.value?.filters?.some((filter) => filter.required) || false;
   });
 
   // Methods
@@ -40,7 +32,7 @@ export function useReportFilters(report) {
     if (!report.value) return;
 
     // Clear existing values
-    Object.keys(filterValues).forEach(key => {
+    Object.keys(filterValues).forEach((key) => {
       delete filterValues[key];
     });
 
@@ -70,7 +62,6 @@ export function useReportFilters(report) {
 
   const loadFilterOptions = async () => {
     if (!report.value) return;
-
     loading.value = true;
     const loadPromises = [];
 
@@ -78,6 +69,7 @@ export function useReportFilters(report) {
       for (const filter of report.value.filters) {
         if ((filter.type === 'dropdown' || filter.type === 'multiselect') && filter.endpoint) {
           const promise = loadFilterOption(filter);
+          console.log('loadFilterOptions called');
           loadPromises.push(promise);
         }
       }
@@ -94,10 +86,10 @@ export function useReportFilters(report) {
   const loadFilterOption = async (filter) => {
     try {
       const response = await apiClient.get(filter.endpoint);
-      
+
       if (response.data.success) {
         const data = response.data.data;
-        
+
         // Handle lookup key if specified
         if (filter.lookupKey && data[filter.lookupKey]) {
           filterOptions[filter.name] = data[filter.lookupKey];
@@ -115,12 +107,11 @@ export function useReportFilters(report) {
     }
   };
 
+  // Clear all filter values For Datatable
   const clearFilters = () => {
-    Object.keys(filterValues).forEach(key => {
-      const filter = report.value.filters.find(f => 
-        f.name === key || f.startDate === key || f.endDate === key
-      );
-      
+    Object.keys(filterValues).forEach((key) => {
+      const filter = report.value.filters.find((f) => f.name === key || f.startDate === key || f.endDate === key);
+
       if (filter) {
         if (filter.type === 'multiselect') {
           filterValues[key] = [];
@@ -131,31 +122,23 @@ export function useReportFilters(report) {
         }
       }
     });
-    
+
     validationErrors.value = {};
-  };
-
-  const getFilterValue = (filterName) => {
-    return filterValues[filterName];
-  };
-
-  const setFilterValue = (filterName, value) => {
-    filterValues[filterName] = value;
   };
 
   const prepareFilterPayload = (transformType = 'data') => {
     const payload = {};
-    
+
     report.value.filters.forEach((filter) => {
       if (filter.type === 'daterange') {
         const startValue = filterValues[filter.startDate];
         const endValue = filterValues[filter.endDate];
-        
+
         if (startValue) payload[filter.startDate] = startValue.toISOString();
         if (endValue) payload[filter.endDate] = endValue.toISOString();
       } else {
         const value = filterValues[filter.name];
-        
+
         if (value !== null && value !== undefined && value !== '') {
           // Handle special transformations for different endpoints
           if (transformType === 'pdf' && filter.pdfTransform) {
@@ -174,62 +157,25 @@ export function useReportFilters(report) {
         }
       }
     });
-    
+
     return payload;
   };
 
-  const getFilterSummary = () => {
-    const summary = [];
-    
-    report.value.filters.forEach(filter => {
-      if (filter.type === 'daterange') {
-        const startValue = filterValues[filter.startDate];
-        const endValue = filterValues[filter.endDate];
-        
-        if (startValue || endValue) {
-          summary.push({
-            label: filter.label,
-            value: `${startValue ? startValue.toLocaleDateString() : ''} - ${endValue ? endValue.toLocaleDateString() : ''}`
-          });
-        }
-      } else {
-        const value = filterValues[filter.name];
-        
-        if (value !== null && value !== undefined && value !== '') {
-          let displayValue = value;
-          
-          // Format display value based on type
-          if (Array.isArray(value)) {
-            displayValue = `${value.length} selected`;
-          } else if (filter.type === 'date') {
-            displayValue = value.toLocaleDateString();
-          } else if (filter.type === 'dropdown' && filter.optionLabel) {
-            const option = filterOptions[filter.name]?.find(opt => opt[filter.optionValue] === value);
-            displayValue = option ? option[filter.optionLabel] : value;
-          }
-          
-          summary.push({
-            label: filter.label,
-            value: displayValue
-          });
-        }
-      }
-    });
-    
-    return summary;
-  };
-
   // Watch for report changes
-  watch(report, async (newReport) => {
-    if (newReport) {
-      await resetFilterValues();
-      await loadFilterOptions();
+  watch(
+    report,
+    async (newReport) => {
+      if (newReport) {
+        console.log('Report changed, resetting filter values and loading options');
+        await resetFilterValues();
+        await loadFilterOptions();
+      }
     }
-  }, { immediate: true });
+  );
 
   // Watch for dependent filter changes
   const setupDependentFilters = () => {
-    report.value?.filters?.forEach(filter => {
+    report.value?.filters?.forEach((filter) => {
       if (filter.dependsOn) {
         watch(
           () => filterValues[filter.dependsOn],
@@ -237,7 +183,7 @@ export function useReportFilters(report) {
             if (newValue) {
               // Clear dependent filter value
               filterValues[filter.name] = filter.type === 'multiselect' ? [] : null;
-              
+
               // Reload options for dependent filter
               if (filter.endpoint) {
                 await loadFilterOption(filter);
@@ -260,19 +206,15 @@ export function useReportFilters(report) {
     filterOptions,
     loading,
     validationErrors,
-    
+
     // Computed
     isFormValid,
     hasRequiredFields,
-    appliedFiltersCount,
-    
+
     // Methods
     resetFilterValues,
     loadFilterOptions,
     clearFilters,
-    getFilterValue,
-    setFilterValue,
-    prepareFilterPayload,
-    getFilterSummary
+    prepareFilterPayload
   };
 }

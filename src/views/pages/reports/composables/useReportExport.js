@@ -27,15 +27,7 @@ export function useReportExport(report) {
     return type === 'pdf' ? !!reportConfig.pdfEndpoint : !!reportConfig.excelEndpoint;
   };
 
-  const getAvailableExportTypes = computed(() => {
-    if (!report.value) return [];
-    
-    const types = [];
-    if (report.value.pdfEndpoint) types.push('pdf');
-    if (report.value.excelEndpoint) types.push('excel');
-    
-    return types;
-  });
+
 
   // Methods
   const exportReport = async (type, options = {}) => {
@@ -78,13 +70,13 @@ export function useReportExport(report) {
         method: method || 'POST',
         data: payload,
         responseType: 'blob',
-        timeout: 120000, // 2 minutes timeout for exports
-        onDownloadProgress: (progressEvent) => {
-          if (progressEvent.lengthComputable) {
-            const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            exportProgress.value = Math.min(25 + (progress * 0.7), 95);
-          }
-        }
+        timeout: 120000 // 2 minutes timeout for exports
+        // onDownloadProgress: (progressEvent) => {
+        //   if (progressEvent.lengthComputable) {
+        //     const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        //     exportProgress.value = Math.min(25 + (progress * 0.7), 95);
+        //   }
+        // }
       });
 
       exportProgress.value = 95;
@@ -101,8 +93,6 @@ export function useReportExport(report) {
         // Show success message
         mainStore.loading.setNotificationInfo('success', t('reports.exportSuccess'));
         
-        // Track export success
-        trackExport('success', type);
         
         return true;
       } else {
@@ -112,8 +102,7 @@ export function useReportExport(report) {
     } catch (err) {
       console.error('Export failed:', err);
       
-      // Track export failure
-      trackExport('error', type, err.message);
+
       
       // Handle specific error types
       if (err.code === 'ECONNABORTED') {
@@ -194,115 +183,8 @@ export function useReportExport(report) {
     return results;
   };
 
-  const scheduleExport = async (type, schedule, options = {}) => {
-    // This would typically integrate with a backend scheduling service
-    try {
-      const payload = {
-        reportId: report.value.id,
-        exportType: type,
-        schedule,
-        filters: prepareFilterPayload(type),
-        options
-      };
-      
-      const response = await apiClient.post('/reports/schedule-export', payload);
-      
-      if (response.data.success) {
-        mainStore.loading.setNotificationInfo('success', t('reports.exportScheduled'));
-        return response.data.scheduleId;
-      }
-    } catch (error) {
-      handleError(error, mainStore.loading);
-    }
-    
-    return null;
-  };
+ 
 
-  const addToExportHistory = (type, filters) => {
-    const historyItem = {
-      id: Date.now(),
-      reportId: report.value.id,
-      reportName: report.value.name,
-      type,
-      timestamp: new Date(),
-      filters: { ...filters },
-      success: true
-    };
-    
-    exportHistory.value.unshift(historyItem);
-    
-    // Keep only last 10 exports
-    if (exportHistory.value.length > 10) {
-      exportHistory.value = exportHistory.value.slice(0, 10);
-    }
-    
-    // Store in localStorage for persistence
-    try {
-      localStorage.setItem('reportExportHistory', JSON.stringify(exportHistory.value));
-    } catch (error) {
-      console.warn('Failed to save export history:', error);
-    }
-  };
-
-  const loadExportHistory = () => {
-    try {
-      const stored = localStorage.getItem('reportExportHistory');
-      if (stored) {
-        exportHistory.value = JSON.parse(stored);
-      }
-    } catch (error) {
-      console.warn('Failed to load export history:', error);
-      exportHistory.value = [];
-    }
-  };
-
-  const clearExportHistory = () => {
-    exportHistory.value = [];
-    try {
-      localStorage.removeItem('reportExportHistory');
-    } catch (error) {
-      console.warn('Failed to clear export history:', error);
-    }
-  };
-
-  const trackExport = (status, type, errorMessage = null) => {
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'report_export', {
-        report_id: report.value?.id,
-        export_type: type,
-        status,
-        error_message: errorMessage
-      });
-    }
-  };
-
-  const getExportOptions = (type) => {
-    const baseOptions = {
-      includeCharts: true,
-      timestamp: true
-    };
-    
-    if (type === 'pdf') {
-      return {
-        ...baseOptions,
-        pageSize: 'A4',
-        orientation: 'portrait',
-        margins: 'normal'
-      };
-    } else if (type === 'excel') {
-      return {
-        ...baseOptions,
-        includeFormulas: false,
-        autoFilter: true,
-        freezeHeaders: true
-      };
-    }
-    
-    return baseOptions;
-  };
-
-  // Load export history on initialization
-  loadExportHistory();
 
   return {
     // State
@@ -312,15 +194,11 @@ export function useReportExport(report) {
     
     // Computed
     canExport,
-    getAvailableExportTypes,
     
     // Methods
     exportReport,
     exportMultipleFormats,
-    scheduleExport,
-    hasExportType,
-    getExportOptions,
-    clearExportHistory,
-    loadExportHistory
+    hasExportType
+
   };
 }
