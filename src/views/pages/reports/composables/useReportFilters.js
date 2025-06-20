@@ -1,157 +1,138 @@
-import { ref, reactive, computed, watch, nextTick } from 'vue';
-import { useMainStore } from '@/stores/mainStore';
+// composables/useReportFilters.js
+import { ref, reactive, watch } from 'vue';
 import apiClient from '@/api/apiClient';
 import { handleError } from '@/utilities/errorHandler';
-import { validateFilters } from '../utils/validators';
+import { useMainStore } from '@/stores/mainStore';
 
-export function useReportFilters(report) {
+export function useReportFilters() {
   const mainStore = useMainStore();
-
-  // Reactive state
-  const filterValues = reactive({});
-  const filterOptions = reactive({});
   const loading = ref(false);
-  const validationErrors = ref({});
+  const filterOptions = reactive({});
+  const filterValues = reactive({});
 
-  // Computed properties
-  const isFormValid = computed(() => {
-    if (!report.value) return false;
+  // Cache for API responses to avoid duplicate calls
+  const optionsCache = new Map();
 
-    const validation = validateFilters(report.value.filters, filterValues);
-    validationErrors.value = validation.errors;
-
-    return validation.isValid;
-  });
-
-  const hasRequiredFields = computed(() => {
-    return report.value?.filters?.some((filter) => filter.required) || false;
-  });
-
-  // Methods
-  const resetFilterValues = async () => {
-    if (!report.value) return;
-
+  const initializeFilters = (filters) => {
     // Clear existing values
-    Object.keys(filterValues).forEach((key) => {
+    Object.keys(filterValues).forEach(key => {
       delete filterValues[key];
     });
 
-    // Set default values
-    report.value.filters.forEach((filter) => {
-      if (filter.type === 'date') {
-        filterValues[filter.name] = filter.default || new Date();
-      } else if (filter.type === 'daterange') {
-        filterValues[filter.startDate] = filter.default?.startDate || null;
-        filterValues[filter.endDate] = filter.default?.endDate || null;
-      } else if (filter.type === 'dropdown') {
-        filterValues[filter.name] = filter.default || null;
-      } else if (filter.type === 'multiselect') {
-        filterValues[filter.name] = filter.default || [];
-      } else if (filter.type === 'checkbox') {
-        filterValues[filter.name] = filter.default || false;
-      } else if (filter.type === 'radio') {
-        filterValues[filter.name] = filter.default || filter.options?.[0]?.value || null;
-      } else {
-        filterValues[filter.name] = filter.default || null;
+    // Initialize with defaults
+    filters.forEach((filter) => {
+      switch (filter.type) {
+        case 'date':
+        case 'datetime':
+          filterValues[filter.name] = filter.default || new Date();
+          break;
+        case 'daterange':
+          filterValues[filter.startDate] = filter.default?.startDate || null;
+          filterValues[filter.endDate] = filter.default?.endDate || null;
+          break;
+        case 'dropdown':
+          filterValues[filter.name] = null;
+          break;
+        case 'multiselect':
+          filterValues[filter.name] = [];
+          break;
+        case 'checkbox':
+          filterValues[filter.name] = filter.default || false;
+          break;
+        case 'radio':
+          filterValues[filter.name] = filter.default || filter.options?.[0]?.value;
+          break;
+        default:
+          filterValues[filter.name] = filter.default || null;
       }
     });
-
-    // Clear validation errors
-    validationErrors.value = {};
   };
 
-  const loadFilterOptions = async () => {
-    if (!report.value) return;
+  const loadFilterOptions = async (filters) => {
+    if (!filters || filters.length === 0) return;
+
     loading.value = true;
-    const loadPromises = [];
-
     try {
-      for (const filter of report.value.filters) {
-        if ((filter.type === 'dropdown' || filter.type === 'multiselect') && filter.endpoint) {
-          const promise = loadFilterOption(filter);
-          console.log('loadFilterOptions called');
-          loadPromises.push(promise);
-        }
-      }
+      // Clear existing options
+      Object.keys(filterOptions).forEach(key => {
+        delete filterOptions[key];
+      });
 
-      await Promise.all(loadPromises);
+      // Load options for filters that need API data
+      const apiCalls = filters
+        .filter(filter => 
+          (filter.type === 'dropdown' || filter.type === 'multiselect') && 
+          filter.endpoint
+        )
+        .map(async (filter) => {
+          // Check cache first
+          const cacheKey = filter.endpoint;
+          if (optionsCache.has(cacheKey)) {
+            filterOptions[filter.name] = optionsCache.get(cacheKey);
+            return;
+          }
+
+          try {
+            const response = await apiClient.get(filter.endpoint);
+            if (response.data.success) {
+              const options = response.data.data;
+              filterOptions[filter.name] = options;
+              // Cache the response
+              optionsCache.set(cacheKey, options);
+            }
+          } catch (error) {
+            console.error(`Failed to load options for ${filter.name}:`, error);
+            filterOptions[filter.name] = [];
+          }
+        });
+
+      await Promise.all(apiCalls);
     } catch (err) {
-      console.error('Failed to load filter options:', err);
       handleError(err, mainStore.loading);
     } finally {
       loading.value = false;
     }
   };
 
-  const loadFilterOption = async (filter) => {
-    try {
-      const response = await apiClient.get(filter.endpoint);
-
-      if (response.data.success) {
-        const data = response.data.data;
-
-        // Handle lookup key if specified
-        if (filter.lookupKey && data[filter.lookupKey]) {
-          filterOptions[filter.name] = data[filter.lookupKey];
-        } else if (Array.isArray(data)) {
-          filterOptions[filter.name] = data;
-        } else {
-          filterOptions[filter.name] = [];
+  const validateFilters = (filters) => {
+    for (const filter of filters) {
+      if (filter.required) {
+        if (filter.type === 'daterange') {
+          if (!filterValues[filter.startDate] || !filterValues[filter.endDate]) {
+            return false;
+          }
+        } else if (filter.type === 'multiselect') {
+          if (!filterValues[filter.name] || filterValues[filter.name].length === 0) {
+            return false;
+          }
+        } else if (!filterValues[filter.name]) {
+          return false;
         }
-      } else {
-        filterOptions[filter.name] = [];
       }
-    } catch (error) {
-      console.error(`Failed to load options for filter ${filter.name}:`, error);
-      filterOptions[filter.name] = [];
     }
+    return true;
   };
 
-  // Clear all filter values For Datatable
-  const clearFilters = () => {
-    Object.keys(filterValues).forEach((key) => {
-      const filter = report.value.filters.find((f) => f.name === key || f.startDate === key || f.endDate === key);
-
-      if (filter) {
-        if (filter.type === 'multiselect') {
-          filterValues[key] = [];
-        } else if (filter.type === 'checkbox') {
-          filterValues[key] = false;
-        } else {
-          filterValues[key] = null;
-        }
-      }
-    });
-
-    validationErrors.value = {};
-  };
-
-  const prepareFilterPayload = (transformType = 'data') => {
+  const prepareFilterPayload = (filters) => {
     const payload = {};
 
-    report.value.filters.forEach((filter) => {
+    filters.forEach((filter) => {
       if (filter.type === 'daterange') {
         const startValue = filterValues[filter.startDate];
         const endValue = filterValues[filter.endDate];
-
-        if (startValue) payload[filter.startDate] = startValue.toISOString();
-        if (endValue) payload[filter.endDate] = endValue.toISOString();
+        
+        if (startValue) {
+          payload[filter.startDate] = startValue.toISOString();
+        }
+        if (endValue) {
+          payload[filter.endDate] = endValue.toISOString();
+        }
       } else {
         const value = filterValues[filter.name];
-
         if (value !== null && value !== undefined && value !== '') {
-          // Handle special transformations for different endpoints
-          if (transformType === 'pdf' && filter.pdfTransform) {
-            const transformed = filter.pdfTransform(value);
-            Object.assign(payload, transformed);
-          } else if (transformType === 'excel' && filter.excelTransform) {
-            const transformed = filter.excelTransform(value);
-            Object.assign(payload, transformed);
+          if (filter.type === 'date' && value instanceof Date) {
+            payload[filter.name] = value.toISOString();
           } else {
-            // For multiselect, only include if not empty
-            if (Array.isArray(value) && value.length === 0) {
-              return;
-            }
             payload[filter.name] = value;
           }
         }
@@ -161,60 +142,52 @@ export function useReportFilters(report) {
     return payload;
   };
 
-  // Watch for report changes
-  watch(
-    report,
-    async (newReport) => {
-      if (newReport) {
-        console.log('Report changed, resetting filter values and loading options');
-        await resetFilterValues();
-        await loadFilterOptions();
-      }
-    }
-  );
-
-  // Watch for dependent filter changes
-  const setupDependentFilters = () => {
-    report.value?.filters?.forEach((filter) => {
-      if (filter.dependsOn) {
-        watch(
-          () => filterValues[filter.dependsOn],
-          async (newValue) => {
-            if (newValue) {
-              // Clear dependent filter value
-              filterValues[filter.name] = filter.type === 'multiselect' ? [] : null;
-
-              // Reload options for dependent filter
-              if (filter.endpoint) {
-                await loadFilterOption(filter);
-              }
-            }
-          }
-        );
-      }
+  const resetFilters = () => {
+    Object.keys(filterValues).forEach(key => {
+      delete filterValues[key];
+    });
+    Object.keys(filterOptions).forEach(key => {
+      delete filterOptions[key];
     });
   };
 
-  // Initialize dependent filters
-  nextTick(() => {
-    setupDependentFilters();
-  });
+  const clearCache = () => {
+    optionsCache.clear();
+  };
+
+  // Watch for changes in filter values and emit events if needed
+  const setupFilterWatchers = (filters, callback) => {
+    if (!callback) return;
+
+    const watchers = filters.map(filter => {
+      if (filter.type === 'daterange') {
+        return [
+          watch(() => filterValues[filter.startDate], callback, { deep: true }),
+          watch(() => filterValues[filter.endDate], callback, { deep: true })
+        ];
+      } else {
+        return watch(() => filterValues[filter.name], callback, { deep: true });
+      }
+    }).flat();
+
+    return () => {
+      watchers.forEach(unwatch => unwatch());
+    };
+  };
 
   return {
     // State
-    filterValues,
-    filterOptions,
     loading,
-    validationErrors,
-
-    // Computed
-    isFormValid,
-    hasRequiredFields,
-
+    filterOptions,
+    filterValues,
+    
     // Methods
-    resetFilterValues,
+    initializeFilters,
     loadFilterOptions,
-    clearFilters,
-    prepareFilterPayload
+    validateFilters,
+    prepareFilterPayload,
+    resetFilters,
+    clearCache,
+    setupFilterWatchers
   };
 }
