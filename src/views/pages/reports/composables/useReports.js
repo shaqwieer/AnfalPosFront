@@ -70,25 +70,25 @@ export function useReports() {
           optionValue: 'id'
         }
       ],
-      columns: [
-        { field: 'customerName', header: 'Customer', sortable: true, filterable: true, width: '200px' },
-        { field: 'customerCode', header: 'Customer Code', sortable: true, filterable: true, width: '120px' },
-        { field: 'current', header: 'Current', sortable: true, type: 'currency', width: '120px' },
-        { field: 'days30', header: '1-30 Days', sortable: true, type: 'currency', width: '120px' },
-        { field: 'days60', header: '31-60 Days', sortable: true, type: 'currency', width: '120px' },
-        { field: 'days90', header: '61-90 Days', sortable: true, type: 'currency', width: '120px' },
-        { field: 'days120', header: '91-120 Days', sortable: true, type: 'currency', width: '120px' },
-        { field: 'over120', header: '120+ Days', sortable: true, type: 'currency', width: '120px' },
-        { field: 'totalBalance', header: 'Total Balance', sortable: true, type: 'currency', width: '140px' }
-      ],
-      tableOptions: {
-        enablePagination: true,
-        defaultPageSize: 50,
-        enableSorting: true,
-        enableFiltering: true,
-        enableExport: true,
-        enableSelection: false
-      }
+      // columns: [
+      //   { field: 'customerName', header: 'Customer', sortable: true, filterable: true, width: '200px' },
+      //   { field: 'customerCode', header: 'Customer Code', sortable: true, filterable: true, width: '120px' },
+      //   { field: 'current', header: 'Current', sortable: true, type: 'currency', width: '120px' },
+      //   { field: 'days30', header: '1-30 Days', sortable: true, type: 'currency', width: '120px' },
+      //   { field: 'days60', header: '31-60 Days', sortable: true, type: 'currency', width: '120px' },
+      //   { field: 'days90', header: '61-90 Days', sortable: true, type: 'currency', width: '120px' },
+      //   { field: 'days120', header: '91-120 Days', sortable: true, type: 'currency', width: '120px' },
+      //   { field: 'over120', header: '120+ Days', sortable: true, type: 'currency', width: '120px' },
+      //   { field: 'totalBalance', header: 'Total Balance', sortable: true, type: 'currency', width: '140px' }
+      // ],
+      // tableOptions: {
+      //   enablePagination: true,
+      //   defaultPageSize: 50,
+      //   enableSorting: true,
+      //   enableFiltering: true,
+      //   enableExport: true,
+      //   enableSelection: false
+      // }
     },
     {
       id: 'item-availability-report',
@@ -111,15 +111,15 @@ export function useReports() {
           optionValue: 'id'
         }
       ],
-      columns: [
-        { field: 'itemCode', header: 'Item Code', sortable: true, filterable: true, width: '120px' },
-        { field: 'itemDescription', header: 'Description', sortable: true, filterable: true, width: '250px' },
-        { field: 'currentStock', header: 'Current Stock', sortable: true, type: 'number', width: '120px' },
-        { field: 'availableStock', header: 'Available', sortable: true, type: 'number', width: '120px' },
-        { field: 'reservedStock', header: 'Reserved', sortable: true, type: 'number', width: '120px' },
-        { field: 'unit', header: 'Unit', sortable: true, filterable: true, width: '80px' },
-        { field: 'lastUpdated', header: 'Last Updated', sortable: true, type: 'date', width: '130px' }
-      ]
+      // columns: [
+      //   { field: 'itemCode', header: 'Item Code', sortable: true, filterable: true, width: '120px' },
+      //   { field: 'itemDescription', header: 'Description', sortable: true, filterable: true, width: '250px' },
+      //   { field: 'currentStock', header: 'Current Stock', sortable: true, type: 'number', width: '120px' },
+      //   { field: 'availableStock', header: 'Available', sortable: true, type: 'number', width: '120px' },
+      //   { field: 'reservedStock', header: 'Reserved', sortable: true, type: 'number', width: '120px' },
+      //   { field: 'unit', header: 'Unit', sortable: true, filterable: true, width: '80px' },
+      //   { field: 'lastUpdated', header: 'Last Updated', sortable: true, type: 'date', width: '130px' }
+      // ]
     },
     {
       id: 'sales-rep-cash-report',
@@ -142,16 +142,16 @@ export function useReports() {
           optionValue: 'id'
         }
       ],
-      columns: [
-        { field: 'salesRepName', header: 'Sales Rep', sortable: true, filterable: true, width: '180px' },
-        { field: 'branchName', header: 'Branch', sortable: true, filterable: true, width: '150px' },
-        { field: 'sessionNumber', header: 'Session #', sortable: true, filterable: true, width: '100px' },
-        { field: 'startingCash', header: 'Starting Cash', sortable: true, type: 'currency', width: '130px' },
-        { field: 'salesAmount', header: 'Sales Amount', sortable: true, type: 'currency', width: '130px' },
-        { field: 'collectedCash', header: 'Collected Cash', sortable: true, type: 'currency', width: '130px' },
-        { field: 'expectedCash', header: 'Expected Cash', sortable: true, type: 'currency', width: '130px' },
-        { field: 'variance', header: 'Variance', sortable: true, type: 'currency', width: '120px' }
-      ]
+      // columns: [
+      //   { field: 'salesRepName', header: 'Sales Rep', sortable: true, filterable: true, width: '180px' },
+      //   { field: 'branchName', header: 'Branch', sortable: true, filterable: true, width: '150px' },
+      //   { field: 'sessionNumber', header: 'Session #', sortable: true, filterable: true, width: '100px' },
+      //   { field: 'startingCash', header: 'Starting Cash', sortable: true, type: 'currency', width: '130px' },
+      //   { field: 'salesAmount', header: 'Sales Amount', sortable: true, type: 'currency', width: '130px' },
+      //   { field: 'collectedCash', header: 'Collected Cash', sortable: true, type: 'currency', width: '130px' },
+      //   { field: 'expectedCash', header: 'Expected Cash', sortable: true, type: 'currency', width: '130px' },
+      //   { field: 'variance', header: 'Variance', sortable: true, type: 'currency', width: '120px' }
+      // ]
     },
     {
       id: 'sales-excel-report',
@@ -220,7 +220,7 @@ export function useReports() {
       ],
       tableOptions: {
         enablePagination: true,
-        defaultPageSize: 100,
+        defaultPageSize: 5,
         enableSorting: true,
         enableFiltering: true,
         enableExport: true,
@@ -260,15 +260,15 @@ export function useReports() {
           optionValue: 'id'
         }
       ],
-      columns: [
-        { field: 'itemCode', header: 'Item Code', sortable: true, filterable: true, width: '120px' },
-        { field: 'itemDescription', header: 'Description', sortable: true, filterable: true, width: '250px' },
-        { field: 'totalSold', header: 'Total Sold', sortable: true, type: 'number', width: '120px' },
-        { field: 'totalRevenue', header: 'Total Revenue', sortable: true, type: 'currency', width: '140px' },
-        { field: 'averagePrice', header: 'Avg Price', sortable: true, type: 'currency', width: '120px' },
-        { field: 'salesFrequency', header: 'Sales Frequency', sortable: true, type: 'number', width: '130px' },
-        { field: 'lastSaleDate', header: 'Last Sale', sortable: true, type: 'date', width: '120px' }
-      ]
+      // columns: [
+      //   { field: 'itemCode', header: 'Item Code', sortable: true, filterable: true, width: '120px' },
+      //   { field: 'itemDescription', header: 'Description', sortable: true, filterable: true, width: '250px' },
+      //   { field: 'totalSold', header: 'Total Sold', sortable: true, type: 'number', width: '120px' },
+      //   { field: 'totalRevenue', header: 'Total Revenue', sortable: true, type: 'currency', width: '140px' },
+      //   { field: 'averagePrice', header: 'Avg Price', sortable: true, type: 'currency', width: '120px' },
+      //   { field: 'salesFrequency', header: 'Sales Frequency', sortable: true, type: 'number', width: '130px' },
+      //   { field: 'lastSaleDate', header: 'Last Sale', sortable: true, type: 'date', width: '120px' }
+      // ]
     },
     {
       id: 'collection-report',
@@ -312,15 +312,15 @@ export function useReports() {
           optionValue: 'id'
         }
       ],
-      columns: [
-        { field: 'receiptNumber', header: 'Receipt #', sortable: true, filterable: true, width: '120px' },
-        { field: 'customerName', header: 'Customer', sortable: true, filterable: true, width: '200px' },
-        { field: 'paymentDate', header: 'Payment Date', sortable: true, type: 'date', width: '120px' },
-        { field: 'paymentMethod', header: 'Payment Method', sortable: true, filterable: true, width: '130px' },
-        { field: 'collectedAmount', header: 'Collected Amount', sortable: true, type: 'currency', width: '140px' },
-        { field: 'salesRepName', header: 'Sales Rep', sortable: true, filterable: true, width: '150px' },
-        { field: 'branchName', header: 'Branch', sortable: true, filterable: true, width: '130px' }
-      ]
+      // columns: [
+      //   { field: 'receiptNumber', header: 'Receipt #', sortable: true, filterable: true, width: '120px' },
+      //   { field: 'customerName', header: 'Customer', sortable: true, filterable: true, width: '200px' },
+      //   { field: 'paymentDate', header: 'Payment Date', sortable: true, type: 'date', width: '120px' },
+      //   { field: 'paymentMethod', header: 'Payment Method', sortable: true, filterable: true, width: '130px' },
+      //   { field: 'collectedAmount', header: 'Collected Amount', sortable: true, type: 'currency', width: '140px' },
+      //   { field: 'salesRepName', header: 'Sales Rep', sortable: true, filterable: true, width: '150px' },
+      //   { field: 'branchName', header: 'Branch', sortable: true, filterable: true, width: '130px' }
+      // ]
     },
     {
       id: 'payments-approval-report',
@@ -354,15 +354,15 @@ export function useReports() {
           optionValue: 'id'
         }
       ],
-      columns: [
-        { field: 'paymentId', header: 'Payment ID', sortable: true, filterable: true, width: '120px' },
-        { field: 'customerName', header: 'Customer', sortable: true, filterable: true, width: '200px' },
-        { field: 'amount', header: 'Amount', sortable: true, type: 'currency', width: '120px' },
-        { field: 'requestDate', header: 'Request Date', sortable: true, type: 'date', width: '120px' },
-        { field: 'status', header: 'Status', sortable: true, type: 'status', width: '100px' },
-        { field: 'approvedBy', header: 'Approved By', sortable: true, filterable: true, width: '150px' },
-        { field: 'approvalDate', header: 'Approval Date', sortable: true, type: 'date', width: '120px' }
-      ]
+      // columns: [
+      //   { field: 'paymentId', header: 'Payment ID', sortable: true, filterable: true, width: '120px' },
+      //   { field: 'customerName', header: 'Customer', sortable: true, filterable: true, width: '200px' },
+      //   { field: 'amount', header: 'Amount', sortable: true, type: 'currency', width: '120px' },
+      //   { field: 'requestDate', header: 'Request Date', sortable: true, type: 'date', width: '120px' },
+      //   { field: 'status', header: 'Status', sortable: true, type: 'status', width: '100px' },
+      //   { field: 'approvedBy', header: 'Approved By', sortable: true, filterable: true, width: '150px' },
+      //   { field: 'approvalDate', header: 'Approval Date', sortable: true, type: 'date', width: '120px' }
+      // ]
     }
   ]);  // Computed
   const reportsByCategory = computed(() => {

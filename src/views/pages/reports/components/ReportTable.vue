@@ -50,30 +50,30 @@ const tableColumns = computed(() => {
   if (hasTableConfig.value && props.tableConfig.columns) {
     return props.tableConfig.columns;
   }
-  
+
   // Fallback to report columns
   return props.report.columns || [];
 });
 
 const tableOptions = computed(() => {
-  return hasTableConfig.value ? props.tableConfig.options : {
-    enablePagination: true,
-    defaultPageSize: 25,
-    enableSorting: true,
-    enableFiltering: true,
-    enableExport: true,
-    enableSelection: false
-  };
+  return hasTableConfig.value
+    ? props.tableConfig.options
+    : {
+        enablePagination: true,
+        defaultPageSize: 25,
+        enableSorting: true,
+        enableFiltering: true,
+        enableExport: true,
+        enableSelection: false
+      };
 });
 
 const globalFilterFields = computed(() => {
-  return tableColumns.value
-    .filter(col => col.filterable)
-    .map(col => col.field);
+  return tableColumns.value.filter((col) => col.filterable).map((col) => col.field);
 });
 
 const exportColumns = computed(() => {
-  return tableColumns.value.map(col => ({
+  return tableColumns.value.map((col) => ({
     title: col.header,
     dataKey: col.field
   }));
@@ -84,7 +84,7 @@ const hasSelection = computed(() => {
 });
 
 const rowsPerPageOptions = computed(() => {
-  return [10, 25, 50, 100, 200];
+  return [5, 10, 25, 50, 100, 200];
 });
 
 // Methods
@@ -95,57 +95,57 @@ const clearFilters = () => {
 
 const exportCSV = () => {
   if (!hasData.value) return;
-  
+
   const filename = `${props.report.id}-data-${new Date().toISOString().split('T')[0]}.csv`;
   exportTableAsCSV(tableData.value, tableColumns.value, filename);
 };
 
 const exportSelectedCSV = () => {
   if (!hasSelection.value) return;
-  
+
   const filename = `${props.report.id}-selected-${new Date().toISOString().split('T')[0]}.csv`;
   exportTableAsCSV(selectedRows.value, tableColumns.value, filename);
 };
 
 const getColumnClass = (column) => {
   const classes = ['table-column'];
-  
+
   if (column.align) classes.push(`text-${column.align}`);
   if (column.type === 'currency') classes.push('text-right');
   if (column.type === 'number') classes.push('text-right');
   if (column.type === 'date') classes.push('text-center');
   if (column.type === 'boolean') classes.push('text-center');
-  
+
   return classes.join(' ');
 };
 
 const getRowClass = (data, index) => {
   const classes = {};
-  
+
   if (index % 2 === 0) classes['table-row-even'] = true;
   if (index % 2 === 1) classes['table-row-odd'] = true;
-  
+
   // Add custom row classes based on data
   if (data._isGroupHeader) classes['group-header-row'] = true;
   if (data.status === 'inactive') classes['inactive-row'] = true;
   if (data.isHighlighted) classes['highlighted-row'] = true;
-  
+
   return classes;
 };
 
 const formatCellValue = (data, column) => {
   const value = getNestedValue(data, column.field);
-  
+
   if (column.formatter && typeof column.formatter === 'function') {
     return column.formatter(value);
   }
-  
+
   return formatValue(value, column.type, column.formatOptions);
 };
 
 const getNestedValue = (obj, path) => {
   if (!obj || !path) return null;
-  
+
   return path.split('.').reduce((current, key) => {
     return current && current[key] !== undefined ? current[key] : null;
   }, obj);
@@ -153,9 +153,9 @@ const getNestedValue = (obj, path) => {
 
 const getStatusSeverity = (status) => {
   if (!status) return 'secondary';
-  
+
   const lowerStatus = status.toLowerCase();
-  
+
   if (lowerStatus.includes('active') || lowerStatus.includes('completed') || lowerStatus.includes('paid')) {
     return 'success';
   } else if (lowerStatus.includes('pending') || lowerStatus.includes('processing')) {
@@ -163,7 +163,7 @@ const getStatusSeverity = (status) => {
   } else if (lowerStatus.includes('inactive') || lowerStatus.includes('cancelled') || lowerStatus.includes('failed')) {
     return 'danger';
   }
-  
+
   return 'info';
 };
 
@@ -171,9 +171,9 @@ const toggleRowExpansion = (event) => {
   // Handle row expansion for detailed view
   const rowData = event.data;
   const isExpanded = expandedRows.value.includes(rowData);
-  
+
   if (isExpanded) {
-    expandedRows.value = expandedRows.value.filter(row => row !== rowData);
+    expandedRows.value = expandedRows.value.filter((row) => row !== rowData);
   } else {
     expandedRows.value.push(rowData);
   }
@@ -189,7 +189,7 @@ const clearSelection = () => {
 
 const generateSummary = () => {
   if (!hasData.value) return;
-  
+
   tableSummary.value = generateTableSummary(tableData.value, tableColumns.value);
 };
 
@@ -208,54 +208,56 @@ const copyToClipboard = (value) => {
 const emit = defineEmits(['refresh-table', 'row-select', 'row-expand']);
 
 // Watchers
-watch(() => props.data, () => {
-  generateSummary();
-}, { immediate: true, deep: true });
+watch(
+  () => props.data,
+  () => {
+    generateSummary();
+  },
+  { immediate: true, deep: true }
+);
 
-watch(() => props.tableConfig, () => {
-  generateSummary();
-}, { immediate: true, deep: true });
+watch(
+  () => props.tableConfig,
+  () => {
+    generateSummary();
+  },
+  { immediate: true, deep: true }
+);
 
-watch(selectedRows, (newSelection) => {
-  emit('row-select', newSelection);
-}, { deep: true });
+watch(
+  selectedRows,
+  (newSelection) => {
+    emit('row-select', newSelection);
+  },
+  { deep: true }
+);
 </script>
 
 <template>
   <Card class="table-section">
     <template #header>
-      <div class="table-header">
+      <div class="table-header mx-2">
         <div class="header-content">
           <i class="pi pi-table header-icon"></i>
-          <h3>{{ t('reports.reportData') }}</h3>
+          <h3>{{ t('common.reportData') }}</h3>
           <Badge v-if="hasData" :value="tableData.length" class="data-count-badge" />
           <Badge v-if="hasSelection" :value="`${selectedRows.length} selected`" severity="success" class="selection-badge" />
         </div>
-        
+
         <div class="table-actions">
           <!-- Global Search -->
-          <div class="search-field">
-            <InputText
-              v-model="globalFilterValue"
-              :placeholder="t('common.search')"
-              class="global-search"
-            >
+          <!-- <div class="search-field">
+            <InputText v-model="globalFilterValue" :placeholder="t('common.search')" class="global-search">
               <template #prefix>
                 <i class="pi pi-search"></i>
               </template>
             </InputText>
-          </div>
-          
+          </div> -->
+
           <!-- Action Buttons -->
-          <Button
-            icon="pi pi-filter-slash"
-            :label="t('common.clearFilters')"
-            class="p-button-outlined p-button-sm"
-            @click="clearFilters"
-            :disabled="Object.keys(filters).length === 0 && !globalFilterValue"
-          />
-          
-          <Button
+          <!-- <Button icon="pi pi-filter-slash" :label="t('common.clearFilters')" class="p-button-outlined p-button-sm" @click="clearFilters" :disabled="Object.keys(filters).length === 0 && !globalFilterValue" /> -->
+
+          <!-- <Button
             v-if="tableOptions.enableSelection"
             icon="pi pi-check-square"
             :label="t('common.selectAll')"
@@ -270,9 +272,9 @@ watch(selectedRows, (newSelection) => {
             :label="t('common.clearSelection')"
             class="p-button-outlined p-button-sm"
             @click="clearSelection"
-          />
-          
-          <SplitButton
+          /> -->
+
+          <!-- <SplitButton
             icon="pi pi-download"
             :label="t('common.export')"
             class="p-button-outlined p-button-sm"
@@ -291,34 +293,29 @@ watch(selectedRows, (newSelection) => {
               }
             ]"
             :disabled="!hasData"
-          />
-          
-          <Button
-            icon="pi pi-refresh"
-            class="p-button-text p-button-sm"
-            v-tooltip="t('common.refresh')"
-            @click="refreshTable"
-          />
+          /> -->
+
+          <Button icon="pi pi-refresh" class="p-button-text p-button-sm" v-tooltip="t('common.refresh')" @click="refreshTable" />
         </div>
       </div>
     </template>
-    
+
     <template #content>
+      <!-- :globalFilterFields="globalFilterFields"
+        :globalFilter="globalFilterValue"
+        filterDisplay="row"
+        v-model:filters="filters" -->
+      <!-- sortMode="multiple"
+        removableSort -->
       <DataTable
         :value="tableData"
         :paginator="tableOptions.enablePagination"
         :rows="tableOptions.defaultPageSize || 25"
         :rowsPerPageOptions="rowsPerPageOptions"
         :loading="loading"
-        :globalFilterFields="globalFilterFields"
-        :globalFilter="globalFilterValue"
-        filterDisplay="row"
-        sortMode="multiple"
-        removableSort
         :selection="tableOptions.enableSelection ? selectedRows : undefined"
         :selectionMode="tableOptions.enableSelection ? 'multiple' : undefined"
         v-model:selection="selectedRows"
-        v-model:filters="filters"
         v-model:expandedRows="expandedRows"
         :rowClass="getRowClass"
         class="report-datatable"
@@ -338,28 +335,20 @@ watch(selectedRows, (newSelection) => {
             <p>{{ t('reports.noDataDescription') }}</p>
           </div>
         </template>
-        
+
         <template #loading>
           <div class="table-loading-state">
-            <ProgressSpinner style="width:50px;height:50px" />
+            <ProgressSpinner style="width: 50px; height: 50px" />
             <p>{{ t('common.loading') }}</p>
           </div>
         </template>
-        
+
         <!-- Selection Column -->
-        <Column
-          v-if="tableOptions.enableSelection"
-          selectionMode="multiple"
-          headerStyle="width: 3rem"
-        />
-        
+        <!-- <Column v-if="tableOptions.enableSelection" selectionMode="multiple" headerStyle="width: 3rem" /> -->
+
         <!-- Expand Column -->
-        <Column
-          v-if="tableOptions.enableGrouping"
-          expander
-          headerStyle="width: 3rem"
-        />
-        
+        <Column v-if="tableOptions.enableGrouping" expander headerStyle="width: 3rem" />
+
         <!-- Data Columns -->
         <Column
           v-for="column in tableColumns"
@@ -368,7 +357,7 @@ watch(selectedRows, (newSelection) => {
           :header="column.header"
           :sortable="column.sortable"
           :class="getColumnClass(column)"
-          :style="{ 
+          :style="{
             minWidth: column.width || '150px',
             width: column.width || 'auto'
           }"
@@ -378,33 +367,14 @@ watch(selectedRows, (newSelection) => {
           <!-- Column Filter -->
           <template v-if="column.filterable" #filter="{ filterModel, filterCallback }">
             <!-- Text Filter -->
-            <InputText
-              v-if="!column.filterConfig || column.filterConfig.type === 'text'"
-              v-model="filterModel.value"
-              type="text"
-              @keydown.enter="filterCallback()"
-              :placeholder="`Filter ${column.header}`"
-              class="column-filter"
-            />
-            
+            <InputText v-if="!column.filterConfig || column.filterConfig.type === 'text'" v-model="filterModel.value" type="text" @keydown.enter="filterCallback()" :placeholder="`Filter ${column.header}`" class="column-filter" />
+
             <!-- Number Filter -->
-            <InputNumber
-              v-else-if="column.filterConfig.type === 'number'"
-              v-model="filterModel.value"
-              @keydown.enter="filterCallback()"
-              :placeholder="`Filter ${column.header}`"
-              class="column-filter"
-            />
-            
+            <InputNumber v-else-if="column.filterConfig.type === 'number'" v-model="filterModel.value" @keydown.enter="filterCallback()" :placeholder="`Filter ${column.header}`" class="column-filter" />
+
             <!-- Date Filter -->
-            <Calendar
-              v-else-if="column.filterConfig.type === 'date'"
-              v-model="filterModel.value"
-              dateFormat="yy-mm-dd"
-              :placeholder="`Filter ${column.header}`"
-              class="column-filter"
-            />
-            
+            <Calendar v-else-if="column.filterConfig.type === 'date'" v-model="filterModel.value" dateFormat="yy-mm-dd" :placeholder="`Filter ${column.header}`" class="column-filter" />
+
             <!-- Select Filter -->
             <Dropdown
               v-else-if="column.filterConfig.type === 'select'"
@@ -417,7 +387,7 @@ watch(selectedRows, (newSelection) => {
               showClear
             />
           </template>
-          
+
           <!-- Column Body -->
           <template #body="{ data, field }">
             <div class="cell-content" @click.stop="copyToClipboard(getNestedValue(data, field))">
@@ -426,57 +396,38 @@ watch(selectedRows, (newSelection) => {
                 <strong>{{ data._groupName }}</strong>
                 <Badge :value="data._groupCount" />
               </div>
-              
+
               <!-- Currency Format -->
               <span v-else-if="column.type === 'currency'" class="currency-value">
                 {{ formatCellValue(data, column) }}
               </span>
-              
+
               <!-- Date Format -->
               <span v-else-if="column.type === 'date'" class="date-value">
                 {{ formatCellValue(data, column) }}
               </span>
-              
+
               <!-- Number Format -->
               <span v-else-if="column.type === 'number'" class="number-value">
                 {{ formatCellValue(data, column) }}
               </span>
-              
+
               <!-- Boolean Format -->
-              <Tag 
-                v-else-if="column.type === 'boolean'"
-                :value="getNestedValue(data, field) ? 'Yes' : 'No'"
-                :severity="getNestedValue(data, field) ? 'success' : 'danger'"
-              />
-              
+              <Tag v-else-if="column.type === 'boolean'" :value="getNestedValue(data, field) ? 'Yes' : 'No'" :severity="getNestedValue(data, field) ? 'success' : 'danger'" />
+
               <!-- Status Format -->
-              <Tag 
-                v-else-if="column.type === 'status'"
-                :value="getNestedValue(data, field)"
-                :severity="getStatusSeverity(getNestedValue(data, field))"
-              />
-              
+              <Tag v-else-if="column.type === 'status'" :value="getNestedValue(data, field)" :severity="getStatusSeverity(getNestedValue(data, field))" />
+
               <!-- Email Format -->
-              <a
-                v-else-if="column.type === 'email'"
-                :href="`mailto:${getNestedValue(data, field)}`"
-                class="email-link"
-                @click.stop
-              >
+              <a v-else-if="column.type === 'email'" :href="`mailto:${getNestedValue(data, field)}`" class="email-link" @click.stop>
                 {{ getNestedValue(data, field) }}
               </a>
-              
+
               <!-- URL Format -->
-              <a
-                v-else-if="column.type === 'url'"
-                :href="getNestedValue(data, field)"
-                target="_blank"
-                class="url-link"
-                @click.stop
-              >
+              <a v-else-if="column.type === 'url'" :href="getNestedValue(data, field)" target="_blank" class="url-link" @click.stop>
                 {{ getNestedValue(data, field) }}
               </a>
-              
+
               <!-- Default Text -->
               <span v-else class="text-value">
                 {{ formatCellValue(data, column) }}
@@ -484,17 +435,13 @@ watch(selectedRows, (newSelection) => {
             </div>
           </template>
         </Column>
-        
+
         <!-- Expansion Template -->
         <template v-if="tableOptions.enableGrouping" #expansion="{ data }">
           <div class="row-expansion">
             <h5>Details for {{ data[tableColumns[0]?.field] }}</h5>
             <div class="expansion-grid">
-              <div
-                v-for="column in tableColumns"
-                :key="column.field"
-                class="expansion-item"
-              >
+              <div v-for="column in tableColumns" :key="column.field" class="expansion-item">
                 <strong>{{ column.header }}:</strong>
                 <span>{{ formatCellValue(data, column) }}</span>
               </div>
@@ -502,18 +449,14 @@ watch(selectedRows, (newSelection) => {
           </div>
         </template>
       </DataTable>
-      
+
       <!-- Table Summary -->
       <div v-if="tableSummary.totalRows" class="table-summary">
         <div class="summary-row">
           <span class="summary-label">Total Rows:</span>
           <span class="summary-value">{{ tableSummary.totalRows.toLocaleString() }}</span>
         </div>
-        <div
-          v-for="column in tableSummary.columns"
-          :key="column.field"
-          class="summary-row"
-        >
+        <div v-for="column in tableSummary.columns" :key="column.field" class="summary-row">
           <span class="summary-label">{{ column.header }}:</span>
           <div class="summary-stats">
             <span v-if="column.sum" class="stat">Sum: {{ formatValue(column.sum, column.type) }}</span>
@@ -773,25 +716,25 @@ watch(selectedRows, (newSelection) => {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .table-actions {
     justify-content: center;
     flex-wrap: wrap;
   }
-  
+
   .global-search {
     min-width: auto;
     width: 100%;
   }
-  
+
   .report-datatable {
     font-size: 0.875rem;
   }
-  
+
   .expansion-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .summary-stats {
     flex-direction: column;
     gap: 0.25rem;

@@ -787,7 +787,8 @@
     "dataVisualization": "تصور البيانات",
     "dataVisualizationComingSoon": "ميزات تصور البيانات قادمة قريباً...",
     "totalReports": "إجمالي التقارير",
-    "allReports": "جميع التقارير"
+    "allReports": "جميع التقارير",
+    "viewData": "أظهار البيانات"
   },
   "page": {
     "configHeader": "إعداد الصفحات",
@@ -939,5 +940,16 @@
     "viewObject": "عرض الكائن",
     "copyToClipboard": "نسخ إلى الحافظة",
     "close": "إغلاق"
+  },
+  "common": {
+    "reportData": "بيانات التقرير",
+    "search": "بحث",
+    "clearFilters": "مسح الفلاتر",
+    "selectAll": "تحديد الكل",
+    "clearSelection": "إلغاء التحديد",
+    "export": "تصدير",
+    "exportCSV": "تصدير كـ CSV",
+    "exportSelected": "تصدير المحدد",
+    "refresh": "تحديث"
   }
 }

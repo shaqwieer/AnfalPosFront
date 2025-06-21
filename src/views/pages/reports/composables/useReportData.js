@@ -66,7 +66,7 @@ export function useReportData() {
           chartData.value = transformDataForCharts(response.data.data, report.chartConfig);
         }
         
-        mainStore.loading.setNotificationInfo('success', t('reports.dataLoadedSuccess'));
+        // mainStore.loading.setNotificationInfo('success', t('reports.dataLoadedSuccess'));
       } else {
         throw new Error(response.data.message || 'Failed to load report data');
       }

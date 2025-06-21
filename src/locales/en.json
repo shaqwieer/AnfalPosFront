@@ -801,7 +801,8 @@
     "dataVisualization": "Data Visualization",
     "dataVisualizationComingSoon": "Data visualization features coming soon...",
     "totalReports": "Total Reports",
-    "allReports": "All Reports"
+    "allReports": "All Reports",
+    "viewData": "View Data"
   },
   "page": {
     "configHeader": "Page Configuration",
@@ -953,5 +954,16 @@
     "viewObject": "View Object",
     "copyToClipboard": "Copy to Clipboard",
     "close": "Close"
+  },
+  "common": {
+    "reportData": "Report Data",
+    "search": "Search",
+    "clearFilters": "Clear Filters",
+    "selectAll": "Select All",
+    "clearSelection": "Clear Selection",
+    "export": "Export",
+    "exportCSV": "Export as CSV",
+    "exportSelected": "Export Selected",
+    "refresh": "Refresh"
   }
 }

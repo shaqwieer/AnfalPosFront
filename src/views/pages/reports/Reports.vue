@@ -70,6 +70,7 @@ const getCategoryDisplayName = (category) => {
 };
 </script>
 
+
 <template>
   <div :class="['reports-container', { 'rtl-direction': rtl }]">
     <!-- Main Layout -->
@@ -86,23 +87,14 @@ const getCategoryDisplayName = (category) => {
 
         <!-- Reports Navigation -->
         <div class="sidebar-content">
-          <div 
-            v-for="(reports, category) in reportsByCategory" 
-            :key="category" 
-            class="category-section"
-          >
+          <div v-for="(reports, category) in reportsByCategory" :key="category" class="category-section">
             <!-- Category Header -->
             <div class="category-header">
               <div class="flex align-items-center gap-2">
-                <i 
-                  :class="['pi', categoryConfig[category]?.icon || 'pi-folder', categoryConfig[category]?.color || 'text-gray-600']"
-                ></i>
+                <i :class="['pi', categoryConfig[category]?.icon || 'pi-folder', categoryConfig[category]?.color || 'text-gray-600']"></i>
                 <span class="font-medium text-sm">{{ getCategoryDisplayName(category) }}</span>
               </div>
-              <Badge 
-                :value="reports.length" 
-                class="bg-gray-100 text-gray-700 text-xs"
-              />
+              <Badge :value="reports.length" class="bg-gray-100 text-gray-700 text-xs" />
             </div>
 
             <!-- Reports List -->
@@ -131,23 +123,12 @@ const getCategoryDisplayName = (category) => {
                     </div>
                   </div>
                 </div>
-                
+
                 <!-- Available formats indicators -->
                 <div class="flex gap-1 mt-2">
-                  <Tag 
-                    v-if="report.endpoints.pdf" 
-                    class="bg-red-100 text-red-700 text-xs px-2 py-1"
-                    icon="pi pi-file-pdf"
-                  >
-                    PDF
-                  </Tag>
-                  <Tag 
-                    v-if="report.endpoints.excel" 
-                    class="bg-green-100 text-green-700 text-xs px-2 py-1"
-                    icon="pi pi-file-excel"
-                  >
-                    Excel
-                  </Tag>
+                  <Tag v-if="report.endpoints.pdf" class="bg-red-100 text-red-700 text-xs px-2 py-1" icon="pi pi-file-pdf"> PDF </Tag>
+                  <Tag v-if="report.endpoints.excel" class="bg-green-100 text-green-700 text-xs px-2 py-1" icon="pi pi-file-excel"> Excel </Tag>
+                  <Tag v-if="report.endpoints.data" class="bg-blue-100 text-blue-700 text-xs px-2 py-1" icon="pi pi-eye"> Data </Tag>
                 </div>
               </div>
             </div>
@@ -190,25 +171,38 @@ const getCategoryDisplayName = (category) => {
 
             <!-- Export Actions -->
             <div class="flex gap-2 mb-6">
-              <Button
-                v-if="selectedReport.endpoints.pdf"
-                @click="generateReport('pdf')"
-                :loading="loading"
-                :disabled="!isFormValid"
-                icon="pi pi-file-pdf"
+              <Button 
+                v-if="selectedReport.endpoints.pdf" 
+                @click="generateReport('pdf')" 
+                :loading="loading" 
+                :disabled="!isFormValid" 
+                icon="pi pi-file-pdf" 
                 class="w-8rem p-button-danger"
               >
                 {{ t('reports.exportPdf') }}
               </Button>
-              <Button
-                v-if="selectedReport.endpoints.excel"
-                @click="generateReport('excel')"
-                :loading="loading"
-                :disabled="!isFormValid"
-                icon="pi pi-file-excel"
+              
+              <Button 
+                v-if="selectedReport.endpoints.excel" 
+                @click="generateReport('excel')" 
+                :loading="loading" 
+                :disabled="!isFormValid" 
+                icon="pi pi-file-excel" 
                 class="w-8rem p-button-success"
               >
                 {{ t('reports.exportExcel') }}
+              </Button>
+              
+              <!-- 🎯 VIEW DATA BUTTON - This should be visible for sales-excel-report -->
+              <Button 
+                v-if="hasDataEndpoint" 
+                @click="loadReportData" 
+                :loading="loading" 
+                :disabled="!isFormValid" 
+                icon="pi pi-eye" 
+                class="w-8rem p-button-info"
+              >
+                View Data
               </Button>
             </div>
           </div>
@@ -216,45 +210,19 @@ const getCategoryDisplayName = (category) => {
           <!-- Filters Section -->
           <Panel :header="t('reports.filters')" class="mb-4">
             <div class="grid gap-4">
-              <div 
-                v-for="filter in selectedReport.filters" 
-                :key="filter.name" 
-                class="col-12 md:col-6 lg:col-4"
-              >
+              <div v-for="filter in selectedReport.filters" :key="filter.name" class="col-12 md:col-6 lg:col-4">
                 <div class="field">
-                  <label 
-                    :for="filter.name" 
-                    class="block font-medium mb-2 text-sm"
-                    :class="{ required: filter.required }"
-                  >
+                  <label :for="filter.name" class="block font-medium mb-2 text-sm" :class="{ required: filter.required }">
                     {{ t(filter.label) }}
                   </label>
 
                   <!-- Date Picker -->
-                  <Calendar 
-                    v-if="filter.type === 'date'" 
-                    v-model="filterValues[filter.name]"
-                    :id="filter.name" 
-                    dateFormat="yy-mm-dd" 
-                    class="w-full"
-                  />
+                  <Calendar v-if="filter.type === 'date'" v-model="filterValues[filter.name]" :id="filter.name" dateFormat="yy-mm-dd" class="w-full" />
 
                   <!-- Date Range Picker -->
                   <div v-else-if="filter.type === 'daterange'" class="flex gap-2">
-                    <Calendar 
-                      v-model="filterValues[filter.startDate]"
-                      :id="filter.startDate" 
-                      dateFormat="yy-mm-dd" 
-                      class="w-full"
-                      :placeholder="t('reports.startDate')"
-                    />
-                    <Calendar 
-                      v-model="filterValues[filter.endDate]"
-                      :id="filter.endDate" 
-                      dateFormat="yy-mm-dd" 
-                      class="w-full"
-                      :placeholder="t('reports.endDate')"
-                    />
+                    <Calendar v-model="filterValues[filter.startDate]" :id="filter.startDate" dateFormat="yy-mm-dd" class="w-full" :placeholder="t('reports.startDate')" />
+                    <Calendar v-model="filterValues[filter.endDate]" :id="filter.endDate" dateFormat="yy-mm-dd" class="w-full" :placeholder="t('reports.endDate')" />
                   </div>
 
                   <!-- Dropdown -->
@@ -282,21 +250,11 @@ const getCategoryDisplayName = (category) => {
                   />
 
                   <!-- Text Input -->
-                  <InputText 
-                    v-else-if="filter.type === 'text'" 
-                    v-model="filterValues[filter.name]"
-                    :id="filter.name" 
-                    :placeholder="t(filter.label)" 
-                    class="w-full"
-                  />
+                  <InputText v-else-if="filter.type === 'text'" v-model="filterValues[filter.name]" :id="filter.name" :placeholder="t(filter.label)" class="w-full" />
 
                   <!-- Checkbox -->
                   <div v-else-if="filter.type === 'checkbox'" class="flex align-items-center">
-                    <Checkbox 
-                      v-model="filterValues[filter.name]"
-                      :inputId="filter.name" 
-                      :binary="true"
-                    />
+                    <Checkbox v-model="filterValues[filter.name]" :inputId="filter.name" :binary="true" />
                     <label :for="filter.name" class="ml-2">{{ t(filter.label) }}</label>
                   </div>
                 </div>
@@ -304,16 +262,45 @@ const getCategoryDisplayName = (category) => {
             </div>
           </Panel>
 
-          <!-- Future: Data Visualization Section -->
+          <!-- 🎯 DATA VISUALIZATION SECTION - This replaces the old static panel -->
           <Panel 
-            :header="t('reports.dataVisualization')" 
+            v-if="hasDataEndpoint"
+            header="Data Visualization" 
             class="mb-4" 
-            :collapsed="true"
+            :collapsed="!showDataVisualization"
             :toggleable="true"
+            @toggle="toggleDataVisualization"
           >
-            <div class="text-center py-8">
+            <!-- Show data when loaded -->
+            <div v-if="showDataVisualization && hasData" class="data-visualization-content">
+              <!-- 🎯 REPORT TABLE COMPONENT -->
+              <ReportTable
+                :report="selectedReport"
+                :data="reportData"
+                :table-config="tableConfig"
+                :loading="loading"
+                @refresh-table="refreshReportData"
+              />
+            </div>
+            
+            <!-- Show when no data but panel is expanded -->
+            <div v-else-if="showDataVisualization && !hasData" class="text-center py-8">
+              <i class="pi pi-info-circle text-4xl text-blue-400 mb-3"></i>
+              <p class="text-gray-500">No data available for the selected filters</p>
+              <Button 
+                label="Load Data" 
+                icon="pi pi-refresh"
+                @click="loadReportData"
+                :loading="loading"
+                :disabled="!isFormValid"
+                class="mt-3"
+              />
+            </div>
+            
+            <!-- Default collapsed state -->
+            <div v-else class="text-center py-8">
               <i class="pi pi-chart-line text-4xl text-gray-300 mb-3"></i>
-              <p class="text-gray-500">{{ t('reports.dataVisualizationComingSoon') }}</p>
+              <p class="text-gray-500">Click to expand and view report data</p>
             </div>
           </Panel>
         </div>
@@ -531,21 +518,21 @@ const getCategoryDisplayName = (category) => {
   .reports-layout {
     flex-direction: column;
   }
-  
+
   .reports-sidebar {
     width: 100%;
     height: auto;
     max-height: 300px;
   }
-  
+
   .reports-main {
     padding: 1rem;
   }
-  
+
   .report-header {
     padding: 1rem;
   }
-  
+
   .welcome-state {
     min-height: 300px;
   }
