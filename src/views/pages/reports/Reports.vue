@@ -3,12 +3,33 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/stores/mainStore';
 import { useReports } from './composables/useReports';
+import ReportTable from './components/ReportTable.vue';
 
 const { t } = useI18n();
 const mainStore = useMainStore();
 const rtl = computed(() => mainStore.isRTL);
 
-const { loading, selectedReport, filterValues, filterOptions, reportDialogVisible, reportsByCategory, availableFormats, isFormValid, selectReport, generateReport, closeDialog } = useReports();
+const {
+  loading,
+  selectedReport,
+  filterValues,
+  filterOptions,
+  reportDialogVisible,
+  reportsByCategory,
+  availableFormats,
+  isFormValid,
+  hasDataEndpoint,
+  showDataVisualization,
+  reportData,
+  tableConfig,
+  hasData,
+  selectReport,
+  generateReport,
+  closeDialog,
+  loadReportData,
+  refreshReportData,
+  toggleDataVisualization
+} = useReports();
 
 // Category configurations for styling
 const categoryConfig = {
@@ -65,14 +86,23 @@ const getCategoryDisplayName = (category) => {
 
         <!-- Reports Navigation -->
         <div class="sidebar-content">
-          <div v-for="(reports, category) in reportsByCategory" :key="category" class="category-section">
+          <div 
+            v-for="(reports, category) in reportsByCategory" 
+            :key="category" 
+            class="category-section"
+          >
             <!-- Category Header -->
             <div class="category-header">
               <div class="flex align-items-center gap-2">
-                <i :class="['pi', categoryConfig[category]?.icon || 'pi-folder', categoryConfig[category]?.color || 'text-gray-600']"></i>
+                <i 
+                  :class="['pi', categoryConfig[category]?.icon || 'pi-folder', categoryConfig[category]?.color || 'text-gray-600']"
+                ></i>
                 <span class="font-medium text-sm">{{ getCategoryDisplayName(category) }}</span>
               </div>
-              <Badge :value="reports.length" class="bg-gray-100 text-gray-700 text-xs" />
+              <Badge 
+                :value="reports.length" 
+                class="bg-gray-100 text-gray-700 text-xs"
+              />
             </div>
 
             <!-- Reports List -->
@@ -101,11 +131,23 @@ const getCategoryDisplayName = (category) => {
                     </div>
                   </div>
                 </div>
-
+                
                 <!-- Available formats indicators -->
                 <div class="flex gap-1 mt-2">
-                  <Tag v-if="report.endpoints.pdf" class="bg-red-100 text-red-700 text-xs px-2 py-1" icon="pi pi-file-pdf"> PDF </Tag>
-                  <Tag v-if="report.endpoints.excel" class="bg-green-100 text-green-700 text-xs px-2 py-1" icon="pi pi-file-excel"> Excel </Tag>
+                  <Tag 
+                    v-if="report.endpoints.pdf" 
+                    class="bg-red-100 text-red-700 text-xs px-2 py-1"
+                    icon="pi pi-file-pdf"
+                  >
+                    PDF
+                  </Tag>
+                  <Tag 
+                    v-if="report.endpoints.excel" 
+                    class="bg-green-100 text-green-700 text-xs px-2 py-1"
+                    icon="pi pi-file-excel"
+                  >
+                    Excel
+                  </Tag>
                 </div>
               </div>
             </div>
@@ -122,6 +164,9 @@ const getCategoryDisplayName = (category) => {
             <h3 class="text-2xl font-semibold text-gray-700 mb-2">
               {{ t('reports.welcome.title') }}
             </h3>
+            <p class="text-gray-500 mb-6 max-w-md mx-auto">
+              {{ t('reports.welcome.description') }}
+            </p>
           </div>
         </div>
 
@@ -145,10 +190,24 @@ const getCategoryDisplayName = (category) => {
 
             <!-- Export Actions -->
             <div class="flex gap-2 mb-6">
-              <Button v-if="selectedReport.endpoints.pdf" @click="generateReport('pdf')" :loading="loading" :disabled="!isFormValid" icon="pi pi-file-pdf" class="w-8rem p-button-danger">
+              <Button
+                v-if="selectedReport.endpoints.pdf"
+                @click="generateReport('pdf')"
+                :loading="loading"
+                :disabled="!isFormValid"
+                icon="pi pi-file-pdf"
+                class="w-8rem p-button-danger"
+              >
                 {{ t('reports.exportPdf') }}
               </Button>
-              <Button v-if="selectedReport.endpoints.excel" @click="generateReport('excel')" :loading="loading" :disabled="!isFormValid" icon="pi pi-file-excel" class="w-8rem p-button-success">
+              <Button
+                v-if="selectedReport.endpoints.excel"
+                @click="generateReport('excel')"
+                :loading="loading"
+                :disabled="!isFormValid"
+                icon="pi pi-file-excel"
+                class="w-8rem p-button-success"
+              >
                 {{ t('reports.exportExcel') }}
               </Button>
             </div>
@@ -156,20 +215,46 @@ const getCategoryDisplayName = (category) => {
 
           <!-- Filters Section -->
           <Panel :header="t('reports.filters')" class="mb-4">
-            <div class="grid gap-1">
-              <div v-for="filter in selectedReport.filters" :key="filter.name" class="col-12 md:col-6 lg:col-4 xl:col-3">
+            <div class="grid gap-4">
+              <div 
+                v-for="filter in selectedReport.filters" 
+                :key="filter.name" 
+                class="col-12 md:col-6 lg:col-4"
+              >
                 <div class="field">
-                  <label :for="filter.name" class="block font-medium mb-2 text-sm" :class="{ required: filter.required }">
+                  <label 
+                    :for="filter.name" 
+                    class="block font-medium mb-2 text-sm"
+                    :class="{ required: filter.required }"
+                  >
                     {{ t(filter.label) }}
                   </label>
 
                   <!-- Date Picker -->
-                  <Calendar v-if="filter.type === 'date'" v-model="filterValues[filter.name]" :id="filter.name" dateFormat="yy-mm-dd" class="w-full" />
+                  <Calendar 
+                    v-if="filter.type === 'date'" 
+                    v-model="filterValues[filter.name]"
+                    :id="filter.name" 
+                    dateFormat="yy-mm-dd" 
+                    class="w-full"
+                  />
 
                   <!-- Date Range Picker -->
                   <div v-else-if="filter.type === 'daterange'" class="flex gap-2">
-                    <Calendar v-model="filterValues[filter.startDate]" :id="filter.startDate" dateFormat="yy-mm-dd" class="w-full" :placeholder="t('reports.startDate')" />
-                    <Calendar v-model="filterValues[filter.endDate]"  :id="filter.endDate" dateFormat="yy-mm-dd" class="w-full" :placeholder="t('reports.endDate')" />
+                    <Calendar 
+                      v-model="filterValues[filter.startDate]"
+                      :id="filter.startDate" 
+                      dateFormat="yy-mm-dd" 
+                      class="w-full"
+                      :placeholder="t('reports.startDate')"
+                    />
+                    <Calendar 
+                      v-model="filterValues[filter.endDate]"
+                      :id="filter.endDate" 
+                      dateFormat="yy-mm-dd" 
+                      class="w-full"
+                      :placeholder="t('reports.endDate')"
+                    />
                   </div>
 
                   <!-- Dropdown -->
@@ -197,11 +282,21 @@ const getCategoryDisplayName = (category) => {
                   />
 
                   <!-- Text Input -->
-                  <InputText v-else-if="filter.type === 'text'" v-model="filterValues[filter.name]" :id="filter.name" :placeholder="t(filter.label)" class="w-full" />
+                  <InputText 
+                    v-else-if="filter.type === 'text'" 
+                    v-model="filterValues[filter.name]"
+                    :id="filter.name" 
+                    :placeholder="t(filter.label)" 
+                    class="w-full"
+                  />
 
                   <!-- Checkbox -->
                   <div v-else-if="filter.type === 'checkbox'" class="flex align-items-center">
-                    <Checkbox v-model="filterValues[filter.name]" :inputId="filter.name" :binary="true" />
+                    <Checkbox 
+                      v-model="filterValues[filter.name]"
+                      :inputId="filter.name" 
+                      :binary="true"
+                    />
                     <label :for="filter.name" class="ml-2">{{ t(filter.label) }}</label>
                   </div>
                 </div>
@@ -210,7 +305,12 @@ const getCategoryDisplayName = (category) => {
           </Panel>
 
           <!-- Future: Data Visualization Section -->
-          <Panel :header="t('reports.dataVisualization')" class="mb-4" :collapsed="true" :toggleable="true">
+          <Panel 
+            :header="t('reports.dataVisualization')" 
+            class="mb-4" 
+            :collapsed="true"
+            :toggleable="true"
+          >
             <div class="text-center py-8">
               <i class="pi pi-chart-line text-4xl text-gray-300 mb-3"></i>
               <p class="text-gray-500">{{ t('reports.dataVisualizationComingSoon') }}</p>
@@ -228,7 +328,7 @@ const getCategoryDisplayName = (category) => {
 }
 
 .reports-container {
-  height:calc(100vh-80px);
+  height: calc(100vh - 14rem);
   background-color: #f8f9fa;
 }
 
@@ -240,13 +340,13 @@ const getCategoryDisplayName = (category) => {
 /* Sidebar Styles */
 .reports-sidebar {
   width: 320px;
+  height: 80vh;
+  overflow-y: auto;
   background: white;
   border-right: 1px solid #e9ecef;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  height: 70vh;
-
+  overflow: hidden;
 }
 
 .sidebar-header {
@@ -332,8 +432,8 @@ const getCategoryDisplayName = (category) => {
 
 .report-header {
   background: white;
-  height: 12rem;
   padding: 2rem;
+  height: 14rem;
   border-radius: 12px;
   margin-bottom: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -431,21 +531,21 @@ const getCategoryDisplayName = (category) => {
   .reports-layout {
     flex-direction: column;
   }
-
+  
   .reports-sidebar {
     width: 100%;
     height: auto;
     max-height: 300px;
   }
-
+  
   .reports-main {
     padding: 1rem;
   }
-
+  
   .report-header {
     padding: 1rem;
   }
-
+  
   .welcome-state {
     min-height: 300px;
   }
