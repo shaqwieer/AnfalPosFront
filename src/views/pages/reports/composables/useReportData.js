@@ -5,6 +5,7 @@ import apiClient from '@/api/apiClient';
 import { handleError } from '@/utilities/errorHandler';
 import { useMainStore } from '@/stores/mainStore';
 import { buildTableConfig, autoGenerateColumns } from '../utils/tableBuilder';
+import { buildSummaryData, buildFormattedSummaryCards } from '../utils/summaryBuilder';
 
 export function useReportData() {
   const { t } = useI18n();
@@ -15,6 +16,8 @@ export function useReportData() {
   const reportData = ref(null);
   const tableConfig = ref(null);
   const chartData = ref(null);
+  const summaryData = ref(null);
+  const formattedSummaryCards = ref([]);
   const error = ref(null);
   
   // Computed
@@ -32,6 +35,10 @@ export function useReportData() {
 
   const summary = computed(() => {
     return tableConfig.value?.summary || {};
+  });
+
+  const hasSummaryCards = computed(() => {
+    return formattedSummaryCards.value && formattedSummaryCards.value.length > 0;
   });
 
   // Methods
@@ -61,6 +68,11 @@ export function useReportData() {
           options
         );
         
+        // Build summary cards if enabled
+        if (report.summaryCards && report.summaryCards.length > 0) {
+          await buildSummaryCards(report, response.data.data, filters);
+        }
+        
         // Prepare chart data if needed
         if (report.chartConfig) {
           chartData.value = transformDataForCharts(response.data.data, report.chartConfig);
@@ -75,8 +87,43 @@ export function useReportData() {
       handleError(err, mainStore.loading);
       reportData.value = null;
       tableConfig.value = null;
+      summaryData.value = null;
+      formattedSummaryCards.value = [];
     } finally {
       loading.value = false;
+    }
+  };
+
+  const buildSummaryCards = async (report, data, filters = {}) => {
+    try {
+      // Build raw summary data using aggregations
+      const options = {
+        includeMetadata: true,
+        filters: Object.keys(filters).length > 0 ? filters : null,
+        customAggregators: report.customAggregators || {}
+      };
+
+      summaryData.value = buildSummaryData(data, report.summaryCards, options);
+      
+      // Build formatted cards for display
+      formattedSummaryCards.value = buildFormattedSummaryCards(
+        summaryData.value, 
+        report.summaryCards,
+        {
+          includeAnimation: true,
+          includeTrends: report.enableTrends || false
+        }
+      );
+
+      console.log('Summary cards built:', {
+        rawData: summaryData.value,
+        formattedCards: formattedSummaryCards.value
+      });
+
+    } catch (error) {
+      console.error('Error building summary cards:', error);
+      summaryData.value = {};
+      formattedSummaryCards.value = [];
     }
   };
 
@@ -88,6 +135,8 @@ export function useReportData() {
     reportData.value = null;
     tableConfig.value = null;
     chartData.value = null;
+    summaryData.value = null;
+    formattedSummaryCards.value = [];
     error.value = null;
   };
 
@@ -279,10 +328,13 @@ export function useReportData() {
     reportData,
     tableConfig,
     chartData,
+    summaryData,
+    formattedSummaryCards,
     error,
     
     // Computed
     hasData,
+    hasSummaryCards,
     tableColumns,
     tableRows,
     summary,
@@ -291,6 +343,7 @@ export function useReportData() {
     fetchReportData,
     refreshData,
     clearData,
-    exportData
+    exportData,
+    buildSummaryCards
   };
 }

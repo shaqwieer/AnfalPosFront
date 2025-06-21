@@ -33,13 +33,16 @@ export function useReports() {
     reportData,
     tableConfig,
     chartData,
+    summaryData,
+    formattedSummaryCards,
     hasData,
+    hasSummaryCards,
     fetchReportData,
     refreshData,
     clearData
   } = useReportData();
 
-  // Report definitions with enhanced configurations
+  // Report definitions with enhanced configurations including summary cards
   const reportDefinitions = ref([
     {
       id: 'aging-report',
@@ -48,9 +51,7 @@ export function useReports() {
       icon: 'pi-clock',
       category: 'financial',
       endpoints: {
-        // pdf: '/Invoices/GenerateAgingReport',
         excel: '/Invoices/GenerateAgingReportForExcel',
-        // data: '/Invoices/GetAgingReportData'
       },
       filters: [
         {
@@ -69,26 +70,7 @@ export function useReports() {
           optionLabel: 'name',
           optionValue: 'id'
         }
-      ],
-      // columns: [
-      //   { field: 'customerName', header: 'Customer', sortable: true, filterable: true, width: '200px' },
-      //   { field: 'customerCode', header: 'Customer Code', sortable: true, filterable: true, width: '120px' },
-      //   { field: 'current', header: 'Current', sortable: true, type: 'currency', width: '120px' },
-      //   { field: 'days30', header: '1-30 Days', sortable: true, type: 'currency', width: '120px' },
-      //   { field: 'days60', header: '31-60 Days', sortable: true, type: 'currency', width: '120px' },
-      //   { field: 'days90', header: '61-90 Days', sortable: true, type: 'currency', width: '120px' },
-      //   { field: 'days120', header: '91-120 Days', sortable: true, type: 'currency', width: '120px' },
-      //   { field: 'over120', header: '120+ Days', sortable: true, type: 'currency', width: '120px' },
-      //   { field: 'totalBalance', header: 'Total Balance', sortable: true, type: 'currency', width: '140px' }
-      // ],
-      // tableOptions: {
-      //   enablePagination: true,
-      //   defaultPageSize: 50,
-      //   enableSorting: true,
-      //   enableFiltering: true,
-      //   enableExport: true,
-      //   enableSelection: false
-      // }
+      ]
     },
     {
       id: 'item-availability-report',
@@ -98,7 +80,6 @@ export function useReports() {
       category: 'inventory',
       endpoints: {
         pdf: '/Items/GenerateItemAvailabiltyReport',
-        // data: '/Items/GetItemAvailabilityData'
       },
       filters: [
         {
@@ -110,16 +91,7 @@ export function useReports() {
           optionLabel: 'name',
           optionValue: 'id'
         }
-      ],
-      // columns: [
-      //   { field: 'itemCode', header: 'Item Code', sortable: true, filterable: true, width: '120px' },
-      //   { field: 'itemDescription', header: 'Description', sortable: true, filterable: true, width: '250px' },
-      //   { field: 'currentStock', header: 'Current Stock', sortable: true, type: 'number', width: '120px' },
-      //   { field: 'availableStock', header: 'Available', sortable: true, type: 'number', width: '120px' },
-      //   { field: 'reservedStock', header: 'Reserved', sortable: true, type: 'number', width: '120px' },
-      //   { field: 'unit', header: 'Unit', sortable: true, filterable: true, width: '80px' },
-      //   { field: 'lastUpdated', header: 'Last Updated', sortable: true, type: 'date', width: '130px' }
-      // ]
+      ]
     },
     {
       id: 'sales-rep-cash-report',
@@ -129,7 +101,6 @@ export function useReports() {
       category: 'financial',
       endpoints: {
         pdf: '/shiftSessions/GenerateSalesRepWithCashReport',
-        // data: '/shiftSessions/GetSalesRepWithCashData'
       },
       filters: [
         {
@@ -141,17 +112,7 @@ export function useReports() {
           optionLabel: 'name',
           optionValue: 'id'
         }
-      ],
-      // columns: [
-      //   { field: 'salesRepName', header: 'Sales Rep', sortable: true, filterable: true, width: '180px' },
-      //   { field: 'branchName', header: 'Branch', sortable: true, filterable: true, width: '150px' },
-      //   { field: 'sessionNumber', header: 'Session #', sortable: true, filterable: true, width: '100px' },
-      //   { field: 'startingCash', header: 'Starting Cash', sortable: true, type: 'currency', width: '130px' },
-      //   { field: 'salesAmount', header: 'Sales Amount', sortable: true, type: 'currency', width: '130px' },
-      //   { field: 'collectedCash', header: 'Collected Cash', sortable: true, type: 'currency', width: '130px' },
-      //   { field: 'expectedCash', header: 'Expected Cash', sortable: true, type: 'currency', width: '130px' },
-      //   { field: 'variance', header: 'Variance', sortable: true, type: 'currency', width: '120px' }
-      // ]
+      ]
     },
     {
       id: 'sales-excel-report',
@@ -183,6 +144,75 @@ export function useReports() {
           endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
           optionLabel: 'name',
           optionValue: 'id'
+        }
+      ],
+      // 🎯 SUMMARY CARDS CONFIGURATION
+      summaryCards: [
+        {
+          key: 'totalSales',
+          label: 'Total Sales',
+          format: 'currency',
+          color: 'primary',
+          icon: 'pi pi-dollar',
+          aggregate: {
+            field: 'finalAmount',
+            operation: 'sum'
+          }
+        },
+        {
+          key: 'totalInvoices',
+          label: 'Total Invoices',
+          format: 'number',
+          color: 'success',
+          icon: 'pi pi-file',
+          aggregate: {
+            field: 'billingDocId',
+            operation: 'countUnique'
+          }
+        },
+        {
+          key: 'totalQuantity',
+          label: 'Total Quantity',
+          format: 'number',
+          color: 'info',
+          icon: 'pi pi-box',
+          aggregate: {
+            field: 'quantity',
+            operation: 'sum'
+          }
+        },
+        {
+          key: 'avgOrderValue',
+          label: 'Avg Order Value',
+          format: 'currency',
+          color: 'warning',
+          icon: 'pi pi-chart-line',
+          aggregate: {
+            field: 'finalAmount',
+            operation: 'average'
+          }
+        },
+        {
+          key: 'totalCustomers',
+          label: 'Unique Customers',
+          format: 'number',
+          color: 'secondary',
+          icon: 'pi pi-users',
+          aggregate: {
+            field: 'customerSapCode',
+            operation: 'countUnique'
+          }
+        },
+        {
+          key: 'freeProducts',
+          label: 'Free Products',
+          format: 'number',
+          color: 'success',
+          icon: 'pi pi-gift',
+          aggregate: {
+            field: 'isFreeProduct',
+            operation: 'countTrue'
+          }
         }
       ],
       columns: [
@@ -235,8 +265,6 @@ export function useReports() {
       category: 'analytics',
       endpoints: {
         pdf: '/Invoices/GenerateItemUsabilityFor',
-        // excel: '/Invoices/GenerateItemUsabilityForExcel',
-        // data: '/Invoices/GetItemUsabilityData'
       },
       filters: [
         {
@@ -259,16 +287,7 @@ export function useReports() {
           optionLabel: 'name',
           optionValue: 'id'
         }
-      ],
-      // columns: [
-      //   { field: 'itemCode', header: 'Item Code', sortable: true, filterable: true, width: '120px' },
-      //   { field: 'itemDescription', header: 'Description', sortable: true, filterable: true, width: '250px' },
-      //   { field: 'totalSold', header: 'Total Sold', sortable: true, type: 'number', width: '120px' },
-      //   { field: 'totalRevenue', header: 'Total Revenue', sortable: true, type: 'currency', width: '140px' },
-      //   { field: 'averagePrice', header: 'Avg Price', sortable: true, type: 'currency', width: '120px' },
-      //   { field: 'salesFrequency', header: 'Sales Frequency', sortable: true, type: 'number', width: '130px' },
-      //   { field: 'lastSaleDate', header: 'Last Sale', sortable: true, type: 'date', width: '120px' }
-      // ]
+      ]
     },
     {
       id: 'collection-report',
@@ -278,8 +297,6 @@ export function useReports() {
       category: 'financial',
       endpoints: {
         pdf: '/Invoices/GenerateCollectionPdf',
-        // excel: '/Invoices/GenerateCollectionExcel',
-        // data: '/Invoices/GetCollectionData'
       },
       filters: [
         {
@@ -311,16 +328,7 @@ export function useReports() {
           optionLabel: 'name',
           optionValue: 'id'
         }
-      ],
-      // columns: [
-      //   { field: 'receiptNumber', header: 'Receipt #', sortable: true, filterable: true, width: '120px' },
-      //   { field: 'customerName', header: 'Customer', sortable: true, filterable: true, width: '200px' },
-      //   { field: 'paymentDate', header: 'Payment Date', sortable: true, type: 'date', width: '120px' },
-      //   { field: 'paymentMethod', header: 'Payment Method', sortable: true, filterable: true, width: '130px' },
-      //   { field: 'collectedAmount', header: 'Collected Amount', sortable: true, type: 'currency', width: '140px' },
-      //   { field: 'salesRepName', header: 'Sales Rep', sortable: true, filterable: true, width: '150px' },
-      //   { field: 'branchName', header: 'Branch', sortable: true, filterable: true, width: '130px' }
-      // ]
+      ]
     },
     {
       id: 'payments-approval-report',
@@ -330,7 +338,6 @@ export function useReports() {
       category: 'financial',
       endpoints: {
         excel: '/Invoices/GetPaymentsApprovelExcelReport',
-        // data: '/Invoices/GetPaymentsApprovalData'
       },
       filters: [
         {
@@ -353,18 +360,11 @@ export function useReports() {
           optionLabel: 'name',
           optionValue: 'id'
         }
-      ],
-      // columns: [
-      //   { field: 'paymentId', header: 'Payment ID', sortable: true, filterable: true, width: '120px' },
-      //   { field: 'customerName', header: 'Customer', sortable: true, filterable: true, width: '200px' },
-      //   { field: 'amount', header: 'Amount', sortable: true, type: 'currency', width: '120px' },
-      //   { field: 'requestDate', header: 'Request Date', sortable: true, type: 'date', width: '120px' },
-      //   { field: 'status', header: 'Status', sortable: true, type: 'status', width: '100px' },
-      //   { field: 'approvedBy', header: 'Approved By', sortable: true, filterable: true, width: '150px' },
-      //   { field: 'approvalDate', header: 'Approval Date', sortable: true, type: 'date', width: '120px' }
-      // ]
+      ]
     }
-  ]);  // Computed
+  ]);
+
+  // Computed
   const reportsByCategory = computed(() => {
     const categories = {};
     reportDefinitions.value.forEach(report => {
@@ -391,6 +391,10 @@ export function useReports() {
 
   const hasDataEndpoint = computed(() => {
     return selectedReport.value?.endpoints?.data;
+  });
+
+  const hasSummaryCardsEnabled = computed(() => {
+    return selectedReport.value?.summaryCards && selectedReport.value.summaryCards.length > 0;
   });
 
   // Methods
@@ -510,13 +514,17 @@ export function useReports() {
     reportData,
     tableConfig,
     chartData,
+    summaryData,
+    formattedSummaryCards,
     hasData,
+    hasSummaryCards,
     
     // Computed
     reportsByCategory,
     availableFormats,
     isFormValid,
     hasDataEndpoint,
+    hasSummaryCardsEnabled,
     
     // Methods
     selectReport,

@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/stores/mainStore';
 import { useReports } from './composables/useReports';
 import ReportTable from './components/ReportTable.vue';
+import SummaryCards from './components/SummaryCards.vue';
 
 const { t } = useI18n();
 const mainStore = useMainStore();
@@ -19,10 +20,14 @@ const {
   availableFormats,
   isFormValid,
   hasDataEndpoint,
+  hasSummaryCardsEnabled,
   showDataVisualization,
   reportData,
   tableConfig,
+  summaryData,
+  formattedSummaryCards,
   hasData,
+  hasSummaryCards,
   selectReport,
   generateReport,
   closeDialog,
@@ -69,7 +74,6 @@ const getCategoryDisplayName = (category) => {
   return categoryNames[category] || category;
 };
 </script>
-
 
 <template>
   <div :class="['reports-container', { 'rtl-direction': rtl }]">
@@ -129,6 +133,7 @@ const getCategoryDisplayName = (category) => {
                   <Tag v-if="report.endpoints.pdf" class="bg-red-100 text-red-700 text-xs px-2 py-1" icon="pi pi-file-pdf"> PDF </Tag>
                   <Tag v-if="report.endpoints.excel" class="bg-green-100 text-green-700 text-xs px-2 py-1" icon="pi pi-file-excel"> Excel </Tag>
                   <Tag v-if="report.endpoints.data" class="bg-blue-100 text-blue-700 text-xs px-2 py-1" icon="pi pi-eye"> Data </Tag>
+                  <Tag v-if="report.summaryCards" class="bg-purple-100 text-purple-700 text-xs px-2 py-1" icon="pi pi-chart-bar"> Summary </Tag>
                 </div>
               </div>
             </div>
@@ -166,6 +171,12 @@ const getCategoryDisplayName = (category) => {
                 <p class="text-gray-600 mt-1">
                   {{ t(selectedReport.description) }}
                 </p>
+                <!-- 🎯 SUMMARY CARDS INDICATOR -->
+                <div v-if="hasSummaryCardsEnabled" class="flex align-items-center gap-2 mt-2">
+                  <Tag class="bg-purple-100 text-purple-700 text-xs" icon="pi pi-chart-bar">
+                    {{ selectedReport.summaryCards.length }} Summary Cards Available
+                  </Tag>
+                </div>
               </div>
             </div>
 
@@ -193,7 +204,7 @@ const getCategoryDisplayName = (category) => {
                 {{ t('reports.exportExcel') }}
               </Button>
               
-              <!-- 🎯 VIEW DATA BUTTON - This should be visible for sales-excel-report -->
+              <!-- 🎯 VIEW DATA BUTTON -->
               <Button 
                 v-if="hasDataEndpoint" 
                 @click="loadReportData" 
@@ -262,7 +273,7 @@ const getCategoryDisplayName = (category) => {
             </div>
           </Panel>
 
-          <!-- 🎯 DATA VISUALIZATION SECTION - This replaces the old static panel -->
+          <!-- 🎯 DATA VISUALIZATION SECTION WITH SUMMARY CARDS -->
           <Panel 
             v-if="hasDataEndpoint"
             header="Data Visualization" 
@@ -273,6 +284,17 @@ const getCategoryDisplayName = (category) => {
           >
             <!-- Show data when loaded -->
             <div v-if="showDataVisualization && hasData" class="data-visualization-content">
+              
+              <!-- 🎯 SUMMARY CARDS SECTION - TOP OF DATA VISUALIZATION -->
+              <SummaryCards
+                v-if="hasSummaryCardsEnabled && hasSummaryCards"
+                :report="selectedReport"
+                :summary="summaryData"
+                :formatted-summary-cards="formattedSummaryCards"
+                :loading="loading"
+                class="mb-6"
+              />
+              
               <!-- 🎯 REPORT TABLE COMPONENT -->
               <ReportTable
                 :report="selectedReport"
@@ -301,6 +323,11 @@ const getCategoryDisplayName = (category) => {
             <div v-else class="text-center py-8">
               <i class="pi pi-chart-line text-4xl text-gray-300 mb-3"></i>
               <p class="text-gray-500">Click to expand and view report data</p>
+              <div v-if="hasSummaryCardsEnabled" class="mt-3">
+                <Tag class="bg-purple-100 text-purple-700" icon="pi pi-chart-bar">
+                  {{ selectedReport.summaryCards.length }} Summary Cards Ready
+                </Tag>
+              </div>
             </div>
           </Panel>
         </div>
@@ -420,7 +447,8 @@ const getCategoryDisplayName = (category) => {
 .report-header {
   background: white;
   padding: 2rem;
-  height: 14rem;
+  height: auto;
+  min-height: 14rem;
   border-radius: 12px;
   margin-bottom: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -435,6 +463,11 @@ const getCategoryDisplayName = (category) => {
   justify-content: center;
   border: 1px solid;
   flex-shrink: 0;
+}
+
+/* Data Visualization Content */
+.data-visualization-content {
+  padding: 0;
 }
 
 /* Form Styles */
