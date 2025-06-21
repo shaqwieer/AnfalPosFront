@@ -6,6 +6,7 @@ import { handleError } from '@/utilities/errorHandler';
 import { useMainStore } from '@/stores/mainStore';
 import { buildTableConfig, autoGenerateColumns } from '../utils/tableBuilder';
 import { buildSummaryData, buildFormattedSummaryCards } from '../utils/summaryBuilder';
+import { buildChartData, buildMultipleCharts, getChartOptions } from '../utils/chartBuilder';
 
 export function useReportData() {
   const { t } = useI18n();
@@ -15,11 +16,15 @@ export function useReportData() {
   const loading = ref(false);
   const reportData = ref(null);
   const tableConfig = ref(null);
-  const chartData = ref(null);
+  const chartData = ref([]);
   const summaryData = ref(null);
   const formattedSummaryCards = ref([]);
   const error = ref(null);
   
+  // Data Visualization Controls
+  const enabledVisualizationTypes = ref(['summary', 'table', 'charts']);
+  const availableVisualizationTypes = ref([]);
+
   // Computed
   const hasData = computed(() => {
     return reportData.value && reportData.value.length > 0;
@@ -41,6 +46,22 @@ export function useReportData() {
     return formattedSummaryCards.value && formattedSummaryCards.value.length > 0;
   });
 
+  const hasCharts = computed(() => {
+    return chartData.value && chartData.value.length > 0;
+  });
+
+  const shouldShowSummary = computed(() => {
+    return enabledVisualizationTypes.value.includes('summary') && hasSummaryCards.value;
+  });
+
+  const shouldShowTable = computed(() => {
+    return enabledVisualizationTypes.value.includes('table') && hasData.value;
+  });
+
+  const shouldShowCharts = computed(() => {
+    return enabledVisualizationTypes.value.includes('charts') && hasCharts.value;
+  });
+
   // Methods
   const fetchReportData = async (report, filters = {}) => {
     if (!report?.endpoints?.data) {
@@ -58,6 +79,9 @@ export function useReportData() {
       if (response.data.success) {
         reportData.value = response.data.data;
         
+        // Determine available visualization types based on report configuration
+        availableVisualizationTypes.value = getAvailableVisualizationTypes(report);
+        
         // Build table configuration
         const columns = getReportColumns(report);
         const options = getTableOptions(report);
@@ -73,12 +97,11 @@ export function useReportData() {
           await buildSummaryCards(report, response.data.data, filters);
         }
         
-        // Prepare chart data if needed
-        if (report.chartConfig) {
-          chartData.value = transformDataForCharts(response.data.data, report.chartConfig);
+        // Build charts if enabled
+        if (report.chartConfigs && report.chartConfigs.length > 0) {
+          await buildCharts(report, response.data.data);
         }
         
-        // mainStore.loading.setNotificationInfo('success', t('reports.dataLoadedSuccess'));
       } else {
         throw new Error(response.data.message || 'Failed to load report data');
       }
@@ -89,6 +112,7 @@ export function useReportData() {
       tableConfig.value = null;
       summaryData.value = null;
       formattedSummaryCards.value = [];
+      chartData.value = [];
     } finally {
       loading.value = false;
     }
@@ -96,7 +120,6 @@ export function useReportData() {
 
   const buildSummaryCards = async (report, data, filters = {}) => {
     try {
-      // Build raw summary data using aggregations
       const options = {
         includeMetadata: true,
         filters: Object.keys(filters).length > 0 ? filters : null,
@@ -105,7 +128,6 @@ export function useReportData() {
 
       summaryData.value = buildSummaryData(data, report.summaryCards, options);
       
-      // Build formatted cards for display
       formattedSummaryCards.value = buildFormattedSummaryCards(
         summaryData.value, 
         report.summaryCards,
@@ -127,6 +149,57 @@ export function useReportData() {
     }
   };
 
+  const buildCharts = async (report, data) => {
+    try {
+      if (!report.chartConfigs || report.chartConfigs.length === 0) {
+        chartData.value = [];
+        return;
+      }
+
+      // Build all charts using the chart builder
+      const charts = buildMultipleCharts(data, report.chartConfigs);
+      
+      // Format charts for display with additional metadata
+      chartData.value = charts.map(chart => ({
+        ...chart,
+        options: getChartOptions(report.chartConfigs.find(config => config.id === chart.id)),
+        loading: false,
+        error: null
+      }));
+
+      console.log('Charts built:', chartData.value);
+
+    } catch (error) {
+      console.error('Error building charts:', error);
+      chartData.value = [];
+    }
+  };
+
+  const getAvailableVisualizationTypes = (report) => {
+    const types = [];
+    
+    // Always include table if report has data endpoint
+    if (report.endpoints?.data) {
+      types.push('table');
+    }
+    
+    // Include summary if report has summary cards
+    if (report.summaryCards && report.summaryCards.length > 0) {
+      types.push('summary');
+    }
+    
+    // Include charts if report has chart configurations
+    if (report.chartConfigs && report.chartConfigs.length > 0) {
+      types.push('charts');
+    }
+    
+    return types;
+  };
+
+  const updateVisualizationTypes = (newTypes) => {
+    enabledVisualizationTypes.value = [...newTypes];
+  };
+
   const refreshData = async (report, filters = {}) => {
     await fetchReportData(report, filters);
   };
@@ -134,10 +207,12 @@ export function useReportData() {
   const clearData = () => {
     reportData.value = null;
     tableConfig.value = null;
-    chartData.value = null;
+    chartData.value = [];
     summaryData.value = null;
     formattedSummaryCards.value = [];
     error.value = null;
+    availableVisualizationTypes.value = [];
+    enabledVisualizationTypes.value = ['summary', 'table', 'charts'];
   };
 
   const prepareDataPayload = (filters) => {
@@ -181,83 +256,6 @@ export function useReportData() {
     return {
       ...defaultOptions,
       ...report.tableOptions
-    };
-  };
-
-  const transformDataForCharts = (data, chartConfig) => {
-    // Transform data for different chart types
-    if (!data || data.length === 0) return null;
-
-    const transformations = {
-      bar: transformForBarChart,
-      line: transformForLineChart,
-      pie: transformForPieChart,
-      area: transformForAreaChart
-    };
-
-    const transformer = transformations[chartConfig.type];
-    return transformer ? transformer(data, chartConfig) : null;
-  };
-
-  const transformForBarChart = (data, config) => {
-    const { labelField, valueField } = config;
-    
-    return {
-      labels: data.map(item => item[labelField]),
-      datasets: [{
-        label: config.label || valueField,
-        data: data.map(item => item[valueField]),
-        backgroundColor: config.backgroundColor || '#3498db',
-        borderColor: config.borderColor || '#2980b9',
-        borderWidth: 1
-      }]
-    };
-  };
-
-  const transformForLineChart = (data, config) => {
-    const { labelField, valueField } = config;
-    
-    return {
-      labels: data.map(item => item[labelField]),
-      datasets: [{
-        label: config.label || valueField,
-        data: data.map(item => item[valueField]),
-        fill: false,
-        borderColor: config.borderColor || '#3498db',
-        backgroundColor: config.backgroundColor || '#3498db',
-        tension: 0.1
-      }]
-    };
-  };
-
-  const transformForPieChart = (data, config) => {
-    const { labelField, valueField } = config;
-    
-    return {
-      labels: data.map(item => item[labelField]),
-      datasets: [{
-        data: data.map(item => item[valueField]),
-        backgroundColor: config.colors || [
-          '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
-          '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
-        ]
-      }]
-    };
-  };
-
-  const transformForAreaChart = (data, config) => {
-    const { labelField, valueField } = config;
-    
-    return {
-      labels: data.map(item => item[labelField]),
-      datasets: [{
-        label: config.label || valueField,
-        data: data.map(item => item[valueField]),
-        fill: true,
-        borderColor: config.borderColor || '#3498db',
-        backgroundColor: config.backgroundColor || 'rgba(52, 152, 219, 0.2)',
-        tension: 0.4
-      }]
     };
   };
 
@@ -314,6 +312,42 @@ export function useReportData() {
     URL.revokeObjectURL(url);
   };
 
+  // Chart-specific methods
+  const refreshChart = async (chartId, report) => {
+    if (!reportData.value || !report.chartConfigs) return;
+    
+    const chartConfig = report.chartConfigs.find(config => config.id === chartId);
+    if (!chartConfig) return;
+
+    try {
+      const newChartData = buildChartData(reportData.value, chartConfig);
+      const chartIndex = chartData.value.findIndex(chart => chart.id === chartId);
+      
+      if (chartIndex !== -1) {
+        chartData.value[chartIndex] = {
+          ...chartData.value[chartIndex],
+          data: newChartData,
+          loading: false,
+          error: null
+        };
+      }
+    } catch (error) {
+      console.error(`Error refreshing chart ${chartId}:`, error);
+      const chartIndex = chartData.value.findIndex(chart => chart.id === chartId);
+      if (chartIndex !== -1) {
+        chartData.value[chartIndex].error = error.message;
+        chartData.value[chartIndex].loading = false;
+      }
+    }
+  };
+
+  const toggleChart = (chartId, enabled) => {
+    const chartIndex = chartData.value.findIndex(chart => chart.id === chartId);
+    if (chartIndex !== -1) {
+      chartData.value[chartIndex].enabled = enabled;
+    }
+  };
+
   const getNestedValue = (obj, path) => {
     if (!obj || !path) return null;
     
@@ -332,18 +366,30 @@ export function useReportData() {
     formattedSummaryCards,
     error,
     
+    // Visualization Controls
+    enabledVisualizationTypes,
+    availableVisualizationTypes,
+    
     // Computed
     hasData,
     hasSummaryCards,
+    hasCharts,
     tableColumns,
     tableRows,
     summary,
+    shouldShowSummary,
+    shouldShowTable,
+    shouldShowCharts,
     
     // Methods
     fetchReportData,
     refreshData,
     clearData,
     exportData,
-    buildSummaryCards
+    buildSummaryCards,
+    buildCharts,
+    updateVisualizationTypes,
+    refreshChart,
+    toggleChart
   };
 }

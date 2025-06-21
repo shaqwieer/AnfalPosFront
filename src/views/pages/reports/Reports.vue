@@ -5,6 +5,7 @@ import { useMainStore } from '@/stores/mainStore';
 import { useReports } from './composables/useReports';
 import ReportTable from './components/ReportTable.vue';
 import SummaryCards from './components/SummaryCards.vue';
+import ReportChart from './components/ReportChart.vue';
 
 const { t } = useI18n();
 const mainStore = useMainStore();
@@ -21,19 +22,29 @@ const {
   isFormValid,
   hasDataEndpoint,
   hasSummaryCardsEnabled,
+  hasChartsEnabled,
   showDataVisualization,
+  visualizationTypeOptions,
   reportData,
   tableConfig,
+  chartData,
   summaryData,
   formattedSummaryCards,
   hasData,
   hasSummaryCards,
+  hasCharts,
+  enabledVisualizationTypes,
+  availableVisualizationOptions,
+  shouldShowSummary,
+  shouldShowTable,
+  shouldShowCharts,
   selectReport,
   generateReport,
   closeDialog,
   loadReportData,
   refreshReportData,
-  toggleDataVisualization
+  toggleDataVisualization,
+  handleVisualizationTypesChange
 } = useReports();
 
 // Category configurations for styling
@@ -129,11 +140,12 @@ const getCategoryDisplayName = (category) => {
                 </div>
 
                 <!-- Available formats indicators -->
-                <div class="flex gap-1 mt-2">
+                <div class="flex gap-1 mt-2 flex-wrap">
                   <Tag v-if="report.endpoints.pdf" class="bg-red-100 text-red-700 text-xs px-2 py-1" icon="pi pi-file-pdf"> PDF </Tag>
                   <Tag v-if="report.endpoints.excel" class="bg-green-100 text-green-700 text-xs px-2 py-1" icon="pi pi-file-excel"> Excel </Tag>
                   <Tag v-if="report.endpoints.data" class="bg-blue-100 text-blue-700 text-xs px-2 py-1" icon="pi pi-eye"> Data </Tag>
                   <Tag v-if="report.summaryCards" class="bg-purple-100 text-purple-700 text-xs px-2 py-1" icon="pi pi-chart-bar"> Summary </Tag>
+                  <Tag v-if="report.chartConfigs" class="bg-orange-100 text-orange-700 text-xs px-2 py-1" icon="pi pi-chart-line"> Charts </Tag>
                 </div>
               </div>
             </div>
@@ -171,24 +183,31 @@ const getCategoryDisplayName = (category) => {
                 <p class="text-gray-600 mt-1">
                   {{ t(selectedReport.description) }}
                 </p>
-                <!-- 🎯 SUMMARY CARDS INDICATOR -->
-                <div v-if="hasSummaryCardsEnabled" class="flex align-items-center gap-2 mt-2">
-                  <Tag class="bg-purple-100 text-purple-700 text-xs" icon="pi pi-chart-bar">
-                    {{ selectedReport.summaryCards.length }} Summary Cards Available
+                <!-- 🎯 FEATURES INDICATORS -->
+                <div class="flex align-items-center gap-2 mt-2 flex-wrap">
+                  <Tag v-if="hasSummaryCardsEnabled" class="bg-purple-100 text-purple-700 text-xs" icon="pi pi-chart-bar">
+                    {{ selectedReport.summaryCards.length }} Summary Cards
+                  </Tag>
+                  <Tag v-if="hasChartsEnabled" class="bg-orange-100 text-orange-700 text-xs" icon="pi pi-chart-line">
+                    {{ selectedReport.chartConfigs.length }} Charts
+                  </Tag>
+                  <Tag v-if="hasDataEndpoint" class="bg-blue-100 text-blue-700 text-xs" icon="pi pi-table">
+                    Data Table Available
                   </Tag>
                 </div>
               </div>
             </div>
 
             <!-- Export Actions -->
-            <div class="flex gap-2 mb-6">
+            <div class="flex gap-2 mb-6 flex-wrap">
               <Button 
                 v-if="selectedReport.endpoints.pdf" 
                 @click="generateReport('pdf')" 
                 :loading="loading" 
                 :disabled="!isFormValid" 
                 icon="pi pi-file-pdf" 
-                class="w-8rem p-button-danger"
+                class="p-button-danger"
+                size="small"
               >
                 {{ t('reports.exportPdf') }}
               </Button>
@@ -199,7 +218,8 @@ const getCategoryDisplayName = (category) => {
                 :loading="loading" 
                 :disabled="!isFormValid" 
                 icon="pi pi-file-excel" 
-                class="w-8rem p-button-success"
+                class="p-button-success"
+                size="small"
               >
                 {{ t('reports.exportExcel') }}
               </Button>
@@ -211,7 +231,8 @@ const getCategoryDisplayName = (category) => {
                 :loading="loading" 
                 :disabled="!isFormValid" 
                 icon="pi pi-eye" 
-                class="w-8rem p-button-info"
+                class="p-button-info"
+                size="small"
               >
                 View Data
               </Button>
@@ -273,7 +294,7 @@ const getCategoryDisplayName = (category) => {
             </div>
           </Panel>
 
-          <!-- 🎯 DATA VISUALIZATION SECTION WITH SUMMARY CARDS -->
+          <!-- 🎯 DATA VISUALIZATION SECTION WITH CONTROLS -->
           <Panel 
             v-if="hasDataEndpoint"
             header="Data Visualization" 
@@ -282,12 +303,38 @@ const getCategoryDisplayName = (category) => {
             :toggleable="true"
             @toggle="toggleDataVisualization"
           >
+            <template #icons>
+              <!-- 🎯 VISUALIZATION TYPE SELECTOR -->
+              <div v-if="showDataVisualization && hasData" class="visualization-controls">
+                <MultiSelect
+                  v-model="enabledVisualizationTypes"
+                  :options="availableVisualizationOptions"
+                  optionLabel="name"
+                  optionValue="code"
+                  placeholder="Select visualization types"
+                  class="visualization-selector"
+                  display="chip"
+                  @change="handleVisualizationTypesChange"
+                >
+                  <template #option="slotProps">
+                    <div class="flex align-items-center gap-2">
+                      <i :class="slotProps.option.icon"></i>
+                      <div>
+                        <div class="font-medium">{{ slotProps.option.name }}</div>
+                        <div class="text-xs text-gray-500">{{ slotProps.option.description }}</div>
+                      </div>
+                    </div>
+                  </template>
+                </MultiSelect>
+              </div>
+            </template>
+
             <!-- Show data when loaded -->
             <div v-if="showDataVisualization && hasData" class="data-visualization-content">
               
-              <!-- 🎯 SUMMARY CARDS SECTION - TOP OF DATA VISUALIZATION -->
+              <!-- 🎯 SUMMARY CARDS SECTION -->
               <SummaryCards
-                v-if="hasSummaryCardsEnabled && hasSummaryCards"
+                v-if="shouldShowSummary"
                 :report="selectedReport"
                 :summary="summaryData"
                 :formatted-summary-cards="formattedSummaryCards"
@@ -295,8 +342,31 @@ const getCategoryDisplayName = (category) => {
                 class="mb-6"
               />
               
+              <!-- 🎯 CHARTS SECTION -->
+              <div v-if="shouldShowCharts" class="charts-section mb-6">
+                <div class="charts-header mb-4">
+                  <h3 class="text-lg font-semibold text-gray-800 flex align-items-center gap-2">
+                    <i class="pi pi-chart-line text-orange-500"></i>
+                    Charts & Analytics
+                  </h3>
+                  <p class="text-sm text-gray-600">Visual representation of your data</p>
+                </div>
+                
+                <!-- Charts Grid -->
+                <div class="charts-grid">
+                  <ReportChart
+                    v-for="chart in chartData"
+                    :key="chart.id"
+                    :chart="chart"
+                    :loading="loading"
+                    class="chart-item"
+                  />
+                </div>
+              </div>
+              
               <!-- 🎯 REPORT TABLE COMPONENT -->
               <ReportTable
+                v-if="shouldShowTable"
                 :report="selectedReport"
                 :data="reportData"
                 :table-config="tableConfig"
@@ -322,10 +392,16 @@ const getCategoryDisplayName = (category) => {
             <!-- Default collapsed state -->
             <div v-else class="text-center py-8">
               <i class="pi pi-chart-line text-4xl text-gray-300 mb-3"></i>
-              <p class="text-gray-500">Click to expand and view report data</p>
-              <div v-if="hasSummaryCardsEnabled" class="mt-3">
-                <Tag class="bg-purple-100 text-purple-700" icon="pi pi-chart-bar">
-                  {{ selectedReport.summaryCards.length }} Summary Cards Ready
+              <p class="text-gray-500">Click to expand and view report data visualization</p>
+              <div class="mt-3 flex gap-2 justify-content-center flex-wrap">
+                <Tag v-if="hasSummaryCardsEnabled" class="bg-purple-100 text-purple-700" icon="pi pi-chart-bar">
+                  {{ selectedReport.summaryCards.length }} Summary Cards
+                </Tag>
+                <Tag v-if="hasChartsEnabled" class="bg-orange-100 text-orange-700" icon="pi pi-chart-line">
+                  {{ selectedReport.chartConfigs.length }} Charts
+                </Tag>
+                <Tag class="bg-blue-100 text-blue-700" icon="pi pi-table">
+                  Data Table
                 </Tag>
               </div>
             </div>
@@ -440,7 +516,7 @@ const getCategoryDisplayName = (category) => {
 }
 
 .report-content {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
@@ -468,6 +544,42 @@ const getCategoryDisplayName = (category) => {
 /* Data Visualization Content */
 .data-visualization-content {
   padding: 0;
+}
+
+/* Visualization Controls */
+.visualization-controls {
+  margin-right: 1rem;
+}
+
+.visualization-selector {
+  min-width: 300px;
+}
+
+/* Charts Section */
+.charts-section {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.charts-header {
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 1rem;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.chart-item {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  overflow: hidden;
 }
 
 /* Form Styles */
@@ -547,6 +659,12 @@ const getCategoryDisplayName = (category) => {
 }
 
 /* Responsive Design */
+@media (max-width: 1200px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
   .reports-layout {
     flex-direction: column;
@@ -568,6 +686,49 @@ const getCategoryDisplayName = (category) => {
 
   .welcome-state {
     min-height: 300px;
+  }
+
+  .visualization-selector {
+    min-width: 200px;
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-item {
+    min-height: 300px;
+  }
+
+  .report-header {
+    min-height: auto;
+  }
+
+  .visualization-controls {
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .report-item {
+    padding: 0.5rem;
+  }
+
+  .chart-item {
+    min-height: 250px;
+  }
+
+  .data-visualization-content {
+    padding: 0.5rem;
+  }
+
+  .charts-section {
+    padding: 1rem;
+  }
+
+  .charts-grid {
+    gap: 1rem;
   }
 }
 
@@ -626,5 +787,132 @@ const getCategoryDisplayName = (category) => {
 
 .slide-leave-to {
   transform: translateX(100%);
+}
+
+/* Chart specific styles */
+.charts-section .charts-grid .chart-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+/* MultiSelect specific styling for visualization controls */
+:deep(.visualization-selector .p-multiselect-label) {
+  font-size: 0.875rem;
+}
+
+:deep(.visualization-selector .p-multiselect-token) {
+  background: #e3f2fd;
+  color: #1976d2;
+  border: 1px solid #bbdefb;
+}
+
+:deep(.visualization-selector .p-multiselect-token-icon) {
+  color: #1976d2;
+}
+
+/* Panel icons alignment */
+:deep(.p-panel-header-icon) {
+  margin-left: auto;
+}
+
+:deep(.p-panel-icons) {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Enhanced Panel styling */
+:deep(.p-panel) {
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+:deep(.p-panel .p-panel-header) {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+:deep(.p-panel .p-panel-content) {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+/* Button group styling */
+.report-header .flex.gap-2 {
+  flex-wrap: wrap;
+}
+
+.report-header .flex.gap-2 .p-button {
+  flex: 1;
+  min-width: 120px;
+}
+
+@media (max-width: 768px) {
+  .report-header .flex.gap-2 .p-button {
+    flex: 1 1 100%;
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Enhanced tag styling */
+.report-item .flex.gap-1 {
+  margin-top: 0.75rem;
+}
+
+:deep(.p-tag.text-xs) {
+  font-size: 0.65rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* Visualization section enhancements */
+.data-visualization-content > * {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced grid layouts */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 1400px) {
+  .charts-grid {
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+/* Accessibility improvements */
+.report-item:focus,
+.report-item:focus-visible {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+}
+
+.visualization-selector:focus-within {
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
 }
 </style>

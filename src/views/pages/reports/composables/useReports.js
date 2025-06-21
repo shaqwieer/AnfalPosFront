@@ -35,14 +35,21 @@ export function useReports() {
     chartData,
     summaryData,
     formattedSummaryCards,
+    enabledVisualizationTypes,
+    availableVisualizationTypes,
     hasData,
     hasSummaryCards,
+    hasCharts,
+    shouldShowSummary,
+    shouldShowTable,
+    shouldShowCharts,
     fetchReportData,
     refreshData,
-    clearData
+    clearData,
+    updateVisualizationTypes
   } = useReportData();
 
-  // Report definitions with enhanced configurations including summary cards
+  // Enhanced report definitions with charts and summary cards
   const reportDefinitions = ref([
     {
       id: 'aging-report',
@@ -215,6 +222,109 @@ export function useReports() {
           }
         }
       ],
+      // 🎯 CHART CONFIGURATIONS
+      chartConfigs: [
+        {
+          id: 'salesByBranch',
+          type: 'bar',
+          title: 'Sales by Branch',
+          groupBy: 'branchEnglishName',
+          aggregate: { field: 'finalAmount', operation: 'sum' },
+          sortBy: 'desc',
+          limit: 10,
+          options: { 
+            responsive: true,
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top'
+              }
+            }
+          }
+        },
+        {
+          id: 'salesByCustomer',
+          type: 'doughnut',
+          title: 'Top 10 Customers by Sales',
+          groupBy: 'customerName',
+          aggregate: { field: 'finalAmount', operation: 'sum' },
+          limit: 10,
+          sortBy: 'desc',
+          options: {
+            plugins: {
+              legend: {
+                position: 'right'
+              }
+            }
+          }
+        },
+        {
+          id: 'quantityByProduct',
+          type: 'bar',
+          title: 'Top 15 Products by Quantity',
+          groupBy: 'sapDesc',
+          aggregate: { field: 'quantity', operation: 'sum' },
+          limit: 15,
+          sortBy: 'desc',
+          options: {
+            indexAxis: 'y', // Horizontal bar chart
+            responsive: true
+          }
+        },
+        {
+          id: 'salesTrend',
+          type: 'line',
+          title: 'Sales Trend Over Time',
+          groupBy: 'invoiceCreation',
+          groupByFormat: 'date',
+          aggregate: { field: 'finalAmount', operation: 'sum' },
+          sortBy: 'asc',
+          options: { 
+            tension: 0.4,
+            elements: {
+              point: {
+                radius: 4,
+                hoverRadius: 8
+              }
+            }
+          }
+        },
+        {
+          id: 'invoicesByBranch',
+          type: 'pie',
+          title: 'Invoice Distribution by Branch',
+          groupBy: 'branchEnglishName',
+          aggregate: { field: 'billingDocId', operation: 'countUnique' },
+          sortBy: 'desc',
+          options: {
+            plugins: {
+              legend: {
+                position: 'bottom'
+              }
+            }
+          }
+        },
+        {
+          id: 'avgOrderByBranch',
+          type: 'radar',
+          title: 'Average Order Value by Branch',
+          groupBy: 'branchEnglishName',
+          aggregate: { field: 'finalAmount', operation: 'average' },
+          limit: 8,
+          options: {
+            scales: {
+              r: {
+                beginAtZero: true,
+                ticks: {
+                  callback: function(value) {
+                    return '$' + (value / 1000).toFixed(1) + 'K';
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
       columns: [
         // Invoice Information
         { field: 'billingDocId', header: 'Invoice #', sortable: true, filterable: true, width: '120px' },
@@ -364,6 +474,28 @@ export function useReports() {
     }
   ]);
 
+  // Visualization type options for MultiSelect
+  const visualizationTypeOptions = ref([
+    { 
+      name: 'Summary Cards', 
+      code: 'summary', 
+      icon: 'pi pi-chart-bar',
+      description: 'Key metrics and statistics'
+    },
+    { 
+      name: 'Data Table', 
+      code: 'table', 
+      icon: 'pi pi-table',
+      description: 'Detailed tabular data'
+    },
+    { 
+      name: 'Charts', 
+      code: 'charts', 
+      icon: 'pi pi-chart-line',
+      description: 'Visual charts and graphs'
+    }
+  ]);
+
   // Computed
   const reportsByCategory = computed(() => {
     const categories = {};
@@ -395,6 +527,18 @@ export function useReports() {
 
   const hasSummaryCardsEnabled = computed(() => {
     return selectedReport.value?.summaryCards && selectedReport.value.summaryCards.length > 0;
+  });
+
+  const hasChartsEnabled = computed(() => {
+    return selectedReport.value?.chartConfigs && selectedReport.value.chartConfigs.length > 0;
+  });
+
+  const availableVisualizationOptions = computed(() => {
+    if (!selectedReport.value) return [];
+    
+    return visualizationTypeOptions.value.filter(option => {
+      return availableVisualizationTypes.value.includes(option.code);
+    });
   });
 
   // Methods
@@ -500,6 +644,10 @@ export function useReports() {
     }
   };
 
+  const handleVisualizationTypesChange = (newTypes) => {
+    updateVisualizationTypes(newTypes);
+  };
+
   return {
     // State
     loading,
@@ -509,6 +657,7 @@ export function useReports() {
     reportDialogVisible,
     reportDefinitions,
     showDataVisualization,
+    visualizationTypeOptions,
     
     // Data state
     reportData,
@@ -518,6 +667,12 @@ export function useReports() {
     formattedSummaryCards,
     hasData,
     hasSummaryCards,
+    hasCharts,
+    enabledVisualizationTypes,
+    availableVisualizationTypes,
+    shouldShowSummary,
+    shouldShowTable,
+    shouldShowCharts,
     
     // Computed
     reportsByCategory,
@@ -525,6 +680,8 @@ export function useReports() {
     isFormValid,
     hasDataEndpoint,
     hasSummaryCardsEnabled,
+    hasChartsEnabled,
+    availableVisualizationOptions,
     
     // Methods
     selectReport,
@@ -532,6 +689,7 @@ export function useReports() {
     closeDialog,
     loadReportData,
     refreshReportData,
-    toggleDataVisualization
+    toggleDataVisualization,
+    handleVisualizationTypesChange
   };
 }
