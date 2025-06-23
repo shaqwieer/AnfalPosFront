@@ -247,9 +247,11 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { BaseButton } from '@/components/shared';
 import { useTerminalStore } from '@/stores/terminalStore.js';
+import { useToast } from 'primevue/usetoast';
 
 // Terminal store
 const terminalStore = useTerminalStore();
+const toast = useToast();
 
 // Session management
 const openingCash = ref(0);
@@ -363,7 +365,12 @@ const formatTime = (date: Date) => {
 
 const openSession = async () => {
   if (openingCash.value < 0) {
-    alert('Opening cash amount cannot be negative');
+    toast.add({
+      severity: 'error',
+      summary: 'Invalid Amount',
+      detail: 'Opening cash amount cannot be negative',
+      life: 5000
+    });
     return;
   }
 
@@ -374,7 +381,12 @@ const openSession = async () => {
     console.log('Session opened successfully');
   } catch (error) {
     console.error('Failed to open session:', error);
-    alert('Failed to open session. Please try again.');
+    toast.add({
+      severity: 'error',
+      summary: 'Session Open Failed',
+      detail: 'Failed to open session. Please try again.',
+      life: 5000
+    });
   }
 };
 
@@ -409,18 +421,33 @@ const prepareCloseSession = async () => {
       errorMessage += `Error: ${error.message}`;
     }
 
-    alert(errorMessage);
+    toast.add({
+      severity: 'error',
+      summary: 'Session Details Error',
+      detail: errorMessage,
+      life: 7000
+    });
   }
 };
 
 const closeSession = async () => {
   if (closingCash.value < 0) {
-    alert('Closing cash amount cannot be negative');
+    toast.add({
+      severity: 'error',
+      summary: 'Invalid Amount',
+      detail: 'Closing cash amount cannot be negative',
+      life: 5000
+    });
     return;
   }
 
   if (!sessionId.value) {
-    alert('Session ID not found. Please try again.');
+    toast.add({
+      severity: 'error',
+      summary: 'Session Error',
+      detail: 'Session ID not found. Please try again.',
+      life: 5000
+    });
     return;
   }
 
@@ -445,7 +472,12 @@ const closeSession = async () => {
     console.log('Session closed successfully');
   } catch (error) {
     console.error('Failed to close session:', error);
-    alert('Failed to close session. Please try again.');
+    toast.add({
+      severity: 'error',
+      summary: 'Session Close Failed',
+      detail: 'Failed to close session. Please try again.',
+      life: 5000
+    });
   }
 };
 

@@ -28,7 +28,7 @@ const terminalInfo = computed(() => ({
 
 // Initialize terminal data
 onMounted(async () => {
-  // await terminalStore.initializeTerminal();
+  await terminalStore.initializeTerminal();
 });
 
 // Cleanup

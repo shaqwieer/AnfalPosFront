@@ -106,16 +106,35 @@ export const useOrderStore = defineStore('order', () => {
   const total = computed(() => subtotal.value + tax.value)
 
   function addItem(product: any) {
-    const existingItem = currentOrder.value.items.find(item => 
-      item.service.sku === product.sku && 
+    // 🔍 CONSOLE LOG: Product being added to order store
+    console.log('🏪 ORDER STORE - Adding item:', {
+      productBeingAdded: product,
+      productSku: product.sku,
+      productName: product.name,
+      productPrice: product.price,
+      hasBatch: !!product.selectedBatch,
+      batchInfo: product.selectedBatch || 'No batch selected'
+    });
+
+    const existingItem = currentOrder.value.items.find(item =>
+      item.service.sku === product.sku &&
       (!item.selectedBatch || !product.selectedBatch || item.selectedBatch.id === product.selectedBatch.id)
     )
 
     if (existingItem) {
+      // 📈 CONSOLE LOG: Updating existing item quantity
+      console.log('📈 ORDER STORE - Updating existing item quantity:', {
+        existingItem: existingItem,
+        oldQuantity: existingItem.quantity,
+        newQuantity: product.quantity || (existingItem.quantity + 1),
+        itemSku: existingItem.service.sku
+      });
+
       // Update quantity instead of incrementing
       existingItem.quantity = product.quantity || (existingItem.quantity + 1)
     } else {
-      currentOrder.value.items.push({
+      // ➕ CONSOLE LOG: Adding new item to cart
+      const newItem = {
         id: crypto.randomUUID(),
         service: {
           sku: product.sku,
@@ -134,26 +153,87 @@ export const useOrderStore = defineStore('order', () => {
         basePrice: product.basePrice || product.price,
         discount: product.discount,
         selectedBatch: product.selectedBatch
-      })
+      };
+
+      console.log('➕ ORDER STORE - Adding new item to cart:', {
+        newItem: newItem,
+        itemId: newItem.id,
+        itemName: newItem.service.name,
+        itemQuantity: newItem.quantity,
+        itemPrice: newItem.price
+      });
+
+      currentOrder.value.items.push(newItem)
     }
 
     updateOrderTotals()
+
+    // 📊 CONSOLE LOG: Updated order totals and complete items array
+    console.log('📊 ORDER STORE - Updated order after item addition:', {
+      completeItemsArray: currentOrder.value.items,
+      totalItemsCount: currentOrder.value.items.length,
+      orderSubtotal: currentOrder.value.subtotal,
+      orderTax: currentOrder.value.tax,
+      orderTotal: currentOrder.value.total,
+      currentCustomer: currentOrder.value.customer,
+      orderStatus: currentOrder.value.status
+    });
   }
 
   function removeItem(itemId: string) {
+    // 🗑️ CONSOLE LOG: Removing item from cart
+    const itemToRemove = currentOrder.value.items.find(item => item.id === itemId);
+    console.log('🗑️ ORDER STORE - Removing item from cart:', {
+      itemToRemove: itemToRemove,
+      itemId: itemId,
+      itemName: itemToRemove?.service.name || 'Unknown item',
+      itemQuantity: itemToRemove?.quantity || 0,
+      itemsBeforeRemoval: currentOrder.value.items.length,
+      currentCustomer: currentOrder.value.customer?.name || 'No customer'
+    });
+
     currentOrder.value.items = currentOrder.value.items.filter(item => item.id !== itemId)
     updateOrderTotals()
+
+    // 📊 CONSOLE LOG: Items array after removal
+    console.log('📊 ORDER STORE - Items array after item removal:', {
+      itemsArray: currentOrder.value.items,
+      itemsCount: currentOrder.value.items.length,
+      orderTotal: currentOrder.value.total
+    });
   }
 
   function updateQuantity(itemId: string, quantity: number) {
     const item = currentOrder.value.items.find(item => item.id === itemId)
     if (item) {
+      // 🔢 CONSOLE LOG: Updating item quantity
+      console.log('🔢 ORDER STORE - Updating item quantity:', {
+        itemId: itemId,
+        itemName: item.service.name,
+        oldQuantity: item.quantity,
+        newQuantity: Math.max(0, quantity),
+        willBeRemoved: Math.max(0, quantity) === 0,
+        currentCustomer: currentOrder.value.customer?.name || 'No customer'
+      });
+
       item.quantity = Math.max(0, quantity)
       if (item.quantity === 0) {
+        console.log('🗑️ ORDER STORE - Item quantity is 0, removing item:', {
+          removedItem: item,
+          itemName: item.service.name,
+          itemId: itemId
+        });
         removeItem(itemId)
       }
     }
     updateOrderTotals()
+
+    // 📊 CONSOLE LOG: Updated items array after quantity change
+    console.log('📊 ORDER STORE - Items array after quantity update:', {
+      itemsArray: currentOrder.value.items,
+      itemsCount: currentOrder.value.items.length,
+      orderTotal: currentOrder.value.total
+    });
   }
 
   function setItemDiscount(itemId: string, discount?: Discount) {
@@ -165,7 +245,28 @@ export const useOrderStore = defineStore('order', () => {
   }
 
   function setCustomer(customer: Customer) {
+    // 👤 CONSOLE LOG: Setting customer in order store
+    console.log('👤 ORDER STORE - Setting customer:', {
+      customerBeingSet: customer,
+      customerId: customer.id,
+      customerName: customer.name,
+      customerType: customer.type,
+      customerMobile: customer.mobile,
+      customerVehicles: customer.vehicles,
+      selectedVehicle: customer.selectedVehicle,
+      businessDetails: customer.businessDetails,
+      previousCustomer: currentOrder.value.customer,
+      orderItemsCount: currentOrder.value.items.length
+    });
+
     currentOrder.value.customer = customer
+
+    // 👤 CONSOLE LOG: Customer successfully set
+    console.log('👤 ORDER STORE - Customer successfully assigned to order:', {
+      orderWithCustomer: currentOrder.value,
+      customerAssigned: !!currentOrder.value.customer,
+      customerName: currentOrder.value.customer?.name
+    });
   }
 
   function updateOrderTotals() {

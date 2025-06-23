@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useOrderStore } from '@/stores/orderStore.ts'
+import { useTerminalStore } from '@/stores/terminalStore.js'
+import { useToast } from 'primevue/usetoast'
+import apiClient from '@/api/apiClient'
 
 const props = defineProps<{
   show: boolean
@@ -9,6 +12,9 @@ const props = defineProps<{
 const emit = defineEmits(['close'])
 
 const orderStore = useOrderStore()
+const terminalStore = useTerminalStore()
+const toast = useToast()
+const isPostingInvoice = ref(false)
 
 const invoiceNumber = computed(() => {
   return `#${Math.floor(Math.random() * 90000) + 10000}`
@@ -39,6 +45,225 @@ const formatPrice = (price: number | string | undefined): string => {
     maximumFractionDigits: 2
   })
 }
+
+// 🧾 Function to validate and post invoice
+const validateAndPostInvoice = (isDraft = false) => {
+  // 🔍 VALIDATION: Check if session is opened
+  if (!terminalStore.isSessionOpened) {
+    console.error('❌ INVOICE VALIDATION ERROR - Session not opened:', {
+      isSessionOpened: terminalStore.isSessionOpened,
+      terminalInfo: terminalStore.getTerminalInfo,
+      error: 'Cannot post invoice without an open session',
+      timestamp: new Date().toISOString()
+    });
+
+    // Show error message to user using PrimeVue Toast
+    toast.add({
+      severity: 'error',
+      summary: 'Session Required',
+      detail: 'Cannot post invoice: Session is not opened. Please open a session first.',
+      life: 5000
+    });
+    return false;
+  }
+
+  // 🔍 VALIDATION: Check if customer is selected
+  if (!orderStore.currentOrder.customer) {
+    console.error('❌ INVOICE VALIDATION ERROR - No customer selected:', {
+      customer: orderStore.currentOrder.customer,
+      order: orderStore.currentOrder,
+      error: 'Cannot post invoice without selecting a customer',
+      timestamp: new Date().toISOString()
+    });
+
+    // Show error message to user using PrimeVue Toast
+    toast.add({
+      severity: 'error',
+      summary: 'Customer Required',
+      detail: 'Cannot post invoice: Please select a customer first.',
+      life: 5000
+    });
+    return false;
+  }
+
+  // 🔍 VALIDATION: Check if items exist
+  if (!orderStore.currentOrder.items || orderStore.currentOrder.items.length === 0) {
+    console.error('❌ INVOICE VALIDATION ERROR - No items in order:', {
+      items: orderStore.currentOrder.items,
+      itemsCount: orderStore.currentOrder.items?.length || 0,
+      order: orderStore.currentOrder,
+      error: 'Cannot post invoice without items',
+      timestamp: new Date().toISOString()
+    });
+
+    // Show error message to user using PrimeVue Toast
+    toast.add({
+      severity: 'error',
+      summary: 'Items Required',
+      detail: 'Cannot post invoice: Please add items to the order first.',
+      life: 5000
+    });
+    return false;
+  }
+
+  // ✅ All validations passed
+  console.log('✅ INVOICE VALIDATION PASSED - Proceeding to post invoice:', {
+    sessionOpened: terminalStore.isSessionOpened,
+    customerSelected: !!orderStore.currentOrder.customer,
+    itemsCount: orderStore.currentOrder.items.length,
+    isDraft: isDraft,
+    timestamp: new Date().toISOString()
+  });
+
+  // Post the invoice
+  postInvoice(isDraft);
+  return true;
+};
+
+// 🧾 Function to post invoice to API
+const postInvoice = async (isDraft = false) => {
+  isPostingInvoice.value = true;
+
+  try {
+    // 📋 Prepare invoice data according to the required format
+    const invoiceData = {
+      customerId: orderStore.currentOrder.customer.id,
+      isDraft: isDraft,
+      items: orderStore.currentOrder.items.map((item) => {
+        // Extract SAP item from specifications if available
+        const sapItem = item.service.specifications?.['Sap Item'] ||
+                       item.service.specifications?.['sapItem'] ||
+                       item.service.sku || '';
+
+        // Calculate batch quantities
+        const batchForQuantities = [];
+        if (item.selectedBatch) {
+          batchForQuantities.push({
+            batch: item.selectedBatch.batchNumber || item.selectedBatch.batch || 'DEFAULT',
+            quantity: item.quantity
+          });
+        } else {
+          // Default batch if no batch selected
+          batchForQuantities.push({
+            batch: 'DEFAULT',
+            quantity: item.quantity
+          });
+        }
+
+        return {
+          id: item.id,
+          quantity: item.quantity,
+          itemName: item.service.name,
+          sapItem: sapItem,
+          changedPrice: item.changedPrice || false,
+          isFreeProduct: item.isFreeProduct || false,
+          price: item.price,
+          finalDiscountAmount: item.selectedBatch?.discountAmount ||
+                              (item.discount?.isPercentage
+                                ? item.price * item.quantity * (item.discount.value / 100)
+                                : item.discount?.value || 0),
+          batchForQuantities: batchForQuantities,
+          existPercentage: item.discount?.isPercentage ? item.discount.value : 0
+        };
+      })
+    };
+
+    // 📊 Console log the prepared data before sending request
+    console.log('📋 INVOICE DATA PREPARED - Ready to send to API:', {
+      invoiceData: invoiceData,
+      customerId: invoiceData.customerId,
+      customerName: orderStore.currentOrder.customer.name,
+      isDraft: isDraft,
+      itemsCount: invoiceData.items.length,
+      totalItems: invoiceData.items,
+      orderTotal: orderStore.total,
+      sessionInfo: {
+        isSessionOpened: terminalStore.isSessionOpened,
+        terminalInfo: terminalStore.getTerminalInfo
+      },
+      timestamp: new Date().toISOString()
+    });
+
+    // 🚀 Send POST request to create invoice
+    console.log('🚀 SENDING INVOICE REQUEST - Posting to API...');
+
+    const response = await apiClient.post('/Invoices/CreateQuickInvoice', invoiceData);
+
+    // ✅ Success response logging
+    console.log('✅ INVOICE POSTED SUCCESSFULLY - API Response:', {
+      response: response,
+      responseData: response.data,
+      success: response.data?.success,
+      message: response.data?.message,
+      invoiceId: response.data?.data?.id || response.data?.data?.invoiceId,
+      invoiceNumber: response.data?.data?.invoiceNumber,
+      isDraft: isDraft,
+      customerName: orderStore.currentOrder.customer.name,
+      itemsCount: invoiceData.items.length,
+      orderTotal: orderStore.total,
+      timestamp: new Date().toISOString()
+    });
+
+    // Show success message to user using PrimeVue Toast
+    const successSummary = isDraft ? 'Draft Saved' : 'Invoice Posted';
+    const successDetail = isDraft
+      ? `Draft saved successfully!`
+      : `Invoice posted successfully!`;
+
+    toast.add({
+      severity: 'success',
+      summary: successSummary,
+      detail: successDetail,
+      life: 5000
+    });
+
+    // Close dialog and clear the order after successful posting (optional)
+    emit('close');
+    if (!isDraft) {
+      orderStore.finalizeOrder();
+      console.log('🔄 ORDER CLEARED - New order started after successful invoice posting');
+    }
+
+    return response.data;
+
+  } catch (error) {
+    // ❌ Error response logging
+    console.error('❌ INVOICE POSTING FAILED - API Error:', {
+      error: error,
+      errorMessage: error.message,
+      errorResponse: error.response?.data,
+      errorStatus: error.response?.status,
+      errorStatusText: error.response?.statusText,
+      invoiceData: {
+        customerId: orderStore.currentOrder.customer?.id,
+        customerName: orderStore.currentOrder.customer?.name,
+        itemsCount: orderStore.currentOrder.items.length,
+        isDraft: isDraft
+      },
+      sessionInfo: {
+        isSessionOpened: terminalStore.isSessionOpened,
+        terminalInfo: terminalStore.getTerminalInfo
+      },
+      timestamp: new Date().toISOString()
+    });
+
+    // Show error message to user using PrimeVue Toast
+    const errorMessage = error.response?.data?.message ||
+                        error.message ||
+                        'Failed to post invoice. Please try again.';
+
+    toast.add({
+      severity: 'error',
+      summary: 'Invoice Posting Failed',
+      detail: errorMessage,
+      life: 7000
+    });
+
+    throw error;
+  } finally {
+    isPostingInvoice.value = false;
+  }
+};
 </script>
 
 <template>
@@ -80,8 +305,8 @@ const formatPrice = (price: number | string | undefined): string => {
               <h3 class="font-bold customer-section-title mb-2">Bill To:</h3>
               <p class="customer-info-text">{{ orderStore.currentOrder.customer?.name || 'Walk-in Customer' }}</p>
               <p class="customer-info-text">{{ orderStore.currentOrder.customer?.mobile || 'N/A' }}</p>
-              <p class="customer-info-text">{{ orderStore.currentOrder.customer?.vehicles?.[0]?.make }} {{ orderStore.currentOrder.customer?.vehicles?.[0]?.model }} {{ orderStore.currentOrder.customer?.vehicles?.[0]?.year }}</p>
-              <p class="customer-info-text">{{ orderStore.currentOrder.customer?.vehicles?.[0]?.plateNo || 'N/A' }}</p>
+              <!-- <p class="customer-info-text">{{ orderStore.currentOrder.customer?.vehicles?.[0]?.make }} {{ orderStore.currentOrder.customer?.vehicles?.[0]?.model }} {{ orderStore.currentOrder.customer?.vehicles?.[0]?.year }}</p>
+              <p class="customer-info-text">{{ orderStore.currentOrder.customer?.vehicles?.[0]?.plateNo || 'N/A' }}</p> -->
             </div>
             <div v-if="orderStore.currentOrder.customer?.type === 'business'">
               <h3 class="font-bold customer-section-title mb-2">Business Details:</h3>
@@ -137,12 +362,29 @@ const formatPrice = (price: number | string | undefined): string => {
       <!-- Dialog Footer -->
       <div class="p-4 border-top flex justify-content-between">
         <div>
-          <button class="px-4 py-2 post-invoice-btn mr-3">
-            <span class="material-icons button-icon">post_add</span>
-            Post Invoice
+          <!-- <button
+            class="px-4 py-2 draft-btn mr-3"
+            @click="validateAndPostInvoice(true)"
+            :disabled="isPostingInvoice"
+          >
+            <span v-if="!isPostingInvoice" class="material-icons button-icon">draft</span>
+            <span v-else class="material-icons button-icon animate-spin">refresh</span>
+            {{ isPostingInvoice ? 'Saving...' : 'Save as Draft' }}
+          </button> -->
+          <button
+            class="px-4 py-2 post-invoice-btn mr-3"
+            @click="validateAndPostInvoice(false)"
+            :disabled="isPostingInvoice"
+          >
+            <span v-if="!isPostingInvoice" class="material-icons button-icon">post_add</span>
+            <span v-else class="material-icons button-icon animate-spin">refresh</span>
+            {{ isPostingInvoice ? 'Posting...' : 'Post Invoice' }}
           </button>
-          <button class="px-4 py-2 border cancel-btn"
-                  @click="$emit('close')">
+          <button
+            class="px-4 py-2 border cancel-btn"
+            @click="$emit('close')"
+            :disabled="isPostingInvoice"
+          >
             Cancel
           </button>
         </div>
@@ -285,6 +527,23 @@ const formatPrice = (price: number | string | undefined): string => {
   gap: 0.75rem;
 }
 
+.draft-btn {
+  background-color: #f59e0b;
+  color: white;
+  border-radius: 0.5rem;
+  border: none;
+  transition: all 0.2s;
+}
+
+.draft-btn:hover {
+  background-color: #d97706;
+}
+
+.draft-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .post-invoice-btn {
   background-color: #7c3aed;
   color: white;
@@ -295,6 +554,11 @@ const formatPrice = (price: number | string | undefined): string => {
 
 .post-invoice-btn:hover {
   background-color: #6d28d9;
+}
+
+.post-invoice-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .cancel-btn {
@@ -333,5 +597,18 @@ const formatPrice = (price: number | string | undefined): string => {
 .button-icon {
   vertical-align: middle;
   margin-right: 0.25rem;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

@@ -398,19 +398,19 @@ const companies: Company[] = [
     ],
     customerFields: [
       { id: 'name', label: 'Customer Name', labelAr: 'اسم العميل', type: 'text', required: true, showFor: 'all' },
-      { id: 'mobile', label: 'Mobile Number', labelAr: 'رقم الجوال', type: 'tel', required: true, showFor: 'all' },
-      { id: 'email', label: 'Email', labelAr: 'البريد الإلكتروني', type: 'email', required: false, showFor: 'all' },
-      { id: 'type', label: 'Customer Type', labelAr: 'نوع العميل', type: 'select', required: true, showFor: 'all' },
+      { id: 'phone', label: 'Mobile Number', labelAr: 'رقم الجوال', type: 'text', required: true, showFor: 'all' },
+      // { id: 'email', label: 'Email', labelAr: 'البريد الإلكتروني', type: 'email', required: false, showFor: 'all' },
+      // { id: 'type', label: 'Customer Type', labelAr: 'نوع العميل', type: 'select', required: true, showFor: 'all' },
       // Vehicle Information
-      { id: 'plateNo', label: 'Plate Number', labelAr: 'رقم اللوحة', type: 'text', required: true, showFor: 'all' },
-      { id: 'make', label: 'Vehicle Make', labelAr: 'نوع المركبة', type: 'text', required: true, showFor: 'all' },
-      { id: 'model', label: 'Vehicle Model', labelAr: 'موديل المركبة', type: 'text', required: true, showFor: 'all' },
-      { id: 'year', label: 'Vehicle Year', labelAr: 'سنة الصنع', type: 'number', required: true, showFor: 'all' },
-      { id: 'vin', label: 'VIN', labelAr: 'رقم الهيكل', type: 'text', required: false, showFor: 'all' },
-      // Business Customer Fields
-      { id: 'cr', label: 'CR Number', labelAr: 'رقم السجل التجاري', type: 'text', required: true, showFor: 'business' },
-      { id: 'vat', label: 'VAT Number', labelAr: 'الرقم الضريبي', type: 'text', required: true, showFor: 'business' },
-      { id: 'fleet', label: 'Fleet Size', labelAr: 'حجم الأسطول', type: 'number', required: false, showFor: 'business' }
+      // { id: 'plateNo', label: 'Plate Number', labelAr: 'رقم اللوحة', type: 'text', required: true, showFor: 'all' },
+      // { id: 'make', label: 'Vehicle Make', labelAr: 'نوع المركبة', type: 'text', required: true, showFor: 'all' },
+      // { id: 'model', label: 'Vehicle Model', labelAr: 'موديل المركبة', type: 'text', required: true, showFor: 'all' },
+      // { id: 'year', label: 'Vehicle Year', labelAr: 'سنة الصنع', type: 'number', required: true, showFor: 'all' },
+      // { id: 'vin', label: 'VIN', labelAr: 'رقم الهيكل', type: 'text', required: false, showFor: 'all' },
+      // // Business Customer Fields
+      // { id: 'cr', label: 'CR Number', labelAr: 'رقم السجل التجاري', type: 'text', required: true, showFor: 'business' },
+      // { id: 'vat', label: 'VAT Number', labelAr: 'الرقم الضريبي', type: 'text', required: true, showFor: 'business' },
+      // { id: 'fleet', label: 'Fleet Size', labelAr: 'حجم الأسطول', type: 'number', required: false, showFor: 'business' }
     ]
   },
   {

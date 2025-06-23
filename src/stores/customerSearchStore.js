@@ -146,6 +146,35 @@ export const useCustomerSearchStore = defineStore('customerSearch', () => {
     error.value = null;
   };
 
+  const createWalkinCustomer = async (customerData) => {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      console.log('Store: Creating walk-in customer with data:', customerData);
+
+      const response = await customerService.createWalkinCustomer(customerData);
+
+      console.log('Store: API response received:', response);
+
+      // Transform the created customer to UI format
+      const newCustomer = transformApiCustomer(response);
+
+      console.log('Store: Transformed customer:', newCustomer);
+
+      // Add to the beginning of the customers list
+      customers.value.unshift(newCustomer);
+
+      return newCustomer;
+    } catch (err) {
+      console.error('Store: Error creating walk-in customer:', err);
+      error.value = handleError(err, loadingStore);
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  };
+
   return {
     // State
     customers,
@@ -173,6 +202,7 @@ export const useCustomerSearchStore = defineStore('customerSearch', () => {
     nextPage,
     previousPage,
     goToPage,
-    resetSearch
+    resetSearch,
+    createWalkinCustomer
   };
 });

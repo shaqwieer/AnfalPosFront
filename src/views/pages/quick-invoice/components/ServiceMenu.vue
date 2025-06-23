@@ -1,8 +1,53 @@
 <script setup lang="ts">
+/**
+ * 🔍 CONSOLE LOGGING ANALYSIS FOR POS SYSTEM
+ *
+ * This component includes comprehensive console logging to track:
+ *
+ * 📦 ITEMS ARRAY TRACKING:
+ * - Items are stored in: orderStore.currentOrder.items
+ * - Each item contains: id, service (product details), quantity, price, discount, selectedBatch
+ * - Console logs show items array before and after each addition/modification
+ *
+ * 👤 CUSTOMER DATA TRACKING:
+ * - Customer is stored in: orderStore.currentOrder.customer
+ * - Customer object contains: id, name, type, mobile, vehicles, businessDetails
+ * - Console logs show customer info whenever items are selected or modified
+ *
+ * 🛍️ ITEM SELECTION TRACKING:
+ * - When user clicks on an item, console shows:
+ *   * Selected product details (name, sku, price, category)
+ *   * Current customer information
+ *   * Items array before and after addition
+ *   * Batch information for batch-managed items
+ *
+ * 🏷️ BATCH MANAGEMENT:
+ * - For batch-managed items, additional logging shows:
+ *   * Selected batch details (batch number, quantity, dates)
+ *   * Final pricing with discounts
+ *   * Batch-specific item data
+ *
+ * 📊 ORDER TOTALS:
+ * - Console shows updated totals after each change:
+ *   * Subtotal, tax, and total amounts
+ *   * Item count and complete order state
+ *
+ * Console log prefixes:
+ * 🛍️ = Item selection
+ * 👤 = Customer data
+ * 📦 = Items array
+ * 🏷️ = Batch management
+ * 🏪 = Order store operations
+ * ➕/➖ = Quantity changes
+ * 🗑️ = Item removal
+ * 📊 = Order totals/summary
+ */
+
 import { ref, computed, onMounted } from 'vue';
-import { useOrderStore } from '@/stores/orderStore.ts';
-import { useCompanyStore } from '@/stores/companyStore.ts';
-import { useCategoryStore } from '@/stores/categoryStore.js';
+import { useOrderStore } from '../../../../stores/orderStore.ts';
+import { useCompanyStore } from '../../../../stores/companyStore.ts';
+import { useCategoryStore } from '../../../../stores/categoryStore.js';
+import apiClient from '../../../../api/apiClient';
 
 const searchQuery = ref('');
 const isCardView = ref(true);
@@ -10,6 +55,10 @@ const showBatchDialog = ref(false);
 const showProductInfo = ref(false);
 const selectedProduct = ref<any>(null);
 const selectedBatch = ref<any>(null);
+
+// 💰 Track SAP price loading states for each product
+const sapPriceLoading = ref(new Set());
+const sapPricesLoaded = ref(new Set());
 
 const companyStore = useCompanyStore();
 const categoryStore = useCategoryStore();
@@ -80,13 +129,228 @@ const toggleView = () => {
   isCardView.value = !isCardView.value;
 };
 
-const handleProductClick = (product: any) => {
-  if (product.batchManaged && product.batches?.length > 0) {
-    selectedProduct.value = product;
-    batchForm.value.sellingPrice = product.price;
+// 💰 Function to fetch item price from SAP
+const fetchPriceFromSap = async (materialSapCode: string) => {
+  try {
+    console.log('💰 SAP PRICE REQUEST - Fetching price for:', {
+      materialSapCode: materialSapCode,
+      requestBody: { materialSapCode: materialSapCode },
+      apiEndpoint: '/Items/GetPriceForSpecificItemFromSap',
+      timestamp: new Date().toISOString()
+    });
+
+    const response = await apiClient.post('/Items/GetPriceForSpecificItemFromSap', {
+      materialSapCode: materialSapCode
+    });
+
+    console.log('💰 SAP PRICE RESPONSE - Complete API Response:', {
+      materialSapCode: materialSapCode,
+      fullResponse: response,
+      responseStatus: response.status,
+      responseHeaders: response.headers,
+      responseData: response.data,
+      dataStructure: {
+        success: response.data?.success,
+        message: response.data?.message,
+        data: response.data?.data,
+        statusCode: response.data?.statusCode
+      },
+      priceDetails: {
+        price: response.data?.data?.price,
+        isCustomerSpecific: response.data?.data?.isCustomerSpecific,
+        canEditPrice: response.data?.data?.canEditPrice,
+        selectBatch: response.data?.data?.selectBatch,
+        batches: response.data?.data?.batches,
+        batchCount: response.data?.data?.batches?.length || 0
+      },
+      timestamp: new Date().toISOString()
+    });
+
+    // Additional validation logging
+    if (response.data?.data?.price === 100) {
+      console.warn('⚠️ SAP PRICE WARNING - Price is exactly 100:', {
+        materialSapCode: materialSapCode,
+        possibleIssues: [
+          'Default/fallback price being returned',
+          'Material code not found in SAP',
+          'SAP system returning test data',
+          'Material code format incorrect'
+        ],
+        responseData: response.data
+      });
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error('❌ SAP PRICE ERROR - Failed to fetch price:', {
+      materialSapCode: materialSapCode,
+      error: error,
+      errorMessage: error.message,
+      errorResponse: error.response?.data,
+      errorStatus: error.response?.status,
+      timestamp: new Date().toISOString()
+    });
+    throw error;
+  }
+};
+
+const handleProductClick = async (product: any) => {
+  // 🔍 Debug product data structure first
+  debugProductData(product);
+
+  // Console log the selected product/item data when user clicks on an item
+  console.log('🛍️ ITEM SELECTED:', {
+    productData: product,
+    itemName: product.name,
+    itemSku: product.sku,
+    itemPrice: product.price,
+    itemCategory: product.category,
+    isBatchManaged: product.batchManaged,
+    timestamp: new Date().toISOString()
+  });
+
+  // Console log current customer information when item is selected
+  console.log('👤 CURRENT CUSTOMER:', {
+    customer: orderStore.currentOrder.customer,
+    customerId: orderStore.currentOrder.customer?.id || 'No customer selected',
+    customerName: orderStore.currentOrder.customer?.name || 'No customer selected',
+    customerType: orderStore.currentOrder.customer?.type || 'No customer selected',
+    customerMobile: orderStore.currentOrder.customer?.mobile || 'No customer selected'
+  });
+
+  // Console log current items array before adding new item
+  console.log('📦 CURRENT ITEMS ARRAY (BEFORE):', {
+    itemsArray: orderStore.currentOrder.items,
+    itemsCount: orderStore.currentOrder.items.length,
+    totalValue: orderStore.total
+  });
+
+  // 💰 Fetch current price from SAP before proceeding
+  let updatedProduct = { ...product };
+  try {
+    if (product.sku) {
+      // Mark this product as loading SAP price
+      sapPriceLoading.value.add(product.sku);
+
+      console.log('💰 FETCHING SAP PRICE - Starting price fetch for item:', {
+        itemName: product.name,
+        itemSku: product.sku,
+        currentPrice: product.price,
+        productData: product,
+        specifications: product.specifications,
+        sapItemFromSpecs: product.specifications?.['Sap Item'] || product.specifications?.['sapItem'],
+        materialCodeToSend: product.sku,
+        allProductProperties: Object.keys(product)
+      });
+
+      // Check if we should use a different field for SAP material code
+      const materialSapCode = product.specifications?.['Sap Item'] ||
+                             product.specifications?.['sapItem'] ||
+                             product.materialCode ||
+                             product.sapCode ||
+                             product.sku;
+
+      console.log('💰 MATERIAL CODE SELECTION:', {
+        selectedMaterialCode: materialSapCode,
+        availableOptions: {
+          'specifications.Sap Item': product.specifications?.['Sap Item'],
+          'specifications.sapItem': product.specifications?.['sapItem'],
+          'materialCode': product.materialCode,
+          'sapCode': product.sapCode,
+          'sku': product.sku
+        },
+        finalChoice: materialSapCode
+      });
+
+      const sapPriceResponse = await fetchPriceFromSap(materialSapCode);
+
+      if (sapPriceResponse.success && sapPriceResponse.data) {
+        // Update product with SAP price and batch information
+        updatedProduct.price = sapPriceResponse.data.price;
+        updatedProduct.basePrice = sapPriceResponse.data.price;
+        updatedProduct.canEditPrice = sapPriceResponse.data.canEditPrice;
+        updatedProduct.isCustomerSpecific = sapPriceResponse.data.isCustomerSpecific;
+
+        // Update batch information if available
+        if (sapPriceResponse.data.selectBatch && sapPriceResponse.data.batches) {
+          updatedProduct.batchManaged = true;
+          updatedProduct.batches = sapPriceResponse.data.batches.map((batch: any) => ({
+            id: `${product.sku}-${batch.batch}`,
+            batchNumber: batch.batch,
+            quantity: batch.quantity,
+            expiryDate: batch.expiryDate,
+            manufactureDate: batch.expiryDate // Using expiry as manufacture for now
+          }));
+        }
+
+        console.log('💰 SAP PRICE UPDATED - Product price updated from SAP:', {
+          itemName: product.name,
+          itemSku: product.sku,
+          originalPrice: product.price,
+          updatedPrice: updatedProduct.price,
+          priceChanged: product.price !== updatedProduct.price,
+          canEditPrice: updatedProduct.canEditPrice,
+          isCustomerSpecific: updatedProduct.isCustomerSpecific,
+          batchManaged: updatedProduct.batchManaged,
+          batchCount: updatedProduct.batches?.length || 0,
+          updatedProduct: updatedProduct
+        });
+
+        // 🔄 UPDATE ITEM PRICE IN CATEGORY STORE (THIS UPDATES THE GRID)
+        const updatedStoreItem = categoryStore.updateItemPrice(product.sku, sapPriceResponse.data);
+        if (updatedStoreItem) {
+          console.log('✅ GRID ITEM UPDATED - Price updated in store and grid:', {
+            itemSku: product.sku,
+            newPrice: updatedStoreItem.price,
+            gridWillReflectNewPrice: true
+          });
+
+          // Use the updated item from store for further processing
+          updatedProduct = updatedStoreItem;
+        }
+
+        // Mark price as loaded from SAP
+        sapPricesLoaded.value.add(product.sku);
+      }
+
+      // Remove from loading state
+      sapPriceLoading.value.delete(product.sku);
+    }
+  } catch (error) {
+    console.warn('⚠️ SAP PRICE FETCH FAILED - Continuing with original price:', {
+      itemName: product.name,
+      itemSku: product.sku,
+      originalPrice: product.price,
+      error: error.message
+    });
+
+    // Remove from loading state and mark as loaded (even if failed)
+    sapPriceLoading.value.delete(product.sku);
+    sapPricesLoaded.value.add(product.sku);
+    // Continue with original product if SAP fetch fails
+  }
+
+  if (updatedProduct.batchManaged && updatedProduct.batches?.length > 0) {
+    selectedProduct.value = updatedProduct;
+    batchForm.value.sellingPrice = updatedProduct.price;
     showBatchDialog.value = true;
+
+    console.log('🏷️ BATCH MANAGED ITEM - Opening batch selection dialog:', {
+      availableBatches: updatedProduct.batches,
+      batchCount: updatedProduct.batches?.length || 0,
+      updatedPrice: updatedProduct.price
+    });
   } else {
-    orderStore.addItem(product);
+    // Add item to cart for non-batch managed items
+    orderStore.addItem(updatedProduct);
+
+    // Console log items array after adding the item
+    console.log('📦 CURRENT ITEMS ARRAY (AFTER):', {
+      itemsArray: orderStore.currentOrder.items,
+      itemsCount: orderStore.currentOrder.items.length,
+      totalValue: orderStore.total,
+      lastAddedItem: orderStore.currentOrder.items[orderStore.currentOrder.items.length - 1]
+    });
   }
 };
 
@@ -117,7 +381,38 @@ const addToCart = () => {
       };
     }
 
+    // Console log batch-managed item details before adding to cart
+    console.log('🏷️ BATCH ITEM BEING ADDED TO CART:', {
+      productData: product,
+      selectedBatch: selectedBatch.value,
+      finalPrice: batchForm.value.sellingPrice,
+      discountApplied: batchForm.value.discountType !== 'none' ? product.discount : 'No discount',
+      batchNumber: selectedBatch.value.batchNumber,
+      batchQuantity: selectedBatch.value.quantity
+    });
+
+    // Console log current customer for batch items
+    console.log('👤 CUSTOMER FOR BATCH ITEM:', {
+      customer: orderStore.currentOrder.customer,
+      customerId: orderStore.currentOrder.customer?.id || 'No customer selected'
+    });
+
+    // Console log items array before adding batch item
+    console.log('📦 ITEMS ARRAY BEFORE BATCH ADD:', {
+      itemsArray: orderStore.currentOrder.items,
+      itemsCount: orderStore.currentOrder.items.length
+    });
+
     orderStore.addItem(product);
+
+    // Console log items array after adding batch item
+    console.log('📦 ITEMS ARRAY AFTER BATCH ADD:', {
+      itemsArray: orderStore.currentOrder.items,
+      itemsCount: orderStore.currentOrder.items.length,
+      totalValue: orderStore.total,
+      lastAddedItem: orderStore.currentOrder.items[orderStore.currentOrder.items.length - 1]
+    });
+
     closeBatchDialog();
   }
 };
@@ -146,6 +441,37 @@ const formatPrice = (price: number): string => {
   return price.toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
+  });
+};
+
+// 💰 Helper function to check if price should be shown
+const shouldShowPrice = (service: any): boolean => {
+  return sapPricesLoaded.value.has(service.sku);
+};
+
+// 💰 Helper function to check if price is loading
+const isPriceLoading = (service: any): boolean => {
+  return sapPriceLoading.value.has(service.sku);
+};
+
+// � Debug function to analyze product data structure
+const debugProductData = (product: any) => {
+  console.log('🔍 PRODUCT DATA ANALYSIS:', {
+    productName: product.name,
+    productSku: product.sku,
+    fullProductObject: product,
+    specifications: product.specifications,
+    possibleSapCodes: {
+      'sku': product.sku,
+      'specifications.Sap Item': product.specifications?.['Sap Item'],
+      'specifications.sapItem': product.specifications?.['sapItem'],
+      'materialCode': product.materialCode,
+      'sapCode': product.sapCode,
+      'sapMaterialCode': product.sapMaterialCode,
+      'materialSapCode': product.materialSapCode
+    },
+    allKeys: Object.keys(product),
+    specificationsKeys: product.specifications ? Object.keys(product.specifications) : 'No specifications'
   });
 };
 </script>
@@ -186,86 +512,11 @@ const formatPrice = (price: number): string => {
 
       <!-- Products/Services View -->
       <div class="p-3 pb-8 overflow-y-auto products-container" :class="isCardView ? 'grid' : 'flex-column gap-2'">
-        <!-- Skeleton Loading -->
-        <div v-if="categoryStore.isItemsLoading" class="skeleton-container" :class="isCardView ? 'grid' : 'flex-column gap-2'">
-          <!-- Card View Skeletons -->
-          <div v-if="isCardView" v-for="n in 6" :key="`card-skeleton-${n}`" :class="'col-12 lg:col-6 xl:col-4'">
-            <div class="skeleton-card">
-              <div class="flex flex-column">
-                <!-- Image skeleton -->
-                <div class="skeleton-image mb-4"></div>
-                
-                <!-- SKU and Unit row -->
-                <div class="flex justify-content-between mb-3">
-                  <div class="flex align-items-center gap-2">
-                    <div class="skeleton-icon"></div>
-                    <div class="skeleton-text skeleton-text-sm"></div>
-                  </div>
-                  <div class="flex align-items-center gap-2">
-                    <div class="skeleton-icon"></div>
-                    <div class="skeleton-text skeleton-text-sm"></div>
-                  </div>
-                </div>
-
-                <!-- Product name -->
-                <div class="flex align-items-center gap-2 mb-3">
-                  <div class="skeleton-icon"></div>
-                  <div class="skeleton-text skeleton-text-lg flex-1"></div>
-                </div>
-
-                <!-- Size and Price row -->
-                <div class="flex justify-content-between">
-                  <div class="flex align-items-center gap-2">
-                    <div class="skeleton-icon"></div>
-                    <div class="skeleton-text skeleton-text-sm"></div>
-                  </div>
-                  <div class="flex align-items-center gap-2">
-                    <div class="skeleton-icon"></div>
-                    <div class="skeleton-text skeleton-text-md"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- List View Skeletons -->
-          <div v-else v-for="n in 8" :key="`list-skeleton-${n}`" class="skeleton-list-item">
-            <div class="flex align-items-center gap-1">
-              <!-- Image skeleton -->
-              <div class="skeleton-list-image mr-4"></div>
-              
-              <!-- Content skeleton -->
-              <div class="flex flex-column list-content py-2">
-                <div class="flex align-items-center gap-1 mb-2">
-                  <div class="skeleton-icon"></div>
-                  <div class="skeleton-text skeleton-text-md"></div>
-                </div>
-                <div class="flex align-items-center gap-1">
-                  <div class="skeleton-icon"></div>
-                  <div class="skeleton-text skeleton-text-lg"></div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="flex justify-content-between align-items-center gap-3">
-              <!-- Unit and Size -->
-              <div class="flex align-items-center gap-2">
-                <div class="skeleton-icon"></div>
-                <div class="skeleton-text skeleton-text-sm"></div>
-              </div>
-              <div class="flex align-items-center gap-2">
-                <div class="skeleton-icon"></div>
-                <div class="skeleton-text skeleton-text-sm"></div>
-              </div>
-
-              <!-- Info Button, Batch Tag, Price -->
-              <div class="skeleton-button"></div>
-              <div class="skeleton-tag"></div>
-              <div class="flex align-items-center gap-1">
-                <div class="skeleton-icon"></div>
-                <div class="skeleton-text skeleton-text-md"></div>
-              </div>
-            </div>
+        <!-- Loading indicator -->
+        <div v-if="categoryStore.isItemsLoading" class="flex align-items-center justify-content-center p-8">
+          <div class="flex flex-column align-items-center gap-3">
+            <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: var(--sap-primary)"></i>
+            <p class="text-lg" style="color: var(--sap-text-secondary)">Loading products...</p>
           </div>
         </div>
 
@@ -283,7 +534,7 @@ const formatPrice = (price: number): string => {
           <div v-if="isCardView" class="service-card cursor-pointer" @click="handleProductClick(service)">
             <div class="flex flex-column">
               <div class="relative mb-4 card-image-container">
-                <img src="/favicon.png" :alt="service.name" class="w-full card-image" />
+                <img :src="service.image" :alt="service.name" class="w-full card-image" />
                 <!-- Moved info button to top left and batch tag to top right -->
                 <div class="absolute card-info-btn">
                   <Button text @click="showProductDetails(service, $event)" class="p-1 bg-white rounded-full">
@@ -323,7 +574,19 @@ const formatPrice = (price: number): string => {
                 <!-- Price -->
                 <div class="flex align-items-center gap-2 justify-content-end">
                   <span class="material-icons text-sm" style="color: var(--sap-primary)">payments</span>
-                  <span class="font-bold text-lg" style="color: var(--sap-primary)"> ${{ formatPrice(service.price) }} </span>
+                  <!-- Show loading spinner while fetching SAP price -->
+                  <div v-if="isPriceLoading(service)" class="flex align-items-center gap-2">
+                    <i class="pi pi-spin pi-spinner" style="font-size: 1rem; color: var(--sap-primary)"></i>
+                    <span class="text-sm" style="color: var(--sap-text-secondary)">Loading price...</span>
+                  </div>
+                  <!-- Show price only after SAP price is loaded -->
+                  <span v-else-if="shouldShowPrice(service)" class="font-bold text-lg" style="color: var(--sap-primary)">
+                    ${{ formatPrice(service.price) }}
+                  </span>
+                  <!-- Show placeholder when price not yet loaded -->
+                  <span v-else class="text-sm" style="color: var(--sap-text-secondary)">
+                    Click to get price
+                  </span>
                 </div>
               </div>
             </div>
@@ -333,7 +596,7 @@ const formatPrice = (price: number): string => {
           <div v-else class="bg-white py-2 px-2 list-item flex align-items-center justify-content-between" @click="handleProductClick(service)">
             <div class="flex align-items-center gap-1">
               <!-- Image -->
-              <img src="/favicon.png" :alt="service.name" class="list-image mr-4" />
+              <img :src="service.image" :alt="service.name" class="list-image mr-4" />
               <!-- SKU and Name -->
               <div class="flex flex-column list-content py-2">
                 <div class="flex align-items-center gap-1">
@@ -362,9 +625,22 @@ const formatPrice = (price: number): string => {
                 <span class="material-icons text-blue-600">info</span>
               </Button>
               <span v-if="service.batchManaged" class="sap-tag bg-purple-100 p-1 border-round text-purple-800"> Batch Managed </span>
+              <!-- Price section for list view -->
               <div class="flex align-items-center gap-1">
                 <span class="material-icons text-sm" style="color: var(--sap-primary)">payments</span>
-                <span class="font-bold text-lg" style="color: var(--sap-primary)"> ${{ formatPrice(service.price) }} </span>
+                <!-- Show loading spinner while fetching SAP price -->
+                <div v-if="isPriceLoading(service)" class="flex align-items-center gap-2">
+                  <i class="pi pi-spin pi-spinner" style="font-size: 1rem; color: var(--sap-primary)"></i>
+                  <span class="text-sm" style="color: var(--sap-text-secondary)">Loading...</span>
+                </div>
+                <!-- Show price only after SAP price is loaded -->
+                <span v-else-if="shouldShowPrice(service)" class="font-bold text-lg" style="color: var(--sap-primary)">
+                  ${{ formatPrice(service.price) }}
+                </span>
+                <!-- Show placeholder when price not yet loaded -->
+                <span v-else class="text-sm" style="color: var(--sap-text-secondary)">
+                  Click to get price
+                </span>
               </div>
             </div>
           </div>
@@ -511,7 +787,7 @@ const formatPrice = (price: number): string => {
         <div class="p-3 overflow-y-auto">
           <!-- Product Image -->
           <div class="relative product-image-container mb-6">
-            <img src="/favicon.png" :alt="selectedProduct.name" class="w-full h-full product-detail-image" />
+            <img :src="selectedProduct.image" :alt="selectedProduct.name" class="w-full h-full product-detail-image" />
           </div>
 
           <!-- Basic Info -->
@@ -697,107 +973,6 @@ const formatPrice = (price: number): string => {
   gap: 0.5rem;
 }
 
-/* Skeleton Loading Styles */
-.skeleton-container {
-  padding: 0.75rem;
-  padding-bottom: 2rem;
-  overflow-y: auto;
-  height: calc(100% - 140px);
-}
-
-/* Base skeleton animation */
-@keyframes skeleton-loading {
-  0% {
-    background-position: -200px 0;
-  }
-  100% {
-    background-position: calc(200px + 100%) 0;
-  }
-}
-
-.skeleton-image,
-.skeleton-icon,
-.skeleton-text,
-.skeleton-list-image,
-.skeleton-button,
-.skeleton-tag {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200px 100%;
-  animation: skeleton-loading 1.5s infinite;
-  border-radius: 4px;
-}
-
-/* Card skeleton styles */
-.skeleton-card {
-  padding: 1.5rem;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 1rem;
-  margin-bottom: 1rem;
-}
-
-.skeleton-image {
-  height: 8rem;
-  width: 100%;
-  border-radius: 0.75rem;
-}
-
-.skeleton-icon {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-}
-
-.skeleton-text {
-  height: 1rem;
-  border-radius: 4px;
-}
-
-.skeleton-text-sm {
-  width: 60px;
-  height: 0.875rem;
-}
-
-.skeleton-text-md {
-  width: 80px;
-  height: 1rem;
-}
-
-.skeleton-text-lg {
-  width: 140px;
-  height: 1.125rem;
-}
-
-/* List skeleton styles */
-.skeleton-list-item {
-  background: white;
-  padding: 0.5rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  margin-bottom: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.skeleton-list-image {
-  width: 3rem;
-  height: 3rem;
-  border-radius: 0.5rem;
-}
-
-.skeleton-button {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-}
-
-.skeleton-tag {
-  width: 80px;
-  height: 24px;
-  border-radius: 12px;
-}
-
 /* Service Cards */
 .service-card {
   padding: 1.5rem;
@@ -819,8 +994,8 @@ const formatPrice = (price: number): string => {
 
 .card-image {
   height: 8rem;
-  object-fit: contain ;
-  transform: scale(0.8);
+  object-fit: cover;
+  transform: scale(1);
   transition: transform 0.3s;
 }
 
@@ -874,7 +1049,7 @@ const formatPrice = (price: number): string => {
   width: 3rem;
   height: 3rem;
   border-radius: 0.5rem;
-  object-fit: contain ;
+  object-fit: cover;
 }
 
 .list-content {
@@ -965,6 +1140,7 @@ const formatPrice = (price: number): string => {
 }
 
 .pricing-base-container {
+  /* background-color: #f9fafb; */
   border-radius: 0.5rem;
 }
 
@@ -1021,6 +1197,7 @@ const formatPrice = (price: number): string => {
 }
 
 .add-to-cart-btn {
+  /* background-color: #2563eb; */
   color: white;
   border-radius: 0.5rem;
   border: none;
@@ -1052,7 +1229,7 @@ const formatPrice = (price: number): string => {
 }
 
 .product-detail-image {
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .product-basic-grid {

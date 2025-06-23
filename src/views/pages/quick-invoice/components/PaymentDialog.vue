@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useOrderStore } from '@/stores/orderStore.ts';
+import { useToast } from 'primevue/usetoast';
 
 const props = defineProps<{
   show: boolean;
@@ -10,6 +11,7 @@ const props = defineProps<{
 const emit = defineEmits(['close']);
 
 const orderStore = useOrderStore();
+const toast = useToast();
 const selectedMethods = ref<{
   method: string;
   amount: number;
@@ -103,7 +105,12 @@ const saveMobileNo = (method: any) => {
 
 const requestTamaraApproval = async (method: any) => {
   if (!method.mobileNo) {
-    alert('Please provide a mobile number for Tamara verification');
+    toast.add({
+      severity: 'warn',
+      summary: 'Mobile Number Required',
+      detail: 'Please provide a mobile number for Tamara verification',
+      life: 5000
+    });
     return;
   }
 

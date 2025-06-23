@@ -102,6 +102,65 @@ export const useCategoryStore = defineStore('category', () => {
     }
   };
 
+  // Update item price after SAP fetch
+  const updateItemPrice = (itemSku, sapPriceData) => {
+    const itemIndex = items.value.findIndex(item => item.sku === itemSku);
+    if (itemIndex !== -1) {
+      const item = items.value[itemIndex];
+
+      console.log('🔄 UPDATING ITEM PRICE IN STORE:', {
+        itemSku: itemSku,
+        oldPrice: item.price,
+        newPrice: sapPriceData.price,
+        sapPriceData: sapPriceData,
+        itemIndex: itemIndex
+      });
+
+      // Update the item with SAP data
+      items.value[itemIndex] = {
+        ...item,
+        price: sapPriceData.price,
+        basePrice: sapPriceData.price,
+        canEditPrice: sapPriceData.canEditPrice,
+        isCustomerSpecific: sapPriceData.isCustomerSpecific,
+        batchManaged: sapPriceData.selectBatch || item.batchManaged,
+        // Update specifications with SAP data
+        specifications: {
+          ...item.specifications,
+          'SAP Price': sapPriceData.price.toString(),
+          'Customer Specific': sapPriceData.isCustomerSpecific ? 'Yes' : 'No',
+          'Can Edit Price': sapPriceData.canEditPrice ? 'Yes' : 'No',
+          'Last Updated': new Date().toISOString()
+        }
+      };
+
+      // Update batch information if available
+      if (sapPriceData.selectBatch && sapPriceData.batches) {
+        items.value[itemIndex].batches = sapPriceData.batches.map((batch) => ({
+          id: `${itemSku}-${batch.batch}`,
+          batchNumber: batch.batch,
+          quantity: batch.quantity,
+          expiryDate: batch.expiryDate,
+          manufactureDate: batch.expiryDate // Using expiry as manufacture for now
+        }));
+      }
+
+      console.log('✅ ITEM PRICE UPDATED IN STORE:', {
+        itemSku: itemSku,
+        updatedItem: items.value[itemIndex],
+        newPrice: items.value[itemIndex].price
+      });
+
+      return items.value[itemIndex];
+    } else {
+      console.warn('⚠️ ITEM NOT FOUND IN STORE:', {
+        itemSku: itemSku,
+        availableItems: items.value.map(item => ({ sku: item.sku, name: item.name }))
+      });
+      return null;
+    }
+  };
+
   return {
     // State
     categories,
@@ -122,6 +181,7 @@ export const useCategoryStore = defineStore('category', () => {
     // Actions
     fetchCategories,
     fetchItemsByCategory,
-    initializeCategories
+    initializeCategories,
+    updateItemPrice
   };
 });

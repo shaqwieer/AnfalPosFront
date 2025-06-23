@@ -2,11 +2,13 @@
 import { ref, computed } from 'vue';
 import { useOrderStore } from '@/stores/orderStore.ts';
 import { usePromoStore } from '@/stores/promoStore.ts';
+import { useToast } from 'primevue/usetoast';
 import { CustomerSearchDialog, InvoiceDialog, PaymentDialog } from '../components';
 import { BaseButton } from '@/components/shared';
 
 const orderStore = useOrderStore();
 const promoStore = usePromoStore();
+const toast = useToast();
 const showCustomerSearch = ref(false);
 const showInvoiceDialog = ref(false);
 const showPaymentDialog = ref(false);
@@ -44,6 +46,17 @@ const formatPrice = (price?: number) => {
 const incrementQuantity = (itemId: string) => {
   const item = orderStore.currentOrder.items.find((i) => i.id === itemId);
   if (item) {
+    // ➕ CONSOLE LOG: User incrementing item quantity
+    console.log('➕ USER ACTION - Incrementing item quantity:', {
+      action: 'increment',
+      itemId: itemId,
+      itemName: item.service.name,
+      currentQuantity: item.quantity,
+      newQuantity: item.quantity + 1,
+      currentCustomer: orderStore.currentOrder.customer?.name || 'No customer',
+      timestamp: new Date().toISOString()
+    });
+
     orderStore.updateQuantity(itemId, item.quantity + 1);
   }
 };
@@ -51,6 +64,18 @@ const incrementQuantity = (itemId: string) => {
 const decrementQuantity = (itemId: string) => {
   const item = orderStore.currentOrder.items.find((i) => i.id === itemId);
   if (item) {
+    // ➖ CONSOLE LOG: User decrementing item quantity
+    console.log('➖ USER ACTION - Decrementing item quantity:', {
+      action: 'decrement',
+      itemId: itemId,
+      itemName: item.service.name,
+      currentQuantity: item.quantity,
+      newQuantity: item.quantity - 1,
+      willBeRemoved: item.quantity - 1 === 0,
+      currentCustomer: orderStore.currentOrder.customer?.name || 'No customer',
+      timestamp: new Date().toISOString()
+    });
+
     orderStore.updateQuantity(itemId, item.quantity - 1);
   }
 };
@@ -81,7 +106,12 @@ const calculateSavings = (item: any) => {
 const applyPromotion = (promotion: any) => {
   // Check if there are items in the cart
   if (orderStore.currentOrder.items.length === 0) {
-    alert('Please add items to your cart before applying a promotion');
+    toast.add({
+      severity: 'warn',
+      summary: 'Cart Empty',
+      detail: 'Please add items to your cart before applying a promotion',
+      life: 5000
+    });
     return;
   }
 
@@ -93,7 +123,12 @@ const applyPromotion = (promotion: any) => {
 
   // Check if promotion is applicable
   if (!promoStore.isPromotionApplicable(promotion, context)) {
-    alert('This promotion cannot be applied to your current items');
+    toast.add({
+      severity: 'warn',
+      summary: 'Promotion Not Applicable',
+      detail: 'This promotion cannot be applied to your current items',
+      life: 5000
+    });
     return;
   }
 
@@ -120,7 +155,12 @@ const applyPromotion = (promotion: any) => {
 
 const handlePromoCodeSubmit = () => {
   if (!selectedPromoCode.value) {
-    alert('Please enter a promo code');
+    toast.add({
+      severity: 'warn',
+      summary: 'Promo Code Required',
+      detail: 'Please enter a promo code',
+      life: 5000
+    });
     return;
   }
 
@@ -129,7 +169,12 @@ const handlePromoCodeSubmit = () => {
   if (promotion) {
     applyPromotion(promotion);
   } else {
-    alert('Invalid or expired promo code');
+    toast.add({
+      severity: 'error',
+      summary: 'Invalid Promo Code',
+      detail: 'Invalid or expired promo code',
+      life: 5000
+    });
   }
 };
 
@@ -235,14 +280,36 @@ const removeAllDiscounts = () => {
 
         <!-- Action Buttons -->
         <div class="mt-4 flex flex-column gap-3">
-          <Button severity="warning" class="w-full" label="Save as Draft" @click="orderStore.saveDraft">
-            <!-- <div class="flex align-items-center justify-content-center"><p>Save as Draft</p></div> -->
+          <Button
+            severity="warning"
+            class="w-full"
+            label="Save as Draft"
+            @click="orderStore.saveDraft"
+            :disabled="!orderStore.currentOrder.items.length"
+          >
+            <span class="material-icons mr-2">draft</span>
+            Save as Draft
           </Button>
           <div class="flex gap-3">
-            <Button severity="primary" class="w-full" @click="handleInvoiceClick" label="Invoice">
+            <Button
+              severity="primary"
+              class="w-full"
+              @click="handleInvoiceClick"
+              label="Invoice"
+              :disabled="!orderStore.currentOrder.items.length"
+            >
+              <span class="material-icons mr-2">receipt</span>
+              Invoice
             </Button>
-            <Button severity="success" class="w-full" @click="handlePaymentClick" label="Payment">
-              <!-- <div class="flex align-items-center justify-content-center">Payment</div> -->
+            <Button
+              severity="success"
+              class="w-full"
+              @click="handlePaymentClick"
+              label="Payment"
+              :disabled="!orderStore.currentOrder.items.length"
+            >
+              <span class="material-icons mr-2">payment</span>
+              Payment
             </Button>
           </div>
         </div>
