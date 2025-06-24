@@ -66,29 +66,12 @@ export const useTerminalStore = defineStore('terminal', () => {
     }
   };
 
-  // Start automatic refresh
-  const startAutoRefresh = (intervalMs = 30000) => { // Default 30 seconds
-    if (refreshInterval.value) {
-      clearInterval(refreshInterval.value);
-    }
-    
-    refreshInterval.value = setInterval(() => {
-      fetchTerminalInfo();
-    }, intervalMs);
-  };
 
-  // Stop automatic refresh
-  const stopAutoRefresh = () => {
-    if (refreshInterval.value) {
-      clearInterval(refreshInterval.value);
-      refreshInterval.value = null;
-    }
-  };
+
 
   // Initialize terminal info
   const initializeTerminal = async () => {
     await fetchTerminalInfo();
-    startAutoRefresh();
   };
 
   // Format session date for display
@@ -182,7 +165,6 @@ export const useTerminalStore = defineStore('terminal', () => {
 
   // Cleanup on store destruction
   const cleanup = () => {
-    stopAutoRefresh();
   };
 
   return {
@@ -215,8 +197,6 @@ export const useTerminalStore = defineStore('terminal', () => {
     // Actions
     fetchTerminalInfo,
     initializeTerminal,
-    startAutoRefresh,
-    stopAutoRefresh,
     openSession,
     getSessionDetailsForClosing,
     closeSession,
