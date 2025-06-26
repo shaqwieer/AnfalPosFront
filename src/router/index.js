@@ -12,6 +12,11 @@ const router = createRouter({
       component: AppLayout,
       children: [
         {
+          path: '/promoter',
+          name: 'Promoters',
+          component: () => import('@/views/pages/promoters/PromotersPage.vue')
+        },
+        {
           path: '/application-logs',
           name: 'Application Logs',
           component: () => import('@/views/pages/applicationLogs/ApplicationLogs.vue')

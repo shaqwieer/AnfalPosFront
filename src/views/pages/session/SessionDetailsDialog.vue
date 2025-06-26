@@ -495,7 +495,7 @@ const formatPriceRaw = (price: number | undefined | null): number => {
     <Dialog v-model:visible="showDatePicker" header="Select Transaction Date" :modal="true" :closable="true" :style="{ width: '450px' }">
       <div class="flex flex-column gap-3">
         <div class="text-lg mb-2">Please select a date for this transaction:</div>
-        <Calendar v-model="selectedDate"  dateFormat="dd/mm/yy" :showTime="true" hourFormat="24" :maxDate="maxDate" />
+        <Calendar v-model="selectedDate"  dateFormat="dd/mm/yy"  :maxDate="maxDate" />
         <div class="flex flex-column gap-2">
           <label class="block mb-1 font-semibold">Assignment Number (Bank Ref)</label>
           <InputText class="w-16rem" v-model="assignmentNumber" placeholder="Enter Assignment Number" />

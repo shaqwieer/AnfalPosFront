@@ -251,7 +251,7 @@ watch(() => props.formattedSummaryCards, (newCards) => {
     </div>
     
     <!-- Summary Stats Footer -->
-    <div v-if="props.summary._metadata" class="summary-footer">
+    <div v-if="props.summary._metadata&&false" class="summary-footer">
       <div class="summary-stats">
         <span class="stat">
           <i class="pi pi-database"></i>

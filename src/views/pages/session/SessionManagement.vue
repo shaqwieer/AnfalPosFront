@@ -151,13 +151,13 @@ const getSessions = useDebounceFn(
   { maxWait: 1500 }
 );
 
-watch(
-  [selectedStatus, selectedSalesReps, dateFrom, dateTo],
-  () => {
-    changedFilter.value = true;
-  },
-  { deep: true }
-);
+// watch(
+//   [selectedStatus, selectedSalesReps, dateFrom, dateTo],
+//   () => {
+//     changedFilter.value = true;
+//   },
+//   { deep: true }
+// );
 onMounted(() => {
   sessionStore.GetSalesReps().then(() => {
     selectedSalesReps.value = sessionStore.salesReps.map((rep) => rep.id);
@@ -197,6 +197,30 @@ const paginatedCustomers = computed(() => {
   const end = start + rowsPerPage.value;
   return sessionStore.sessions.slice(start, end);
 });
+const onDateSelect = (selectedDate, key) => {
+  if (!selectedDate) return;
+  
+  try {
+    const newDate = new Date(selectedDate);
+    
+    if (isNaN(newDate.getTime())) {
+      console.error('Invalid date provided:', selectedDate);
+      return;
+    }
+    
+    newDate.setHours(12, 0, 0, 0);
+    
+    console.log('selectedDate', newDate);
+    
+    if (key === 'dateFrom') {
+      dateFrom.value = newDate;
+    } else if (key === 'dateTo') {
+      dateTo.value = newDate;
+    }
+  } catch (error) {
+    console.error('Error processing date selection:', error);
+  }
+};
 </script>
 
 <template>
@@ -224,7 +248,7 @@ const paginatedCustomers = computed(() => {
             <div class="h-full cursor-pointer transition-all transition-duration-200">
               <div class="w-full">
                 <label class="block text-sm font-semibold mb-1">{{ t('Session.FromDate') }}</label>
-                <Calendar v-model="dateFrom" showIcon iconDisplay="input" class="w-full h-3rem" />
+                <Calendar v-model="dateFrom" @date-select="(e) => onDateSelect(e, 'dateFrom')" dateFormat="yy-mm-dd" showIcon iconDisplay="input" class="w-full h-3rem" />
               </div>
             </div>
           </div>
@@ -233,7 +257,7 @@ const paginatedCustomers = computed(() => {
             <div class="h-full cursor-pointer">
               <div class="w-full">
                 <label class="block text-sm font-semibold mb-1">{{ t('Session.ToDate') }}</label>
-                <Calendar v-model="dateTo" showIcon iconDisplay="input" class="w-full h-3rem" />
+                <Calendar v-model="dateTo" showIcon iconDisplay="input" @date-select="(e) => onDateSelect(e, 'dateTo')" dateFormat="yy-mm-dd" class="w-full h-3rem" />
               </div>
             </div>
           </div>

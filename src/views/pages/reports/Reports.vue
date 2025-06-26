@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/stores/mainStore';
 import { useReports } from './composables/useReports';
@@ -10,6 +10,9 @@ import ReportChart from './components/ReportChart.vue';
 const { t } = useI18n();
 const mainStore = useMainStore();
 const rtl = computed(() => mainStore.isRTL);
+
+// Add current view state - THIS IS NEW
+const currentView = ref('table'); // 'table' or 'charts'
 
 const {
   loading,
@@ -84,6 +87,18 @@ const getCategoryDisplayName = (category) => {
   };
   return categoryNames[category] || category;
 };
+
+// NEW METHOD - Add this method to set current view
+const setCurrentView = (view) => {
+  if (view === 'charts' && !hasCharts.value) {
+    return; // Don't switch to charts if no charts available
+  }
+  currentView.value = view;
+};
+const onDateSelect = (selectedDate, key) => {
+  if (!selectedDate) return; // Handle null selection
+  filterValues[key].value = selectedDate.setHours(12, 0, 0, 0);
+};
 </script>
 
 <template>
@@ -154,7 +169,7 @@ const getCategoryDisplayName = (category) => {
       </div>
 
       <!-- Main Content -->
-      <div class="reports-main">
+      <div class="reports-main gap-3">
         <!-- Welcome State -->
         <div v-if="!selectedReport" class="welcome-state">
           <div class="text-center">
@@ -172,7 +187,7 @@ const getCategoryDisplayName = (category) => {
         <div v-else class="report-content">
           <!-- Report Header -->
           <div class="report-header">
-            <div class="flex align-items-center gap-3 mb-4">
+            <div class="flex align-items-center gap-3 ">
               <div :class="['report-icon-large', categoryConfig[selectedReport.category]?.bgColor, categoryConfig[selectedReport.category]?.borderColor]">
                 <i :class="['pi', selectedReport.icon, categoryConfig[selectedReport.category]?.color, 'text-2xl']"></i>
               </div>
@@ -183,65 +198,35 @@ const getCategoryDisplayName = (category) => {
                 <p class="text-gray-600 mt-1">
                   {{ t(selectedReport.description) }}
                 </p>
-                <!-- 🎯 FEATURES INDICATORS -->
+                <!-- FEATURES INDICATORS -->
                 <div class="flex align-items-center gap-2 mt-2 flex-wrap">
-                  <Tag v-if="hasSummaryCardsEnabled" class="bg-purple-100 text-purple-700 text-xs" icon="pi pi-chart-bar">
-                    {{ selectedReport.summaryCards.length }} Summary Cards
-                  </Tag>
-                  <Tag v-if="hasChartsEnabled" class="bg-orange-100 text-orange-700 text-xs" icon="pi pi-chart-line">
-                    {{ selectedReport.chartConfigs.length }} Charts
-                  </Tag>
-                  <Tag v-if="hasDataEndpoint" class="bg-blue-100 text-blue-700 text-xs" icon="pi pi-table">
-                    Data Table Available
-                  </Tag>
+                  <Tag v-if="hasSummaryCardsEnabled" class="bg-purple-100 text-purple-700 text-xs" icon="pi pi-chart-bar"> {{ selectedReport.summaryCards.length }} Summary Cards </Tag>
+                  <Tag v-if="hasChartsEnabled" class="bg-orange-100 text-orange-700 text-xs" icon="pi pi-chart-line"> {{ selectedReport.chartConfigs.length }} Charts </Tag>
+                  <Tag v-if="hasDataEndpoint" class="bg-blue-100 text-blue-700 text-xs" icon="pi pi-table"> Data Table Available </Tag>
                 </div>
+              </div>
+              <div class="flex gap-2 mx-8 flex-wrap">
+                <Button v-if="selectedReport.endpoints.pdf" @click="generateReport('pdf')" :loading="loading" :disabled="!isFormValid" icon="pi pi-file-pdf" outlined class="p-button-danger w-3rem h-3rem cursor-pointer" size="small">
+                  <!-- {{ t('reports.exportPdf') }} -->
+                </Button>
+
+                <Button v-if="selectedReport.endpoints.excel" @click="generateReport('excel')" :loading="loading" :disabled="!isFormValid" icon="pi pi-file-excel" outlined class="p-button-success w-3rem h-3rem cursor-pointer" size="small">
+                  <!-- {{ t('reports.exportExcel') }} -->
+                </Button>
+
+                <!-- VIEW DATA BUTTON -->
+                <Button v-if="hasDataEndpoint" @click="loadReportData" :loading="loading" :disabled="!isFormValid" icon="pi pi-eye" outlined class="p-button-info w-3rem h-3rem cursor-pointer" size="small">
+                  <!-- View Data -->
+                </Button>
               </div>
             </div>
 
             <!-- Export Actions -->
-            <div class="flex gap-2 mb-6 flex-wrap">
-              <Button 
-                v-if="selectedReport.endpoints.pdf" 
-                @click="generateReport('pdf')" 
-                :loading="loading" 
-                :disabled="!isFormValid" 
-                icon="pi pi-file-pdf" 
-                class="p-button-danger"
-                size="small"
-              >
-                {{ t('reports.exportPdf') }}
-              </Button>
-              
-              <Button 
-                v-if="selectedReport.endpoints.excel" 
-                @click="generateReport('excel')" 
-                :loading="loading" 
-                :disabled="!isFormValid" 
-                icon="pi pi-file-excel" 
-                class="p-button-success"
-                size="small"
-              >
-                {{ t('reports.exportExcel') }}
-              </Button>
-              
-              <!-- 🎯 VIEW DATA BUTTON -->
-              <Button 
-                v-if="hasDataEndpoint" 
-                @click="loadReportData" 
-                :loading="loading" 
-                :disabled="!isFormValid" 
-                icon="pi pi-eye" 
-                class="p-button-info"
-                size="small"
-              >
-                View Data
-              </Button>
-            </div>
           </div>
 
           <!-- Filters Section -->
-          <Panel :header="t('reports.filters')" class="mb-4">
-            <div class="grid gap-4">
+          <Panel :header="t('reports.filters')" class="mb-1">
+            <div class="grid">
               <div v-for="filter in selectedReport.filters" :key="filter.name" class="col-12 md:col-6 lg:col-4">
                 <div class="field">
                   <label :for="filter.name" class="block font-medium mb-2 text-sm" :class="{ required: filter.required }">
@@ -249,12 +234,12 @@ const getCategoryDisplayName = (category) => {
                   </label>
 
                   <!-- Date Picker -->
-                  <Calendar v-if="filter.type === 'date'" v-model="filterValues[filter.name]" :id="filter.name" dateFormat="yy-mm-dd" class="w-full" />
+                  <Calendar v-if="filter.type === 'date'" v-model="filterValues[filter.name]" @date-select="(e) => onDateSelect(e, filter.name)" :id="filter.name" dateFormat="yy-mm-dd" class="w-full" />
 
                   <!-- Date Range Picker -->
                   <div v-else-if="filter.type === 'daterange'" class="flex gap-2">
-                    <Calendar v-model="filterValues[filter.startDate]" :id="filter.startDate" dateFormat="yy-mm-dd" class="w-full" :placeholder="t('reports.startDate')" />
-                    <Calendar v-model="filterValues[filter.endDate]" :id="filter.endDate" dateFormat="yy-mm-dd" class="w-full" :placeholder="t('reports.endDate')" />
+                    <Calendar v-model="filterValues[filter.startDate]" :id="filter.startDate" @date-select="(e) => onDateSelect(e, filter.startDate)" dateFormat="yy-mm-dd" class="w-full" :placeholder="t('reports.startDate')" />
+                    <Calendar v-model="filterValues[filter.endDate]" :id="filter.endDate" @date-select="(e) => onDateSelect(e, filter.endDate)" dateFormat="yy-mm-dd" class="w-full" :placeholder="t('reports.endDate')" />
                   </div>
 
                   <!-- Dropdown -->
@@ -294,118 +279,60 @@ const getCategoryDisplayName = (category) => {
             </div>
           </Panel>
 
-          <!-- 🎯 DATA VISUALIZATION SECTION WITH CONTROLS -->
-          <Panel 
-            v-if="hasDataEndpoint"
-            header="Data Visualization" 
-            class="mb-4" 
-            :collapsed="!showDataVisualization"
-            :toggleable="true"
-            @toggle="toggleDataVisualization"
-          >
-            <template #icons>
-              <!-- 🎯 VISUALIZATION TYPE SELECTOR -->
-              <div v-if="showDataVisualization && hasData" class="visualization-controls">
-                <MultiSelect
-                  v-model="enabledVisualizationTypes"
-                  :options="availableVisualizationOptions"
-                  optionLabel="name"
-                  optionValue="code"
-                  placeholder="Select visualization types"
-                  class="visualization-selector"
-                  display="chip"
-                  @change="handleVisualizationTypesChange"
-                >
-                  <template #option="slotProps">
-                    <div class="flex align-items-center gap-2">
-                      <i :class="slotProps.option.icon"></i>
-                      <div>
-                        <div class="font-medium">{{ slotProps.option.name }}</div>
-                        <div class="text-xs text-gray-500">{{ slotProps.option.description }}</div>
-                      </div>
-                    </div>
-                  </template>
-                </MultiSelect>
-              </div>
-            </template>
+          <!-- 🎯 NEW: SUMMARY CARDS SECTION (Under Filters) -->
+          <div v-if="hasData && shouldShowSummary" class="summary-cards-section mb-4 ">
+            <SummaryCards :report="selectedReport" :summary="summaryData" :formatted-summary-cards="formattedSummaryCards" :loading="loading" />
+          </div>
 
-            <!-- Show data when loaded -->
-            <div v-if="showDataVisualization && hasData" class="data-visualization-content">
-              
-              <!-- 🎯 SUMMARY CARDS SECTION -->
-              <SummaryCards
-                v-if="shouldShowSummary"
-                :report="selectedReport"
-                :summary="summaryData"
-                :formatted-summary-cards="formattedSummaryCards"
-                :loading="loading"
-                class="mb-6"
-              />
-              
-              <!-- 🎯 CHARTS SECTION -->
-              <div v-if="shouldShowCharts" class="charts-section mb-6">
-                <div class="charts-header mb-4">
-                  <h3 class="text-lg font-semibold text-gray-800 flex align-items-center gap-2">
-                    <i class="pi pi-chart-line text-orange-500"></i>
-                    Charts & Analytics
-                  </h3>
-                  <p class="text-sm text-gray-600">Visual representation of your data</p>
+          <!-- 🎯 NEW: DATA VISUALIZATION SECTION WITH SAP-STYLE TOGGLE BUTTONS -->
+          <div v-if="hasData" class="data-visualization-section">
+            <!-- Toggle Buttons Header -->
+            <div class="visualization-header">
+              <div class="flex align-items-center justify-content-between">
+                <h3 class="text-lg font-semibold text-gray-800 flex align-items-center gap-2">
+                  <i class="pi pi-chart-line text-blue-500"></i>
+                  Data Visualization
+                </h3>
+
+                <!-- SAP-Style Toggle Buttons -->
+                <div class="toggle-buttons">
+                  <Button v-tooltip.top="'Table View'" :class="['toggle-btn', { active: currentView === 'table' }]" @click="setCurrentView('table')" icon="pi pi-table" text size="small" />
+                  <Button v-tooltip.top="'Chart View'" :class="['toggle-btn', { active: currentView === 'charts' }]" @click="setCurrentView('charts')" icon="pi pi-chart-bar" text size="small" :disabled="!hasCharts" />
                 </div>
-                
-                <!-- Charts Grid -->
+              </div>
+            </div>
+
+            <!-- Content based on current view -->
+            <div class="visualization-content">
+              <!-- Table View -->
+              <div v-if="currentView === 'table'" class="table-view">
+                <ReportTable :report="selectedReport" :data="reportData" :table-config="tableConfig" :loading="loading" @refresh-table="refreshReportData" />
+              </div>
+
+              <!-- Charts View -->
+              <div v-else-if="currentView === 'charts' && hasCharts" class="charts-view">
                 <div class="charts-grid">
-                  <ReportChart
-                    v-for="chart in chartData"
-                    :key="chart.id"
-                    :chart="chart"
-                    :loading="loading"
-                    class="chart-item"
-                  />
+                  <ReportChart v-for="chart in chartData" :key="chart.id" :chart="chart" :loading="loading" class="chart-item" />
                 </div>
               </div>
-              
-              <!-- 🎯 REPORT TABLE COMPONENT -->
-              <ReportTable
-                v-if="shouldShowTable"
-                :report="selectedReport"
-                :data="reportData"
-                :table-config="tableConfig"
-                :loading="loading"
-                @refresh-table="refreshReportData"
-              />
-            </div>
-            
-            <!-- Show when no data but panel is expanded -->
-            <div v-else-if="showDataVisualization && !hasData" class="text-center py-8">
-              <i class="pi pi-info-circle text-4xl text-blue-400 mb-3"></i>
-              <p class="text-gray-500">No data available for the selected filters</p>
-              <Button 
-                label="Load Data" 
-                icon="pi pi-refresh"
-                @click="loadReportData"
-                :loading="loading"
-                :disabled="!isFormValid"
-                class="mt-3"
-              />
-            </div>
-            
-            <!-- Default collapsed state -->
-            <div v-else class="text-center py-8">
-              <i class="pi pi-chart-line text-4xl text-gray-300 mb-3"></i>
-              <p class="text-gray-500">Click to expand and view report data visualization</p>
-              <div class="mt-3 flex gap-2 justify-content-center flex-wrap">
-                <Tag v-if="hasSummaryCardsEnabled" class="bg-purple-100 text-purple-700" icon="pi pi-chart-bar">
-                  {{ selectedReport.summaryCards.length }} Summary Cards
-                </Tag>
-                <Tag v-if="hasChartsEnabled" class="bg-orange-100 text-orange-700" icon="pi pi-chart-line">
-                  {{ selectedReport.chartConfigs.length }} Charts
-                </Tag>
-                <Tag class="bg-blue-100 text-blue-700" icon="pi pi-table">
-                  Data Table
-                </Tag>
+
+              <!-- No Charts Available -->
+              <div v-else-if="currentView === 'charts' && !hasCharts" class="no-charts-state">
+                <div class="text-center py-8">
+                  <i class="pi pi-chart-bar text-4xl text-gray-300 mb-3"></i>
+                  <p class="text-gray-500">No charts available for this report</p>
+                  <Button label="Switch to Table View" icon="pi pi-table" @click="setCurrentView('table')" class="mt-3" outlined />
+                </div>
               </div>
             </div>
-          </Panel>
+          </div>
+
+          <!-- ORIGINAL: No Data State when data visualization is shown but no data -->
+          <div v-else-if="showDataVisualization && !hasData" class="text-center py-8">
+            <i class="pi pi-info-circle text-4xl text-blue-400 mb-3"></i>
+            <p class="text-gray-500">No data available for the selected filters</p>
+            <Button label="Load Data" icon="pi pi-refresh" @click="loadReportData" :loading="loading" :disabled="!isFormValid" class="mt-3" />
+          </div>
         </div>
       </div>
     </div>
@@ -524,9 +451,9 @@ const getCategoryDisplayName = (category) => {
   background: white;
   padding: 2rem;
   height: auto;
-  min-height: 14rem;
+  min-height: 9rem;
   border-radius: 12px;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
@@ -541,38 +468,94 @@ const getCategoryDisplayName = (category) => {
   flex-shrink: 0;
 }
 
-/* Data Visualization Content */
-.data-visualization-content {
-  padding: 0;
-}
+/* 🎯 NEW STYLES FOR ENHANCED UI */
 
-/* Visualization Controls */
-.visualization-controls {
-  margin-right: 1rem;
-}
-
-.visualization-selector {
-  min-width: 300px;
-}
-
-/* Charts Section */
-.charts-section {
-  background: white;
+/* Summary Cards Section */
+.summary-cards-section {
+  background: transparent;
   border-radius: 8px;
   padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); */
+  /* border: 1px solid #e9ecef; */
 }
 
-.charts-header {
+/* Data Visualization Section */
+.data-visualization-section {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  overflow: hidden;
+}
+
+/* Visualization Header */
+.visualization-header {
+  padding: 1.5rem;
   border-bottom: 1px solid #e9ecef;
-  padding-bottom: 1rem;
+  background: #f8f9fa;
+}
+
+/* SAP-Style Toggle Buttons */
+.toggle-buttons {
+  display: flex;
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.toggle-btn {
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #6c757d !important;
+  padding: 0.5rem 0.75rem !important;
+  min-width: 40px;
+  height: 36px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.toggle-btn:not(:last-child) {
+  border-right: 1px solid #dee2e6 !important;
+}
+
+.toggle-btn:hover:not(.active):not(:disabled) {
+  background: #f8f9fa !important;
+  color: #495057 !important;
+}
+
+.toggle-btn.active {
+  background: #0d6efd !important;
+  color: white !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Visualization Content */
+.visualization-content {
+  padding: 1.5rem;
+}
+
+/* Table View */
+.table-view {
+  min-height: 400px;
+}
+
+/* Charts View */
+.charts-view {
+  min-height: 400px;
 }
 
 .charts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
   gap: 1.5rem;
-  margin-top: 1.5rem;
 }
 
 .chart-item {
@@ -580,6 +563,20 @@ const getCategoryDisplayName = (category) => {
   border-radius: 8px;
   border: 1px solid #e9ecef;
   overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.chart-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+/* No Charts State */
+.no-charts-state {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Form Styles */
@@ -661,7 +658,7 @@ const getCategoryDisplayName = (category) => {
 /* Responsive Design */
 @media (max-width: 1200px) {
   .charts-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   }
 }
 
@@ -682,14 +679,11 @@ const getCategoryDisplayName = (category) => {
 
   .report-header {
     padding: 1rem;
+    min-height: auto;
   }
 
   .welcome-state {
     min-height: 300px;
-  }
-
-  .visualization-selector {
-    min-width: 200px;
   }
 
   .charts-grid {
@@ -700,13 +694,22 @@ const getCategoryDisplayName = (category) => {
     min-height: 300px;
   }
 
-  .report-header {
-    min-height: auto;
+  .visualization-header .flex {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
   }
 
-  .visualization-controls {
-    margin-right: 0;
-    margin-bottom: 1rem;
+  .toggle-buttons {
+    align-self: stretch;
+  }
+
+  .visualization-content {
+    padding: 1rem;
+  }
+
+  .summary-cards-section {
+    padding: 1rem;
   }
 }
 
@@ -719,16 +722,18 @@ const getCategoryDisplayName = (category) => {
     min-height: 250px;
   }
 
-  .data-visualization-content {
-    padding: 0.5rem;
-  }
-
-  .charts-section {
+  .visualization-header {
     padding: 1rem;
   }
 
-  .charts-grid {
-    gap: 1rem;
+  .visualization-content {
+    padding: 0.75rem;
+  }
+
+  .toggle-btn {
+    min-width: 36px;
+    height: 32px;
+    padding: 0.375rem 0.5rem !important;
   }
 }
 
@@ -751,132 +756,16 @@ const getCategoryDisplayName = (category) => {
   background: #a8a8a8;
 }
 
-/* Loading States */
-.loading-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-/* Animation Classes */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.slide-enter-active,
-.slide-leave-active {
-  transition: transform 0.3s ease;
-}
-
-.slide-enter-from {
-  transform: translateX(-100%);
-}
-
-.slide-leave-to {
-  transform: translateX(100%);
-}
-
-/* Chart specific styles */
-.charts-section .charts-grid .chart-item:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
-  transition: all 0.3s ease;
-}
-
-/* MultiSelect specific styling for visualization controls */
-:deep(.visualization-selector .p-multiselect-label) {
-  font-size: 0.875rem;
-}
-
-:deep(.visualization-selector .p-multiselect-token) {
-  background: #e3f2fd;
-  color: #1976d2;
-  border: 1px solid #bbdefb;
-}
-
-:deep(.visualization-selector .p-multiselect-token-icon) {
-  color: #1976d2;
-}
-
-/* Panel icons alignment */
-:deep(.p-panel-header-icon) {
-  margin-left: auto;
-}
-
-:deep(.p-panel-icons) {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-/* Enhanced Panel styling */
-:deep(.p-panel) {
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-:deep(.p-panel .p-panel-header) {
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  border-bottom: 1px solid #dee2e6;
-}
-
-:deep(.p-panel .p-panel-content) {
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-}
-
-/* Button group styling */
-.report-header .flex.gap-2 {
-  flex-wrap: wrap;
-}
-
-.report-header .flex.gap-2 .p-button {
-  flex: 1;
-  min-width: 120px;
-}
-
-@media (max-width: 768px) {
-  .report-header .flex.gap-2 .p-button {
-    flex: 1 1 100%;
-    margin-bottom: 0.5rem;
-  }
-}
-
-/* Enhanced tag styling */
-.report-item .flex.gap-1 {
-  margin-top: 0.75rem;
-}
-
-:deep(.p-tag.text-xs) {
-  font-size: 0.65rem;
-  padding: 0.2rem 0.4rem;
-  border-radius: 4px;
-  font-weight: 500;
-}
-
-/* Visualization section enhancements */
-.data-visualization-content > * {
-  animation: fadeInUp 0.5s ease-out;
+/* Animation for view transitions */
+.table-view,
+.charts-view {
+  animation: fadeInUp 0.3s ease-out;
 }
 
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -884,35 +773,42 @@ const getCategoryDisplayName = (category) => {
   }
 }
 
-/* Enhanced grid layouts */
-.charts-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1.5rem;
+/* Enhanced tooltip styling */
+:deep(.p-tooltip .p-tooltip-text) {
+  font-size: 0.75rem;
+  padding: 0.375rem 0.5rem;
+  background: #212529;
+  color: white;
+  border-radius: 4px;
 }
 
-@media (max-width: 1400px) {
-  .charts-grid {
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  }
+/* Active state indicator */
+.toggle-btn.active::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #ffffff;
+  opacity: 0.8;
 }
-
-@media (max-width: 900px) {
-  .charts-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
+.rtl-direction :deep(.p-datatable .p-datatable-tbody > tr > td) {
+  text-align: right;
 }
-
-/* Accessibility improvements */
-.report-item:focus,
-.report-item:focus-visible {
-  outline: 2px solid #1976d2;
-  outline-offset: 2px;
+:deep(.p-paginator .p-dropdown .p-dropdown-label) {
+  padding-right: 1rem;
 }
-
-.visualization-selector:focus-within {
-  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+.rtl-direction :deep(.p-paginator .p-paginator-first) {
+  rotate: 180deg;
+}
+.rtl-direction :deep(.p-paginator .p-paginator-prev) {
+  rotate: 180deg;
+}
+.rtl-direction :deep(.p-paginator .p-paginator-next) {
+  rotate: 180deg;
+}
+.rtl-direction :deep(.p-paginator .p-paginator-last) {
+  rotate: 180deg;
 }
 </style>

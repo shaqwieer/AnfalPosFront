@@ -451,7 +451,7 @@ watch(
       </DataTable>
 
       <!-- Table Summary -->
-      <div v-if="tableSummary.totalRows" class="table-summary">
+      <div v-if="tableSummary.totalRows&&false" class="table-summary">
         <div class="summary-row">
           <span class="summary-label">Total Rows:</span>
           <span class="summary-value">{{ tableSummary.totalRows.toLocaleString() }}</span>

@@ -10,23 +10,15 @@ import { useReportData } from './useReportData';
 export function useReports() {
   const { t } = useI18n();
   const mainStore = useMainStore();
-  
+
   // State
   const loading = ref(false);
   const selectedReport = ref(null);
   const reportDialogVisible = ref(false);
   const showDataVisualization = ref(false);
-  
+
   // Use filter composable
-  const {
-    filterValues,
-    filterOptions,
-    initializeFilters,
-    loadFilterOptions,
-    validateFilters,
-    prepareFilterPayload,
-    resetFilters
-  } = useReportFilters();
+  const { filterValues, filterOptions, initializeFilters, loadFilterOptions, validateFilters, prepareFilterPayload, resetFilters } = useReportFilters();
 
   // Use data composable
   const {
@@ -58,7 +50,7 @@ export function useReports() {
       icon: 'pi-clock',
       category: 'financial',
       endpoints: {
-        excel: '/Invoices/GenerateAgingReportForExcel',
+        excel: '/Invoices/GenerateAgingReportForExcel'
       },
       filters: [
         {
@@ -86,7 +78,7 @@ export function useReports() {
       icon: 'pi-box',
       category: 'inventory',
       endpoints: {
-        pdf: '/Items/GenerateItemAvailabiltyReport',
+        pdf: '/Items/GenerateItemAvailabiltyReport'
       },
       filters: [
         {
@@ -107,7 +99,7 @@ export function useReports() {
       icon: 'pi-wallet',
       category: 'financial',
       endpoints: {
-        pdf: '/shiftSessions/GenerateSalesRepWithCashReport',
+        pdf: '/shiftSessions/GenerateSalesRepWithCashReport'
       },
       filters: [
         {
@@ -199,28 +191,28 @@ export function useReports() {
             operation: 'average'
           }
         },
-        {
-          key: 'totalCustomers',
-          label: 'Unique Customers',
-          format: 'number',
-          color: 'secondary',
-          icon: 'pi pi-users',
-          aggregate: {
-            field: 'customerSapCode',
-            operation: 'countUnique'
-          }
-        },
-        {
-          key: 'freeProducts',
-          label: 'Free Products',
-          format: 'number',
-          color: 'success',
-          icon: 'pi pi-gift',
-          aggregate: {
-            field: 'isFreeProduct',
-            operation: 'countTrue'
-          }
-        }
+        // {
+        //   key: 'totalCustomers',
+        //   label: 'Unique Customers',
+        //   format: 'number',
+        //   color: 'secondary',
+        //   icon: 'pi pi-users',
+        //   aggregate: {
+        //     field: 'customerSapCode',
+        //     operation: 'countUnique'
+        //   }
+        // },
+        // {
+        //   key: 'freeProducts',
+        //   label: 'Free Products',
+        //   format: 'number',
+        //   color: 'success',
+        //   icon: 'pi pi-gift',
+        //   aggregate: {
+        //     field: 'isFreeProduct',
+        //     operation: 'countTrue'
+        //   }
+        // }
       ],
       // 🎯 CHART CONFIGURATIONS
       chartConfigs: [
@@ -232,7 +224,7 @@ export function useReports() {
           aggregate: { field: 'finalAmount', operation: 'sum' },
           sortBy: 'desc',
           limit: 10,
-          options: { 
+          options: {
             responsive: true,
             plugins: {
               legend: {
@@ -279,7 +271,7 @@ export function useReports() {
           groupByFormat: 'date',
           aggregate: { field: 'finalAmount', operation: 'sum' },
           sortBy: 'asc',
-          options: { 
+          options: {
             tension: 0.4,
             elements: {
               point: {
@@ -316,7 +308,7 @@ export function useReports() {
               r: {
                 beginAtZero: true,
                 ticks: {
-                  callback: function(value) {
+                  callback: function (value) {
                     return '$' + (value / 1000).toFixed(1) + 'K';
                   }
                 }
@@ -330,30 +322,30 @@ export function useReports() {
         { field: 'billingDocId', header: 'Invoice #', sortable: true, filterable: true, width: '120px' },
         { field: 'salesOrderId', header: 'Sales Order #', sortable: true, filterable: true, width: '120px' },
         { field: 'invoiceCreation', header: 'Invoice Date', sortable: true, type: 'date', width: '110px' },
-        
+
         // Customer Information
         { field: 'customerName', header: 'Customer', sortable: true, filterable: true, width: '200px' },
         { field: 'customerSapCode', header: 'Customer Code', sortable: true, filterable: true, width: '120px' },
-        
+
         // Product Information
         { field: 'sapItem', header: 'Item Code', sortable: true, filterable: true, width: '120px' },
         { field: 'sapDesc', header: 'Product Description', sortable: true, filterable: true, width: '250px' },
         { field: 'batch', header: 'Batch', sortable: true, filterable: true, width: '100px' },
-        
+
         // Quantity & Pricing
         { field: 'quantity', header: 'Quantity', sortable: true, type: 'number', width: '100px' },
         { field: 'unit', header: 'Unit', sortable: true, filterable: true, width: '80px' },
         { field: 'price', header: 'Unit Price', sortable: true, type: 'currency', width: '110px' },
-        
+
         // Financial Details
         { field: 'taxTotal', header: 'Tax', sortable: true, type: 'currency', width: '100px' },
         { field: 'finalAmount', header: 'Final Amount', sortable: true, type: 'currency', width: '120px' },
         { field: 'totalAmount', header: 'Total Amount', sortable: true, type: 'currency', width: '120px' },
-        
+
         // Branch Information
         { field: 'branchEnglishName', header: 'Branch', sortable: true, filterable: true, width: '150px' },
         { field: 'sapStorageLocation', header: 'Storage Location', sortable: true, filterable: true, width: '130px' },
-        
+
         // Flags
         { field: 'isFreeProduct', header: 'Free Product', sortable: true, type: 'boolean', width: '100px' },
         { field: 'isSpecificPrice', header: 'Special Price', sortable: true, type: 'boolean', width: '100px' }
@@ -367,38 +359,38 @@ export function useReports() {
         enableSelection: true
       }
     },
-    {
-      id: 'item-usability-report',
-      name: 'reports.itemUsabilityReport',
-      description: 'reports.itemUsabilityReportDescription',
-      icon: 'pi-chart-line',
-      category: 'analytics',
-      endpoints: {
-        pdf: '/Invoices/GenerateItemUsabilityFor',
-      },
-      filters: [
-        {
-          type: 'daterange',
-          startDate: 'fromDate',
-          endDate: 'toDate',
-          label: 'reports.dateRange',
-          required: true,
-          default: {
-            startDate: new Date(new Date().setDate(new Date().getDate() - 7)),
-            endDate: new Date()
-          }
-        },
-        {
-          type: 'dropdown',
-          name: 'branchId',
-          label: 'reports.branch',
-          required: true,
-          endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
-          optionLabel: 'name',
-          optionValue: 'id'
-        }
-      ]
-    },
+    // {
+    //   id: 'item-usability-report',
+    //   name: 'reports.itemUsabilityReport',
+    //   description: 'reports.itemUsabilityReportDescription',
+    //   icon: 'pi-chart-line',
+    //   category: 'analytics',
+    //   endpoints: {
+    //     pdf: '/Invoices/GenerateItemUsabilityFor'
+    //   },
+    //   filters: [
+    //     {
+    //       type: 'daterange',
+    //       startDate: 'fromDate',
+    //       endDate: 'toDate',
+    //       label: 'reports.dateRange',
+    //       required: true,
+    //       default: {
+    //         startDate: new Date(new Date().setDate(new Date().getDate() - 7)),
+    //         endDate: new Date()
+    //       }
+    //     },
+    //     {
+    //       type: 'dropdown',
+    //       name: 'branchId',
+    //       label: 'reports.branch',
+    //       required: true,
+    //       endpoint: '/BusinessEntities/GetUserVanSaleInBranch',
+    //       optionLabel: 'name',
+    //       optionValue: 'id'
+    //     }
+    //   ]
+    // },
     {
       id: 'collection-report',
       name: 'reports.collectionReport',
@@ -406,7 +398,7 @@ export function useReports() {
       icon: 'pi-money-bill',
       category: 'financial',
       endpoints: {
-        pdf: '/Invoices/GenerateCollectionPdf',
+        pdf: '/Invoices/GenerateCollectionPdf'
       },
       filters: [
         {
@@ -437,6 +429,16 @@ export function useReports() {
           endpoint: '/PaymentMethods',
           optionLabel: 'name',
           optionValue: 'id'
+        },
+        {
+          type: 'dropdown',
+          name: 'sessionId',
+          label: t('reports.sessionNumber'),
+          required: false,
+          endpoint: '/Payments/GenerateCollectionPdfLookup',
+          lookupKey: 'sessionNumbers',
+          optionLabel: 'id',
+          optionValue: 'id'
         }
       ]
     },
@@ -447,7 +449,7 @@ export function useReports() {
       icon: 'pi-check-circle',
       category: 'financial',
       endpoints: {
-        excel: '/Invoices/GetPaymentsApprovelExcelReport',
+        excel: '/Invoices/GetPaymentsApprovelExcelReport'
       },
       filters: [
         {
@@ -476,21 +478,21 @@ export function useReports() {
 
   // Visualization type options for MultiSelect
   const visualizationTypeOptions = ref([
-    { 
-      name: 'Summary Cards', 
-      code: 'summary', 
+    {
+      name: 'Summary Cards',
+      code: 'summary',
       icon: 'pi pi-chart-bar',
       description: 'Key metrics and statistics'
     },
-    { 
-      name: 'Data Table', 
-      code: 'table', 
+    {
+      name: 'Data Table',
+      code: 'table',
       icon: 'pi pi-table',
       description: 'Detailed tabular data'
     },
-    { 
-      name: 'Charts', 
-      code: 'charts', 
+    {
+      name: 'Charts',
+      code: 'charts',
       icon: 'pi pi-chart-line',
       description: 'Visual charts and graphs'
     }
@@ -499,7 +501,7 @@ export function useReports() {
   // Computed
   const reportsByCategory = computed(() => {
     const categories = {};
-    reportDefinitions.value.forEach(report => {
+    reportDefinitions.value.forEach((report) => {
       if (!categories[report.category]) {
         categories[report.category] = [];
       }
@@ -535,8 +537,8 @@ export function useReports() {
 
   const availableVisualizationOptions = computed(() => {
     if (!selectedReport.value) return [];
-    
-    return visualizationTypeOptions.value.filter(option => {
+
+    return visualizationTypeOptions.value.filter((option) => {
       return availableVisualizationTypes.value.includes(option.code);
     });
   });
@@ -546,11 +548,11 @@ export function useReports() {
     selectedReport.value = report;
     initializeFilters(report.filters);
     await loadFilterOptions(report.filters);
-    
+
     // Clear previous data
     clearData();
     showDataVisualization.value = false;
-    
+
     reportDialogVisible.value = true;
   };
 
@@ -563,13 +565,13 @@ export function useReports() {
     try {
       const payload = prepareFilterPayload(selectedReport.value.filters);
       const endpoint = selectedReport.value.endpoints[format];
-      
+
       const response = await apiClient.post(endpoint, payload, {
         responseType: 'blob'
       });
 
       downloadFile(response, format);
-      
+
       mainStore.loading.setNotificationInfo('success', t('reports.downloadSuccess'));
     } catch (err) {
       handleError(err, mainStore.loading);
@@ -585,7 +587,7 @@ export function useReports() {
 
     const filters = prepareFilterPayload(selectedReport.value.filters);
     await fetchReportData(selectedReport.value, filters);
-    
+
     if (hasData.value) {
       showDataVisualization.value = true;
     }
@@ -593,7 +595,7 @@ export function useReports() {
 
   const refreshReportData = async () => {
     if (!selectedReport.value || !hasDataEndpoint.value) return;
-    
+
     const filters = prepareFilterPayload(selectedReport.value.filters);
     await refreshData(selectedReport.value, filters);
   };
@@ -611,18 +613,18 @@ export function useReports() {
 
     const contentType = contentTypeMap[format];
     const extension = extensionMap[format];
-    
+
     const blob = new Blob([response.data], { type: contentType });
     const url = window.URL.createObjectURL(blob);
-    
+
     const link = document.createElement('a');
     link.href = url;
     const timestamp = new Date().toISOString().split('T')[0];
     link.setAttribute('download', `${selectedReport.value.id}-${timestamp}.${extension}`);
-    
+
     document.body.appendChild(link);
     link.click();
-    
+
     // Cleanup
     window.URL.revokeObjectURL(url);
     document.body.removeChild(link);
@@ -658,7 +660,7 @@ export function useReports() {
     reportDefinitions,
     showDataVisualization,
     visualizationTypeOptions,
-    
+
     // Data state
     reportData,
     tableConfig,
@@ -673,7 +675,7 @@ export function useReports() {
     shouldShowSummary,
     shouldShowTable,
     shouldShowCharts,
-    
+
     // Computed
     reportsByCategory,
     availableFormats,
@@ -682,7 +684,7 @@ export function useReports() {
     hasSummaryCardsEnabled,
     hasChartsEnabled,
     availableVisualizationOptions,
-    
+
     // Methods
     selectReport,
     generateReport,

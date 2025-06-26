@@ -3,7 +3,7 @@ import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useMainStore } from '@/stores/mainStore';
 import CustomerFilters from './components/CustomerFilters.vue';
-import TransactionTypeCards from './components/TransactionTypeCards.vue';
+import TransactionTypeSelector from './components/TransactionTypeSelector.vue';
 import StatisticsCards from './components/StatisticsCards.vue';
 import TransactionsList from './components/TransactionsList.vue';
 import TransactionDetail from './components/TransactionDetail.vue';
@@ -40,11 +40,11 @@ const {
 import { watch, onMounted } from 'vue';
 
 // Watch for any changes that should trigger transaction loading
-watch([selectedCustomer, selectedTransactionType, () => filters.fromDate, () => filters.toDate], () => {
-  if (selectedCustomer.value && selectedTransactionType.value && isFiltersValid.value) {
-    loadTransactions(selectedTransactionType.value, selectedCustomer.value.id, filters);
-  }
-});
+// watch([selectedCustomer, selectedTransactionType, () => filters.fromDate, () => filters.toDate], () => {
+//   if (selectedCustomer.value && selectedTransactionType.value && isFiltersValid.value) {
+//     loadTransactions(selectedTransactionType.value, selectedCustomer.value.id, filters);
+//   }
+// });
 
 // Handle transaction type selection
 const handleTransactionTypeSelect = (type) => {
@@ -54,6 +54,11 @@ const handleTransactionTypeSelect = (type) => {
     loadTransactions(type, selectedCustomer.value.id, filters);
   }
 };
+
+// Computed property to determine if transaction type selector should be disabled
+const isTransactionTypeSelectorDisabled = computed(() => {
+  return !selectedCustomer.value || !filters.fromDate || !filters.toDate;
+});
 
 onMounted(() => {
   loadCustomers();
@@ -76,45 +81,51 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Customer Filters -->
+    <!-- Customer Filters with Transaction Type Selector -->
     <CustomerFilters
       v-model:selectedCustomer="selectedCustomer"
       v-model:filters="filters"
       :customers="customers"
       :loading="loading"
-    />
+    >
+      <template #transaction-selector>
+        <TransactionTypeSelector
+          :selectedType="selectedTransactionType"
+          :disabled="isTransactionTypeSelectorDisabled"
+          @select="handleTransactionTypeSelect"
+        />
+      </template>
+    </CustomerFilters>
 
-    <!-- Transaction Type Selection -->
-    <TransactionTypeCards
-      v-if="!selectedTransactionType && isFiltersValid"
-      @select="handleTransactionTypeSelect"
-    />
+    <!-- Validation Message -->
+    <div v-if="!isFiltersValid" class="col-12">
+      <div class="card p-4 border-left-3 border-blue-500 bg-blue-50">
+        <div class="flex align-items-center gap-3">
+          <i class="pi pi-info-circle text-blue-600 text-xl"></i>
+          <div>
+            <h5 class="text-blue-800 m-0 mb-1">{{ t('transactions.completeFilters') }}</h5>
+            <p class="text-blue-600 m-0 text-sm">{{ t('transactions.selectCustomerAndDates') }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Statistics Cards -->
     <StatisticsCards
-      v-if="selectedTransactionType && transactionTypeStats"
+      v-if="selectedTransactionType && transactionTypeStats && isFiltersValid"
       :stats="transactionTypeStats"
       :transaction-type="selectedTransactionType"
     />
 
     <!-- Transactions List -->
     <TransactionsList
-      v-if="selectedTransactionType"
+      v-if="selectedTransactionType && isFiltersValid"
       :transactions="transactions"
       :transaction-type="selectedTransactionType"
       :loading="loading"
       @select="selectTransaction"
       @refresh="() => loadTransactions(selectedTransactionType, selectedCustomer.id, filters)"
     />
-
-    <!-- No Customer Selected Message -->
-    <div v-if="!isFiltersValid" class="col-12">
-      <div class="card p-6 text-center">
-        <i class="pi pi-info-circle text-6xl text-500 mb-3"></i>
-        <h4 class="text-xl text-500 mb-2">{{ t('transactions.selectCustomerFirst') }}</h4>
-        <p class="text-500">{{ t('transactions.selectCustomerMessage') }}</p>
-      </div>
-    </div>
 
     <!-- Transaction Detail Dialog -->
     <TransactionDetail
@@ -128,5 +139,19 @@ onMounted(() => {
 <style scoped>
 .rtl-direction {
   direction: rtl;
+}
+
+/* SAP-like notification styling */
+.card.border-left-3 {
+  border-left-width: 4px !important;
+  border-left-style: solid !important;
+}
+
+.bg-blue-50 {
+  background-color: #f0f7ff !important;
+}
+
+.border-blue-500 {
+  border-color: #3b82f6 !important;
 }
 </style>

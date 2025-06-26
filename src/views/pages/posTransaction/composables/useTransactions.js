@@ -7,7 +7,7 @@ import { handleError } from '@/utilities/errorHandler';
 export function useTransactions() {
   const { t } = useI18n();
   const mainStore = useMainStore();
-  
+
   const selectedTransactionType = ref(null);
   const selectedTransaction = ref(null);
   const transactions = ref([]);
@@ -16,12 +16,12 @@ export function useTransactions() {
 
   const transactionTypeStats = computed(() => {
     if (!selectedTransactionType.value || !transactions.value.length) return null;
-    
+
     if (selectedTransactionType.value.id === 'invoices') {
       const totalAmount = transactions.value.reduce((sum, inv) => sum + (inv.finalAmount || 0), 0);
       const paidAmount = transactions.value.reduce((sum, inv) => sum + (inv.paidAmount || 0), 0);
       const remainingAmount = transactions.value.reduce((sum, inv) => sum + (inv.remainingAmount || 0), 0);
-      
+
       return {
         count: transactions.value.length,
         totalAmount,
@@ -30,20 +30,20 @@ export function useTransactions() {
       };
     } else if (selectedTransactionType.value.id === 'payments') {
       const totalAmount = transactions.value.reduce((sum, payment) => sum + (payment.totalAmount || 0), 0);
-      
+
       return {
         count: transactions.value.length,
         totalAmount
       };
     } else if (selectedTransactionType.value.id === 'expenses') {
       const totalAmount = transactions.value.reduce((sum, expense) => sum + (expense.amount || 0), 0);
-      
+
       return {
         count: transactions.value.length,
         totalAmount
       };
     }
-    
+
     return null;
   });
 
@@ -69,13 +69,13 @@ export function useTransactions() {
 
   const loadTransactions = async (transactionType, customerId, filters) => {
     if (!customerId || !transactionType) return;
-
     loading.value = true;
     try {
       const payload = {
         customerId: customerId,
         fromDate: filters.fromDate?.toISOString(),
         toDate: filters.toDate?.toISOString()
+        // ianaZone:Intl.DateTimeFormat().resolvedOptions().timeZone
       };
 
       const response = await apiClient.post(transactionType.endpoint, payload);

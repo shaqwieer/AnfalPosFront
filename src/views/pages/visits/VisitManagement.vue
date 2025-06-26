@@ -173,13 +173,13 @@ const getVisits = useDebounceFn(
   { maxWait: 1500 }
 );
 
-watch(
-  [selectedStatus, selectedSalesReps, dateFrom, dateTo],
-  () => {
-    changedFilter.value = true;
-  },
-  { deep: true }
-);
+// watch(
+//   [selectedStatus, selectedSalesReps, dateFrom, dateTo],
+//   () => {
+//     changedFilter.value = true;
+//   },
+//   { deep: true }
+// );
 onMounted(() => {
   visitStore.GetSalesReps().then(() => {
     selectedSalesReps.value = visitStore.salesReps.map((rep) => rep.id);
@@ -198,6 +198,32 @@ const props = defineProps({
     default: true
   }
 });
+const onDateSelect = (selectedDate, key) => {
+  if (!selectedDate) return;
+  
+  try {
+    // Create a new Date object to avoid mutating the original
+    const newDate = new Date(selectedDate);
+    
+    // Validate that we have a valid date
+    if (isNaN(newDate.getTime())) {
+      console.error('Invalid date provided:', selectedDate);
+      return;
+    }
+    
+    newDate.setHours(12, 0, 0, 0);
+    
+    console.log('selectedDate', newDate);
+    
+    if (key === 'dateFrom') {
+      dateFrom.value = newDate;
+    } else if (key === 'dateTo') {
+      dateTo.value = newDate;
+    }
+  } catch (error) {
+    console.error('Error processing date selection:', error);
+  }
+};
 </script>
 
 <template>
@@ -219,7 +245,7 @@ const props = defineProps({
             <div class="h-full cursor-pointer transition-all transition-duration-200">
               <div class="w-full">
                 <label class="block text-sm font-semibold mb-1">{{ t('Visit.FromDate') }}</label>
-                <Calendar v-model="dateFrom" showIcon iconDisplay="input" class="w-full h-3rem" />
+                <Calendar v-model="dateFrom" @date-select="(e) => onDateSelect(e, 'dateFrom')" dateFormat="yy-mm-dd"  showIcon iconDisplay="input" class="w-full h-3rem" />
               </div>
             </div>
           </div>
@@ -228,7 +254,7 @@ const props = defineProps({
             <div class="h-full cursor-pointer">
               <div class="w-full">
                 <label class="block text-sm font-semibold mb-1">{{ t('Visit.ToDate') }}</label>
-                <Calendar v-model="dateTo" showIcon iconDisplay="input" class="w-full h-3rem" />
+                <Calendar v-model="dateTo" @date-select="(e) => onDateSelect(e, 'dateTo')" dateFormat="yy-mm-dd" showIcon iconDisplay="input" class="w-full h-3rem" />
               </div>
             </div>
           </div>
