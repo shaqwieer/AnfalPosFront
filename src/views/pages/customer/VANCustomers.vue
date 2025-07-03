@@ -36,7 +36,7 @@ const handleSubmitCustomer = (customer: any) => {
   showNewCustomerForm.value = false;
   selectType.value = '';
   // Switch to pending tab since new customers start as pending
-  activeTab.value = 'pending';
+  activeTab.value = 'active';
 };
 
 const selectType = ref('');

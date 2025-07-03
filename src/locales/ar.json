@@ -476,7 +476,21 @@
     "editCreditLimit": "تعديل حد الائتمان",
     "editPaymentTerm": "تعديل شرط الدفع",
     "paymentTermPlaceholder": "اختر شرط الدفع",
-    "paymentTerm": "مدة الدفع"
+    "paymentTerm": "مدة الدفع",
+    "CR_Number": "رقم السجل التجاري",
+    "VAT_Number": "الرقم الضريبي",
+    "Financial_Notes": "الملاحظات المالية",
+    "Name": "اسم العميل",
+    "Phone": "رقم الهاتف",
+    "Address": "العنوان",
+    "Country": "البلد",
+    "Created_Date": "تاريخ الإنشاء",
+    "Updated_Date": "تاريخ التحديث",
+    "Contact_Person": "الشخص المسؤول",
+    "Currency": "العملة",
+    "Tax_ID": "الرقم الضريبي",
+    "Website": "الموقع الإلكتروني",
+    "Industry": "القطاع"
   },
   "organizationConfig": {
     "basePriceCode": "كود السعر الأساسي",

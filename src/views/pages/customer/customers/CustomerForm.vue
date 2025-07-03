@@ -1,324 +1,332 @@
 <script setup lang="ts">
-import { ref, onMounted, watch, nextTick } from 'vue';
-//import CustomerAttachments from './CustomerAttachments.vue';
-import 'leaflet/dist/leaflet.css';
+import { ref, onMounted, watch, nextTick, computed, onUnmounted } from 'vue';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import CustomerAttachmentsNew from './CustomerAttachmentsNew.vue';
-
 import apiClient from '@/api/apiClient';
-
 import { handleError } from '@/utilities/errorHandler';
+import { useForm } from 'vee-validate';
+import * as yup from 'yup';
 
 const props = defineProps<{
   show: boolean;
-  customer?: any; // For edit mode
-  readOnly?: boolean; // For view mode
+  customer?: any;
+  readOnly?: boolean;
   action?: string;
 }>();
 
 const emit = defineEmits(['close', 'submit']);
 
-// Initialize left column tab state
-const leftColumnTab = ref('basic');
+// Validation Schema
+const validationSchema = yup.object({
+  name: yup.string().required('Customer name is required'),
+  branchId: yup.string().required('Branch selection is required'),
+  Region: yup.string().required('Region selection is required'),
+  mobile: yup.string().required('Mobile number is required'),
+  email: yup.string().email('Please enter a valid email').nullable().optional(),
+  buildingNumber: yup.string()
+    .nullable()
+    .optional()
+    .test('is-number', 'Building number must contain only numbers', function(value) {
+      if (!value || value.length === 0) return true;
+      return /^\d+$/.test(value);
+    }),
+  postalCode: yup.string()
+    .nullable()
+    .optional()
+    .test('is-five-digits', 'Postal code must be exactly 5 digits', function(value) {
+      if (!value || value.length === 0) return true;
+      return /^\d{5}$/.test(value);
+    }),
+  latitude: yup.number().optional(),
+  longitude: yup.number().optional()
+});
 
-// Map refs
-const mapRef = ref<HTMLElement | null>(null);
+// Form setup
+const { handleSubmit, errors, defineField, resetForm, setValues, setFieldValue } = useForm({
+  validationSchema,
+  initialValues: {
+    branchId: props.customer?.branchId || '',
+    name: props.customer?.name || '',
+    type: props.customer?.type || 'business',
+    mobile: props.customer?.primaryPhone || '',
+    email: props.customer?.email || '',
+    Region: props.customer?.regionId || '',
+    cr: props.customer?.crNumber || '',
+    vat: props.customer?.vatNumber || '',
+    creditLimit: props.customer?.creditLimit || 0,
+    paymentTerm: props.customer?.paymentTerm || '75',
+    bankName: props.customer?.bankName || '',
+    bankAccount: props.customer?.accountNumber || '',
+    iban: props.customer?.iban || '',
+    swiftCode: props.customer?.swiftCode || '',
+    financialNotes: props.customer?.financeNotes || '',
+    buildingNumber: props.customer?.buildingNumber || '',
+    streetName: props.customer?.streetName || '',
+    district: props.customer?.district || '',
+    city: props.customer?.city || '',
+    postalCode: props.customer?.postalCode || '',
+    additionalNumber: props.customer?.additionalNumber || '',
+    notes: props.customer?.additionalNotes || '',
+    latitude: props.customer?.latitude || 24.7136,
+    longitude: props.customer?.altitude || 46.6753
+  }
+});
+
+// Define form fields
+const [branchId, branchIdAttrs] = defineField('branchId');
+const [name, nameAttrs] = defineField('name');
+const [mobile, mobileAttrs] = defineField('mobile');
+const [email, emailAttrs] = defineField('email');
+const [Region, RegionAttrs] = defineField('Region');
+const [cr, crAttrs] = defineField('cr');
+const [vat, vatAttrs] = defineField('vat');
+const [bankName, bankNameAttrs] = defineField('bankName');
+const [bankAccount, bankAccountAttrs] = defineField('bankAccount');
+const [iban, ibanAttrs] = defineField('iban');
+const [swiftCode, swiftCodeAttrs] = defineField('swiftCode');
+const [financialNotes, financialNotesAttrs] = defineField('financialNotes');
+const [buildingNumber, buildingNumberAttrs] = defineField('buildingNumber');
+const [streetName, streetNameAttrs] = defineField('streetName');
+const [district, districtAttrs] = defineField('district');
+const [city, cityAttrs] = defineField('city');
+const [postalCode, postalCodeAttrs] = defineField('postalCode');
+const [additionalNumber, additionalNumberAttrs] = defineField('additionalNumber');
+const [notes, notesAttrs] = defineField('notes');
+const [latitude, latitudeAttrs] = defineField('latitude');
+const [longitude, longitudeAttrs] = defineField('longitude');
+
+// Map configuration
+const mapRef = ref<HTMLDivElement | null>(null);
 const map = ref<L.Map | null>(null);
 const marker = ref<L.Marker | null>(null);
-const searchResults = ref<any[]>([]);
-const searchQuery = ref('');
 const locationError = ref('');
-const mapZoom = ref(12);
+const mapInitialized = ref(false);
 
-const selectedRegion = ref('');
-
-// Form data with all fields
-const formData = ref({
-  // Basic Information
-  branchId: props.customer?.branchId || '',
-  id: props.customer?.id || '',
-  name: props.customer?.name || '',
-  type: props.customer?.type || 'business',
-  mobile: props.customer?.primaryPhone || '',
-  email: props.customer?.email || '',
-
-  Region: props.customer?.regionId || '',
-
-  // Business Informationa
-  cr: props.customer?.crNumber || '',
-  vat: props.customer?.vatNumber || '',
-
-  // Financial Information
-  creditLimit: props.customer?.creditLimit || 0,
-  paymentTerm: props.customer?.paymentTerm || '75',
-  bankName: props.customer?.bankName || '',
-  bankAccount: props.customer?.accountNumber || '',
-  iban: props.customer?.iban || '',
-  swiftCode: props.customer?.swiftCode || '',
-  financialNotes: props.customer?.financeNotes || '',
-  bulkStorageLocation: props.customer?.bulkStorageLocation || '',
-  bulkOrderType: props.customer?.bulkOrderType || '',
-
-  // Address Information
-  buildingNumber: props.customer?.buildingNumber || '',
-  streetName: props.customer?.streetName || '',
-  district: props.customer?.district || '',
-  city: props.customer?.city || '',
-  postalCode: props.customer?.postalCode || '',
-  additionalNumber: props.customer?.additionalNumber || '',
-  latitude: props.customer?.latitude || 24.7136,
-  altitude: props.customer?.altitude || 46.6753,
-  // Location
-  location: {
-    lat: props.customer?.latitude || 24.7136,
-    lng: props.customer?.altitude || 46.6753,
-    address: props.customer?.location?.address || ''
-  },
-
-  // Attachments
-  attachments: props.customer?.attachments || [],
-  notes: props.customer?.additionalNotes || ''
-});
+// Customer data
 const attachments = ref(props.customer?.attachments || []);
+const CustomerLookups = ref({ regions: [], paymentTerms: [], branches: [] });
 
-// Left column tabs
-const leftTabs = [
-  { id: 'basic', name: 'Basic_Information', icon: 'user' },
-  { id: 'business', name: 'Business_Information', icon: 'building' },
-  { id: 'financial', name: 'Financial_Information', icon: 'wallet' },
-  { id: 'address', name: 'Address_Information', icon: 'map-marker' },
-  { id: 'documents', name: 'Documents', icon: 'folder' },
-  { id: 'notes', name: 'Notes', icon: 'file-edit' }
-];
+// Tab state
+const activeTab = ref(0);
 
-// Payment terms options
-const paymentTermsOptions = [
-  { value: '30', label: '30 Days' },
-  { value: '45', label: '45 Days' },
-  { value: '60', label: '60 Days' },
-  { value: '75', label: '75 Days' },
-  { value: '90', label: '90 Days' }
-];
+// Initialize Leaflet icons
+const initializeLeafletIcons = () => {
+  // Fix for default markers in Leaflet
+  delete (L.Icon.Default.prototype as any)._getIconUrl;
+  L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  });
+};
 
 // Initialize map
-const initMap = async () => {
-  if (!mapRef.value || map.value) return;
-
-  await nextTick();
+const initializeMap = async () => {
+  if (!mapRef.value || mapInitialized.value || props.readOnly) return;
 
   try {
-    map.value = L.map(mapRef.value).setView([formData.value.location.lat, formData.value.location.lng], mapZoom.value);
+    await nextTick();
+    
+    // Initialize Leaflet icons
+    initializeLeafletIcons();
 
-    const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
+    // Create map
+    map.value = L.map(mapRef.value, {
+      center: [latitude.value as number, longitude.value as number],
+      zoom: 13,
+      zoomControl: true
     });
 
-    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-    });
+    // Add tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors',
+      maxZoom: 19
+    }).addTo(map.value);
 
-    osmLayer.addTo(map.value);
+    // Add marker
+    marker.value = L.marker([latitude.value as number, longitude.value as number], {
+      draggable: !props.readOnly
+    }).addTo(map.value);
 
-    const baseLayers = {
-      Street: osmLayer,
-      Satellite: satelliteLayer
-    };
-    L.control.layers(baseLayers).addTo(map.value);
+    // Map click event
+    map.value.on('click', onMapClick);
 
-    L.control
-      .zoom({
-        position: 'topright'
-      })
-      .addTo(map.value);
-
-    L.control
-      .scale({
-        imperial: false,
-        position: 'bottomright'
-      })
-      .addTo(map.value);
-
-    marker.value = L.marker([formData.value.location.lat, formData.value.location.lng], { draggable: !props.readOnly }).addTo(map.value);
-
-    if (!props.readOnly) {
-      marker.value.on('dragend', async () => {
-        const position = marker.value?.getLatLng();
-        if (!position) return;
-        await reverseGeocode(position.lat, position.lng);
-      });
+    // Marker drag event
+    if (marker.value && !props.readOnly) {
+      marker.value.on('dragend', onMarkerDrag);
     }
 
-    if (!props.readOnly) {
-      const searchControl = L.Control.extend({
-        options: {
-          position: 'topleft'
-        },
-        onAdd: function () {
-          const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-          const searchBox = L.DomUtil.create('div', 'leaflet-control-search', container);
+    mapInitialized.value = true;
+    console.log('Map initialized successfully');
 
-          searchBox.innerHTML = `
-            <div class="relative">
-              <span class="p-input-icon-left w-full">
-                <i class="pi pi-search"></i>
-                <input type="text" 
-                       class="p-inputtext w-full"
-                       placeholder="Search address...">
-              </span>
-            </div>
-          `;
-
-          const input = searchBox.querySelector('input');
-
-          L.DomEvent.disableClickPropagation(container);
-
-          let timeout: NodeJS.Timeout;
-          input?.addEventListener('input', (e) => {
-            const target = e.target as HTMLInputElement;
-            clearTimeout(timeout);
-            timeout = setTimeout(() => searchAddress(target.value), 500);
-          });
-
-          return container;
-        }
-      });
-      map.value.addControl(new searchControl());
-    }
   } catch (error) {
     console.error('Error initializing map:', error);
+    locationError.value = 'Failed to initialize map';
   }
 };
 
-// Search address using Nominatim
-const searchAddress = async (query: string) => {
-  try {
-    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=sa`);
-    const results = await response.json();
+// Map click handler
+const onMapClick = async (event: L.LeafEvent) => {
+  if (props.readOnly) return;
 
-    if (results.length > 0) {
-      searchResults.value = results;
-      const { lat, lon } = results[0];
-      map.value?.setView([lat, lon], 16);
-      marker.value?.setLatLng([lat, lon]);
+  const { lat, lng } = (event as L.LocationEvent).latlng;
+  updateMapPosition(lat, lng);
+  await reverseGeocode(lat, lng);
+};
 
-      await reverseGeocode(lat, lon);
-    }
-  } catch (error) {
-    console.error('Error searching address:', error);
+// Marker drag handler
+const onMarkerDrag = async (event: L.DragEndEvent) => {
+  if (props.readOnly) return;
+
+  const { lat, lng } = event.target.getLatLng();
+  updateMapPosition(lat, lng, false);
+  await reverseGeocode(lat, lng);
+};
+
+// Update map position
+const updateMapPosition = (lat: number, lng: number, updateView = true) => {
+  // Update form coordinates
+  setFieldValue('latitude', lat);
+  setFieldValue('longitude', lng);
+
+  // Update marker position
+  if (marker.value) {
+    marker.value.setLatLng([lat, lng]);
+  }
+
+  // Update map view
+  if (map.value && updateView) {
+    map.value.setView([lat, lng], map.value.getZoom());
   }
 };
 
-// Reverse geocode coordinates
+// Reverse geocode
 const reverseGeocode = async (lat: number, lng: number) => {
   try {
-    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`,
+      {
+        headers: {
+          'User-Agent': 'CustomerManagementApp/1.0'
+        }
+      }
+    );
+    
+    if (!response.ok) {
+      throw new Error('Geocoding request failed');
+    }
+
     const data = await response.json();
-
-    formData.value.location = {
-      lat,
-      lng,
-      address: data.display_name
-    };
-
-    updateAddressFromGeocoding(data);
+    
+    if (data.address) {
+      // Update form fields with geocoded data
+      if (data.address.house_number) {
+        setFieldValue('buildingNumber', data.address.house_number);
+      }
+      if (data.address.road) {
+        setFieldValue('streetName', data.address.road);
+      }
+      if (data.address.suburb || data.address.neighbourhood) {
+        setFieldValue('district', data.address.suburb || data.address.neighbourhood);
+      }
+      if (data.address.city || data.address.town) {
+        setFieldValue('city', data.address.city || data.address.town);
+      }
+      if (data.address.postcode) {
+        setFieldValue('postalCode', data.address.postcode.slice(0, 5));
+      }
+    }
   } catch (error) {
     console.error('Error reverse geocoding:', error);
-    formData.value.location.address = 'Address lookup failed';
+    locationError.value = 'Failed to get address details';
+    setTimeout(() => { locationError.value = ''; }, 3000);
   }
-};
-
-// Update address fields from geocoding result
-const updateAddressFromGeocoding = (data: any) => {
-  if (!data.address) return;
-
-  formData.value.buildingNumber = data.address.house_number || '';
-  formData.value.streetName = data.address.road || '';
-  formData.value.district = data.address.suburb || '';
-  formData.value.city = data.address.city || 'Riyadh';
-  formData.value.postalCode = data.address.postcode || '';
 };
 
 // Get current location
-const getCurrentLocation = async () => {
+const getCurrentLocation = () => {
   if (props.readOnly) return;
-
-  try {
-    locationError.value = '';
-
-    const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(resolve, reject);
-    });
-
-    const { latitude, longitude } = position.coords;
-
-    if (map.value && marker.value) {
-      map.value.setView([latitude, longitude], 16);
-      marker.value.setLatLng([latitude, longitude]);
-    }
-
-    await reverseGeocode(latitude, longitude);
-  } catch (error: any) {
-    console.error('Error getting location:', error);
-
-    switch (error.code) {
-      case error.PERMISSION_DENIED:
-        locationError.value = 'Location access was denied. Please enable location services.';
-        break;
-      case error.POSITION_UNAVAILABLE:
-        locationError.value = 'Location information is unavailable.';
-        break;
-      case error.TIMEOUT:
-        locationError.value = 'Location request timed out.';
-        break;
-      default:
-        locationError.value = 'Unable to get current location.';
-    }
+  
+  locationError.value = '';
+  
+  if (!navigator.geolocation) {
+    locationError.value = 'Geolocation is not supported by this browser';
+    return;
   }
+  
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      const { latitude: lat, longitude: lng } = position.coords;
+      updateMapPosition(lat, lng);
+      
+      // Update map zoom for current location
+      if (map.value) {
+        map.value.setView([lat, lng], 16);
+      }
+      
+      await reverseGeocode(lat, lng);
+    },
+    (error) => {
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          locationError.value = 'Location access was denied';
+          break;
+        case error.POSITION_UNAVAILABLE:
+          locationError.value = 'Location information is unavailable';
+          break;
+        case error.TIMEOUT:
+          locationError.value = 'Location request timed out';
+          break;
+        default:
+          locationError.value = 'An unknown error occurred';
+      }
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 600000 // 10 minutes
+    }
+  );
 };
 
-const handleSubmit = () => {
-  if (props.readOnly) return;
-  formData.value.attachments = attachments.value;
-  console.log('formData.value');
-  console.log(formData.value);
-  emit('submit', formData.value);
-};
-
-const handleAttachmentsUpdate = (attachments: any[]) => {
-  if (props.readOnly) return;
-  formData.value.attachments = attachments;
-};
-
-onMounted(() => {
-  if (leftColumnTab.value === 'address') {
-    initMap();
+// Watch for coordinate changes to update map
+watch([latitude, longitude], ([newLat, newLng]) => {
+  if (map.value && marker.value && newLat && newLng) {
+    const currentMarkerPos = marker.value.getLatLng();
+    
+    // Only update if coordinates actually changed
+    if (Math.abs(currentMarkerPos.lat - newLat) > 0.000001 || 
+        Math.abs(currentMarkerPos.lng - newLng) > 0.000001) {
+      marker.value.setLatLng([newLat, newLng]);
+      map.value.setView([newLat, newLng], map.value.getZoom());
+    }
   }
 });
 
-watch(leftColumnTab, (newTab) => {
-  if (newTab === 'address' && !map.value) {
-    nextTick(() => {
-      initMap();
-    });
+// Watch for active tab changes
+watch(activeTab, async (newTab) => {
+  if (newTab === 3 && !mapInitialized.value) { // Address tab
+    await nextTick();
+    setTimeout(initializeMap, 100); // Small delay to ensure DOM is ready
   }
 });
 
-import { LMap, LTileLayer, LMarker } from '@vue-leaflet/vue-leaflet';
-import 'leaflet/dist/leaflet.css';
-
-const zoom = ref(13);
-const center = ref([formData.value.location.lat, formData.value.location.lng]); // الرياض
-const markerPosition = ref([formData.value.location.lat, formData.value.location.lng]);
-const tileLayerUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-const isLoaded = ref(false);
-
+// Initialize on mount
 onMounted(() => {
-  isLoaded.value = true;
   getCustomerLookups();
 });
 
-const Regions = ref([]);
-const CustomerLookups = ref({ regions: [], paymentTerms: [], branches: [] });
+// Cleanup on unmount
+onUnmounted(() => {
+  if (map.value) {
+    map.value.remove();
+    map.value = null;
+    mapInitialized.value = false;
+  }
+});
+
+// Get customer lookups
 const getCustomerLookups = async () => {
   try {
     const response = await apiClient.get(`/Customers/GetCustomerLookups`);
@@ -327,336 +335,730 @@ const getCustomerLookups = async () => {
     handleError(err);
   }
 };
-const gitRegions = async () => {
-  try {
-    const response = await apiClient.get(`/Regions`);
-    Regions.value = response.data.data;
-  } catch (err) {
-    handleError(err);
-  }
+
+// Form submission
+const onSubmit = handleSubmit((values) => {
+  if (props.readOnly) return;
+  
+  const formData = {
+    id: props.customer?.id,
+    ...values,
+    latitude: latitude.value,
+    altitude: longitude.value, // Note: API expects 'altitude' for longitude
+    attachments: attachments.value,
+    location: {
+      lat: latitude.value,
+      lng: longitude.value
+    }
+  };
+  
+  console.log('Form Data:', formData);
+  emit('submit', formData);
+});
+
+// Helper function to get error message
+const getErrorMessage = (fieldName: string) => {
+  return errors.value[fieldName];
 };
+
+// Helper function to check if field has error
+const hasError = (fieldName: string) => {
+  return !!errors.value[fieldName];
+};
+
+const tabs = [
+  { label: 'Basic Info', icon: 'pi pi-user' },
+  { label: 'Business', icon: 'pi pi-building' },
+  { label: 'Banking', icon: 'pi pi-credit-card' },
+  { label: 'Address', icon: 'pi pi-map-marker' },
+  { label: 'Attachments', icon: 'pi pi-paperclip' },
+  { label: 'Financial', icon: 'pi pi-dollar' }
+];
 </script>
 
 <template>
-  <Dialog closable :close-on-click-outside="true" :modal="true" v-model:visible="props.show" class="flex justify-content-center" style="width: 100vw; max-width: 80%" :header="$t(`Customer.Customer_Details`)" @update:visible="$emit('close')">
-    <form @submit.prevent="handleSubmit" class="flex-1 overflow-hidden relative pb-8">
-      <TabView>
-        <TabPanel header="Customer Info">
-          <div v-if="show" style="height: 500px" class="inset-0 flex pt-5 justify-content-center z-5">
-            <div class="surface-card border-round-xl w-full max-w-7xl max-h-90vh flex flex-column">
-              <!-- Single column layout -->
-              <div class="h-full flex flex-column">
-                <!-- Tab Content - Scrollable -->
-                <div class="flex-1 overflow-y-auto px-6">
-                  <!-- Basic Information -->
-                  <div v-show="leftColumnTab === 'basic'" class="flex flex-column gap-4">
-                    <div>
-                      <label class="block text-sm font-medium text-700 mb-1"> {{ $t(`Customer.Branch`) }} </label>
-                      <Dropdown v-model="formData.branchId" :options="CustomerLookups.branches" optionLabel="name" optionValue="id" placeholder="Select a Branch" class="w-full">
-                        <template #option="slotProps">
-                          {{ slotProps.option.name }}
-                        </template>
-                      </Dropdown>
-                    </div>
-                    <div>
-                      <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Customer_Name`) }}</label>
-                      <input v-model="formData.name" type="text" required :disabled="readOnly" class="w-full p-inputtext" />
-                    </div>
-                    <div>
-                      <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Mobile_Number`) }}</label>
-                      <input v-model="formData.mobile" type="tel" required :disabled="readOnly" class="w-full p-inputtext" />
-                    </div>
-                    <div>
-                      <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Email`) }}</label>
-                      <input v-model="formData.email" type="email" :disabled="readOnly" class="w-full p-inputtext" />
-                    </div>
-                  </div>
-                </div>
+  <Dialog 
+    v-model:visible="props.show" 
+    :header="$t('Customer.Customer_Details')"
+    :modal="true"
+    :closable="true"
+    :draggable="false"
+    class="customer-dialog"
+    style="width: 90vw; max-width: 1200px;"
+    @update:visible="$emit('close')"
+  >
+    <form @submit.prevent="onSubmit" class="customer-form">
+      <!-- Tab Navigation -->
+      <div class="tab-navigation">
+        <div class="tab-buttons">
+          <button
+            v-for="(tab, index) in tabs"
+            :key="index"
+            type="button"
+            class="tab-button"
+            :class="{ active: activeTab === index }"
+            @click="activeTab = index"
+            :disabled="readOnly && index > 3"
+          >
+            <i :class="tab.icon"></i>
+            <span>{{ tab.label }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <!-- Basic Information -->
+        <div v-show="activeTab === 0" class="tab-panel">
+          <div class="form-section">
+            <h3 class="section-title">
+              <i class="pi pi-user"></i>
+              Basic Information
+            </h3>
+            
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="field-label required">Branch</label>
+                <Dropdown
+                  v-model="branchId"
+                  v-bind="branchIdAttrs"
+                  :options="CustomerLookups.branches"
+                  optionLabel="name"
+                  optionValue="id"
+                  placeholder="Select Branch"
+                  :class="{ 'p-invalid': hasError('branchId') }"
+                  :disabled="readOnly"
+                />
+                <small v-if="hasError('branchId')" class="error-message">
+                  {{ getErrorMessage('branchId') }}
+                </small>
+              </div>
+
+              <div class="form-field">
+                <label class="field-label required">Customer Name</label>
+                <InputText
+                  v-model="name"
+                  v-bind="nameAttrs"
+                  :class="{ 'p-invalid': hasError('name') }"
+                  :disabled="readOnly"
+                  placeholder="Enter customer name"
+                />
+                <small v-if="hasError('name')" class="error-message">
+                  {{ getErrorMessage('name') }}
+                </small>
+              </div>
+
+              <div class="form-field">
+                <label class="field-label required">Mobile Number</label>
+                <InputText
+                  v-model="mobile"
+                  v-bind="mobileAttrs"
+                  :class="{ 'p-invalid': hasError('mobile') }"
+                  :disabled="readOnly"
+                  placeholder="Enter mobile number"
+                />
+                <small v-if="hasError('mobile')" class="error-message">
+                  {{ getErrorMessage('mobile') }}
+                </small>
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">Email</label>
+                <InputText
+                  v-model="email"
+                  v-bind="emailAttrs"
+                  type="email"
+                  :class="{ 'p-invalid': hasError('email') }"
+                  :disabled="readOnly"
+                  placeholder="Enter email address"
+                />
+                <small v-if="hasError('email')" class="error-message">
+                  {{ getErrorMessage('email') }}
+                </small>
               </div>
             </div>
           </div>
-        </TabPanel>
+        </div>
 
-        <TabPanel header="Business">
-          <div v-if="show" style="height: 500px" class="inset-0 flex pt-5 justify-content-center z-5">
-            <div class="surface-card border-round-xl w-full max-w-7xl max-h-90vh flex flex-column">
-              <!-- Single column layout -->
-              <div class="h-full flex flex-column">
-                <!-- Tab Content - Scrollable -->
-                <div class="flex-1 overflow-y-auto px-6">
-                  <!-- Business Information -->
-                  <div v-show="leftColumnTab === 'business'" class="flex flex-column gap-4">
-                    <div>
-                      <label class="block text-sm font-medium text-700 mb-1">CR </label>
-                      <input v-model="formData.cr" type="text" :disabled="readOnly" class="w-full p-inputtext" />
-                    </div>
-                    <div>
-                      <label class="block text-sm font-medium text-700 mb-1">VAT </label>
-                      <input v-model="formData.vat" type="text" :disabled="readOnly" class="w-full p-inputtext" />
-                    </div>
+        <!-- Business Information -->
+        <div v-show="activeTab === 1" class="tab-panel">
+          <div class="form-section">
+            <h3 class="section-title">
+              <i class="pi pi-building"></i>
+              Business Information
+            </h3>
+            
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="field-label">CR Number</label>
+                <InputText
+                  v-model="cr"
+                  v-bind="crAttrs"
+                  :disabled="readOnly"
+                  placeholder="Enter CR number"
+                />
+              </div>
 
-                    <!-- <Dropdown @click="gitRegions" v-model="selectedRegion" :options="CustomerLookups.regions" optionLabel="name" placeholder="Select a City" class="w-full">
-                      <template #option="slotProps">
-                        {{ slotProps.option.name }}
-                      </template>
-                    </Dropdown> -->
-                    <!-- <Dropdown @click="gitRegions" v-model="selectedCity" :options="cities" optionLabel="name" placeholder="Select a City" class="w-full md:w-14rem" /> -->
-                  </div>
-                </div>
+              <div class="form-field">
+                <label class="field-label">VAT Number</label>
+                <InputText
+                  v-model="vat"
+                  v-bind="vatAttrs"
+                  :disabled="readOnly"
+                  placeholder="Enter VAT number"
+                />
               </div>
             </div>
           </div>
-        </TabPanel>
+        </div>
 
-        <TabPanel header="Bank">
-          <div v-if="show" style="height: 500px" class="inset-0 flex pt-5 justify-content-center z-5">
-            <div class="surface-card border-round-xl w-full max-w-7xl max-h-90vh flex flex-column">
-              <!-- Single column layout -->
-              <div class="h-full flex flex-column">
-                <!-- Tab Content - Scrollable -->
-                <div class="flex-1 overflow-y-auto px-6">
-                  <!-- Financial Information -->
-                  <div v-show="leftColumnTab === 'financial'" class="flex flex-column gap-4 mt-2">
-                    <!-- Bank Information -->
-                    <div class="surface-100 p-4 border-round-lg flex flex-column gap-4">
-                      <h4 class="font-medium text-900">{{ $t(`Customer.Bank_Information`) }}</h4>
-                      <div class="grid">
-                        <div class="col-12 md:col-6">
-                          <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Bank_Name`) }} </label>
-                          <input v-model="formData.bankName" type="text" :disabled="readOnly" class="w-full p-inputtext" />
-                        </div>
-                        <div class="col-12 md:col-6">
-                          <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Account_Number`) }}</label>
-                          <input v-model="formData.bankAccount" type="text" :disabled="readOnly" class="w-full p-inputtext" />
-                        </div>
-                        <div class="col-12 md:col-6">
-                          <label class="block text-sm font-medium text-700 mb-1">IBAN</label>
-                          <input v-model="formData.iban" type="text" :disabled="readOnly" class="w-full p-inputtext" placeholder="SA..." />
-                        </div>
+        <!-- Banking Information -->
+        <div v-show="activeTab === 2" class="tab-panel">
+          <div class="form-section">
+            <h3 class="section-title">
+              <i class="pi pi-credit-card"></i>
+              Banking Information
+            </h3>
+            
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="field-label">Bank Name</label>
+                <InputText
+                  v-model="bankName"
+                  v-bind="bankNameAttrs"
+                  :disabled="readOnly"
+                  placeholder="Enter bank name"
+                />
+              </div>
 
-                        <div class="col-12 md:col-6">
-                          <label class="block text-sm font-medium text-700 mb-1">SWIFT Code</label>
-                          <input v-model="formData.swiftCode" type="text" :disabled="readOnly" class="w-full p-inputtext" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <div class="form-field">
+                <label class="field-label">Account Number</label>
+                <InputText
+                  v-model="bankAccount"
+                  v-bind="bankAccountAttrs"
+                  :disabled="readOnly"
+                  placeholder="Enter account number"
+                />
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">IBAN</label>
+                <InputText
+                  v-model="iban"
+                  v-bind="ibanAttrs"
+                  :disabled="readOnly"
+                  placeholder="SA..."
+                />
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">SWIFT Code</label>
+                <InputText
+                  v-model="swiftCode"
+                  v-bind="swiftCodeAttrs"
+                  :disabled="readOnly"
+                  placeholder="Enter SWIFT code"
+                />
+              </div>
+
+              <div class="form-field full-width">
+                <label class="field-label">Financial Notes</label>
+                <Textarea
+                  v-model="financialNotes"
+                  v-bind="financialNotesAttrs"
+                  :disabled="readOnly"
+                  rows="3"
+                  placeholder="Add financial notes..."
+                />
               </div>
             </div>
           </div>
-        </TabPanel>
+        </div>
 
-        <TabPanel header="Address">
-          <div v-if="show" style="height: 500px" class="inset-0 flex pt-5 justify-content-center z-5">
-            <div class="surface-card border-round-xl w-full max-w-7xl max-h-90vh flex flex-column">
-              <!-- Single column layout -->
-              <div class="h-full flex flex-column">
-                <div class="flex-1 overflow-y-auto px-6">
-                  <!-- Address Information -->
-                  <div class="flex flex-column gap-6">
-                    <!-- Map View -->
-                    <div>
-                      <label class="block text-sm font-medium text-700 mb-1"> {{ $t(`Customer.Region`) }} </label>
-                      <Dropdown v-model="formData.Region" :options="CustomerLookups.regions" optionLabel="name" optionValue="id" placeholder="Select a Region" class="w-full">
-                        <template #option="slotProps">
-                          {{ slotProps.option.name }}
-                        </template>
-                      </Dropdown>
-                    </div>
+        <!-- Address Information -->
+        <div v-show="activeTab === 3" class="tab-panel">
+          <div class="form-section">
+            <h3 class="section-title">
+              <i class="pi pi-map-marker"></i>
+              Address Information
+            </h3>
 
-                    <div class="h-300px border-round-lg border-1 surface-border overflow-hidden relative">
-                      <!-- <div ref="mapRef" class="w-full h-full"></div> -->
-                      <div>
-                        <l-map v-if="isLoaded" v-model:zoom="zoom" v-model:center="center" style="height: 400px; width: 100%">
-                          <l-tile-layer :url="tileLayerUrl"></l-tile-layer>
+            <!-- Region Selection -->
+            <div class="form-field">
+              <label class="field-label required">Region</label>
+              <Dropdown
+                v-model="Region"
+                v-bind="RegionAttrs"
+                :options="CustomerLookups.regions"
+                optionLabel="name"
+                optionValue="id"
+                placeholder="Select Region"
+                :class="{ 'p-invalid': hasError('Region') }"
+                :disabled="readOnly"
+              />
+              <small v-if="hasError('Region')" class="error-message">
+                {{ getErrorMessage('Region') }}
+              </small>
+            </div>
 
-                          <l-marker :lat-lng="markerPosition"></l-marker>
-                        </l-map>
-                      </div>
+            <!-- Map Section -->
+            <div class="map-section">
+              <div class="map-controls">
+                <Button
+                  type="button"
+                  icon="pi pi-map-marker"
+                  label="Get Current Location"
+                  @click="getCurrentLocation"
+                  :disabled="readOnly"
+                  class="location-button"
+                />
+              </div>
 
-                      <!-- Search Results Dropdown -->
-                      <div v-if="!readOnly && searchResults.length > 0" class="absolute top-4rem left-3rem w-20rem surface-card border-round-lg shadow-5 border-1 surface-border z-5 max-h-12rem overflow-y-auto">
-                        <div v-for="result in searchResults" :key="result.place_id" class="p-2 hover:surface-100 cursor-pointer" @click="selectSearchResult(result)">
-                          <div class="font-medium text-900">{{ result.display_name }}</div>
-                          <div class="text-xs text-600">{{ result.type }}</div>
-                        </div>
-                      </div>
-                    </div>
+              <!-- Location Error -->
+              <Message v-if="locationError" severity="error" :closable="false" class="mb-3">
+                {{ locationError }}
+              </Message>
 
-                    <!-- Location Error -->
-                    <div v-if="locationError" class="text-red-600 text-sm">
-                      {{ locationError }}
-                    </div>
+              <!-- Map Container -->
+              <div class="map-container">
+                <div 
+                  ref="mapRef" 
+                  class="leaflet-map"
+                  style="height: 350px; width: 100%;"
+                />
+              </div>
 
-                    <!-- Location Info -->
-                    <div class="grid">
-                      <div class="col-12 md:col-6">
-                        <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Latitude`) }}</label>
-                        <input v-model="formData.location.lat" type="number" step="0.000001" class="w-full p-inputtext" readonly />
-                      </div>
-                      <div class="col-12 md:col-6">
-                        <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Longitude`) }}</label>
-                        <input v-model="formData.location.lng" type="number" step="0.000001" class="w-full p-inputtext" readonly />
-                      </div>
-                    </div>
-
-                    <!-- Address Fields -->
-                    <div class="grid">
-                      <div class="col-12 md:col-6">
-                        <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Building_Number`) }}</label>
-                        <input v-model="formData.buildingNumber" type="text" :disabled="readOnly" class="w-full p-inputtext" />
-                      </div>
-                      <div class="col-12 md:col-6">
-                        <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Street_Name`) }}</label>
-                        <input v-model="formData.streetName" type="text" :disabled="readOnly" class="w-full p-inputtext" />
-                      </div>
-                      <div class="col-12 md:col-6">
-                        <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.District`) }}</label>
-                        <input v-model="formData.district" type="text" :disabled="readOnly" class="w-full p-inputtext" />
-                      </div>
-                      <div class="col-12 md:col-6">
-                        <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.City`) }}</label>
-                        <input v-model="formData.city" type="text" :disabled="readOnly" class="w-full p-inputtext" />
-                      </div>
-                      <div class="col-12 md:col-6">
-                        <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Postal_Code`) }}</label>
-                        <input v-model="formData.postalCode" type="text" :disabled="readOnly" class="w-full p-inputtext" />
-                      </div>
-                      <div class="col-12 md:col-6">
-                        <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Additional_Number`) }}</label>
-                        <input v-model="formData.additionalNumber" type="text" :disabled="readOnly" class="w-full p-inputtext" />
-                      </div>
-                    </div>
-
-                    <!-- Current Location Button -->
-                    <div v-if="!readOnly" class="flex justify-content-end pb-5">
-                      <button type="button" @click="getCurrentLocation" class="p-button p-button-primary">
-                        <i class="pi pi-map-marker mr-2"></i>
-                        {{ $t(`Customer.Get_Current_Location`) }}
-                      </button>
-                    </div>
-                  </div>
+              <!-- Coordinates Display -->
+              <div class="coordinates">
+                <div class="coordinate-field">
+                  <label>Latitude:</label>
+                  <span>{{ Number(latitude).toFixed(6) }}</span>
+                </div>
+                <div class="coordinate-field">
+                  <label>Longitude:</label>
+                  <span>{{ Number(longitude).toFixed(6) }}</span>
+                </div>
+                <div class="coordinate-field" v-if="mapInitialized">
+                  <label>Status:</label>
+                  <span class="status-active">Map Active</span>
                 </div>
               </div>
             </div>
-          </div>
-        </TabPanel>
 
-        <TabPanel header="Attachment">
-          <div v-if="show" style="height: 500px" class="inset-0 flex pt-5 justify-content-center z-5">
-            <div class="surface-card border-round-xl w-full max-w-7xl max-h-90vh flex flex-column">
-              <!-- Single column layout -->
-              <div class="h-full flex flex-column">
-                <div class="flex-1 overflow-y-auto px-6">
-                  <!-- Documents -->
-                  <div>
-                    <CustomerAttachmentsNew :customer-id="customer?.id || 'new'" :read-only="readOnly" v-model="attachments" />
-                  </div>
+            <!-- Address Fields -->
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="field-label">Building Number</label>
+                <InputText
+                  v-model="buildingNumber"
+                  v-bind="buildingNumberAttrs"
+                  :class="{ 'p-invalid': hasError('buildingNumber') }"
+                  :disabled="readOnly"
+                  placeholder="Building number"
+                />
+                <small v-if="hasError('buildingNumber')" class="error-message">
+                  {{ getErrorMessage('buildingNumber') }}
+                </small>
+              </div>
 
-                  <!-- Notes -->
-                  <div v-show="leftColumnTab === 'notes'" class="flex flex-column gap-4">
-                    <h3 class="text-lg font-medium text-900">{{ $t(`Customer.Additional_Notes`) }}</h3>
-                    <textarea v-model="formData.notes" rows="4" :disabled="readOnly" class="w-full p-inputtextarea" :placeholder="$t(`Customer.Add_any_additional_notes`)"></textarea>
-                  </div>
-                </div>
+              <div class="form-field">
+                <label class="field-label">Street Name</label>
+                <InputText
+                  v-model="streetName"
+                  v-bind="streetNameAttrs"
+                  :disabled="readOnly"
+                  placeholder="Street name"
+                />
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">District</label>
+                <InputText
+                  v-model="district"
+                  v-bind="districtAttrs"
+                  :disabled="readOnly"
+                  placeholder="District"
+                />
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">City</label>
+                <InputText
+                  v-model="city"
+                  v-bind="cityAttrs"
+                  :disabled="readOnly"
+                  placeholder="City"
+                />
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">Postal Code</label>
+                <InputText
+                  v-model="postalCode"
+                  v-bind="postalCodeAttrs"
+                  :class="{ 'p-invalid': hasError('postalCode') }"
+                  :disabled="readOnly"
+                  placeholder="12345"
+                  maxlength="5"
+                />
+                <small v-if="hasError('postalCode')" class="error-message">
+                  {{ getErrorMessage('postalCode') }}
+                </small>
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">Additional Number</label>
+                <InputText
+                  v-model="additionalNumber"
+                  v-bind="additionalNumberAttrs"
+                  :disabled="readOnly"
+                  placeholder="Additional number"
+                />
               </div>
             </div>
           </div>
-        </TabPanel>
+        </div>
 
-        <TabPanel header="Financial info">
-          <div v-if="show" style="height: 500px" class="inset-0 flex pt-5 justify-content-center z-5">
-            <div class="surface-card border-round-xl w-full max-w-7xl max-h-90vh flex flex-column">
-              <!-- Single column layout -->
-              <div class="h-full flex flex-column">
-                <div class="flex-1 overflow-y-auto px-6">
-                  <!-- Credit and Payment Terms -->
-                  <div class="grid">
-                    <div v-if="false" class="col-12 md:col-6">
-                      <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.Credit_Limit`) }} (SAR)</label>
-                      <input v-model="formData.creditLimit" type="number" min="0" step="1000" required :disabled="readOnly" class="w-full p-inputtext" />
-                    </div>
+        <!-- Attachments -->
+        <div v-show="activeTab === 4" class="tab-panel">
+          <div class="form-section">
+            <h3 class="section-title">
+              <i class="pi pi-paperclip"></i>
+              Documents & Attachments
+            </h3>
+            
+            <CustomerAttachmentsNew
+              :customer-id="customer?.id || 'new'"
+              :read-only="readOnly"
+              v-model="attachments"
+            />
 
-                    <div class="col-12 md:col-6" v-if="false">
-                      <label class="block text-sm font-medium text-700 mb-1"> {{ $t(`Customer.Payment_Terms`) }} </label>
-                      <Dropdown v-model="formData.paymentTerm" :options="CustomerLookups.paymentTerms" optionValue="id" optionLabel="description" placeholder="Select a Payment Term" class="w-full">
-                        <template #option="slotProps">
-                          {{ slotProps.option.description }}
-                        </template>
-                      </Dropdown>
-                    </div>
-                  </div>
+            <div class="form-field">
+              <label class="field-label">Additional Notes</label>
+              <Textarea
+                v-model="notes"
+                v-bind="notesAttrs"
+                :disabled="readOnly"
+                rows="4"
+                placeholder="Add any additional notes..."
+              />
+            </div>
+          </div>
+        </div>
 
-                  <!-- Financial Notes -->
-                  <div>
-                    <label class="block text-sm font-medium text-700 mb-1">{{ $t(`Customer.FinancialNotes`) }}</label>
-                    <textarea v-model="formData.financialNotes" rows="3" :disabled="readOnly" class="w-full p-inputtextarea" :placeholder="$t(`Customer.Add_any_financial_notes_or_special_payment_arrangements`)"></textarea>
-                  </div>
-                </div>
+        <!-- Financial Information -->
+        <div v-show="activeTab === 5" class="tab-panel">
+          <div class="form-section">
+            <h3 class="section-title">
+              <i class="pi pi-dollar"></i>
+              Financial Information
+            </h3>
+            
+            <div class="form-grid">
+              <!-- Add financial fields as needed -->
+              <div class="form-field full-width">
+                <label class="field-label">Financial Notes</label>
+                <Textarea
+                  v-model="financialNotes"
+                  v-bind="financialNotesAttrs"
+                  :disabled="readOnly"
+                  rows="3"
+                  placeholder="Add financial notes or special arrangements..."
+                />
               </div>
             </div>
           </div>
-        </TabPanel>
-      </TabView>
+        </div>
+      </div>
 
       <!-- Form Actions -->
-      <div style="width: 94%; bottom: 0; padding: 15px !important; border: 0px" class="bg-white surface-border flex justify-content-end gap-2 fixed">
-        <button type="button" @click="$emit('close')" class="p-button p-button-outlined">
-          {{ readOnly ? `${$t('Customer.Close')}` : `${$t('Customer.Cancel')}` }}
-        </button>
-
-        <button v-if="!readOnly" type="submit" class="p-button p-button-primary">
-          {{ customer ? `${$t('Customer.Update_Customer')}` : `${$t('Customer.Create_Customer')}` }}
-        </button>
+      <div class="form-actions">
+        <Button
+          type="button"
+          label="Cancel"
+          severity="secondary"
+          @click="$emit('close')"
+        />
+        <Button
+          v-if="!readOnly"
+          type="submit"
+          :label="customer ? 'Update Customer' : 'Create Customer'"
+          icon="pi pi-save"
+        />
       </div>
     </form>
   </Dialog>
 </template>
 
 <style scoped>
-/* Map-specific styles */
-.leaflet-container {
-  z-index: 1;
+.customer-dialog {
+  --primary-color: #3b82f6;
+  --border-radius: 8px;
+  --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.leaflet-control-search input {
-  min-width: 0;
-  font-size: 14px;
+.customer-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-height: 80vh;
 }
 
-.leaflet-control-search input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px var(--primary-color-alpha-10);
+/* Tab Navigation */
+.tab-navigation {
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 1.5rem;
 }
 
-.leaflet-control-fullscreen a {
+.tab-buttons {
+  display: flex;
+  overflow-x: auto;
+  gap: 0.5rem;
+  padding-bottom: 1rem;
+}
+
+.tab-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  border-radius: var(--border-radius);
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.tab-button:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.tab-button.active {
+  background: var(--primary-color);
+  color: white;
+  box-shadow: var(--box-shadow);
+}
+
+.tab-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Tab Content */
+.tab-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.tab-panel {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Form Sections */
+.form-section {
+  background: #f9fafb;
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  color: #374151;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+/* Form Grid */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-field.full-width {
+  grid-column: 1 / -1;
+}
+
+.field-label {
+  font-weight: 500;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.field-label.required::after {
+  content: ' *';
+  color: #ef4444;
+}
+
+.error-message {
+  color: #ef4444;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* Map Section */
+.map-section {
+  margin: 1.5rem 0;
+}
+
+.map-controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.location-button {
+  white-space: nowrap;
+}
+
+.map-container {
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--box-shadow);
+  margin-bottom: 1rem;
+  background: #f8f9fa;
+}
+
+.leaflet-map {
+  border-radius: var(--border-radius);
+}
+
+.coordinates {
+  display: flex;
+  gap: 2rem;
+  padding: 1rem;
   background: white;
-  color: var(--text-color-secondary);
+  border-radius: var(--border-radius);
+  border: 1px solid #e5e7eb;
 }
 
-.leaflet-control-fullscreen a:hover {
-  background: var(--surface-100);
+.coordinate-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
-.leaflet-control-layers {
-  border: none !important;
-  box-shadow: var(--card-shadow) !important;
-  border-radius: var(--border-radius) !important;
+.coordinate-field label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 500;
 }
 
-.leaflet-control-layers-toggle {
-  width: 34px !important;
-  height: 34px !important;
+.coordinate-field span {
+  font-family: monospace;
+  color: #374151;
 }
 
-.leaflet-touch .leaflet-control-layers-toggle {
-  width: 34px !important;
-  height: 34px !important;
+.status-active {
+  color: #10b981 !important;
+  font-weight: 600;
 }
-/* 
-:deep(.p-dialog .p-dialog-content) {
-  height: 500px !important;
-} */
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+  margin-top: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tab-buttons {
+    justify-content: flex-start;
+  }
+  
+  .tab-button span {
+    display: none;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .coordinates {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+}
+
+/* PrimeVue Component Overrides */
+:deep(.p-dropdown) {
+  width: 100%;
+}
+
+:deep(.p-inputtext) {
+  width: 100%;
+}
+
+:deep(.p-inputtextarea) {
+  width: 100%;
+  resize: vertical;
+}
+
+:deep(.p-button) {
+  border-radius: var(--border-radius);
+}
+
+:deep(.p-invalid) {
+  border-color: #ef4444;
+}
+
+/* Leaflet Map Overrides */
+:deep(.leaflet-container) {
+  font-family: inherit;
+  border-radius: var(--border-radius);
+}
+
+:deep(.leaflet-popup-content-wrapper) {
+  border-radius: var(--border-radius);
+}
+
+:deep(.leaflet-control-zoom) {
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+:deep(.leaflet-bar) {
+  border-radius: var(--border-radius);
+}
+
+:deep(.leaflet-control-zoom-in),
+:deep(.leaflet-control-zoom-out) {
+  border-radius: 0;
+}
+
+:deep(.leaflet-control-zoom-in:first-child) {
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+:deep(.leaflet-control-zoom-out:last-child) {
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
+}
 </style>

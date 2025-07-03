@@ -483,7 +483,21 @@
     "editCreditLimit": "Edit Credit Limit",
     "editPaymentTerm": "Edit Payment Term",
     "paymentTermPlaceholder": "Payment Term",
-    "paymentTerm": "Payment Term"
+    "paymentTerm": "Payment Term",
+    "CR_Number": "Commercial Registration Number",
+    "VAT_Number": "VAT Number",
+    "Financial_Notes": "Financial Notes",
+    "Name": "Customer Name",
+    "Phone": "Phone Number",
+    "Address": "Address",
+    "Country": "Country",
+    "Created_Date": "Created Date",
+    "Updated_Date": "Updated Date",
+    "Contact_Person": "Contact Person",
+    "Currency": "Currency",
+    "Tax_ID": "Tax ID",
+    "Website": "Website",
+    "Industry": "Industry"
   },
   "organizationConfig": {
     "basePriceCode": "Base Price Code",
