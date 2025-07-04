@@ -64,7 +64,8 @@ export const useCustomerStore = defineStore({
           formData.append(`CustomerAttachments[${index}].attachmentTypeData`, file.file);
         });
         const response = await apiClient.post('/Customers/CreateCustomerBasedOnBranchType', formData);
-        this.customer.push(response.data.data);
+        await this.GetCustomerBasedOnBranchType();
+        // this.customer.push(response.data.data);
       } catch (err) {
         this.error = handleError(err, this.loading);
       }
@@ -75,8 +76,7 @@ export const useCustomerStore = defineStore({
         // debugger;
 
         const formData = new FormData();
-        formData.append('Id', customer.id.toString());
-
+        formData.append('Id', customer.id);
         formData.append('Name', customer.name || '');
         formData.append('PrimaryPhone', customer.mobile || '');
         formData.append('Email', customer.email || '');
@@ -127,15 +127,16 @@ export const useCustomerStore = defineStore({
         // });
 
         const response = await apiClient.put('/Customers/UpdateCustomerBasedOnBranchType', formData);
+        await this.GetCustomerBasedOnBranchType();
 
-        if (!response || !response.data || !response.data.data) {
-          throw new Error('استجابة غير صحيحة من السيرفر');
-        }
+        // if (!response || !response.data || !response.data.data) {
+        //   throw new Error('استجابة غير صحيحة من السيرفر');
+        // }
 
-        const index = this.customers.findIndex((c) => c.id === customer.id);
-        if (index !== -1) {
-          this.customers[index] = response.data.data;
-        }
+        // const index = this.customers.findIndex((c) => c.id === customer.id);
+        // if (index !== -1) {
+        //   this.customers[index] = response.data.data;
+        // }
 
         // this.customers[index] = response.data.data;
       } catch (err) {
