@@ -37,6 +37,9 @@ export const useTerminalStore = defineStore('terminal', () => {
   const canEditPrice = computed(() => terminalInfo.value.canEditPrice || false);
   const selectBatch = computed(() => terminalInfo.value.selectBatch || false);
 
+  // Payment methods getter
+  const paymentMethods = computed(() => terminalInfo.value.paymentMethods || []);
+
   // Helper function to get user timezone
   const getUserTimezone = () => {
     try {
@@ -193,6 +196,7 @@ export const useTerminalStore = defineStore('terminal', () => {
     selectBatch,
     getFormattedSessionDate,
     getSessionDuration,
+    paymentMethods,
 
     // Actions
     fetchTerminalInfo,

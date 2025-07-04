@@ -2,16 +2,19 @@
 import { ref, computed } from 'vue';
 import { useOrderStore } from '@/stores/orderStore.ts';
 import { usePromoStore } from '@/stores/promoStore.ts';
+import { useTerminalStore } from '@/stores/terminalStore.js';
 import { useToast } from 'primevue/usetoast';
-import { CustomerSearchDialog, InvoiceDialog, PaymentDialog } from '../components';
+import { CustomerSearchDialog, InvoiceDialog, PaymentDialog, SaveDraftInvoiceDialog } from '../components';
 import { BaseButton } from '@/components/shared';
 
 const orderStore = useOrderStore();
 const promoStore = usePromoStore();
+const terminalStore = useTerminalStore();
 const toast = useToast();
 const showCustomerSearch = ref(false);
 const showInvoiceDialog = ref(false);
 const showPaymentDialog = ref(false);
+const showDraftDialog = ref(false);
 const showPromoDialog = ref(false);
 const selectedPromoCode = ref('');
 const searchQuery = ref('');
@@ -89,7 +92,28 @@ const handleInvoiceClick = () => {
 };
 
 const handlePaymentClick = () => {
+  // Log payment methods to console
+  const methods = terminalStore.paymentMethods;
+  if (methods && methods.length > 0) {
+    console.log('💳 PAYMENT BUTTON CLICKED - Terminal Methods:', {
+      count: methods.length,
+      methods: methods.map(m => ({
+        id: m.id,
+        name: m.name,
+        arabicName: m.arabicName,
+        englishName: m.englishName
+      })),
+      timestamp: new Date().toISOString()
+    });
+  } else {
+    console.log('💳 PAYMENT BUTTON CLICKED - No payment methods available from terminal');
+  }
+  
   showPaymentDialog.value = true;
+};
+
+const handleDraftClick = () => {
+  showDraftDialog.value = true;
 };
 
 const getDiscountText = (item: any) => {
@@ -187,6 +211,26 @@ const removeAllDiscounts = () => {
     orderStore.setItemDiscount(item.id, undefined);
   });
 };
+
+const showPaymentMethodsTest = () => {
+  // Log payment methods to console for testing
+  const methods = terminalStore.paymentMethods;
+  if (methods && methods.length > 0) {
+    console.log('🧪 TEST PAYMENT METHODS:', {
+      count: methods.length,
+      methods: methods.map(m => ({
+        id: m.id,
+        name: m.name,
+        arabicName: m.arabicName,
+        englishName: m.englishName
+      })),
+      terminalInfo: terminalStore.getTerminalInfo,
+      timestamp: new Date().toISOString()
+    });
+  } else {
+    console.log('🧪 TEST - No payment methods found in terminal data');
+  }
+};
 </script>
 
 <template>
@@ -202,6 +246,9 @@ const removeAllDiscounts = () => {
         </Button>
         <Button text class="p-2 header-btn" @click="showPromoDialog = true">
           <span class="material-icons text-blue-600">local_offer</span>
+        </Button>
+        <Button text class="p-2 header-btn" @click="showPaymentMethodsTest">
+          <span class="material-icons text-blue-600">credit_card</span>
         </Button>
         <Button text class="p-2 header-btn">
           <span class="material-icons text-blue-600">more_vert</span>
@@ -232,6 +279,7 @@ const removeAllDiscounts = () => {
                   </div>
                 </div>
                 <div class="text-md item-subtitle">Selling Price: ${{ formatPrice(item.price) }}</div>
+
               </div>
               <div class="text-right">
                 <div class="font-bold text-lg" style="color: var(--sap-text)">${{ formatPrice(orderStore.calculateItemTotal(item)) }}</div>
@@ -284,7 +332,7 @@ const removeAllDiscounts = () => {
             severity="warning"
             class="w-full"
             label="Save as Draft"
-            @click="orderStore.saveDraft"
+            @click="handleDraftClick"
             :disabled="!orderStore.currentOrder.items.length"
           >
             <span class="material-icons mr-2">draft</span>
@@ -320,6 +368,8 @@ const removeAllDiscounts = () => {
     <CustomerSearchDialog :show="showCustomerSearch" @close="showCustomerSearch = false" />
 
     <InvoiceDialog :show="showInvoiceDialog" @close="showInvoiceDialog = false" />
+
+    <SaveDraftInvoiceDialog :show="showDraftDialog" @close="showDraftDialog = false" />
 
     <PaymentDialog :show="showPaymentDialog" :order="currentOrder" @close="showPaymentDialog = false" />
 

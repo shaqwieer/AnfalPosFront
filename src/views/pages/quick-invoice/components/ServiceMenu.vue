@@ -56,7 +56,7 @@ const showProductInfo = ref(false);
 const selectedProduct = ref<any>(null);
 const selectedBatch = ref<any>(null);
 
-// 💰 Track SAP price loading states for each product
+// �� Track SAP price loading states for each product
 const sapPriceLoading = ref(new Set());
 const sapPricesLoaded = ref(new Set());
 
@@ -510,88 +510,16 @@ const debugProductData = (product: any) => {
         </div>
       </div>
 
-      <div v-if="categoryStore.isItemsLoading" class="skeleton-container" :class="isCardView ? 'grid' : 'flex-column gap-2'">
-          <!-- Card View Skeletons -->
-          <div v-if="isCardView" v-for="n in 6" :key="`card-skeleton-${n}`" :class="'col-12 lg:col-6 xl:col-4'">
-            <div class="skeleton-card">
-              <div class="flex flex-column">
-                <!-- Image skeleton -->
-                <div class="skeleton-image mb-4"></div>
-                
-                <!-- SKU and Unit row -->
-                <div class="flex justify-content-between mb-3">
-                  <div class="flex align-items-center gap-2">
-                    <div class="skeleton-icon"></div>
-                    <div class="skeleton-text skeleton-text-sm"></div>
-                  </div>
-                  <div class="flex align-items-center gap-2">
-                    <div class="skeleton-icon"></div>
-                    <div class="skeleton-text skeleton-text-sm"></div>
-                  </div>
-                </div>
-
-                <!-- Product name -->
-                <div class="flex align-items-center gap-2 mb-3">
-                  <div class="skeleton-icon"></div>
-                  <div class="skeleton-text skeleton-text-lg flex-1"></div>
-                </div>
-
-                <!-- Size and Price row -->
-                <div class="flex justify-content-between">
-                  <div class="flex align-items-center gap-2">
-                    <div class="skeleton-icon"></div>
-                    <div class="skeleton-text skeleton-text-sm"></div>
-                  </div>
-                  <div class="flex align-items-center gap-2">
-                    <div class="skeleton-icon"></div>
-                    <div class="skeleton-text skeleton-text-md"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- List View Skeletons -->
-          <div v-else v-for="n in 8" :key="`list-skeleton-${n}`" class="skeleton-list-item">
-            <div class="flex align-items-center gap-1">
-              <!-- Image skeleton -->
-              <div class="skeleton-list-image mr-4"></div>
-              
-              <!-- Content skeleton -->
-              <div class="flex flex-column list-content py-2">
-                <div class="flex align-items-center gap-1 mb-2">
-                  <div class="skeleton-icon"></div>
-                  <div class="skeleton-text skeleton-text-md"></div>
-                </div>
-                <div class="flex align-items-center gap-1">
-                  <div class="skeleton-icon"></div>
-                  <div class="skeleton-text skeleton-text-lg"></div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="flex justify-content-between align-items-center gap-3">
-              <!-- Unit and Size -->
-              <div class="flex align-items-center gap-2">
-                <div class="skeleton-icon"></div>
-                <div class="skeleton-text skeleton-text-sm"></div>
-              </div>
-              <div class="flex align-items-center gap-2">
-                <div class="skeleton-icon"></div>
-                <div class="skeleton-text skeleton-text-sm"></div>
-              </div>
-
-              <!-- Info Button, Batch Tag, Price -->
-              <div class="skeleton-button"></div>
-              <div class="skeleton-tag"></div>
-              <div class="flex align-items-center gap-1">
-                <div class="skeleton-icon"></div>
-                <div class="skeleton-text skeleton-text-md"></div>
-              </div>
-            </div>
+      <!-- Products/Services View -->
+      <div class="p-3 pb-8 overflow-y-auto products-container" :class="isCardView ? 'grid' : 'flex-column gap-2'">
+        <!-- Loading indicator -->
+        <div v-if="categoryStore.isItemsLoading" class="flex align-items-center justify-content-center p-8">
+          <div class="flex flex-column align-items-center gap-3">
+            <i class="pi pi-spin pi-spinner" style="font-size: 2rem; color: var(--sap-primary)"></i>
+            <p class="text-lg" style="color: var(--sap-text-secondary)">Loading products...</p>
           </div>
         </div>
-        
+
         <!-- No items message -->
         <div v-else-if="!categoryStore.isItemsLoading && filteredServices.length === 0" class="flex align-items-center justify-content-center p-8">
           <div class="flex flex-column align-items-center gap-3">
@@ -601,8 +529,7 @@ const debugProductData = (product: any) => {
         </div>
 
         <!-- Products list -->
-        <div v-else :class="isCardView ? 'grid' : 'flex-column gap-2'">
-          <div v-for="service in filteredServices" :key="service.id" :class="isCardView ? 'col-12 lg:col-6 xl:col-4' : 'flex-1'">
+        <div v-else v-for="service in filteredServices" :key="service.id" :class="isCardView ? 'col-12 lg:col-6 xl:col-4' : 'flex-1'">
           <!-- Card View -->
           <div v-if="isCardView" class="service-card cursor-pointer" @click="handleProductClick(service)">
             <div class="flex flex-column">
@@ -717,7 +644,6 @@ const debugProductData = (product: any) => {
               </div>
             </div>
           </div>
-        </div>
         </div>
       </div>
     </div>
@@ -969,6 +895,7 @@ const debugProductData = (product: any) => {
         </div>
       </div>
     </div>
+  </div>
 </template>
 
 <style scoped>
@@ -1024,106 +951,6 @@ const debugProductData = (product: any) => {
 /* Products Container */
 .products-container {
   height: calc(100% - 140px);
-}
-/* Skeleton Loading Styles */
-.skeleton-container {
-  padding: 0.75rem;
-  padding-bottom: 2rem;
-  overflow-y: auto;
-  height: calc(100% - 140px);
-}
-
-/* Base skeleton animation */
-@keyframes skeleton-loading {
-  0% {
-    background-position: -200px 0;
-  }
-  100% {
-    background-position: calc(200px + 100%) 0;
-  }
-}
-
-.skeleton-image,
-.skeleton-icon,
-.skeleton-text,
-.skeleton-list-image,
-.skeleton-button,
-.skeleton-tag {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200px 100%;
-  animation: skeleton-loading 1.5s infinite;
-  border-radius: 4px;
-}
-
-/* Card skeleton styles */
-.skeleton-card {
-  padding: 1.5rem;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 1rem;
-  margin-bottom: 1rem;
-}
-
-.skeleton-image {
-  height: 8rem;
-  width: 100%;
-  border-radius: 0.75rem;
-}
-
-.skeleton-icon {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-}
-
-.skeleton-text {
-  height: 1rem;
-  border-radius: 4px;
-}
-
-.skeleton-text-sm {
-  width: 60px;
-  height: 0.875rem;
-}
-
-.skeleton-text-md {
-  width: 80px;
-  height: 1rem;
-}
-
-.skeleton-text-lg {
-  width: 140px;
-  height: 1.125rem;
-}
-
-/* List skeleton styles */
-.skeleton-list-item {
-  background: white;
-  padding: 0.5rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  margin-bottom: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.skeleton-list-image {
-  width: 3rem;
-  height: 3rem;
-  border-radius: 0.5rem;
-}
-
-.skeleton-button {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-}
-
-.skeleton-tag {
-  width: 80px;
-  height: 24px;
-  border-radius: 12px;
 }
 
 .card-grid {
@@ -1222,7 +1049,7 @@ const debugProductData = (product: any) => {
   width: 3rem;
   height: 3rem;
   border-radius: 0.5rem;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .list-content {

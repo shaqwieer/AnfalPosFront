@@ -253,7 +253,6 @@ export const useOrderStore = defineStore('order', () => {
       customerType: customer.type,
       customerMobile: customer.mobile,
       customerVehicles: customer.vehicles,
-      selectedVehicle: customer.selectedVehicle,
       businessDetails: customer.businessDetails,
       previousCustomer: currentOrder.value.customer,
       orderItemsCount: currentOrder.value.items.length
@@ -298,6 +297,61 @@ export const useOrderStore = defineStore('order', () => {
     }
   }
 
+  function loadInvoiceData(invoiceData: any) {
+    console.log('🔄 ORDER STORE - Loading invoice data:', invoiceData);
+    
+    // Clear current order
+    currentOrder.value = {
+      id: crypto.randomUUID(),
+      customer: null,
+      items: [],
+      status: 'draft',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      total: 0,
+      tax: 0,
+      subtotal: 0
+    };
+
+    // Set customer
+    if (invoiceData.customer) {
+      console.log('👤 ORDER STORE - Setting customer:', invoiceData.customer);
+      setCustomer(invoiceData.customer);
+    }
+
+    // Add items
+    console.log('📦 ORDER STORE - Adding items:', invoiceData.items);
+    invoiceData.items.forEach((item: any) => {
+      console.log('➕ ORDER STORE - Adding item:', item);
+      // Extract the service data and pass it directly to addItem
+      const productData = {
+        sku: item.service.sku,
+        name: item.service.name,
+        unit: item.service.unit,
+        size: item.service.size,
+        price: item.service.price,
+        image: item.service.image,
+        category: item.service.category,
+        description: item.service.description,
+        features: item.service.features,
+        specifications: item.service.specifications,
+        quantity: item.quantity,
+        basePrice: item.basePrice
+      };
+      addItem(productData);
+    });
+
+    // Set totals (override calculated totals)
+    if (invoiceData.totals) {
+      console.log('💰 ORDER STORE - Setting totals:', invoiceData.totals);
+      currentOrder.value.subtotal = invoiceData.totals.subtotal;
+      currentOrder.value.tax = invoiceData.totals.tax;
+      currentOrder.value.total = invoiceData.totals.total;
+    }
+    
+    console.log('✅ ORDER STORE - Final order state:', currentOrder.value);
+  }
+
   return {
     currentOrder,
     orders,
@@ -310,6 +364,7 @@ export const useOrderStore = defineStore('order', () => {
     setItemDiscount,
     setCustomer,
     finalizeOrder,
-    calculateItemTotal
+    calculateItemTotal,
+    loadInvoiceData
   }
 })

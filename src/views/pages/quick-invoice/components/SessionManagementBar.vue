@@ -33,14 +33,16 @@
         <!-- Right Side: Action Buttons -->
         <div class="flex align-items-center gap-2">
           <!-- Draft Invoices -->
-          <Button outlined severity="info" class="session-action-btn w-10rem  border-1 border-300" @click="showDraftInvoices = true" v-tooltip.bottom="'Draft Invoices'">
+          <Button outlined severity="info" class="session-action-btn w-10rem  border-1 border-300" @click="openDraftInvoicesDialog" v-tooltip.bottom="'Draft Invoices'">
             <div class="flex align-items-center text-center gap-1">
               <!-- <span class="material-icons text-blue-600 text-sm">draft</span> -->
               <span class="w-full ">Draft Invoices</span>
               <span v-if="draftInvoices.length > 0" class="draft-count">{{ draftInvoices.length }}</span>
             </div>
           </Button>
-
+          <Button outlined severity="info" class="session-action-btn w-12.5rem  border-1 border-300 text-center" @click="openNotSyncedInvoicesDialog" v-tooltip.bottom="'Not Synced Invoices'">
+            <span class="whitespace-nowrap">Not Synced Invoices</span>
+          </Button>
           <!-- Session Actions -->
           <Button v-if="!isSessionOpen" severity="success" @click="showOpenSessionDialog = true" class="session-btn w-12rem ">
             <div class="flex align-items-center gap-2">
@@ -85,6 +87,8 @@
           </div>
         </div>
       </div>
+
+      
     </div>
 
     <!-- Close Session Dialog -->
@@ -203,36 +207,108 @@
         </div>
 
         <div class="p-4">
-          <div v-if="draftInvoices.length === 0" class="text-center py-8">
+          <div v-if="loadingDraftInvoices" class="text-center py-8">
+            <span class="material-icons text-4xl text-gray-400 mb-2 animate-spin">sync</span>
+            <p class="text-gray-500">Loading draft invoices...</p>
+          </div>
+
+          <div v-else-if="draftInvoices.length === 0" class="text-center py-8">
             <span class="material-icons text-4xl text-gray-400 mb-2">draft</span>
             <p class="text-gray-500">No draft invoices found</p>
           </div>
 
           <div v-else class="draft-list">
-            <div v-for="draft in draftInvoices" :key="draft.id" class="draft-item p-4 border-1 border-gray-200 border-round cursor-pointer" @click="loadDraftInvoice(draft)">
+            <div v-for="invoice in draftInvoices" :key="invoice.id" class="draft-item p-4 border-1 border-gray-200 border-round cursor-pointer" @click="loadDraftInvoice(invoice)">
               <div class="flex align-items-start justify-content-between">
                 <div class="flex-1">
                   <div class="flex align-items-center gap-2 mb-2">
-                    <span class="font-medium text-blue-600">{{ draft.id }}</span>
-                    <span class="text-sm text-gray-500">{{ formatTime(draft.createdAt) }}</span>
+                    <span class="font-medium text-blue-600">{{ invoice.uniqueIdentifier }}</span>
+                    <span class="text-sm text-gray-500">{{ formatTime(new Date(invoice.createdAt)) }}</span>
                   </div>
 
                   <div class="flex align-items-center gap-4 mb-2">
                     <div class="flex align-items-center gap-1">
                       <span class="material-icons text-sm text-gray-400">person</span>
-                      <span class="text-sm">{{ draft.customer }}</span>
+                      <span class="text-sm">{{ invoice.customerName }}</span>
+                    </div>
+                    <div class="flex align-items-center gap-1">
+                      <span class="material-icons text-sm text-gray-400">phone</span>
+                      <span class="text-sm">{{ invoice.customerPhoneNumber }}</span>
                     </div>
                     <div class="flex align-items-center gap-1">
                       <span class="material-icons text-sm text-gray-400">shopping_cart</span>
-                      <span class="text-sm">{{ draft.items }} items</span>
+                      <span class="text-sm">{{ invoice.items?.length || 0 }} items</span>
                     </div>
                   </div>
 
-                  <div class="font-bold text-lg" style="color: var(--sap-primary)">${{ formatPrice(draft.total) }}</div>
+                  <div class="font-bold text-lg" style="color: var(--sap-primary)">${{ formatPrice(invoice.finalAmount) }}</div>
                 </div>
 
-                <Button text severity="danger" class="p-2 delete-draft-btn" @click="deleteDraftInvoice(draft.id, $event)" v-tooltip.left="'Delete Draft'">
-                  <span class="material-icons text-red-500">delete</span>
+                <div class="flex flex-column gap-2">
+                  <Button text severity="success" class="p-2 publish-btn" @click="publishDraftInvoice(invoice.id, $event)" v-tooltip.left="'Publish Invoice'">
+                    <span class="material-icons text-green-500">publish</span>
+                  </Button>
+                  <Button text severity="info" class="p-2 edit-btn" @click="editDraftInvoice(invoice, $event)" v-tooltip.left="'Edit Draft'">
+                    <span class="material-icons text-blue-500">edit</span>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Not Synced Invoices Dialog -->
+    <div v-if="showNotSyncedInvoices" class="fixed dialog-overlay">
+      <div class="bg-white draft-dialog">
+        <div class="p-4 border-bottom flex align-items-center justify-content-between">
+          <h3 class="text-lg font-semibold">Not Synced Invoices</h3>
+          <Button text @click="showNotSyncedInvoices = false" class="p-2 dialog-close-btn">
+            <span class="material-icons">close</span>
+          </Button>
+        </div>
+
+        <div class="p-4">
+          <div v-if="loadingNotSyncedInvoices" class="text-center py-8">
+            <span class="material-icons text-4xl text-gray-400 mb-2 animate-spin">sync</span>
+            <p class="text-gray-500">Loading not synced invoices...</p>
+          </div>
+
+          <div v-else-if="notSyncedInvoices.length === 0" class="text-center py-8">
+            <span class="material-icons text-4xl text-gray-400 mb-2">cloud_off</span>
+            <p class="text-gray-500">No unsynced invoices found</p>
+          </div>
+
+          <div v-else class="draft-list">
+            <div v-for="invoice in notSyncedInvoices" :key="invoice.id" class="draft-item p-4 border-1 border-gray-200 border-round cursor-pointer" @click="loadNotSyncedInvoice(invoice)">
+              <div class="flex align-items-start justify-content-between">
+                <div class="flex-1">
+                  <div class="flex align-items-center gap-2 mb-2">
+                    <span class="font-medium text-orange-600">{{ invoice.uniqueIdentifier }}</span>
+                    <span class="text-sm text-gray-500">{{ formatTime(new Date(invoice.createdAt)) }}</span>
+                  </div>
+
+                  <div class="flex align-items-center gap-4 mb-2">
+                    <div class="flex align-items-center gap-1">
+                      <span class="material-icons text-sm text-gray-400">person</span>
+                      <span class="text-sm">{{ invoice.customerName }}</span>
+                    </div>
+                    <div class="flex align-items-center gap-1">
+                      <span class="material-icons text-sm text-gray-400">phone</span>
+                      <span class="text-sm">{{ invoice.customerPhoneNumber }}</span>
+                    </div>
+                    <div class="flex align-items-center gap-1">
+                      <span class="material-icons text-sm text-gray-400">shopping_cart</span>
+                      <span class="text-sm">{{ invoice.items?.length || 0 }} items</span>
+                    </div>
+                  </div>
+
+                  <div class="font-bold text-lg" style="color: var(--sap-primary)">${{ formatPrice(invoice.finalAmount) }}</div>
+                </div>
+
+                <Button text severity="warning" class="p-2 sync-btn" @click="syncInvoice(invoice.id, $event)" v-tooltip.left="'Sync Invoice'">
+                  <span class="material-icons text-orange-500">sync</span>
                 </Button>
               </div>
             </div>
@@ -247,10 +323,14 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { BaseButton } from '@/components/shared';
 import { useTerminalStore } from '@/stores/terminalStore.js';
+import { useOrderStore } from '../../../../stores/orderStore';
 import { useToast } from 'primevue/usetoast';
+import { invoiceService } from '../../../../api/invoiceService.js';
+import { transformInvoiceToOrder } from '../../../../utilities/invoiceTransformer';
 
 // Terminal store
 const terminalStore = useTerminalStore();
+const orderStore = useOrderStore();
 const toast = useToast();
 
 // Session management
@@ -260,7 +340,7 @@ const showOpenSessionDialog = ref(false);
 const showCloseSessionDialog = ref(false);
 const sessionNotes = ref('');
 const depositNo = ref('');
-const attachmentFile = ref(null);
+const attachmentFile = ref<File | null>(null);
 
 // Session details for closing
 const expectedCashEndAmount = ref(0);
@@ -284,29 +364,13 @@ let timerInterval: NodeJS.Timeout | null = null;
 
 // Draft invoices
 const showDraftInvoices = ref(false);
-const draftInvoices = ref([
-  {
-    id: 'DRAFT-001',
-    customer: 'John Doe',
-    items: 3,
-    total: 125.5,
-    createdAt: new Date('2025-05-24T10:30:00')
-  },
-  {
-    id: 'DRAFT-002',
-    customer: 'Select Customer',
-    items: 1,
-    total: 45.0,
-    createdAt: new Date('2025-05-24T11:15:00')
-  },
-  {
-    id: 'DRAFT-003',
-    customer: 'Sarah Smith',
-    items: 5,
-    total: 280.75,
-    createdAt: new Date('2025-05-24T12:00:00')
-  }
-]);
+const draftInvoices = ref<any[]>([]);
+const loadingDraftInvoices = ref(false);
+
+// Not synced invoices
+const showNotSyncedInvoices = ref(false);
+const notSyncedInvoices = ref<any[]>([]);
+const loadingNotSyncedInvoices = ref(false);
 
 const sessionDuration = computed(() => {
   if (!sessionStartTime.value) return '00:00:00';
@@ -324,7 +388,11 @@ const sessionDuration = computed(() => {
 onMounted(async () => {
   startTimer();
   // Initialize terminal information
-  await terminalStore.initializeTerminal();
+  // await terminalStore.initializeTerminal();
+  
+  // Debug order store
+  console.log('Order store initialized:', orderStore);
+  console.log('Order store methods:', Object.keys(orderStore));
 });
 
 // Clean up timer when component unmounts
@@ -491,22 +559,248 @@ const resetCloseSessionForm = () => {
   sessionId.value = null;
 };
 
-const loadDraftInvoice = (draft: any) => {
-  // Here you would load the draft into your order store
-  console.log('Loading draft:', draft.id);
-  showDraftInvoices.value = false;
-
-  // Emit event to parent or use store to load draft
-  // orderStore.loadDraft(draft);
+const openDraftInvoicesDialog = async () => {
+  showDraftInvoices.value = true;
+  await fetchDraftInvoices();
 };
 
-const deleteDraftInvoice = (draftId: string, event: Event) => {
+const fetchDraftInvoices = async () => {
+  try {
+    loadingDraftInvoices.value = true;
+    const response = await invoiceService.getDraftInvoices();
+    
+    if (response.success && response.data) {
+      draftInvoices.value = response.data;
+    } else {
+      draftInvoices.value = [];
+      toast.add({
+        severity: 'warn',
+        summary: 'No Data',
+        detail: response.message || 'No draft invoices found',
+        life: 3000
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching draft invoices:', error);
+    draftInvoices.value = [];
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to fetch draft invoices',
+      life: 5000
+    });
+  } finally {
+    loadingDraftInvoices.value = false;
+  }
+};
+
+const loadDraftInvoice = async (invoice: any) => {
+  try {
+    console.log('Loading draft invoice:', invoice.id);
+    
+    // Transform API data to order format
+    const orderData = transformInvoiceToOrder(invoice);
+    
+    // Load data into order store
+    if (typeof orderStore.loadInvoiceData === 'function') {
+      orderStore.loadInvoiceData(orderData);
+    } else {
+      throw new Error('loadInvoiceData function not found in order store');
+    }
+    
+    // Close dialog
+    showDraftInvoices.value = false;
+    
+    // Show success message
+    toast.add({
+      severity: 'success',
+      summary: 'Draft Loaded',
+      detail: `Draft invoice ${invoice.uniqueIdentifier} loaded successfully`,
+      life: 3000
+    });
+  } catch (error) {
+    console.error('Error loading draft invoice:', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to load draft invoice data',
+      life: 5000
+    });
+  }
+};
+
+const editDraftInvoice = async (invoice: any, event: Event) => {
+  event.stopPropagation();
+  
+  try {
+    console.log('Editing draft invoice:', invoice.id);
+    
+    // Transform API data to order format
+    const orderData = transformInvoiceToOrder(invoice);
+    
+    // Load data into order store
+    if (typeof orderStore.loadInvoiceData === 'function') {
+      orderStore.loadInvoiceData(orderData);
+    } else {
+      throw new Error('loadInvoiceData function not found in order store');
+    }
+    
+    // Close dialog
+    showDraftInvoices.value = false;
+    
+    // Show success message
+    toast.add({
+      severity: 'success',
+      summary: 'Draft Loaded for Editing',
+      detail: `Draft invoice ${invoice.uniqueIdentifier} loaded for editing`,
+      life: 3000
+    });
+  } catch (error) {
+    console.error('Error loading draft invoice for editing:', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to load draft invoice for editing',
+      life: 5000
+    });
+  }
+};
+
+const publishDraftInvoice = async (invoiceId: string, event: Event) => {
   event.stopPropagation();
 
-  if (confirm('Are you sure you want to delete this draft invoice?')) {
-    const index = draftInvoices.value.findIndex((d) => d.id === draftId);
-    if (index > -1) {
-      draftInvoices.value.splice(index, 1);
+  if (confirm('Are you sure you want to publish this draft invoice? This action cannot be undone.')) {
+    try {
+      console.log('Publishing draft invoice:', invoiceId);
+      await invoiceService.publishDraftInvoice(invoiceId);
+      
+      // Remove from draft list after successful publish
+      const index = draftInvoices.value.findIndex((i) => i.id === invoiceId);
+      if (index > -1) {
+        draftInvoices.value.splice(index, 1);
+      }
+
+      toast.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Draft invoice published successfully',
+        life: 3000
+      });
+    } catch (error) {
+      console.error('Error publishing draft invoice:', error);
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to publish draft invoice',
+        life: 5000
+      });
+    }
+  }
+};
+
+const openNotSyncedInvoicesDialog = async () => {
+  showNotSyncedInvoices.value = true;
+  await fetchNotSyncedInvoices();
+};
+
+const fetchNotSyncedInvoices = async () => {
+  try {
+    loadingNotSyncedInvoices.value = true;
+    const response = await invoiceService.getNotSyncedInvoices();
+    
+    if (response.success && response.data) {
+      notSyncedInvoices.value = response.data;
+    } else {
+      notSyncedInvoices.value = [];
+      toast.add({
+        severity: 'warn',
+        summary: 'No Data',
+        detail: response.message || 'No not synced invoices found',
+        life: 3000
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching not synced invoices:', error);
+    notSyncedInvoices.value = [];
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to fetch not synced invoices',
+      life: 5000
+    });
+  } finally {
+    loadingNotSyncedInvoices.value = false;
+  }
+};
+
+const loadNotSyncedInvoice = async (invoice: any) => {
+  try {
+    console.log('Loading not synced invoice:', invoice.id);
+    console.log('Order store:', orderStore);
+    console.log('Order store methods:', Object.keys(orderStore));
+    
+    // Transform API data to order format
+    const orderData = transformInvoiceToOrder(invoice);
+    console.log('Transformed order data:', orderData);
+    console.log('Items in transformed data:', orderData.items);
+    console.log('First item name:', orderData.items[0]?.service?.name);
+    
+    // Load data into order store
+    if (typeof orderStore.loadInvoiceData === 'function') {
+      orderStore.loadInvoiceData(orderData);
+    } else {
+      throw new Error('loadInvoiceData function not found in order store');
+    }
+    
+    // Close dialog
+    showNotSyncedInvoices.value = false;
+    
+    // Show success message
+    toast.add({
+      severity: 'success',
+      summary: 'Invoice Loaded',
+      detail: `Invoice ${invoice.uniqueIdentifier} loaded successfully`,
+      life: 3000
+    });
+  } catch (error) {
+    console.error('Error loading invoice:', error);
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to load invoice data',
+      life: 5000
+    });
+  }
+};
+
+const syncInvoice = async (invoiceId: string, event: Event) => {
+  event.stopPropagation();
+
+  if (confirm('Are you sure you want to sync this invoice?')) {
+    try {
+      console.log('Syncing invoice:', invoiceId);
+      await invoiceService.syncInvoice(invoiceId);
+      
+      // Remove from not synced list after successful sync
+      const index = notSyncedInvoices.value.findIndex((i) => i.id === invoiceId);
+      if (index > -1) {
+        notSyncedInvoices.value.splice(index, 1);
+      }
+
+      toast.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Invoice synced successfully',
+        life: 3000
+      });
+    } catch (error) {
+      console.error('Error syncing invoice:', error);
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to sync invoice',
+        life: 5000
+      });
     }
   }
 };
@@ -688,5 +982,45 @@ const cancelCloseSession = () => {
 
 .delete-draft-btn:hover {
   background-color: #fef2f2;
+}
+
+.publish-btn {
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.publish-btn:hover {
+  background-color: #f0fdf4;
+}
+
+.edit-btn {
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.edit-btn:hover {
+  background-color: #eff6ff;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.sync-btn {
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.sync-btn:hover {
+  background-color: #fff7ed;
 }
 </style>

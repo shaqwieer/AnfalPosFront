@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useOrderStore } from '@/stores/orderStore.ts';
+import { useTerminalStore } from '@/stores/terminalStore.js';
 import { useToast } from 'primevue/usetoast';
 
 const props = defineProps<{
@@ -11,6 +12,7 @@ const props = defineProps<{
 const emit = defineEmits(['close']);
 
 const orderStore = useOrderStore();
+const terminalStore = useTerminalStore();
 const toast = useToast();
 const selectedMethods = ref<{
   method: string;
@@ -26,12 +28,56 @@ const isRequestingApproval = ref(false);
 const editingMobileNo = ref(false);
 const tempMobileNo = ref('');
 
-const paymentMethods = [
-  { id: 'cash', name: 'Cash', icon: 'payments' },
-  { id: 'visa', name: 'VISA', icon: 'credit_card' },
-  { id: 'mastercard', name: 'Mastercard', icon: 'credit_card' },
-  { id: 'tamara', name: 'Tamara', icon: 'calendar_month', installments: true }
-];
+// Use terminal payment methods instead of hardcoded ones
+const paymentMethods = computed(() => {
+  const terminalMethods = terminalStore.paymentMethods;
+  if (terminalMethods && terminalMethods.length > 0) {
+    return terminalMethods.map(method => ({
+      id: method.id.toString(),
+      name: method.name,
+      arabicName: method.arabicName,
+      englishName: method.englishName,
+      icon: getPaymentMethodIcon(method.name)
+    }));
+  }
+  // Fallback to default methods if terminal methods are not available
+  return [
+    { id: 'cash', name: 'Cash', icon: 'payments' },
+    { id: 'visa', name: 'VISA', icon: 'credit_card' },
+    { id: 'mastercard', name: 'Mastercard', icon: 'credit_card' },
+    { id: 'tamara', name: 'Tamara', icon: 'calendar_month', installments: true }
+  ];
+});
+
+// Helper function to get icon based on payment method name
+const getPaymentMethodIcon = (methodName: string) => {
+  const name = methodName.toLowerCase();
+  if (name.includes('cash')) return 'payments';
+  if (name.includes('card') || name.includes('visa') || name.includes('mastercard')) return 'credit_card';
+  if (name.includes('bank')) return 'account_balance';
+  if (name.includes('tamara')) return 'calendar_month';
+  return 'payment'; // default icon
+};
+
+// Show alert with payment methods when dialog opens
+const showPaymentMethodsAlert = () => {
+  const methods = terminalStore.paymentMethods;
+  if (methods && methods.length > 0) {
+    // Log to console for debugging
+    console.log('💰 TERMINAL PAYMENT METHODS:', {
+      count: methods.length,
+      methods: methods.map(m => ({
+        id: m.id,
+        name: m.name,
+        arabicName: m.arabicName,
+        englishName: m.englishName
+      })),
+      timestamp: new Date().toISOString()
+    });
+  } else {
+    console.log('💰 No payment methods available from terminal');
+  }
+};
 
 const totalAmount = computed(() => {
   return props.order?.total || Number(orderStore.total) || 0;
@@ -44,6 +90,16 @@ watch(
     remainingAmount.value = newTotal;
   },
   { immediate: true }
+);
+
+// Watch for dialog opening to show payment methods alert
+watch(
+  () => props.show,
+  (isVisible) => {
+    if (isVisible) {
+      showPaymentMethodsAlert();
+    }
+  }
 );
 
 const addPaymentMethod = (method: string) => {
